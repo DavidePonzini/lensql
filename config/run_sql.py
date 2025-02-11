@@ -1,7 +1,5 @@
 from IPython.core.interactiveshell import InteractiveShell, ExecutionResult, ExecutionInfo
 import psycopg2
-from IPython.core.compilerop import CachingCompiler
-from IPython.utils.capture import capture_output
 
 # Database connection parameters
 DB_PARAMS = {
