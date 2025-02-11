@@ -19,11 +19,12 @@ venv:
 
 ########## Makefile end ##########
 
-JUPYTER_CONFIG_DIR=notebook/.config
+JUPYTER_CONFIG_DIR=notebook/config
 
 $(JUPYTER_CONFIG_DIR):
 	export JUPYTER_CONFIG_DIR=$(JUPYTER_CONFIG_DIR) && $(VENV_BIN)/jupyter notebook --generate-config
 
 start:
-	export JUPYTER_CONFIG_DIR=$(JUPYTER_CONFIG_DIR) && $(VENV_BIN)/jupyter notebook
+	sudo service postgresql start
+	$(VENV_BIN)/jupyter notebook --config=$(JUPYTER_CONFIG_DIR)/jupyter_notebook_config.py
 
