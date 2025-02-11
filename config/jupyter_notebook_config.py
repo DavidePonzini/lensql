@@ -1115,3 +1115,7 @@ c.ServerApp.root_dir = 'notebook'
 #          Should be in the form of an HTTP origin: ws[s]://hostname[:port]
 #  Default: ''
 # c.ServerApp.websocket_url = ''
+
+
+
+c.InteractiveShellApp.exec_files = ['/home/dav/Desktop/sql-collection/config/run_sql.py']
