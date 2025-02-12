@@ -1,3 +1,4 @@
 jupyter
 psycopg2
-pandasql
+dav_tools
+pandas

@@ -11,9 +11,12 @@ else
 endif
 
 
-venv:
+$(VENV):
 	python -m venv --clear $(VENV)
 	touch -a $(REQUIREMENTS)
+	$(VENV_BIN)/python -m pip install -r $(REQUIREMENTS)
+
+$(VENV)_upgrade: $(VENV)
 	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS)
 
 
