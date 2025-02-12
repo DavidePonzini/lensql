@@ -6,13 +6,15 @@ import psycopg2
 import utils
 import pandas as pd
 
-DB_PARAMS = None
-
+DB_NAME = None
+DB_USERNAME = None
+DB_PASSWORD = None
+DB_ADDRESS = None
 
 def auto_execute_sql(shell, raw_cell, store_history=True, silent=False, shell_futures=True, cell_id=None):
     '''Automatically executes SQL queries when detected in a Jupyter Notebook cell.'''
 
-    if DB_PARAMS is None:
+    if DB_ADDRESS is None or DB_USERNAME is None or DB_PASSWORD is None or DB_NAME is None:
         messages.error('Module not configured, please run the setup function first')
         return
 
@@ -25,7 +27,7 @@ def auto_execute_sql(shell, raw_cell, store_history=True, silent=False, shell_fu
 
     # We have a SQL query, let's execute it
     try:
-        conn = psycopg2.connect(**DB_PARAMS)
+        conn = psycopg2.connect(user=DB_USERNAME, password=DB_PASSWORD, host=DB_ADDRESS, dbname=DB_NAME)
         cur = conn.cursor()
         cur.execute(raw_cell)
         conn.commit()

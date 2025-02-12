@@ -8,16 +8,14 @@ import sql
 
 
 def setup(username, password, host, database):
-    sql.DB_PARAMS = {
-        "user": username,
-        "password": password,
-        "host": host,
-        "dbname": database,
-    }
+    sql.DB_USERNAME = username
+    sql.DB_PASSWORD = password
+    sql.DB_ADDRESS = host
+    sql.DB_NAME = database
 
     # Test connection
     try:
-        conn = psycopg2.connect(**sql.DB_PARAMS)
+        conn = psycopg2.connect(user=sql.DB_USERNAME, password=sql.DB_PASSWORD, host=sql.DB_ADDRESS, dbname=sql.DB_NAME)
         conn.close()
 
         messages.success('Database connection successful', file=sys.stdout)
