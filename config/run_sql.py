@@ -1,5 +1,4 @@
-import sys
-from IPython.core.interactiveshell import InteractiveShell
+from IPython.core.interactiveshell import ExecutionResult
 from dav_tools import messages
 import psycopg2
 
@@ -11,21 +10,20 @@ DB_USERNAME = None
 DB_PASSWORD = None
 DB_ADDRESS = None
 
-def auto_execute_sql(shell, raw_cell, store_history=True, silent=False, shell_futures=True, cell_id=None):
+SQL_COMMANDS = ('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'SET')
+
+
+def run_cell(shell, raw_cell, store_history=True, silent=False, shell_futures=True, cell_id=None) -> ExecutionResult:
     '''Automatically executes SQL queries when detected in a Jupyter Notebook cell.'''
 
     if DB_ADDRESS is None or DB_USERNAME is None or DB_PASSWORD is None or DB_NAME is None:
         messages.error('Module not configured, please run the setup function first')
         return
+    
+    if not raw_cell.strip().upper().startswith(SQL_COMMANDS):
+        return shell.run_cell_original(raw_cell, store_history, silent, shell_futures, cell_id)
 
-
-    # If it's not a SQL query, run it as normal code
-    stripped_code = raw_cell.strip().lower()
-    sql_keywords = ('select', 'insert', 'update', 'delete', 'create', 'drop', 'alter', 'set', 'truncate', 'grant', 'revoke')
-    if not stripped_code.startswith(sql_keywords):
-        return InteractiveShell.original_run_cell(shell, raw_cell, store_history, silent, shell_futures, cell_id)
-
-    # We have a SQL query, let's execute it
+    # execute SQL query
     try:
         conn = psycopg2.connect(user=DB_USERNAME, password=DB_PASSWORD, host=DB_ADDRESS, dbname=DB_NAME)
         cur = conn.cursor()
@@ -35,13 +33,12 @@ def auto_execute_sql(shell, raw_cell, store_history=True, silent=False, shell_fu
         if cur.description:  # Check if the query has a result set
             rows = cur.fetchall()
             columns = [desc[0] for desc in cur.description]
-            df = pd.DataFrame(rows, columns=columns)
-            result = df
+            result = pd.DataFrame(rows, columns=columns)
         else:
             print(f'Affected rows: {cur.rowcount}')
             result = None
 
-        return utils.return_result(shell, result, raw_cell, store_history, silent, shell_futures, cell_id)
+        return utils.return_result(shell, result, raw_cell, store_history, False, shell_futures, cell_id)
     except Exception as e:
         utils.raise_exception(shell, e)
         return

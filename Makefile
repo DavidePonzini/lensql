@@ -24,9 +24,10 @@ $(VENV)_upgrade: $(VENV)
 
 JUPYTER_CONFIG_DIR=config
 
-$(JUPYTER_CONFIG_DIR):
-	export JUPYTER_CONFIG_DIR=$(JUPYTER_CONFIG_DIR) && $(VENV_BIN)/jupyter notebook --generate-config
-
 start:
 	sudo service postgresql start
-	$(VENV_BIN)/jupyter notebook --config=$(JUPYTER_CONFIG_DIR)/jupyter_notebook_config.py
+	export JUPYTER_CONFIG_DIR=$(JUPYTER_CONFIG_DIR) && $(VENV_BIN)/jupyter-lab
+
+$(JUPYTER_CONFIG_DIR):
+	export JUPYTER_CONFIG_DIR=$(JUPYTER_CONFIG_DIR) && $(VENV_BIN)/jupyter-lab --generate-config
+
