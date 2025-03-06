@@ -1,12 +1,7 @@
-from IPython.core.interactiveshell import ExecutionResult, ExecutionInfo
+import os
 
-def return_result(shell, result, raw_cell, store_history, silent, shell_futures, cell_id) -> ExecutionResult:
-    res = ExecutionResult(ExecutionInfo(raw_cell, store_history, silent, shell_futures, cell_id))
-    res.result = result
+def load_file(filename: str) -> str:
+    file_path = f'{os.path.dirname(os.path.abspath(__file__))}/{filename}'
 
-    shell.displayhook(res.result)
-    
-    return res
-
-def raise_exception(shell, e) -> None:
-    shell.showtraceback((type(e), e, e.__traceback__))
+    with open(file_path) as file_path:
+        return file_path.read()
