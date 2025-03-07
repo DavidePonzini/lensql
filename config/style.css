@@ -2,17 +2,36 @@ html {
     --bg-color: #FFF4DB;
     --bg-color-code: #FFFFFF;
     --text-color: #000000;
+    --icon-width: 50px;
+    --icon-margin: 10px;
 }
 
 .messagebox {
     display: flex;
 }
 
+.messagebox-assistant {
+    justify-content: left;
+}
+
+.messagebox-user {
+    justify-content: right;
+}
+
 .icon {
+    width: var(--icon-width);
+    overflow: hidden;
     position: relative;
     float: left;
-    margin-right: 25px;
     text-align: center;
+}
+
+.messagebox-user .icon {
+    margin-left: var(--icon-margin);
+}
+
+.messagebox-assistant .icon {
+    margin-right: var(--icon-margin);
 }
 
 .message {
@@ -24,17 +43,38 @@ html {
     font-size: 14px;
     line-height: 1.5;
     padding: 8px;
-    font-family: monospace;
+    margin-top: 1px;
 }
+
+/* .messagebox-assistant .message {
+    margin-right: var(--icon-width);
+}
+
+.messagebox-user .message {
+    margin-left: var(--icon-width);
+} */
 
 .message:after {
     content: "";
     position: absolute;
     top: 15px;
-    left: -10px;
     border-style: solid;
+}
+
+.messagebox-assistant .message:after {
+    left: -10px;
     border-width: 8px 10px 8px 0;
     border-color: transparent var(--bg-color) transparent transparent;
+}
+
+.messagebox-user .message:after {
+    right: -10px;
+    border-width: 8px 0 8px 10px;
+    border-color: transparent transparent transparent var(--bg-color);
+}
+
+.m {
+    font-family: monospace;
 }
 
 .code {
