@@ -35,14 +35,14 @@ def run_cell(shell, raw_cell, **kwargs) -> ExecutionResult:
             columns = [desc[0] for desc in cur.description]
             result = pd.DataFrame(rows, columns=columns)
             
-            webui.show_result(result, shell=shell)
+            webui.show_result(raw_cell, result)
         else:
             print(f'Affected rows: {cur.rowcount}')
             result = None
 
         return return_result(result, raw_cell, **kwargs)
     except Exception as e:
-        webui.show_error(e, shell=shell)
+        webui.show_error(code=raw_cell, exception=e)
         return
     finally:
         cur.close()

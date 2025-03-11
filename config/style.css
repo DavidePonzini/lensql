@@ -8,6 +8,7 @@ html {
 
 .messagebox {
     display: flex;
+    margin-top: .5rem;
 }
 
 .messagebox-assistant {
@@ -43,7 +44,7 @@ html {
     font-size: 14px;
     line-height: 1.5;
     padding: 8px;
-    margin-top: 1px;
+    max-width: calc(100% - 200px);  /* 140px to have perfectly-aligned messages */
 }
 
 /* .messagebox-assistant .message {
