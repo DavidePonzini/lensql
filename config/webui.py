@@ -5,11 +5,12 @@ import llm
 import webui_html
 from sql_errors import SQLException
 from llm import MessageRole
+import pandas as pd
 
 CHAT_ID = 0
 MSG_ID = 0
 
-def show_result(code: str, result) -> None:
+def show_result(code: str, result: pd.DataFrame) -> None:
     display(result)
 
     chat = Chat()
@@ -125,7 +126,12 @@ class Chat:
 
             def provide_help(user_text):
                 self.show_message(MessageRole.USER, user_text)
-                self.show_message(MessageRole.ASSISTANT, 'I see. Let me help you with that.')
+
+                messages = [{'role': msg.role, 'content': msg.content} for msg in self.messages]
+                messages.insert(0, {'role': MessageRole.USER, 'content': str(self.result)})
+                msg = llm.free_prompt(user_text, self.code, messages)
+
+                self.show_message(MessageRole.ASSISTANT, msg)
                 # self.show_error_buttons()
 
             self.get_input(provide_help)
