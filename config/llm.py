@@ -21,6 +21,15 @@ def identify_error_cause(code: str, exception: str) -> str:
 
     return answer
 
+
+def explain_my_query(code: str) -> str:
+    message = chatgpt.Message()
+    
+    message.add_message(chatgpt.MessageRole.USER, prompts.explain_my_query(code))
+    answer = message.generate_answer()
+
+    return answer
+
 def free_prompt(prompt: str, code: str, conversation: list[dict[str, str]]) -> str:
     message = chatgpt.Message()
     message.add_message(chatgpt.MessageRole.USER, code)

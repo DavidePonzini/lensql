@@ -13,15 +13,20 @@ DB_ADDRESS = None
 SQL_COMMANDS = ('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'SET')
 
 
-def run_cell(shell, raw_cell, **kwargs) -> ExecutionResult:
-    '''Automatically executes SQL queries when detected in a Jupyter Notebook cell.'''
+def run_cell_sql_python(shell, raw_cell: str, **kwargs) -> ExecutionResult:
+    '''Executes SQL queries when the cell starts with a SQL command. Otherwise, executes Python code.'''
+
+    if not raw_cell.strip().upper().startswith(SQL_COMMANDS):
+        return shell.run_cell_original(raw_cell, **kwargs)
+    
+    return run_cell_sql_only(shell, raw_cell, **kwargs)
+
+def run_cell_sql_only(shell, raw_cell: str, **kwargs) -> ExecutionResult:
+    '''Executes SQL queries.'''
 
     if DB_ADDRESS is None or DB_USERNAME is None or DB_PASSWORD is None or DB_NAME is None:
         messages.error('Module not configured, please run the setup function first')
         return
-    
-    if not raw_cell.strip().upper().startswith(SQL_COMMANDS):
-        return shell.run_cell_original(raw_cell, **kwargs)
 
     # execute SQL query
     try:

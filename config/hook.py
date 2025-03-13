@@ -38,10 +38,11 @@ def test_connection():
 def override_execution(allow_code_execution=False):
     if allow_code_execution and not hasattr(InteractiveShell, 'run_cell_original'):
         InteractiveShell.run_cell_original = InteractiveShell.run_cell
+        InteractiveShell.run_cell = run_cell.run_cell_sql_python
+    else:
+        InteractiveShell.run_cell = run_cell.run_cell_sql_only
 
-    InteractiveShell.run_cell = run_cell.run_cell
     messages.success('SQL execution enabled', file=sys.stdout)
-
     if allow_code_execution:
         messages.warning(f'Only commands starting with {run_cell.SQL_COMMANDS} will be interpreted as SQL', file=sys.stdout)
     else:
