@@ -30,7 +30,7 @@ $(VENV)_upgrade: $(VENV)
 	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS)
 
 $(ENV):
-	cp ENV.template $(ENV)
+	cp $(ENV).template $(ENV)
 
 
 
