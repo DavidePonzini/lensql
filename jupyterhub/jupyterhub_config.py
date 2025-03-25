@@ -1066,7 +1066,7 @@ c.JupyterHub.authenticator_class = 'jupyterhub.auth.PAMAuthenticator'
 #      To preserve pre-5.0 behavior,
 #      set `allow_all = True` if you have no other allow configuration.
 #  Default: False
-c.Authenticator.allow_all = True
+# c.Authenticator.allow_all = True
 
 ## Allow existing users to login.
 #  
@@ -1113,7 +1113,10 @@ c.Authenticator.allow_all = True
 #  .. versionchanged:: 1.2
 #      `Authenticator.whitelist` renamed to `allowed_users`
 #  Default: set()
-# c.Authenticator.allowed_users = set()
+c.Authenticator.allowed_users = set(
+    't',
+    
+)
 
 ## Is there any allow config?
 #  
