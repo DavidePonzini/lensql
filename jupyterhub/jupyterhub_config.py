@@ -1113,10 +1113,16 @@ c.Authenticator.allow_all = False
 #  .. versionchanged:: 1.2
 #      `Authenticator.whitelist` renamed to `allowed_users`
 #  Default: set()
-c.Authenticator.allowed_users = set(
-    't',
-    
-)
+
+# read valid users from file
+with open('../allowed_users') as f:
+    allowed_users = set()
+    for line in f.readlines():
+        stripped_line = line.strip()
+        if stripped_line:
+            allowed_users.add(stripped_line)
+
+c.Authenticator.allowed_users = allowed_users
 
 ## Is there any allow config?
 #  

@@ -5,3 +5,4 @@ venv/
 jupyterhub.sqlite
 jupyterhub_cookie_secret
 jupyterhub-proxy.pid
+allowed_users

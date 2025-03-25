@@ -4,7 +4,6 @@ REQUIREMENTS=requirements.txt
 ENV=.env
 JUPYTER_CONFIG_DIR=jupyterhub
 
-
 ifeq ($(OS),Windows_NT)
 	VENV_BIN=$(VENV)/Scripts
 else
@@ -14,7 +13,7 @@ endif
 
 .PHONY: $(VENV)_upgrade start
 
-start: $(VENV) $(ENV)
+start: $(VENV) $(ENV) allowed_users
 	sudo npm install -g configurable-http-proxy
 	sudo service postgresql start
 # sets LLM key
@@ -33,7 +32,8 @@ $(VENV)_upgrade: $(VENV)
 $(ENV):
 	cp $(ENV).template $(ENV)
 
-
+allowed_users:
+	touch allowed_users
 
 
 
