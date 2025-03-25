@@ -2,6 +2,8 @@ SHELL=/bin/bash
 VENV=venv
 REQUIREMENTS=requirements.txt
 ENV=.env
+JUPYTER_CONFIG_DIR=jupyterhub
+
 
 ifeq ($(OS),Windows_NT)
 	VENV_BIN=$(VENV)/Scripts
@@ -12,9 +14,12 @@ endif
 
 .PHONY: $(VENV)_upgrade start
 
-start: $(VENV) $(ENV) $(JUPYTER_CONFIG_DIR)
+start: $(VENV) $(ENV)
 	sudo service postgresql start
-	source $(ENV) && source $(VENV_BIN)/activate && jupyterhub
+# sets LLM key
+# activates venv, needed to be able to run jupyterhub-singleuser properly
+# changes directory to keep generated files in the right place
+	source $(ENV) && source $(VENV_BIN)/activate && cd $(JUPYTER_CONFIG_DIR) && jupyterhub
 
 $(VENV):
 	python -m venv --clear $(VENV)
@@ -26,9 +31,6 @@ $(VENV)_upgrade: $(VENV)
 
 $(ENV):
 	cp ENV.template $(ENV)
-
-$(JUPYTER_CONFIG_DIR):
-	source $(ENV) && $(VENV_BIN)/jupyter-lab --generate-config
 
 
 
