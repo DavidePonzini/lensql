@@ -14,16 +14,16 @@ endif
 .PHONY: $(VENV)_upgrade start
 
 start: $(VENV) $(ENV) allowed_users
-	@if [ "$$EUID" -ne 0 ]; then $(VENV_BIN)/python -m dav_tools.messages error "Server must be started by root user"; exit 1; fi
-	npm install -g configurable-http-proxy
-	service postgresql start
+# @if [ "$$EUID" -ne 0 ]; then $(VENV_BIN)/python -m dav_tools.messages error "Server must be started by root user"; exit 1; fi
+# npm install -g configurable-http-proxy
+# service postgresql start
 # sets LLM key
 # activates venv, needed to be able to run jupyterhub-singleuser properly
 # changes directory to keep generated files in the right place
-	source $(ENV) && source $(VENV_BIN)/activate && cd $(JUPYTER_CONFIG_DIR) && jupyterhub
+	source $(ENV) && $(VENV_BIN)/jupyter-lab
 
 $(VENV):
-	python -m venv --clear $(VENV)
+	python -m venv $(VENV)
 	touch -a $(REQUIREMENTS)
 	$(VENV_BIN)/python -m pip install -r $(REQUIREMENTS)
 
