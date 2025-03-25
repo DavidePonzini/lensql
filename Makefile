@@ -15,6 +15,7 @@ endif
 .PHONY: $(VENV)_upgrade start
 
 start: $(VENV) $(ENV)
+	sudo npm install -g configurable-http-proxy
 	sudo service postgresql start
 # sets LLM key
 # activates venv, needed to be able to run jupyterhub-singleuser properly
