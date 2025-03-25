@@ -1,3 +1,4 @@
+jupyterhub
 jupyterlab
 psycopg2
 dav_tools

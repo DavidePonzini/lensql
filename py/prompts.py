@@ -1,15 +1,26 @@
 import sql_code
 
-def explain_error(code: str, exception: Exception):
+RESPONSE_FORMAT = '''
+Format the response as follows:
+- SQL code (e.g. tables, columns or keywords) should be enclosed in <code></code> tags
+'''
+
+MOTIVATIONAL_MESSAGE_RESULT = '''
+BRIEF MOTIVATIONALLY-POSITIVE MESSAGE RELATED TO THE QUERY'S STYLE.
+'''
+MOTIVATIONAL_MESSAGE_ERROR = '''
+BRIEF MOTIVATIONALLY-POSITIVE MESSAGE RELATED TO THE SPECIFIC ERROR ENCOUNTERED.
+'''
+
+def explain_error(code: str, exception: Exception, language='PostgreSQL'):
     query = sql_code.SQLCode(code)
     query = query.strip_comments()
     
     return  f'''
-I encountered an error while trying to execute the following SQL query. Please briefly explain what this error means.
+I encountered an error while trying to execute the following {language} query. Please briefly explain what this error means.
 Do not provide the correct answer, I only want an explanation of the error.
 
-Format the response as follows:
-- SQL code (e.g. tables, columns or keywords) should be enclosed in <code></code> tags
+{RESPONSE_FORMAT}
 
 -- SQL Query --
 {query}
@@ -18,27 +29,26 @@ Format the response as follows:
 {exception}
 
 -- Template answer --
-The error <b>ERROR</b> means that EXPLANATION.
+The error <b>{exception}</b> means that EXPLANATION.
 <br>
 <br>
 The error occurred because REASON.
 <br>
 <br>
-<i>BRIEF MOTIVATIONALLY-POSITIVE MESSAGE.</i>
+<i>{MOTIVATIONAL_MESSAGE_ERROR}</i>
 '''
 
 
-def guide_user(code: str, exception: Exception):
+def guide_user(code: str, exception: Exception, language='PostgreSQL'):
     query = sql_code.SQLCode(code)
     query = query.strip_comments()
 
     return f'''
-I encountered an error while trying to execute the following SQL query. Please provide guidance on how to fix this error.
-Do not provide the correct answer, I only want guidance on how to fix the error.
+I encountered an error while trying to execute the following {language} query.
+Please tell me which part of the query I should check to fix the error.
+Do not correct the query, I only want guidance on where to look to fix the error.
 
-Format the response as follows:
-- each step should be enclosed in <li></li> tags
-- SQL code (e.g. tables, columns or keywords) should be enclosed in <code></code> tags
+{RESPONSE_FORMAT}
 
 -- SQL Query --
 {query}
@@ -47,16 +57,14 @@ Format the response as follows:
 {exception}
 
 -- Template answer --
-To fix this error, you should:
-<ol>
-    <li>STEP(s)</li>
-</ol>
+This error is caused by a problem in the following clause:
+<pre class="code m">RELEVANT CODE</pre>
 <br>
-<i>BRIEF MOTIVATIONALLY-POSITIVE MESSAGE.</i>
+<i>{MOTIVATIONAL_MESSAGE_ERROR}</i>
 '''
 
 
-def explain_my_query(code: str):
+def explain_my_query(code: str, language='PostgreSQL'):
     query = sql_code.SQLCode(code)
     query = query.strip_comments()
 
@@ -98,12 +106,11 @@ def explain_my_query(code: str):
     templates = ''.join([f'<li>{clause["template"]}</li>' for clause in clauses])
 
     return f'''
-Please explain the purpose of the following SQL query. What is the query trying to achieve?
+Please explain the purpose of the following {language} query. What is the query trying to achieve?
 Do not provide the correct answer and do not try to fix eventual errors, I only want an explanation of this query's purpose.
 Assume the user has willingly formulated the query this way.
 
-Format the response as follows:
-- SQL code (e.g. tables, columns or keywords) should be enclosed in <code></code> tags
+{RESPONSE_FORMAT}
 
 -- SQL Query --
 {query}
@@ -116,6 +123,5 @@ Here is a detailed explanation of the query:
 {templates}
 </ol>
 <br>
-<i>BRIEF MOTIVATIONALLY-POSITIVE MESSAGE</i>
-
+<i>{MOTIVATIONAL_MESSAGE_RESULT}</i>
 '''

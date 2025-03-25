@@ -2,3 +2,6 @@ venv/
 .ipynb_checkpoints/
 */__pycache__/
 .env
+jupyterhub.sqlite
+jupyterhub_cookie_secret
+jupyterhub-proxy.pid

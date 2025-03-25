@@ -14,7 +14,7 @@ endif
 
 start: $(VENV) $(ENV) $(JUPYTER_CONFIG_DIR)
 	sudo service postgresql start
-	source $(ENV) && $(VENV_BIN)/jupyter-lab
+	source $(ENV) && source $(VENV_BIN)/activate && jupyterhub
 
 $(VENV):
 	python -m venv --clear $(VENV)

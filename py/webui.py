@@ -30,8 +30,8 @@ class ResultButtons(Buttons):
 
 class ErrorButtons(Buttons):
     EXPLAIN_ERROR = 'Explain error'
-    IDENTIFY_CAUSE = 'Identify cause'
-    FIX_HINT = 'How do I fix this?'
+    IDENTIFY_CAUSE = 'Where to look'
+    FIX = 'I give up. Fix the error for me'
 
 
 class Message:
