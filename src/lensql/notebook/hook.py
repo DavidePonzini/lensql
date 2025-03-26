@@ -17,7 +17,8 @@ def setup(host: str | None = None, port: int = 5432, dbname: str | None = None, 
     if database.test_logger_connection():
         messages.success('Database is online', file=sys.stdout)
     else:
-        return
+        database.SKIP_LOGGING = True
+        messages.warning('Database is offline. Logging is disabled!', file=sys.stdout)
 
     database.HOST = host if host is not None else messages.ask('Enter database host', file=sys.stdout)
     database.PORT = port if port is not None else messages.ask('Enter database port', file=sys.stdout)

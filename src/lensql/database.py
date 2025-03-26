@@ -6,9 +6,10 @@ import os
 HOST = None
 PORT = None
 DBNAME = None
-
 USERNAME = None
 PASSWORD = None
+
+SKIP_LOGGING = False
 
 def are_credentials_set():
     for cred in (HOST, PORT, DBNAME, USERNAME, PASSWORD):

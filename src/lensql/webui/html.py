@@ -28,7 +28,7 @@ class Icon:
         <div class="icon">
             <i class="fas fa-search"></i>
             <br>
-            LenSQL
+            <b>LenS</b>QL
         </div>
     '''
     NO_ICON = ''
