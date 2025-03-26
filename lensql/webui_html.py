@@ -24,9 +24,9 @@ class Icon:
     '''
     ASSISTANT = '''
         <div class="icon">
-            <i class="fas fa-robot"></i>
+            <i class="fas fa-search"></i>
             <br>
-            AI 
+            LenSQL
         </div>
     '''
     NO_ICON = ''

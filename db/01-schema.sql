@@ -1,7 +1,5 @@
-DROP SCHEMA IF EXISTS sql_collection CASCADE;
-CREATE SCHEMA sql_collection;
+DROP SCHEMA IF EXISTS lensql CASCADE;
+CREATE SCHEMA lensql;
 
-GRANT ALL PRIVILEGES ON SCHEMA sql_collection TO jupyter_admin;
-GRANT USAGE ON SCHEMA sql_collection TO jupyter_user;
-GRANT SELECT ON ALL TABLES IN SCHEMA sql_collection TO jupyter_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA sql_collection GRANT SELECT ON TABLES TO jupyter_user;
+GRANT ALL PRIVILEGES ON SCHEMA lensql TO lensql;
+GRANT USAGE ON SCHEMA lensql TO lensql;

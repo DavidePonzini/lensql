@@ -1,4 +1,4 @@
-SET search_path TO sql_collection;
+SET search_path TO lensql;
 
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,

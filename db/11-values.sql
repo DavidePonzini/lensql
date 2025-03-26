@@ -1,4 +1,4 @@
-SET search_path TO sql_collection;
+SET search_path TO lensql;
 
 INSERT INTO customers (name, email, phone, city) VALUES
 ('Alice Johnson', 'alice.johnson@example.com', '123-456-7890', 'New York'),

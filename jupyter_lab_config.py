@@ -1056,7 +1056,7 @@ c.ServerApp.ip = '0.0.0.0'
 
 ## The directory to use for notebooks and kernels.
 #  Default: ''
-c.ServerApp.root_dir = '/home/jupyter/'
+c.ServerApp.root_dir = '/home/user/'
 
 ## The session manager class to use.
 #  Default: 'builtins.object'
