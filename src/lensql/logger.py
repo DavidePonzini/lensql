@@ -1,12 +1,12 @@
-from typing import Any
-from .. import database
+from . import database
 
-def log_button(button: str, query: str, data: str, chat_id: int, msg_id: int):
+def log_button(button: str, query: str, success: bool, data: str, chat_id: int, msg_id: int):
     db = database.logger_connect()
     db.insert('lensql_log', 'buttons', {
         'username': database.USERNAME,
         'button': button,
         'query': query,
+        'success': success,
         'data': data,
         'chat_id': chat_id,
         'msg_id': msg_id,

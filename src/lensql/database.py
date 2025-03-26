@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2.extensions import connection
-from dav_tools import database
+from dav_tools import database, messages
+import os
 
 HOST = None
 PORT = None
@@ -28,11 +29,31 @@ def connect() -> connection:
 
 def logger_connect() -> database.PostgreSQL:
     conn = database.PostgreSQL(
-        host='ponzidav.com',
-        port=5432,
-        database='postgres',
-        user='lensql',
-        password='lensql_pwd'
+        host=       os.getenv('LENSQL_LOGGER_HOST'),
+        port=   int(os.getenv('LENSQL_LOGGER_PORT')),
+        database=   os.getenv('LENSQL_LOGGER_DBNAME'),
+        user=       os.getenv('LENSQL_LOGGER_USER'),
+        password=   os.getenv('LENSQL_LOGGER_PASSWORD')
     )
 
     return conn
+
+def test_connection():
+    try:
+        conn = connect()
+        conn.close()
+
+        return True
+    except Exception as e:
+        messages.error('Error connecting user to the database:', e)
+        return False
+    
+def test_logger_connection():
+    try:
+        with logger_connect().connect():
+            pass
+
+        return True
+    except Exception as e:
+        messages.error('Error connecting to the database:', e)
+        return False

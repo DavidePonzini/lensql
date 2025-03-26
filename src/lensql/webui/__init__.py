@@ -1,5 +1,6 @@
 from . import chat
-from . import logger
+
+from .. import logger
 
 import pandas as pd
 from IPython.display import display

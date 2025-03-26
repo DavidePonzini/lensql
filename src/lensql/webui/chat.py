@@ -1,11 +1,10 @@
 from . import html
-from . import logger
 
+from .. import logger
 from .. import llm
 from ..llm import MessageRole
 from ..sql import SQLException
 
-from abc import abstractmethod
 from enum import Enum
 from IPython.display import display, HTML
 import ipywidgets as widgets
@@ -20,12 +19,14 @@ class Buttons(Enum):
     # MANUAL_PROMPT = 'Other'
 
 class ResultButtons(Buttons):
-    EXPLAIN_MY_QUERY = 'Explain my query'
+    DESCRIBE_QUERY = 'Describe query'
+    EXPLAIN_QUERY = 'Explain query'
 
 class ErrorButtons(Buttons):
-    EXPLAIN_ERROR = 'Explain error'
-    IDENTIFY_CAUSE = 'Where to look'
-    FIX = 'I give up. Fix the error for me'
+    EXPLAIN = 'Explain error'
+    EXAMPLE = 'Show example'
+    LOCATE = 'Where to look'
+    FIX = 'Suggest fix'
 
 
 class Message:
@@ -210,9 +211,9 @@ class ResultChat(CodeChat):
             self.show_message(MessageRole.USER, button_text)
             self.start_thinking()
 
-            logger.log_button(button_text, self.code, self.data.to_csv(), self.chat_id, self.last_message_id)
+            logger.log_button(button_text, self.code, True, self.data.to_csv(), self.chat_id, self.last_message_id)
 
-            if button_text == ResultButtons.EXPLAIN_MY_QUERY.value:
+            if button_text == ResultButtons.DESCRIBE_QUERY.value:
                 response = llm.explain_my_query(self.code)
             else:
                 response = 'Action not implemented yet.'
@@ -260,12 +261,12 @@ class ErrorChat(CodeChat):
             self.show_message(MessageRole.USER, button_text)
             self.start_thinking()
 
-            logger.log_button(button_text, self.code, str(self.data), self.chat_id, self.last_message_id)
+            logger.log_button(button_text, self.code, False, str(self.data), self.chat_id, self.last_message_id)
 
-            if button_text == ErrorButtons.EXPLAIN_ERROR.value:
+            if button_text == ErrorButtons.EXPLAIN.value:
                 
                 response = llm.explain_error_message(code=self.code, exception=self.data)
-            elif button_text == ErrorButtons.IDENTIFY_CAUSE.value:
+            elif button_text == ErrorButtons.LOCATE.value:
                 response = llm.identify_error_cause(code=self.code, exception=self.data)
             else:
                 response = 'Action not implemented yet.'

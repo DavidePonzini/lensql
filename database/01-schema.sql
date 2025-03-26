@@ -9,6 +9,7 @@ CREATE TABLE lensql_log.buttons (
     username VARCHAR(255) NOT NULL,
     button VARCHAR(255) NOT NULL,
     query TEXT NOT NULL,
+    success BOOLEAN NOT NULL,
     data TEXT NOT NULL,
     chat_id INTEGER NOT NULL,
     msg_id INTEGER NOT NULL,

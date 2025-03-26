@@ -20,11 +20,11 @@ $(VENV):
 $(VENV)_upgrade: $(VENV)
 	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS)
 
-run: docker/$(ENV) install
-	source docker/$(ENV) && $(VENV_BIN)/jupyter-lab docker/notebook.ipynb
+$(ENV):
+	cp $(ENV).template $(ENV)
 
-docker/$(ENV):
-	make -C docker/$(ENV)
+run: $(ENV) install
+	source $(ENV) && $(VENV_BIN)/jupyter-lab docker/notebook.ipynb
 
 install: uninstall build
 	$(VENV_BIN)/python -m pip install ./dist/*.whl
