@@ -1,6 +1,0 @@
-jupyterlab
-psycopg2
-dav_tools
-pandas
-ipywidgets
-sqlparse

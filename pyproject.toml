@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lensql"
-version = "0.1.0"
+version = "0.1.4"
 authors = [
   { name="Davide Ponzini", email="davide.ponzini95@gmail.com" },
 ]
@@ -17,10 +17,12 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-  "argparse",
-  "elevate",
-  "openai",
+  "jupyterlab",
   "psycopg2",
+  "dav_tools==0.4.15",
+  "pandas",
+  "ipywidgets",
+  "sqlparse",
 ]
 
 [project.urls]

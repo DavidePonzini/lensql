@@ -1,0 +1,29 @@
+BEGIN;
+
+DROP SCHEMA IF EXISTS lensql_log CASCADE;
+CREATE SCHEMA lensql_log;
+GRANT USAGE ON SCHEMA lensql_log TO lensql;
+
+CREATE TABLE lensql_log.buttons (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    button VARCHAR(255) NOT NULL,
+    query TEXT NOT NULL,
+    data TEXT NOT NULL,
+    chat_id INTEGER NOT NULL,
+    msg_id INTEGER NOT NULL,
+    ts TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE lensql_log.queries (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    query TEXT NOT NULL,
+    success BOOLEAN NOT NULL,
+    ts TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+GRANT INSERT, UPDATE ON ALL TABLES IN SCHEMA lensql_log TO lensql;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA lensql_log TO lensql;
+
+COMMIT;

@@ -1,1 +1,1 @@
-lensql
+lensql==0.1.4

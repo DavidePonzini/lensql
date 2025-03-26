@@ -3,7 +3,8 @@ This module contains the functions to configure the database connection and enab
 '''
 
 from . import run_cell
-from . import credentials
+
+from .. import database
 
 from IPython.core.interactiveshell import InteractiveShell
 from dav_tools import messages
@@ -12,13 +13,13 @@ import sys
 import pandas as pd
 
 
-def setup(host: str | None = None, port: int = 5432, database: str | None = None, username: str | None = None, *,  allow_code_execution=False):
+def setup(host: str | None = None, port: int = 5432, dbname: str | None = None, username: str | None = None, *,  allow_code_execution=False):
     '''Configures the database connection and enables SQL execution in the notebook.'''
-    credentials.HOST = host if host is not None else messages.ask('Enter database host', file=sys.stdout)
-    credentials.PORT = port if port is not None else messages.ask('Enter database port', file=sys.stdout)
-    credentials.DBNAME = database if database is not None else messages.ask('Enter database name', file=sys.stdout)
-    credentials.USERNAME = username if username is not None else messages.ask('Enter database username', file=sys.stdout)
-    credentials.PASSWORD = messages.ask('Enter database password', secret=True, file=sys.stdout)
+    database.HOST = host if host is not None else messages.ask('Enter database host', file=sys.stdout)
+    database.PORT = port if port is not None else messages.ask('Enter database port', file=sys.stdout)
+    database.DBNAME = dbname if dbname is not None else messages.ask('Enter database name', file=sys.stdout)
+    database.USERNAME = username if username is not None else messages.ask('Enter database username', file=sys.stdout)
+    database.PASSWORD = messages.ask('Enter database password', secret=True, file=sys.stdout)
 
     if test_connection():
         messages.success('Database connection successful', file=sys.stdout)
@@ -33,13 +34,7 @@ def setup(host: str | None = None, port: int = 5432, database: str | None = None
 
 def test_connection():
     try:
-        conn = psycopg2.connect(
-            host=credentials.HOST,
-            port=credentials.PORT,
-            dbname=credentials.DBNAME,
-            user=credentials.USERNAME,
-            password=credentials.PASSWORD
-        )
+        conn = database.connect()
         conn.close()
 
         return True

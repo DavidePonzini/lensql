@@ -1,6 +1,6 @@
 from .. import webui
 
-from . import credentials
+from .. import database
 
 from dav_tools import messages
 import psycopg2
@@ -21,19 +21,13 @@ def run_cell_sql_python(shell, raw_cell: str, **kwargs) -> ExecutionResult:
 def run_cell_sql_only(shell, raw_cell: str, **kwargs) -> ExecutionResult:
     '''Executes SQL queries.'''
 
-    if not credentials.are_credentials_set():
+    if not database.are_credentials_set():
         messages.error('Module not configured, please run the setup function first')
         return
 
     # execute SQL query
     try:
-        conn = psycopg2.connect(
-            host=credentials.HOST,
-            port=credentials.PORT,
-            dbname=credentials.DBNAME,
-            user=credentials.USERNAME,
-            password=credentials.PASSWORD
-        )
+        conn = database.connect()
         cur = conn.cursor()
         cur.execute(raw_cell)
         conn.commit()

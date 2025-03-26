@@ -1,9 +1,7 @@
-########## Makefile start ##########
-# Type: PyPi
-# Author: Davide Ponzini
-
+SHELL=/bin/bash
 NAME=lensql
 VENV=./venv
+ENV=.env
 REQUIREMENTS=requirements.txt
 
 ifeq ($(OS),Windows_NT)
@@ -12,6 +10,7 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
+.PHONY: $(VENV)_upgrade run install build uninstall documentation test upload download
 
 $(VENV):
 	python -m venv $(VENV)
@@ -21,6 +20,11 @@ $(VENV):
 $(VENV)_upgrade: $(VENV)
 	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS)
 
+run: docker/$(ENV) install
+	source docker/$(ENV) && $(VENV_BIN)/jupyter-lab docker/notebook.ipynb
+
+docker/$(ENV):
+	make -C docker/$(ENV)
 
 install: uninstall build
 	$(VENV_BIN)/python -m pip install ./dist/*.whl
@@ -45,6 +49,4 @@ upload: test documentation
 download: uninstall
 	$(VENV_BIN)/python -m pip install $(NAME)
 
-
-########## Makefile end ##########
 

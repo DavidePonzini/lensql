@@ -8,23 +8,23 @@ ENV JUPYTER_PORT=8888
 
 WORKDIR /lensql
 
-# Install requirements
+# Requirements
 COPY requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements.txt
 
-# Jupyter Lab configuration
+# JupyterLab configuration
 COPY jupyter_lab_config.py ./jupyter_lab_config.py
-
-# Disable Jupyter Lab announcements
 RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
 
 # Ports
 EXPOSE ${JUPYTER_PORT}
 
-# Non-root user
+# Add a non-root account for the user
 RUN useradd -ms /bin/bash ${USERNAME}
-COPY lensql/* /home/${USERNAME}/
+
+# Copy sample notebook
 COPY notebook.ipynb /home/${USERNAME}/
+RUN chown ${USERNAME}:${USERNAME} /home/${USERNAME}/notebook.ipynb
 
 # Run as non-root user
 USER ${USERNAME}

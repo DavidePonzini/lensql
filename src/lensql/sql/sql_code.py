@@ -17,3 +17,4 @@ class SQLCode:
 
     def __str__(self) -> str:
         return self.query
+    
