@@ -1,5 +1,5 @@
 from dav_tools import chatgpt
-import prompts
+from . import prompts
 
 
 MessageRole = chatgpt.MessageRole

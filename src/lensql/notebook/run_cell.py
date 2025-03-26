@@ -1,14 +1,11 @@
+from .. import webui
+
+from . import credentials
+
 from dav_tools import messages
 import psycopg2
 from IPython.core.interactiveshell import ExecutionResult, ExecutionInfo
-
-import webui
 import pandas as pd
-
-DB_NAME = None
-DB_USERNAME = None
-DB_PASSWORD = None
-DB_ADDRESS = None
 
 SQL_COMMANDS = ('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'SET')
 
@@ -24,13 +21,19 @@ def run_cell_sql_python(shell, raw_cell: str, **kwargs) -> ExecutionResult:
 def run_cell_sql_only(shell, raw_cell: str, **kwargs) -> ExecutionResult:
     '''Executes SQL queries.'''
 
-    if DB_ADDRESS is None or DB_USERNAME is None or DB_PASSWORD is None or DB_NAME is None:
+    if not credentials.are_credentials_set():
         messages.error('Module not configured, please run the setup function first')
         return
 
     # execute SQL query
     try:
-        conn = psycopg2.connect(user=DB_USERNAME, password=DB_PASSWORD, host=DB_ADDRESS, dbname=DB_NAME)
+        conn = psycopg2.connect(
+            host=credentials.HOST,
+            port=credentials.PORT,
+            dbname=credentials.DBNAME,
+            user=credentials.USERNAME,
+            password=credentials.PASSWORD
+        )
         cur = conn.cursor()
         cur.execute(raw_cell)
         conn.commit()

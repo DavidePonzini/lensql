@@ -1,11 +1,13 @@
+from . import html
+
+from .. import llm
+from ..llm import MessageRole
+from ..sql import SQLException
+
 from abc import abstractmethod
 from enum import Enum
 from IPython.display import display, HTML
 import ipywidgets as widgets
-import llm
-import webui_html
-from sql_errors import SQLException
-from llm import MessageRole
 import pandas as pd
 
 CHAT_ID = 0
@@ -42,7 +44,7 @@ class Message:
         self.msg_id = MSG_ID
         self.role = role
         self.content = content
-        self.html = webui_html.Message(role, content, self.msg_id)
+        self.html = html.Message(role, content, self.msg_id)
 
 
 class Chat:
@@ -59,8 +61,8 @@ class Chat:
     def show(self) -> None:
         display(self.output_widget)  # Ensure output appears inside the correct cell
 
-        html = webui_html.Chat(self.chat_id)
-        self.display_html(html)
+        chat_html = html.Chat(self.chat_id)
+        self.display_html(chat_html)
 
     def display_html(self, content: str):
         with self.output_widget:
@@ -235,7 +237,7 @@ class ErrorChat(CodeChat):
     def show(self):
         super().show()
 
-        message = webui_html.exception_to_html(self.data)
+        message = html.exception_to_html(self.data)
         self.show_message(MessageRole.ASSISTANT, message)
         self.show_buttons()
 

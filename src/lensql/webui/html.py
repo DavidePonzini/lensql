@@ -1,9 +1,11 @@
-import html
-import sql_errors
-import utils
-from llm import MessageRole
+from . import load_content
 
-CSS = utils.load_file('style.css')
+from ..sql import SQLException
+from ..llm import MessageRole
+
+import html
+
+CSS = load_content.load_from_this_dir('style.css')
 
 
 class HtmlComponent:
@@ -31,7 +33,7 @@ class Icon:
     '''
     NO_ICON = ''
 
-def exception_to_html(exception: sql_errors.SQLException) -> str:
+def exception_to_html(exception: SQLException) -> str:
     traceback = '\n' + '\n'.join(exception.traceback)
     traceback = html.escape(traceback)
 

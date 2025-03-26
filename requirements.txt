@@ -1,6 +1,10 @@
 jupyterlab
 psycopg2
-dav_tools
+dav_tools>=0.4.13
 pandas
 ipywidgets
 sqlparse
+build
+autoapi
+pytest
+sphinx-autoapi

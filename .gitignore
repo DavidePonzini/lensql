@@ -1,8 +1,10 @@
+dist/
+__pycache__/
+test.py
 venv/
 .ipynb_checkpoints/
-*/__pycache__/
 .env
-jupyterhub.sqlite
-jupyterhub_cookie_secret
-jupyterhub-proxy.pid
-allowed_users
+
+# documentation
+docs/_build
+.pytest_cache

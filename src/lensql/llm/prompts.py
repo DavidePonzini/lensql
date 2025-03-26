@@ -1,4 +1,4 @@
-import sql_code
+from ..sql import SQLCode
 
 RESPONSE_FORMAT = '''
 Format the response as follows:
@@ -13,7 +13,7 @@ BRIEF MOTIVATIONALLY-POSITIVE MESSAGE RELATED TO THE SPECIFIC ERROR ENCOUNTERED.
 '''
 
 def explain_error(code: str, exception: Exception, language='PostgreSQL'):
-    query = sql_code.SQLCode(code)
+    query = SQLCode(code)
     query = query.strip_comments()
     
     return  f'''
@@ -40,7 +40,7 @@ The error occurred because REASON.
 
 
 def guide_user(code: str, exception: Exception, language='PostgreSQL'):
-    query = sql_code.SQLCode(code)
+    query = SQLCode(code)
     query = query.strip_comments()
 
     return f'''
@@ -65,7 +65,7 @@ This error is caused by a problem in the following clause:
 
 
 def explain_my_query(code: str, language='PostgreSQL'):
-    query = sql_code.SQLCode(code)
+    query = SQLCode(code)
     query = query.strip_comments()
 
     clauses = [

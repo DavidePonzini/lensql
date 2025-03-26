@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lensql"
+version = "0.1.0"
+authors = [
+  { name="Davide Ponzini", email="davide.ponzini95@gmail.com" },
+]
+description = "AI-powered tutor for learning SQL."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "argparse",
+  "elevate",
+  "openai",
+  "psycopg2",
+]
+
+[project.urls]
+"Repository" = "https://github.com/DavidePonzini/dav-utils"
+"Documentation" = "https://dav-tools.readthedocs.io/en/latest/index.html"
+"Bug Tracker" = "https://github.com/DavidePonzini/dav-utils/issues"

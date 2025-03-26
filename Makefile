@@ -1,8 +1,10 @@
-SHELL=/bin/bash
-VENV=venv
+########## Makefile start ##########
+# Type: PyPi
+# Author: Davide Ponzini
+
+NAME=lensql
+VENV=./venv
 REQUIREMENTS=requirements.txt
-ENV=.env
-DOCKER_IMAGE=davideponzini/lensql
 
 ifeq ($(OS),Windows_NT)
 	VENV_BIN=$(VENV)/Scripts
@@ -10,27 +12,39 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade start build
-
-run: build
-	docker run --rm -p 8888:8888 $(DOCKER_IMAGE)
-
-build:
-	docker build -t $(DOCKER_IMAGE) .
-
-start: $(VENV) $(ENV)
-	source $(ENV) && $(VENV_BIN)/jupyter-lab
 
 $(VENV):
 	python -m venv $(VENV)
 	touch -a $(REQUIREMENTS)
-	$(VENV_BIN)/python -m pip install -r $(REQUIREMENTS)
+	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS)
 
 $(VENV)_upgrade: $(VENV)
 	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS)
 
-$(ENV):
-	cp $(ENV).template $(ENV)
+
+install: uninstall build
+	$(VENV_BIN)/python -m pip install ./dist/*.whl
+
+build: venv
+	rm -rf dist/
+	$(VENV_BIN)/python -m build
+
+uninstall:
+	$(VENV_BIN)/python -m pip uninstall -y $(NAME)
+
+documentation:
+	make html -C docs/
+
+test: install
+	$(VENV_BIN)/python -m pytest
+
+upload: test documentation
+	$(VENV_BIN)/python -m pip install --upgrade twine
+	$(VENV_BIN)/python -m twine upload --verbose dist/*
+
+download: uninstall
+	$(VENV_BIN)/python -m pip install $(NAME)
 
 
+########## Makefile end ##########
 
