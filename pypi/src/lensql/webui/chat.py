@@ -1,14 +1,14 @@
 from . import html
 
 from .. import logger
-from .. import llm
-from ..llm import MessageRole
-from ..sql import SQLException
+from .. import server
+from ..sql_errors import SQLException
 
 from enum import Enum
 from IPython.display import display, HTML
 import ipywidgets as widgets
 import pandas as pd
+from dav_tools.chatgpt import MessageRole
 
 CHAT_ID = 0
 MSG_ID = 0
@@ -136,44 +136,6 @@ class Chat:
 
         self.display_box([text_input, send_button])
 
-    # def show_free_input(self):
-    #     """Creates an interactive text input field with a send button."""
-    #     text_input = widgets.Text(placeholder='Type here...', layout=widgets.Layout(width='100%'))
-    #     send_button = widgets.Button(description='Send')
-    #     back_button = widgets.Button(description='Back')
-
-    #     # Define the on_submit event
-    #     def on_submit(b):
-    #         user_text = text_input.value.strip()
-    #         if user_text:
-    #             self.show_message(MessageRole.USER, user_text)
-    #             text_input.close()
-    #             send_button.close()
-    #             back_button.close()
-
-    #             tmp = self.start_thinking()
-
-    #             conversation = [{'role': msg.role, 'content': msg.content} for msg in self.messages]
-    #             response = llm.free_prompt(user_text, self.code, conversation)
-                
-    #             self.delete_message(tmp.msg_id)
-    #             self.show_message(MessageRole.ASSISTANT, response)
-    #             self.show_free_input()
-    #     # -- End of on_submit event --
-
-    #     text_input.on_submit(on_submit)
-    #     send_button.on_click(on_submit)
-
-    #     def back_to_quick_answers(b):
-    #         text_input.close()
-    #         send_button.close()
-    #         back_button.close()
-    #         self.show_error_buttons()
-
-    #     back_button.on_click(back_to_quick_answers)
-
-    #     self.display_box([text_input, send_button, back_button])
-
 class CodeChat(Chat):
     '''Chat related to a specific code snippet.'''
     def __init__(self, code: str, data):
@@ -214,7 +176,7 @@ class ResultChat(CodeChat):
             logger.log_button(button_text, self.code, True, self.data.to_csv(), self.chat_id, self.last_message_id)
 
             if button_text == ResultButtons.DESCRIBE_QUERY.value:
-                response = llm.explain_my_query(self.code)
+                response = server.explain_my_query(self.code, self.chat_id, self.last_message_id)
             else:
                 response = 'Action not implemented yet.'
 
@@ -265,9 +227,9 @@ class ErrorChat(CodeChat):
 
             if button_text == ErrorButtons.EXPLAIN.value:
                 
-                response = llm.explain_error_message(code=self.code, exception=self.data)
+                response = server.explain_error_message(self.code, str(self.data), self.chat_id, self.last_message_id)
             elif button_text == ErrorButtons.LOCATE.value:
-                response = llm.identify_error_cause(code=self.code, exception=self.data)
+                response = server.identify_error_cause(self.code, str(self.data), self.chat_id, self.last_message_id)
             else:
                 response = 'Action not implemented yet.'
 

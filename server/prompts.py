@@ -1,4 +1,4 @@
-from ..sql import SQLCode
+from sql_code import SQLCode
 
 RESPONSE_FORMAT = '''
 Format the response as follows:

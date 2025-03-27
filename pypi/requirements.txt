@@ -1,6 +1,6 @@
 jupyterlab
 psycopg2
-dav_tools==0.4.15
+dav_tools==0.4.16
 pandas
 ipywidgets
 sqlparse

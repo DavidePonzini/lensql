@@ -1,30 +1,35 @@
 BEGIN;
 
-DROP SCHEMA IF EXISTS lensql_log CASCADE;
-CREATE SCHEMA lensql_log;
-GRANT USAGE ON SCHEMA lensql_log TO lensql;
+DROP SCHEMA IF EXISTS lensql CASCADE;
+CREATE SCHEMA lensql;
 
-CREATE TABLE lensql_log.buttons (
+GRANT USAGE ON SCHEMA lensql TO lensql;
+ALTER DEFAULT PRIVILEGES IN SCHEMA lensql GRANT ALL ON TABLES TO lensql;
+ALTER DEFAULT PRIVILEGES IN SCHEMA lensql GRANT ALL ON SEQUENCES TO lensql;
+
+CREATE TABLE lensql.users (
+    username VARCHAR(255) PRIMARY KEY,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE lensql.buttons (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL REFERENCES lensql.users(username),
     button VARCHAR(255) NOT NULL,
     query TEXT NOT NULL,
     success BOOLEAN NOT NULL,
-    data TEXT NOT NULL,
+    data TEXT DEFAULT NULL,
     chat_id INTEGER NOT NULL,
     msg_id INTEGER NOT NULL,
     ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE lensql_log.queries (
+CREATE TABLE lensql.queries (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL REFERENCES lensql.users(username),
     query TEXT NOT NULL,
     success BOOLEAN NOT NULL,
     ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
-
-GRANT INSERT, UPDATE ON ALL TABLES IN SCHEMA lensql_log TO lensql;
-GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA lensql_log TO lensql;
 
 COMMIT;

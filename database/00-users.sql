@@ -1,0 +1,1 @@
+CREATE USER lensql WITH PASSWORD 'lnsql';

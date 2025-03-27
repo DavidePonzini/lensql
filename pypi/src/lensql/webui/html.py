@@ -1,7 +1,7 @@
 from . import load_content
+from ..sql_errors import SQLException
 
-from ..sql import SQLException
-from ..llm import MessageRole
+from dav_tools.chatgpt import MessageRole
 
 import html
 
