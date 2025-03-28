@@ -52,7 +52,6 @@ def explain_error_message():
         username=username,
         query_id=query_id,
         button=request.path,
-        success=False,
         data=exception,
         chat_id=chat_id,
         msg_id=msg_id
@@ -75,7 +74,6 @@ def locate_error_cause():
         username=username,
         query_id=query_id,
         button=request.path,
-        success=False,
         data=exception,
         chat_id=chat_id,
         msg_id=msg_id
@@ -97,7 +95,6 @@ def provide_error_example():
         username=username,
         query_id=query_id,
         button=request.path,
-        success=False,
         data=None,
         chat_id=chat_id,
         msg_id=msg_id
@@ -120,7 +117,6 @@ def fix_query():
         username=username,
         query_id=query_id,
         button=request.path,
-        success=False,
         data=None,
         chat_id=chat_id,
         msg_id=msg_id
@@ -143,7 +139,6 @@ def describe_my_query():
         username=username,
         query_id=query_id,
         button=request.path,
-        success=False,
         data=None,
         chat_id=chat_id,
         msg_id=msg_id
@@ -165,7 +160,6 @@ def explain_my_query():
         username=username,
         query_id=query_id,
         button=request.path,
-        success=False,
         data=None,
         chat_id=chat_id,
         msg_id=msg_id

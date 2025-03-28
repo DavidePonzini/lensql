@@ -30,12 +30,11 @@ def can_login(username: str) -> bool:
 
     return len(result) == 1    
 
-def log_button(username: str, button: str, query_id: str, success: bool, data: str, chat_id: int, msg_id: int):
+def log_button(username: str, button: str, query_id: str, data: str, chat_id: int, msg_id: int):
     db.insert(schema, 'buttons', {
         'username': username,
         'query_id': query_id,
         'button': button,
-        'success': success,
         'data': data,
         'chat_id': chat_id,
         'msg_id': msg_id,

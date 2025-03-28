@@ -26,7 +26,6 @@ CREATE TABLE lensql.buttons (
     username VARCHAR(255) NOT NULL REFERENCES lensql.users(username),
     query_id INTEGER REFERENCES lensql.queries(id),
     button VARCHAR(255) NOT NULL,
-    success BOOLEAN NOT NULL,
     data TEXT DEFAULT NULL,
     chat_id INTEGER NOT NULL,
     msg_id INTEGER NOT NULL,

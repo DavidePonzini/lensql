@@ -22,7 +22,7 @@ Do not provide the correct answer, I only want an explanation of the error.
 
 {RESPONSE_FORMAT}
 
--- SQL Query --
+-- {language} Query --
 {query}
 
 -- Error --
@@ -50,7 +50,7 @@ Do not correct the query, I only want guidance on where to look to fix the error
 
 {RESPONSE_FORMAT}
 
--- SQL Query --
+-- {language} Query --
 {query}
 
 -- Error --
@@ -75,7 +75,7 @@ Do not provide the correct answer and do not try to fix eventual errors, I only 
 
 {RESPONSE_FORMAT}
 
--- SQL Query --
+-- {language} Query --
 {query}
 
 -- Error --
@@ -98,7 +98,7 @@ Return only the relevant part fixed, without any additional explanation.
 
 {RESPONSE_FORMAT}
 
--- SQL Query --
+-- {language} Query --
 {query}
 
 -- Error --
@@ -124,7 +124,7 @@ Assume the user has willingly formulated the query this way.
 
 {RESPONSE_FORMAT}
 
--- SQL Query --
+-- {language} Query --
 {query}
 
 -- Template answer --
@@ -181,7 +181,7 @@ Assume the user has willingly formulated the query this way.
 
 {RESPONSE_FORMAT}
 
--- SQL Query --
+-- {language} Query --
 {query}
 
 -- Template answer --
