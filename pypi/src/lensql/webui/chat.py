@@ -18,8 +18,8 @@ class Buttons(Enum):
     # MANUAL_PROMPT = 'Other'
 
 class ResultButtons(Buttons):
-    DESCRIBE_QUERY = 'Describe query'
-    EXPLAIN_QUERY = 'Explain query'
+    DESCRIBE = 'Describe query'
+    EXPLAIN = 'Explain query'
 
 class ErrorButtons(Buttons):
     EXPLAIN = 'Explain error'
@@ -137,17 +137,18 @@ class Chat:
 
 class CodeChat(Chat):
     '''Chat related to a specific code snippet.'''
-    def __init__(self, code: str, data):
+    def __init__(self, query_id : int, code: str, data):
         super().__init__()
 
+        self.query_id = query_id
         self.code = code
         self.data = data
 
 
 class ResultChat(CodeChat):
     '''Chat related to a specific code snippet that has returned a result.'''
-    def __init__(self, code: str, result: pd.DataFrame):
-        super().__init__(code, data=result)
+    def __init__(self, query_id: int, code: str, result: pd.DataFrame):
+        super().__init__(query_id, code, data=result)
 
     def show(self):
         super().show()
@@ -172,8 +173,10 @@ class ResultChat(CodeChat):
             self.show_message(MessageRole.USER, button_text)
             self.start_thinking()
 
-            if button_text == ResultButtons.DESCRIBE_QUERY.value:
-                response = server.explain_my_query(self.code, self.chat_id, self.last_message_id)
+            if button_text == ResultButtons.DESCRIBE.value:
+                response = server.describe_my_query(self.query_id, self.chat_id, self.last_message_id)
+            elif button_text == ResultButtons.EXPLAIN.value:
+                response = server.explain_my_query(self.query_id, self.chat_id, self.last_message_id)
             else:
                 response = 'Action not implemented yet.'
 
@@ -191,8 +194,8 @@ class ResultChat(CodeChat):
 
 class ErrorChat(CodeChat):
     '''Chat related to a specific code snippet that has returned an error.'''
-    def __init__(self, code, exception: Exception):
-        super().__init__(code, data=SQLException(exception))
+    def __init__(self, query_id: int, code, exception: Exception):
+        super().__init__(query_id, code, data=SQLException(exception))
         
     def show(self):
         super().show()
@@ -221,10 +224,13 @@ class ErrorChat(CodeChat):
             self.start_thinking()
 
             if button_text == ErrorButtons.EXPLAIN.value:
-                
-                response = server.explain_error_message(self.code, str(self.data), self.chat_id, self.last_message_id)
+                response = server.explain_error_message(self.query_id, str(self.data), self.chat_id, self.last_message_id)
+            elif button_text == ErrorButtons.EXAMPLE.value:
+                response = server.provide_error_example(self.query_id, str(self.data), self.chat_id, self.last_message_id)
             elif button_text == ErrorButtons.LOCATE.value:
-                response = server.identify_error_cause(self.code, str(self.data), self.chat_id, self.last_message_id)
+                response = server.locate_error_cause(self.query_id, str(self.data), self.chat_id, self.last_message_id)
+            elif button_text == ErrorButtons.FIX.value:
+                response = server.fix_query(self.query_id, str(self.data), self.chat_id, self.last_message_id)
             else:
                 response = 'Action not implemented yet.'
 

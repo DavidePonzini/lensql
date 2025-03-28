@@ -12,7 +12,7 @@ MOTIVATIONAL_MESSAGE_ERROR = '''
 BRIEF MOTIVATIONALLY-POSITIVE MESSAGE RELATED TO THE SPECIFIC ERROR ENCOUNTERED.
 '''
 
-def explain_error(code: str, exception: Exception, language='PostgreSQL'):
+def explain_error(code: str, exception: str, language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
     
@@ -39,7 +39,7 @@ The error occurred because REASON.
 '''
 
 
-def guide_user(code: str, exception: Exception, language='PostgreSQL'):
+def locate_error_cause(code: str, exception: str, language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
 
@@ -63,6 +63,75 @@ This error is caused by a problem in the following clause:
 <i>{MOTIVATIONAL_MESSAGE_ERROR}</i>
 '''
 
+def provide_error_example(code: str, exception: str, language='PostgreSQL'):
+    query = SQLCode(code)
+    query = query.strip_comments()
+
+    return f'''
+Please provide a simplified minimalistic example of a {language} query that would cause the same error as the one below.
+The example should be extremely simplified, leaving out all query parts that do not contribute to generating the error message.
+Remove conditions that are not necessary to reproduce the error.
+Do not provide the correct answer and do not try to fix eventual errors, I only want an example of a query that would cause this same error.
+
+{RESPONSE_FORMAT}
+
+-- SQL Query --
+{query}
+
+-- Error --
+{exception}
+
+-- Template answer --
+The following query would cause the same error as the one you provided, because BRIEF EXPLANATION:
+<pre class="code m">EXAMPLE QUERY</pre>
+<br>
+<i>{MOTIVATIONAL_MESSAGE_ERROR}</i>
+'''
+
+def fix_query(code: str, exception: str, language='PostgreSQL'):
+    query = SQLCode(code)
+    query = query.strip_comments()
+
+    return f'''
+Please provide a fixed version of the following {language} query that would not cause the same error as the one below.
+Return only the relevant part fixed, without any additional explanation.
+
+{RESPONSE_FORMAT}
+
+-- SQL Query --
+{query}
+
+-- Error --
+{exception}
+
+-- Template answer --
+To fix the query, you could for example change
+<pre class="code m'>ORIGINAL QUERY PART</pre>
+to:
+<pre class="code m">FIXED QUERY PART</pre>
+<br>
+<i>{MOTIVATIONAL_MESSAGE_RESULT}</i>
+'''
+
+def describe_my_query(code: str, language='PostgreSQL'):
+    query = SQLCode(code)
+    query = query.strip_comments()
+
+    return f'''
+Please explain the purpose of the following {language} query. What is the query trying to achieve?
+Do not provide the correct answer and do not try to fix eventual errors, I only want an explanation of this query's purpose.
+Assume the user has willingly formulated the query this way.
+
+{RESPONSE_FORMAT}
+
+-- SQL Query --
+{query}
+
+-- Template answer --
+The query you wrote <b>GOAL DESCRIPTION</b>.
+<br><br>
+<i>{MOTIVATIONAL_MESSAGE_RESULT}</i>
+'''
 
 def explain_my_query(code: str, language='PostgreSQL'):
     query = SQLCode(code)
@@ -116,8 +185,10 @@ Assume the user has willingly formulated the query this way.
 {query}
 
 -- Template answer --
+<div class="hidden">
 The query you wrote <b>GOAL DESCRIPTION</b>.
 <br><br>
+</div>
 Here is a detailed explanation of the query:
 <ol class="detailed-explanantion">
 {templates}

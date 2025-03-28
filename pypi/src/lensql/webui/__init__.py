@@ -8,12 +8,9 @@ from IPython.display import display
 def show_result(code: str, result: pd.DataFrame) -> None:
     display(result)
 
-    server.log_query(query=code, success=True)
-
-    chat.ResultChat(code, result).show()
+    query_id = server.log_query(query=code, success=True)
+    chat.ResultChat(query_id, code, result).show()
 
 def show_error(code: str, exception: Exception) -> None:
-    
-    server.log_query(query=code, success=False)
-
-    chat.ErrorChat(code, exception).show()
+    query_id = server.log_query(query=code, success=False)
+    chat.ErrorChat(query_id, code, exception).show()

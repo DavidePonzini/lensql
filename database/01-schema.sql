@@ -12,23 +12,24 @@ CREATE TABLE lensql.users (
     enabled BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE lensql.buttons (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL REFERENCES lensql.users(username),
-    button VARCHAR(255) NOT NULL,
-    query TEXT NOT NULL,
-    success BOOLEAN NOT NULL,
-    data TEXT DEFAULT NULL,
-    chat_id INTEGER NOT NULL,
-    msg_id INTEGER NOT NULL,
-    ts TIMESTAMP NOT NULL DEFAULT NOW()
-);
-
 CREATE TABLE lensql.queries (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL REFERENCES lensql.users(username),
     query TEXT NOT NULL,
     success BOOLEAN NOT NULL,
+    ts TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+
+CREATE TABLE lensql.buttons (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL REFERENCES lensql.users(username),
+    query_id INTEGER REFERENCES lensql.queries(id),
+    button VARCHAR(255) NOT NULL,
+    success BOOLEAN NOT NULL,
+    data TEXT DEFAULT NULL,
+    chat_id INTEGER NOT NULL,
+    msg_id INTEGER NOT NULL,
     ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

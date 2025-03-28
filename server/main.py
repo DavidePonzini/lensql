@@ -1,50 +1,29 @@
 from flask import Flask, request
 from flask_cors import CORS
-
-
 import json
 
 import llm
 import db
 
 
-OK = { 'status': 'ok' }
-
 app = Flask(__name__)
 CORS(app)
 
 
+def response(success: bool = True, **kwargs):
+    return {
+        'status': 'ok' if success else 'error',
+        **kwargs
+    }
+
+#################### Generic ####################
 @app.route('/login', methods=['POST'])
 def login():
     username = json.loads(request.form['username'])
 
     if db.can_login(username):
-        return OK
-    return {
-        'status': 'invalid_user',
-    }
-
-@app.route('/log-button', methods=['POST'])
-def log_button():
-    username = json.loads(request.form['username'])
-    button = json.loads(request.form['button'])
-    query = json.loads(request.form['query'])
-    success = json.loads(request.form['success'])
-    data = json.loads(request.form['data'])
-    chat_id = json.loads(request.form['chat_id'])
-    msg_id = json.loads(request.form['msg_id'])
-
-    db.log_button(
-        username=username,
-        button=button,
-        query=query,
-        success=success,
-        data=data,
-        chat_id=chat_id,
-        msg_id=msg_id
-    )
-
-    return OK
+        return response()
+    return response(False, message='Invalid username')
 
 @app.route('/log-query', methods=['POST'])
 def log_query():
@@ -52,79 +31,150 @@ def log_query():
     query = json.loads(request.form['query'])
     success = json.loads(request.form['success'])
 
-    db.log_query(
+    query_id = db.log_query(
         username=username,
         query=query,
         success=success
     )
 
-    return OK
+    return response(query_id=query_id)
 
+#################### Syntax Error ####################
 @app.route('/explain-error-message', methods=['POST'])
 def explain_error_message():
     username = json.loads(request.form['username'])
-    query = json.loads(request.form['query'])
+    query_id = json.loads(request.form['query_id'])
     exception = json.loads(request.form['exception'])
     chat_id = json.loads(request.form['chat_id'])
     msg_id = json.loads(request.form['msg_id'])
     
     db.log_button(
         username=username,
-        button='explain-error-message',
-        query=query,
+        query_id=query_id,
+        button=request.path,
         success=False,
         data=exception,
         chat_id=chat_id,
         msg_id=msg_id
     )
 
+    query = db.get_query(query_id)
     answer = llm.explain_error_message(query, exception)
 
-    return answer
+    return response(answer=answer)
 
-@app.route('/identify-error-cause', methods=['POST'])
-def identify_error_cause():
+@app.route('/locate-error-cause', methods=['POST'])
+def locate_error_cause():
     username = json.loads(request.form['username'])
-    query = json.loads(request.form['query'])
+    query_id = json.loads(request.form['query_id'])
     exception = json.loads(request.form['exception'])
     chat_id = json.loads(request.form['chat_id'])
     msg_id = json.loads(request.form['msg_id'])
 
     db.log_button(
         username=username,
-        button='identify-error-cause',
-        query=query,
+        query_id=query_id,
+        button=request.path,
         success=False,
         data=exception,
         chat_id=chat_id,
         msg_id=msg_id
     )
 
-    answer = llm.identify_error_cause(query, exception)
+    query = db.get_query(query_id)
+    answer = llm.locate_error_cause(query, exception)
 
-    return answer
+    return response(answer=answer)
 
-
-@app.route('/explain-my-query', methods=['POST'])
-def explain_my_query():
+@app.route('/provide-error-example', methods=['POST'])
+def provide_error_example():
     username = json.loads(request.form['username'])
-    query = json.loads(request.form['query'])
+    query_id = json.loads(request.form['query_id'])
+    exception = json.loads(request.form['exception'])
     chat_id = json.loads(request.form['chat_id'])
     msg_id = json.loads(request.form['msg_id'])
-
     db.log_button(
         username=username,
-        button='explain-my-query',
-        query=query,
+        query_id=query_id,
+        button=request.path,
         success=False,
         data=None,
         chat_id=chat_id,
         msg_id=msg_id
     )
 
+    query = db.get_query(query_id)
+    answer = llm.provide_error_example(query, exception)
+
+    return response(answer=answer)
+
+@app.route('/fix-query', methods=['POST'])
+def fix_query():
+    username = json.loads(request.form['username'])
+    query_id = json.loads(request.form['query_id'])
+    exception = json.loads(request.form['exception'])
+    chat_id = json.loads(request.form['chat_id'])
+    msg_id = json.loads(request.form['msg_id'])
+
+    db.log_button(
+        username=username,
+        query_id=query_id,
+        button=request.path,
+        success=False,
+        data=None,
+        chat_id=chat_id,
+        msg_id=msg_id
+    )
+
+    query = db.get_query(query_id)
+    answer = llm.fix_query(query, exception)
+
+    return response(answer=answer)
+
+#################### Syntax OK ####################
+@app.route('/describe-my-query', methods=['POST'])
+def describe_my_query():
+    username = json.loads(request.form['username'])
+    query_id = json.loads(request.form['query_id'])
+    chat_id = json.loads(request.form['chat_id'])
+    msg_id = json.loads(request.form['msg_id'])
+
+    db.log_button(
+        username=username,
+        query_id=query_id,
+        button=request.path,
+        success=False,
+        data=None,
+        chat_id=chat_id,
+        msg_id=msg_id
+    )
+
+    query = db.get_query(query_id)
+    answer = llm.describe_my_query(query)
+
+    return response(answer=answer)
+
+@app.route('/explain-my-query', methods=['POST'])
+def explain_my_query():
+    username = json.loads(request.form['username'])
+    query_id = json.loads(request.form['query_id'])
+    chat_id = json.loads(request.form['chat_id'])
+    msg_id = json.loads(request.form['msg_id'])
+
+    db.log_button(
+        username=username,
+        query_id=query_id,
+        button=request.path,
+        success=False,
+        data=None,
+        chat_id=chat_id,
+        msg_id=msg_id
+    )
+
+    query = db.get_query(query_id)
     answer = llm.explain_my_query(query)
 
-    return answer
+    return response(answer=answer)
 
 
 if __name__ == '__main__':
