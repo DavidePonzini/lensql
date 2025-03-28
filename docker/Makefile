@@ -10,5 +10,5 @@ rund: build
 	docker run -d -p 8888:8888 $(DOCKER_IMAGE)
 
 build:
-	source $(ENV) && docker build -t $(DOCKER_IMAGE) .
+	docker build -t $(DOCKER_IMAGE) .
 

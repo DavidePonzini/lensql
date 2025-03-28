@@ -18,27 +18,27 @@ $(VENV):
 $(VENV)_upgrade: $(VENV)
 	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS)
 
-install: uninstall build
+install: $(VENV) uninstall build
 	$(VENV_BIN)/python -m pip install ./dist/*.whl
 
 build: $(VENV)
 	rm -rf dist/
 	$(VENV_BIN)/python -m build
 
-uninstall:
+uninstall: $(VENV)
 	$(VENV_BIN)/python -m pip uninstall -y $(NAME)
 
 documentation:
 	make html -C docs/
 
-test: install
+test: $(VENV) install
 	$(VENV_BIN)/python -m pytest
 
-upload: test documentation
+upload: $(VENV) test documentation
 	$(VENV_BIN)/python -m pip install --upgrade twine
 	$(VENV_BIN)/python -m twine upload --verbose dist/*
 
-download: uninstall
+download: $(VENV) uninstall
 	$(VENV_BIN)/python -m pip install $(NAME)
 
 
