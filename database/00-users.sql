@@ -1,1 +1,1 @@
-CREATE USER lensql WITH PASSWORD 'lnsql';
+CREATE USER lensql WITH PASSWORD 'lesnql';

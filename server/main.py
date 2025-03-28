@@ -1,6 +1,5 @@
 from flask import Flask, request
 from flask_cors import CORS
-from dav_tools import messages
 
 
 import json
@@ -17,7 +16,6 @@ CORS(app)
 
 @app.route('/login', methods=['POST'])
 def login():
-    messages.debug(request.form)
     username = json.loads(request.form['username'])
 
     if db.can_login(username):

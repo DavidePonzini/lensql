@@ -1,15 +1,16 @@
 from typing import Literal
 
 from dav_tools import database
+import os
 
 schema = 'lensql'
 
 db = database.PostgreSQL(
-    host='localhost',
-    port=5432,
-    database='postgres',
-    user='lensql',
-    password='lnsql'
+    host =      os.getenv('LENSQL_HOST'),
+    port =  int(os.getenv('LENSQL_PORT')),
+    database =  os.getenv('LENSQL_DATABASE'),
+    user =      os.getenv('LENSQL_USER'),
+    password =  os.getenv('LENSQL_PASSWORD')
 )
 
 def can_login(username: str) -> bool:
@@ -32,7 +33,7 @@ def can_login(username: str) -> bool:
     return len(result) == 1    
 
 def log_button(username: str, button: str, query: str, success: bool, data: str, chat_id: int, msg_id: int):
-    db.insert('lensql_log', 'buttons', {
+    db.insert(schema, 'buttons', {
         'username': username,
         'button': button,
         'query': query,
@@ -43,7 +44,7 @@ def log_button(username: str, button: str, query: str, success: bool, data: str,
     })
 
 def log_query(username: str, query: str, success: bool):
-    db.insert('lensql_log', 'queries', {
+    db.insert(schema, 'queries', {
         'username': username,
         'query': query,
         'success': success,

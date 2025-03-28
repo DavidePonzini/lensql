@@ -1,6 +1,5 @@
 from . import html
 
-from .. import logger
 from .. import server
 from ..sql_errors import SQLException
 
@@ -173,8 +172,6 @@ class ResultChat(CodeChat):
             self.show_message(MessageRole.USER, button_text)
             self.start_thinking()
 
-            logger.log_button(button_text, self.code, True, self.data.to_csv(), self.chat_id, self.last_message_id)
-
             if button_text == ResultButtons.DESCRIBE_QUERY.value:
                 response = server.explain_my_query(self.code, self.chat_id, self.last_message_id)
             else:
@@ -222,8 +219,6 @@ class ErrorChat(CodeChat):
 
             self.show_message(MessageRole.USER, button_text)
             self.start_thinking()
-
-            logger.log_button(button_text, self.code, False, str(self.data), self.chat_id, self.last_message_id)
 
             if button_text == ErrorButtons.EXPLAIN.value:
                 
