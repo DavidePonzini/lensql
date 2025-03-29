@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lensql"
-version = "0.1.6"
+version = "0.1.8"
 authors = [
   { name="Davide Ponzini", email="davide.ponzini95@gmail.com" },
 ]

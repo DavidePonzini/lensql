@@ -1114,7 +1114,8 @@ c.ServerApp.root_dir = '/home/user/'
 
 ## DEPRECATED. Use IdentityProvider.token
 #  Default: '<DEPRECATED>'
-c.ServerApp.token = ''
+# c.ServerApp.token = ''
+c.IdentityProvider.token = ''
 
 ## Supply overrides for the tornado.web.Application that the Jupyter server uses.
 #  Default: {}

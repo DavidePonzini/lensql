@@ -1,7 +1,5 @@
 FROM python:3.11
 
-ARG USERNAME=user
-
 ENV JUPYTER_PORT=8888
 
 WORKDIR /lensql
@@ -18,12 +16,12 @@ RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
 EXPOSE ${JUPYTER_PORT}
 
 # Add a non-root account for the user
-RUN useradd -ms /bin/bash ${USERNAME}
+RUN useradd -ms /bin/bash user
 
 # Copy sample notebook
-COPY notebook.ipynb /home/${USERNAME}/
-RUN chown ${USERNAME}:${USERNAME} /home/${USERNAME}/notebook.ipynb
+COPY notebook.ipynb /home/user/
+RUN chown user:user /home/user/notebook.ipynb
 
 # Run as non-root user
-USER ${USERNAME}
+USER user
 CMD ["jupyter-lab", "--no-browser", "--config=jupyter_lab_config.py"]

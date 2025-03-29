@@ -3,8 +3,26 @@ services:
     image: davideponzini/lensql:latest
     ports:
       - "8888:8888"
+    depends_on:
+      - db
+    environment:
+      LENSQL_HOST: https://ponzidav.com/lensql
+      LENSQL_DB_HOST: db
+      LENSQL_DB_PORT: 5432
+      LENSQL_DB_USERNAME: postgres
+      LENSQL_DB_PASSWORD: password
+      LENSQL_DB_NAME: postgres
     volumes:
-      - appdata:/home/user
+      - lensql_data:/home/user
+
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  appdata:
+  lensql_data:
+  pgdata:

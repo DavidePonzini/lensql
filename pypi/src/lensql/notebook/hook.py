@@ -11,11 +11,16 @@ from IPython.core.interactiveshell import InteractiveShell
 from dav_tools import messages
 import sys
 import pandas as pd
-
+import os
 
 def setup(
-        host: str = '', username: str = '',
-        dbhost: str = '', dbport: int = 5432, dbname: str = '', dbusername: str = '',
+        host:       str =       os.getenv('LENSQL_HOST',        ''),
+        username:   str =       '',
+        dbhost:     str =       os.getenv('LENSQL_DB_HOST',     ''),
+        dbport:     int =   int(os.getenv('LENSQL_DB_PORT',     '5432')),
+        dbname:     str =       os.getenv('LENSQL_DB_NAME',     ''),
+        dbusername: str =       os.getenv('LENSQL_DB_USERNAME', ''),
+        dbpassword: str =       os.getenv('LENSQL_DB_PASSWORD', ''),
         *, allow_code_execution=False):
     '''Configures the database connection and enables SQL execution in the notebook.'''
     while len(host) == 0: 
@@ -36,7 +41,8 @@ def setup(
         dbname = messages.ask('Enter database name', file=sys.stdout)
     while len(dbusername) == 0:
         dbusername = messages.ask('Enter database username', file=sys.stdout)
-    dbpassword = messages.ask('Enter database password', secret=True, file=sys.stdout)
+    while len(dbpassword) == 0:
+        dbpassword = messages.ask('Enter database password', secret=True, file=sys.stdout)
 
     if database.set_credentials(dbhost, dbport, dbname, dbusername, dbpassword):
         messages.success('Connected to database', file=sys.stdout)
