@@ -18,7 +18,8 @@ start: $(ENV) $(VENV)
 
 start_bg: $(ENV) $(VENV)
 	sudo service postgresql start
-	source $(ENV) && nohup $(VENV_BIN)/python ./main.py > log.txt 2>&1 &
+	mkdir -p log
+	source $(ENV) && nohup $(VENV_BIN)/python ./main.py > log/$(shell date +%Y-%m-%d.%H:%M:%S).txt 2>&1 &
 
 $(ENV):
 	cp $(ENV).template $(ENV)
