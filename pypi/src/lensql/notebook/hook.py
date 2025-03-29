@@ -14,13 +14,13 @@ import pandas as pd
 
 
 def setup(
-        host: str | None = None, username: str | None = None,
-        dbhost: str | None = None, dbport: int = 5432, dbname: str | None = None, dbusername: str | None = None,
+        host: str = '', username: str = '',
+        dbhost: str = '', dbport: int = 5432, dbname: str = '', dbusername: str = '',
         *, allow_code_execution=False):
     '''Configures the database connection and enables SQL execution in the notebook.'''
-    if host is None:
+    while len(host) == 0: 
         host = messages.ask('Enter server host', file=sys.stdout)
-    if username is None:
+    while len(username) == 0:
         username = messages.ask('Enter server username', file=sys.stdout)
 
     if server.login(host, username):
@@ -28,13 +28,13 @@ def setup(
     else:
         return
     
-    if dbhost is None:
+    while len(dbhost) == 0:
         dbhost = messages.ask('Enter database host', file=sys.stdout)
-    if dbport is None:
+    while dbport is None:
         dbport = messages.ask('Enter database port', file=sys.stdout)
-    if dbname is None:
+    while len(dbname) == 0:
         dbname = messages.ask('Enter database name', file=sys.stdout)
-    if dbusername is None:
+    while len(dbusername) == 0:
         dbusername = messages.ask('Enter database username', file=sys.stdout)
     dbpassword = messages.ask('Enter database password', secret=True, file=sys.stdout)
 

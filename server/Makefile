@@ -26,7 +26,7 @@ $(ENV):
 
 $(VENV):
 	python -m venv $(VENV)
-	$(VENV_BIN)/python -m pip install --upgrade -r requirements.txt
+	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS)
 
 $(VENV)_upgrade: $(VENV)
 	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS)

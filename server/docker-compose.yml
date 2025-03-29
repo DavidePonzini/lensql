@@ -1,0 +1,10 @@
+services:
+  lensql:
+    image: davideponzini/lensql:latest
+    ports:
+      - "8888:8888"
+    volumes:
+      - appdata:/home/user
+
+volumes:
+  appdata:

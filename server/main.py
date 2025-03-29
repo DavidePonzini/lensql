@@ -171,6 +171,13 @@ def explain_my_query():
 
     return response(answer=answer)
 
+@app.route('/', methods=['GET'])
+def start():
+    with open('docker-compose.yml') as f:
+        docker_compose = f.read()
+    
+    return docker_compose
+
 
 if __name__ == '__main__':
     app.run(
