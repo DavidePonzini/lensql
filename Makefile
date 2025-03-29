@@ -11,7 +11,11 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade
+.PHONY: $(VENV)_upgrade run start
+
+
+start:
+	docker compose up -d
 
 run: $(VENV)
 	make -C pypi install VENV=../$(VENV)
