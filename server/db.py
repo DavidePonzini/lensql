@@ -4,11 +4,11 @@ import os
 schema = 'lensql'
 
 db = database.PostgreSQL(
-    host =      os.getenv('LENSQL_DB_HOST'),
-    port =  int(os.getenv('LENSQL_DB_PORT')),
-    database =  os.getenv('LENSQL_DB_DATABASE'),
-    user =      os.getenv('LENSQL_DB_USER'),
-    password =  os.getenv('LENSQL_DB_PASSWORD')
+    host =      os.getenv('DB_HOST'),
+    port =  int(os.getenv('DB_PORT')),
+    database =  os.getenv('DB_DATABASE'),
+    user =      os.getenv('DB_USER'),
+    password =  os.getenv('DB_PASSWORD')
 )
 
 def can_login(username: str) -> bool:

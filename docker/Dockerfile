@@ -2,7 +2,7 @@ FROM python:3.11
 
 ENV JUPYTER_PORT=8888
 
-WORKDIR /lensql
+WORKDIR /app
 
 # Requirements
 COPY requirements.txt ./requirements.txt
