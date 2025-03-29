@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request
 from flask_cors import CORS
 import json
@@ -174,5 +175,6 @@ def explain_my_query():
 if __name__ == '__main__':
     app.run(
     	host='0.0.0.0',
+        port=os.getenv('LENSQL_PORT', 5431),
     	debug=True
     )
