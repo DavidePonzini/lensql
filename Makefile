@@ -15,6 +15,8 @@ endif
 
 
 start:
+	docker compose down
+	docker rmi lensql-server
 	docker compose up -d
 
 run: $(VENV)

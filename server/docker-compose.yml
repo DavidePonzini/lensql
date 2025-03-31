@@ -1,8 +1,9 @@
 services:
   lensql:
-    image: davideponzini/lensql:latest
+    image: davideponzini/lensql:1
     ports:
       - "8888:8888"
+    container_name: lensql_client
     depends_on:
       - db
     environment:
@@ -13,16 +14,16 @@ services:
       LENSQL_DB_PASSWORD: password
       LENSQL_DB_NAME: postgres
     volumes:
-      - lensql_data:/home/user
+      - lensql_client_data:/home/user
 
   db:
     image: postgres:latest
-    restart: unless-stopped
+    container_name: lensql_client_db
     environment:
       POSTGRES_PASSWORD: password
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - lensql_client_pgdata:/var/lib/postgresql/data
 
 volumes:
-  lensql_data:
-  pgdata:
+  lensql_client_data:
+  lensql_client_pgdata:
