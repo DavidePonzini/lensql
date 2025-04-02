@@ -18,7 +18,7 @@ def response(success: bool = True, **kwargs):
     }
 
 OK = response()
-NOT_IMPLEMENTED = response(message='This feature is not implemented yet. Please check back later.')
+NOT_IMPLEMENTED = response(answer='This feature is not implemented yet. Please check back later.')
 
 #################### Generic ####################
 @app.route('/login', methods=['POST'])
