@@ -1,38 +1,52 @@
 BEGIN;
 
-CREATE OR REPLACE VIEW lensql.v_button_presses AS
+SET search_path to lensql;
+
+CREATE OR REPLACE VIEW v_button_presses AS
 SELECT 
     button,
     COUNT(*) AS press_count
 FROM 
-    lensql.buttons
+    messages
 GROUP BY 
     button
 ORDER BY 
     button;
 
-CREATE OR REPLACE VIEW lensql.v_button_presses_by_user AS
+CREATE OR REPLACE VIEW v_button_presses_by_user AS
 SELECT 
     username,
     button,
     COUNT(*) AS press_count
 FROM 
-    lensql.buttons
+    messages
+    JOIN queries ON messages.query_id = queries.id
 GROUP BY 
     username, button
 ORDER BY 
     username, button;
 
-CREATE OR REPLACE VIEW lensql.v_user_query_counts AS
+CREATE OR REPLACE VIEW v_user_query_counts AS
 SELECT 
     username,
     COUNT(*) FILTER (WHERE success) AS success_count,
     COUNT(*) FILTER (WHERE NOT success) AS error_count
 FROM 
-    lensql.queries
+    queries
 GROUP BY 
     username
 ORDER BY 
     username;
 
+CREATE OR REPLACE VIEW v_feedbacks AS
+SELECT 
+    button,
+    COUNT(*) FILTER (WHERE feedback = TRUE) AS positive_feedback,
+    COUNT(*) FILTER (WHERE feedback = FALSE) AS negative_feedback
+FROM
+    messages
+GROUP BY
+    button
+ORDER BY
+    button;
 COMMIT;

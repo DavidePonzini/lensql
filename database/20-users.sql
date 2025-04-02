@@ -4,7 +4,10 @@ INSERT INTO lensql.users(username)
 VALUES
     ('dav'),
     ('dev'),
-    ('test')
+    ('test'),
+    ('barbara'),
+    ('giovanna')
+
 ON CONFLICT (username) DO NOTHING;
 
 COMMIT;
