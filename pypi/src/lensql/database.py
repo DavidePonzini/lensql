@@ -1,3 +1,4 @@
+import pandas as pd
 import psycopg2
 from psycopg2.extensions import connection
 from dav_tools import messages
@@ -49,3 +50,90 @@ def set_credentials(host: str, port: int, dbname: str, username: str, password: 
     except Exception as e:
         messages.error('Error connecting to the database:', e)
         return False
+    
+def list_users() -> pd.DataFrame:
+    '''Lists all users in the database.'''
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(Queries.LIST_USERS)
+    rows = cur.fetchall()
+    columns = [desc[0] for desc in cur.description]
+    result = pd.DataFrame(rows, columns=columns)
+
+    cur.close()
+    conn.close()
+
+    return result
+
+def list_schemas() -> pd.DataFrame:
+    '''Lists all schemas in the database.'''
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(Queries.LIST_SCHEMAS)
+    rows = cur.fetchall()
+    columns = [desc[0] for desc in cur.description]
+    result = pd.DataFrame(rows, columns=columns)
+
+    cur.close()
+    conn.close()
+
+    return result
+
+def list_tables() -> pd.DataFrame:
+    '''Lists all tables in the database.'''
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(Queries.LIST_TABLES)
+    rows = cur.fetchall()
+    columns = [desc[0] for desc in cur.description]
+    result = pd.DataFrame(rows, columns=columns)
+
+    cur.close()
+    conn.close()
+
+    return result
+
+
+class Queries:
+    LIST_USERS = '''
+        -- LENSQL_BUILTIN
+        SELECT
+            usename AS username
+        FROM
+            pg_catalog.pg_user
+        ORDER BY
+            usename;
+    '''
+
+    LIST_SCHEMAS = '''
+        -- LENSQL_BUILTIN
+        SELECT
+            schema_name,
+            schema_owner
+        FROM
+            information_schema.schemata
+        ORDER BY
+            schema_name;
+    '''
+
+    LIST_TABLES = '''
+        -- LENSQL_BUILTIN
+        SELECT
+            table_schema AS schema,
+            table_name as table,
+            table_type as type
+        FROM
+            information_schema.tables
+        WHERE
+            table_schema <> 'pg_catalog'
+            AND table_schema <> 'information_schema'
+        ORDER BY
+            table_schema,
+            table_name;
+    '''

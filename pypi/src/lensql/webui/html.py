@@ -53,12 +53,16 @@ class Chat(HtmlComponent):
 
 class Message(HtmlComponent):
     def __init__(self, role: MessageRole, content: str, msg_id: int):
+        self.msg_id = msg_id
+        self.role = role
+
         super().__init__(f'''
-                <div class="messagebox messagebox-{role}" id="msg{msg_id}">
-                    {Icon.ASSISTANT if role == MessageRole.ASSISTANT else Icon.NO_ICON}    
+                <div class="messagebox messagebox-{self.role}" id="msg{self.msg_id}">
+                    {Icon.ASSISTANT if self.role == MessageRole.ASSISTANT else Icon.NO_ICON}    
                     <div class="message">
                         {content}
                     </div>
-                    {Icon.USER if role == MessageRole.USER else Icon.NO_ICON}
+                    {Icon.USER if self.role == MessageRole.USER else Icon.NO_ICON}
                 </div>
+                <div class="message-feedback" id="feedback{self.msg_id}"></div>
             ''')

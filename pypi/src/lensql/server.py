@@ -99,3 +99,9 @@ def explain_my_query(query_id: int, chat_id: int, msg_id: int) -> str:
     }).json()
     
     return response['answer']
+
+def message_feedback(query_id: int, feedback: bool | None) -> None:
+    requests.post(f'{HOST}/message-feedback', data={
+        'query_id': json.dumps(query_id),
+        'feedback': json.dumps(feedback)
+    })
