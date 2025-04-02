@@ -11,7 +11,7 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade run start
+.PHONY: $(VENV)_upgrade run start psql
 
 
 start:
@@ -19,7 +19,7 @@ start:
 	docker rmi lensql-server
 	docker compose up -d
 
-psql: start
+psql:
 	docker exec -it lensql-db-1 psql -U postgres
 
 run: $(VENV)
