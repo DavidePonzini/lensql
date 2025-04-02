@@ -19,6 +19,9 @@ start:
 	docker rmi lensql-server
 	docker compose up -d
 
+psql: start
+	docker exec -it lensql-db-1 psql -U postgres
+
 run: $(VENV)
 	make -C pypi install VENV=../$(VENV)
 	$(VENV_BIN)/jupyter-lab docker/notebook.ipynb
