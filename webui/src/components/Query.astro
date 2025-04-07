@@ -1,4 +1,5 @@
 ---
+import ListButtons from "./ListButtons.astro"
 
 ---
 
@@ -16,10 +17,11 @@
 <textarea class="form-control" id="query" rows="10" placeholder="SELECT * FROM table_name"></textarea>
 <div class="mt-3">
     <button type="button" class="btn btn-primary" id="run-query">Execute</button>
+    <ListButtons></ListButtons>
 </div>
 <div class="mt-3">
     <h5>Result</h5>
-    <pre id="result" class="bg-light p-3"></pre>
+    <div id="result"></div>
 </div>
 
 <script>

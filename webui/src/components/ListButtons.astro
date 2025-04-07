@@ -1,0 +1,26 @@
+---
+
+---
+
+<button class="btn btn-primary" id="list-users">List Users</button>
+<button class="btn btn-primary" id="list-schemas">List Schemas</button>
+<button class="btn btn-primary" id="list-tables">List Tables</button>
+
+
+<script>
+    $('#list-users').on('click', function() {
+        $.get('http://localhost:5000/list-users', function(data) {
+            display_table(data);
+        });
+    });
+    $('#list-schemas').on('click', function() {
+        $.get('http://localhost:5000/list-schemas', function(data) {
+            display_table(data);
+        });
+    });
+    $('#list-tables').on('click', function() {
+        $.get('http://localhost:5000/list-tables', function(data) {
+            display_table(data);
+        });
+    });
+</script>

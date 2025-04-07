@@ -4,21 +4,26 @@ import Section from '../components/Section.astro';
 import Page from '../layouts/Page.astro';
 import Connection from '../components/Connection.astro';
 import Query from '../components/Query.astro';
+import ListButtons from '../components/ListButtons.astro';
 ---
 
 <Page title="LensQL">
     <Background>
-        <Section title="Connection">
+        <Section title="LensQL">
             <div class="row">
+                <div class="col"></div>
                 <div class="col">
                     <Connection/>
                 </div>
-                <div class="col"></div>
             </div>
         </Section>
+
+
 
         <Section title="Query">
             <Query/>
         </Section>
     </Background>
 </Page>
+
+<script is:inline src="scripts/display.js"></script>
