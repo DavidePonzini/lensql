@@ -5,16 +5,23 @@
 <button class="btn btn-primary" id="list-users">List Users</button>
 <button class="btn btn-primary" id="list-schemas">List Schemas</button>
 <button class="btn btn-primary" id="list-tables">List Tables</button>
+<button class="btn btn-primary" id="clear">Clear output</button>
 
 
 <script>
     $('#list-users').on('click', function() {
         $.get('http://localhost:5000/list-users', display);
     });
+    
     $('#list-schemas').on('click', function() {
         $.get('http://localhost:5000/list-schemas', display);
     });
+    
     $('#list-tables').on('click', function() {
         $.get('http://localhost:5000/list-tables', display);
+    });
+
+    $('#clear').on('click', function() {
+        clear_result();
     });
 </script>

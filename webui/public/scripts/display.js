@@ -4,37 +4,34 @@ function display(json_data) {
 
     if (status === 'error') {
         display_text(data['message']);
-        return;
-    }
-    if (status === 'success') {
+    } else if (status === 'success') {
         if (data['data']) {
             display_table(data['data']);
-            return;
-        }
-        if (data['affected_rows']) {
+        } else if (data['affected_rows']) {
             display_text(`Affected rows: ${data['affected_rows']}`);
-            return;
+        } else {
+            console.warn(data);
         }
     }
 
-    console.warn(data);
+    $('#result')[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function display_table(json_data) {
     data = JSON.parse(json_data);
 
     let columns = data['columns'];
-    let row_idx = data['index'];
+    // let row_idx = data['index'];
     let rows = data['data'];
 
     let result = $('#result');
     result.empty();
 
-    let table = $('<table></table>').addClass('table table-striped table-bordered');
-    let thead = $('<thead></thead>');
+    let table = $('<table></table>').addClass('table table-bordered table-hover table-responsive');
+    let thead = $('<thead></thead>').addClass('table-dark');
     let header_row = $('<tr></tr>');
-    let header = $('<th></th>').text('Index');
-    header_row.append(header);
+    // let header = $('<th></th>').text('#');
+    // header_row.append(header);
 
     for (let i = 0; i < columns.length; i++) {
         let th = $('<th></th>').text(columns[i]);
@@ -43,11 +40,11 @@ function display_table(json_data) {
     thead.append(header_row);
     table.append(thead);
 
-    let tbody = $('<tbody></tbody>');
+    let tbody = $('<tbody></tbody>').addClass('table-group-divider');
     for (let i = 0; i < rows.length; i++) {
         let row = $('<tr></tr>');
-        let index_cell = $('<td></td>').text(row_idx[i]);
-        row.append(index_cell);
+        // let index_cell = $('<td></td>').text(row_idx[i]);
+        // row.append(index_cell);
 
         for (let j = 0; j < rows[i].length; j++) {
             let cell = $('<td></td>').text(rows[i][j]);

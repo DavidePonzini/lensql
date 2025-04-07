@@ -1,9 +1,13 @@
-html {
+/* html {
     --bg-color: #FFF4DB;
     --bg-color-code: #FFFFFF;
     --text-color: #000000;
     --icon-width: 50px;
     --icon-margin: 10px;
+} */
+
+table {
+    width: auto!important;
 }
 
 .messagebox {

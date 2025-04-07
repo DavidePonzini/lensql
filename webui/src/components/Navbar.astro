@@ -3,8 +3,8 @@
 const { pathname } = Astro.url;
 
 const navItems = [
-  { match: '/lensql2', label: 'LensQL', href: '/#navbar' },
-  { match: '/utils/', label: 'Installation', href: '/utils' },
+  { match: '/lensql2', label: 'LensQL', href: 'index.html' },
+  { match: '/lensql2/installation.html', label: 'Installation', href: 'installation.html' },
   // { match: '/portfolio/', label: '', href: '/portfolio' },
 ];
 
@@ -12,7 +12,7 @@ const navItems = [
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/#navbar">LensQL</a>
+    <a class="navbar-brand" href="index.html">LensQL</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
