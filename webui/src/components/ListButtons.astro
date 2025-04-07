@@ -9,18 +9,12 @@
 
 <script>
     $('#list-users').on('click', function() {
-        $.get('http://localhost:5000/list-users', function(data) {
-            display_table(data);
-        });
+        $.get('http://localhost:5000/list-users', display);
     });
     $('#list-schemas').on('click', function() {
-        $.get('http://localhost:5000/list-schemas', function(data) {
-            display_table(data);
-        });
+        $.get('http://localhost:5000/list-schemas', display);
     });
     $('#list-tables').on('click', function() {
-        $.get('http://localhost:5000/list-tables', function(data) {
-            display_table(data);
-        });
+        $.get('http://localhost:5000/list-tables', display);
     });
 </script>

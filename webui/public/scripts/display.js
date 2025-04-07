@@ -1,5 +1,27 @@
-function display_table(json_data) {
+function display(json_data) {
     let data = JSON.parse(json_data);
+    let status = data['status'];
+
+    if (status === 'error') {
+        display_text(data['message']);
+        return;
+    }
+    if (status === 'success') {
+        if (data['data']) {
+            display_table(data['data']);
+            return;
+        }
+        if (data['affected_rows']) {
+            display_text(`Affected rows: ${data['affected_rows']}`);
+            return;
+        }
+    }
+
+    console.warn(data);
+}
+
+function display_table(json_data) {
+    data = JSON.parse(json_data);
 
     let columns = data['columns'];
     let row_idx = data['index'];
@@ -38,9 +60,7 @@ function display_table(json_data) {
     result.append(table);
 }
 
-function display_text(json_text) {
-    let text = JSON.parse(json_text);
-
+function display_text(text) {
     let result = $('#result');
     result.empty();
 

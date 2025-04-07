@@ -29,13 +29,11 @@ import ListButtons from "./ListButtons.astro"
         const query = $("#query").val();
         if (query) {
             $.ajax({
-                url: "localhost:5000/run-query",
-                type: "POST",
+                url: "http://localhost:5000/run-query",
                 contentType: "application/json",
+                type: "POST",
                 data: JSON.stringify({ query: query }),
-                success: function(response) {
-                    console.log(response);
-                },
+                success: display,
                 error: console.error
             });
         } else {
