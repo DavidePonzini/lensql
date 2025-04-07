@@ -1,0 +1,91 @@
+html {
+    --bg-color: #FFF4DB;
+    --bg-color-code: #FFFFFF;
+    --text-color: #000000;
+    --icon-width: 50px;
+    --icon-margin: 10px;
+}
+
+.messagebox {
+    display: flex;
+    margin-top: .5rem;
+}
+
+.messagebox-assistant {
+    justify-content: left;
+}
+
+.messagebox-user {
+    justify-content: right;
+}
+
+.icon {
+    width: var(--icon-width);
+    overflow: hidden;
+    position: relative;
+    float: left;
+    text-align: center;
+}
+
+.messagebox-user .icon {
+    margin-left: var(--icon-margin);
+}
+
+.messagebox-assistant .icon {
+    margin-right: var(--icon-margin);
+}
+
+.message {
+    position: relative;
+    border: 2px solid var(--bg-color);
+    border-radius: 6px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 8px;
+    max-width: calc(100% - 200px);  /* 140px to have perfectly-aligned messages */
+}
+
+/* .messagebox-assistant .message {
+    margin-right: var(--icon-width);
+}
+
+.messagebox-user .message {
+    margin-left: var(--icon-width);
+} */
+
+.message:after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    border-style: solid;
+}
+
+.messagebox-assistant .message:after {
+    left: -10px;
+    border-width: 8px 10px 8px 0;
+    border-color: transparent var(--bg-color) transparent transparent;
+}
+
+.messagebox-user .message:after {
+    right: -10px;
+    border-width: 8px 0 8px 10px;
+    border-color: transparent transparent transparent var(--bg-color);
+}
+
+.m {
+    font-family: monospace;
+}
+
+.code {
+    font-size: 1.4em;
+    background: var(--bg-color-code);
+    color: var(--text-color);
+    padding-left: 1rem!important;
+    padding-right: 1rem!important;
+}
+
+.hidden {
+    display: none;
+}

@@ -1,0 +1,43 @@
+---
+
+---
+
+<!-- <form action="" id="search-path-form" class="mb-3">
+    <div class="input-group">
+        <div class="input-group-text">
+            <input class="form-check-input mt-0" type="checkbox" value="">
+        </div>
+        <span class="input-group-text monospace">set search_path to</span>
+        <input type="text" class="form-control" id="search-path" placeholder="public" disabled />
+
+    </div>
+</form> -->
+
+<textarea class="form-control" id="query" rows="10" placeholder="SELECT * FROM table_name"></textarea>
+<div class="mt-3">
+    <button type="button" class="btn btn-primary" id="run-query">Execute</button>
+</div>
+<div class="mt-3">
+    <h5>Result</h5>
+    <pre id="result" class="bg-light p-3"></pre>
+</div>
+
+<script>
+    $("#run-query").on("click", function() {
+        const query = $("#query").val();
+        if (query) {
+            $.ajax({
+                url: "localhost:5000/run-query",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ query: query }),
+                success: function(response) {
+                    console.log(response);
+                },
+                error: console.error
+            });
+        } else {
+            alert("Please enter a query.");
+        }
+    });
+</script>

@@ -1,0 +1,24 @@
+---
+import Background from '../components/Background.astro';
+import Section from '../components/Section.astro';
+import Page from '../layouts/Page.astro';
+import Connection from '../components/Connection.astro';
+import Query from '../components/Query.astro';
+---
+
+<Page title="LensQL">
+    <Background>
+        <Section title="Connection">
+            <div class="row">
+                <div class="col">
+                    <Connection/>
+                </div>
+                <div class="col"></div>
+            </div>
+        </Section>
+
+        <Section title="Query">
+            <Query/>
+        </Section>
+    </Background>
+</Page>
