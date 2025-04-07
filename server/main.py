@@ -13,7 +13,7 @@ CORS(app)
 
 def response(success: bool = True, **kwargs):
     return {
-        'status': 'ok' if success else 'error',
+        'status': 'success' if success else 'error',
         **kwargs
     }
 

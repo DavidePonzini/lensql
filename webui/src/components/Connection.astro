@@ -5,29 +5,106 @@
 <form action="" class="connection-form">
     <div class="input-group">
         <span class="input-group-text">LensQL Username</span>
-        <input type="text" class="form-control" id="username" placeholder="sXXXXXXX" />
+        <input type="text" class="form-control" id="username" placeholder="sXXXXXXX" required />
+        <div class="invalid-feedback hidden" id="username-error-invalid">Invalid username</div>
     </div>
-    <div class="input-group">
+    <!-- <div class="input-group">
         <span class="input-group-text">DB Host</span>
-        <input type="text" class="form-control" id="dbhost" placeholder="localhost" value="localhost" />
+        <input type="text" class="form-control" id="dbhost" placeholder="localhost" required value="localhost" />
     </div>
     <div class="input-group">
         <span class="input-group-text">DB Port</span>
-        <input type="text" class="form-control" id="dbport" placeholder="5432" value="5432" />
-    </div>
+        <input type="text" class="form-control" id="dbport" placeholder="5432" required value="5432" />
+    </div> -->
     <div class="input-group">
         <span class="input-group-text">DB Name</span>
-        <input type="text" class="form-control" id="dbname" placeholder="postgres" value="postgres" />
+        <input type="text" class="form-control" id="dbname" placeholder="postgres" required value="postgres" />
     </div>
     <div class="input-group">
         <span class="input-group-text">DB Username</span>
-        <input type="text" class="form-control" id="dbuser" placeholder="postgres" value="postgres" />
+        <input type="text" class="form-control" id="dbuser" placeholder="postgres" required value="postgres" />
     </div>
     <div class="input-group">
         <span class="input-group-text">DB Password</span>
-        <input type="password" class="form-control" id="dbpassword" placeholder="password" value="password" />
+        <input type="password" class="form-control" id="dbpassword" placeholder="password" required value="password" />
     </div>
+    <button type="submit" class="btn btn-primary mt-3" id="connect">Connect</button>
 </form>
+
+<script>
+    let connect = $('#connect');
+
+    $('#connect').on('click', function(event) {
+        event.preventDefault();
+        connect_to_lensql_server();
+        connect_to_db();
+    });
+
+    function connect_to_lensql_server() {
+        const username = $('#username').val();
+
+        $.ajax({
+            url: 'https://ponzidav.com/lensql/login',
+            type: 'POST',
+            // contentType: 'application/json',
+            contentType: 'application/x-www-form-urlencoded',
+            data: { username: username },
+            // data: JSON.stringify({ username: username }),
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(response) {
+                console.error(response);
+            }
+        });
+    }
+
+    function connect_to_db() {
+        const dbname = $('#dbname').val();
+        const dbuser = $('#dbuser').val();
+        const dbpassword = $('#dbpassword').val();
+
+        $.ajax({
+            url: 'http://localhost:5000/login',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                'db_name': dbname,
+                'db_username': dbuser,
+                'db_password': dbpassword,
+            }),
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(response) {
+                console.error(response);
+            }
+        });
+
+    }
+
+    function set_input_validity(input: any, valid: boolean) {
+        if (valid) {
+            input.removeClass('is-invalid');
+            input.addClass('is-valid');
+        } else {
+            input.removeClass('is-valid');
+            input.addClass('is-invalid');
+        }
+    }
+
+
+    function set_error_message(message_id: string, valid: boolean) {
+        let message = $(`#${message_id}`);
+
+        if (valid)
+            message.addClass('hidden');
+        else
+            message.removeClass('hidden');
+
+        return valid;
+    }
+</script>
 
 <style>
     .input-group-text {
