@@ -3,14 +3,14 @@
 ---
 
 <form action="" class="connection-form">
-    <!-- <div class="input-group">
+    <div class="input-group mb-1">
         <span class="input-group-text">DB Host</span>
         <input type="text" class="form-control" id="dbhost" placeholder="localhost" required value="localhost" />
     </div>
-    <div class="input-group">
+    <div class="input-group mb-1">
         <span class="input-group-text">DB Port</span>
-        <input type="text" class="form-control" id="dbport" placeholder="5432" required value="5432" />
-    </div> -->
+        <input type="text" class="form-control" id="dbport" placeholder="5432" required value="5000" />
+    </div>
     <div class="input-group mb-1">
         <span class="input-group-text">DB Name</span>
         <input type="text" class="form-control" id="dbname" placeholder="postgres" required value="postgres" />
@@ -23,7 +23,7 @@
         <span class="input-group-text">DB Password</span>
         <input type="password" class="form-control" id="dbpassword" placeholder="password" required value="password" />
     </div>
-    <button type="submit" class="btn btn-primary mt-3" id="connect-db">Connect</button>
+    <button type="submit" class="btn btn-primary mt-3" id="connect-db">Connect to DB</button>
     <div id="connection-db-status"></div>
 </form>
 
@@ -34,12 +34,14 @@
     });
 
     function connect_to_db() {
+        const dbhost = $('#dbhost').val();
+        const dbport = $('#dbport').val();
         const dbname = $('#dbname').val();
         const dbuser = $('#dbuser').val();
         const dbpassword = $('#dbpassword').val();
 
         $.ajax({
-            url: 'http://localhost:5000/login',
+            url: `http://${dbhost}:${dbport}/login`,
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ 

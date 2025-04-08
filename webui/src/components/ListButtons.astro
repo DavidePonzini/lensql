@@ -9,16 +9,23 @@
 
 
 <script>
+    
     $('#list-users').on('click', function() {
-        $.get('http://localhost:5000/list-users', display);
+        let dbhost = $('#dbhost').val();
+        let dbport = $('#dbport').val();
+        $.get(`http://${dbhost}:${dbport}/list-users`, display);
     });
     
     $('#list-schemas').on('click', function() {
-        $.get('http://localhost:5000/list-schemas', display);
+        let dbhost = $('#dbhost').val();
+        let dbport = $('#dbport').val();
+        $.get(`http://${dbhost}:${dbport}/list-schemas`, display);
     });
     
     $('#list-tables').on('click', function() {
-        $.get('http://localhost:5000/list-tables', display);
+        let dbhost = $('#dbhost').val();
+        let dbport = $('#dbport').val();
+        $.get(`http://${dbhost}:${dbport}/list-tables`, display);
     });
 
     $('#clear').on('click', function() {

@@ -1,10 +1,19 @@
-/* html {
+html {
+    --chat-bg-color: #FFF4DB;
     --bg-color: #FFF4DB;
     --bg-color-code: #FFFFFF;
     --text-color: #000000;
     --icon-width: 50px;
     --icon-margin: 10px;
-} */
+}
+
+.chat {
+    background-color: var(--chat-bg-color);
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+}
 
 table {
     width: auto!important;

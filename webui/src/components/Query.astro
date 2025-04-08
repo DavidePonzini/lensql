@@ -20,7 +20,6 @@ import ListButtons from "./ListButtons.astro"
     <ListButtons></ListButtons>
 </div>
 <div class="mt-3">
-    <h5>Result</h5>
     <div id="result"></div>
 </div>
 
@@ -28,8 +27,11 @@ import ListButtons from "./ListButtons.astro"
     $("#run-query").on("click", function() {
         const query = $("#query").val();
         if (query) {
+            let dbhost = $('#dbhost').val();
+            let dbport = $('#dbport').val();
+
             $.ajax({
-                url: "http://localhost:5000/run-query",
+                url: `http://${dbhost}:${dbport}/run-query`,
                 contentType: "application/json",
                 type: "POST",
                 data: JSON.stringify({ query: query }),
