@@ -52,16 +52,35 @@ class Message {
 }
 
 class Chat {
-    constructor(query) {
+    constructor(query, is_builtin) {
         CHAT_ID += 1;
         this.id = CHAT_ID;
+
         this.query = query;
+        this.is_builtin = is_builtin;
+        
         this.messages = [];
 
         this.elem = $('<div></div>')
             .addClass('chat')
             .attr('id', `chat-${CHAT_ID}`);
-        this.elem.append($('<div></div>').addClass('chat-query').text(query));
+
+        let title = $('<div></div>').addClass('chat-title');
+        if (this.is_builtin) {
+            let icon = $('<i></i>')
+                .addClass('fas fa-search');
+            title.append(icon);
+            title.append('<br/>');
+            let span = $('<span></span>').text(query);
+            title.append(span);
+        } else {
+            let icon = $('<i></i>')
+                .addClass('fas fa-user');
+            title.append(icon);
+            let pre = $('<pre></pre>').text(query);
+            title.append(pre);
+        }
+        this.elem.append(title);
         this.elem.append($('<hr></hr>'));
         
         $('#result').append(this.elem);

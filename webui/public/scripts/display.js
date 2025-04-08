@@ -2,19 +2,17 @@ TMP_CHATS = [];
 
 function display(json_data) {
     let result = $('#result');
-    result.empty();
-
+    clear_result();
     
     let data = JSON.parse(json_data);
     
     for (let i = 0; i < data.length; i++) {
-        
         let item = data[i];
         let status = item['status'];
-        // let query = item['query'];
-        let query = 'asdf';
+        let query = item['query'];
+        let is_builtin = item['is_builtin'];
         
-        let chat = new Chat(query);
+        let chat = new Chat(query, is_builtin);
         TMP_CHATS.push(chat);
 
         if (status === 'exception') {
@@ -30,7 +28,6 @@ function display(json_data) {
         }
     }
 }
-
 
 function clear_result() {
     let result = $('#result');
