@@ -8,36 +8,14 @@
         <input type="text" class="form-control" id="username" placeholder="sXXXXXXX" required />
         <div class="invalid-feedback hidden" id="username-error-invalid">Invalid username</div>
     </div>
-    <!-- <div class="input-group">
-        <span class="input-group-text">DB Host</span>
-        <input type="text" class="form-control" id="dbhost" placeholder="localhost" required value="localhost" />
-    </div>
-    <div class="input-group">
-        <span class="input-group-text">DB Port</span>
-        <input type="text" class="form-control" id="dbport" placeholder="5432" required value="5432" />
-    </div> -->
-    <div class="input-group">
-        <span class="input-group-text">DB Name</span>
-        <input type="text" class="form-control" id="dbname" placeholder="postgres" required value="postgres" />
-    </div>
-    <div class="input-group">
-        <span class="input-group-text">DB Username</span>
-        <input type="text" class="form-control" id="dbuser" placeholder="postgres" required value="postgres" />
-    </div>
-    <div class="input-group">
-        <span class="input-group-text">DB Password</span>
-        <input type="password" class="form-control" id="dbpassword" placeholder="password" required value="password" />
-    </div>
-    <button type="submit" class="btn btn-primary mt-3" id="connect">Connect</button>
+    <button type="submit" class="btn btn-primary mt-3" id="connect-lensql">Connect to LensQL</button>
+    <div id="connection-lensql-status"></div>
 </form>
 
 <script>
-    let connect = $('#connect');
-
-    $('#connect').on('click', function(event) {
+    $('#connect-lensql').on('click', function(event) {
         event.preventDefault();
         connect_to_lensql_server();
-        connect_to_db();
     });
 
     function connect_to_lensql_server() {
@@ -51,36 +29,16 @@
             data: { username: username },
             // data: JSON.stringify({ username: username }),
             success: function(response) {
-                console.log(response);
+                response = JSON.parse(response);
+                if (response.status == 'error')
+                    $('#connection-lensql-status').text('Connection to LensQL server failed');
+                else
+                    $('#connection-lensql-status').text('Connected to LensQL server');
             },
             error: function(response) {
-                console.error(response);
+                $('#connection-lensql-status').text('Connection to LensQL server failed');
             }
         });
-    }
-
-    function connect_to_db() {
-        const dbname = $('#dbname').val();
-        const dbuser = $('#dbuser').val();
-        const dbpassword = $('#dbpassword').val();
-
-        $.ajax({
-            url: 'http://localhost:5000/login',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ 
-                'db_name': dbname,
-                'db_username': dbuser,
-                'db_password': dbpassword,
-            }),
-            success: function(response) {
-                console.log(response);
-            },
-            error: function(response) {
-                console.error(response);
-            }
-        });
-
     }
 
     function set_input_validity(input: any, valid: boolean) {
@@ -112,12 +70,12 @@
         justify-content: right;
     }
 
+/*
     .input-group .form-control,
     .input-group-text {
-        border-radius: 0; /* Remove all border radii */
+        border-radius: 0;
     }
 
-    /* First input group – keep top border-radius */
     .input-group:first-of-type .form-control:first-child,
     .input-group:first-of-type .input-group-text:first-child {
         border-top-left-radius: 0.375rem;
@@ -127,7 +85,6 @@
         border-top-right-radius: 0.375rem;
     }
 
-    /* Last input group – keep bottom border-radius */
     .input-group:last-of-type .form-control:first-child,
     .input-group:last-of-type .input-group-text:first-child {
         border-bottom-left-radius: 0.375rem;
@@ -136,4 +93,5 @@
     .input-group:last-of-type .input-group-text:last-child {
         border-bottom-right-radius: 0.375rem;
     }
+*/
 </style>

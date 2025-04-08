@@ -1,0 +1,118 @@
+---
+
+---
+
+<form action="" class="connection-form">
+    <!-- <div class="input-group">
+        <span class="input-group-text">DB Host</span>
+        <input type="text" class="form-control" id="dbhost" placeholder="localhost" required value="localhost" />
+    </div>
+    <div class="input-group">
+        <span class="input-group-text">DB Port</span>
+        <input type="text" class="form-control" id="dbport" placeholder="5432" required value="5432" />
+    </div> -->
+    <div class="input-group mb-1">
+        <span class="input-group-text">DB Name</span>
+        <input type="text" class="form-control" id="dbname" placeholder="postgres" required value="postgres" />
+    </div>
+    <div class="input-group mb-1">
+        <span class="input-group-text">DB Username</span>
+        <input type="text" class="form-control" id="dbuser" placeholder="postgres" required value="postgres" />
+    </div>
+    <div class="input-group mb-1">
+        <span class="input-group-text">DB Password</span>
+        <input type="password" class="form-control" id="dbpassword" placeholder="password" required value="password" />
+    </div>
+    <button type="submit" class="btn btn-primary mt-3" id="connect-db">Connect</button>
+    <div id="connection-db-status"></div>
+</form>
+
+<script>
+    $('#connect-db').on('click', function(event) {
+        event.preventDefault();
+        connect_to_db();
+    });
+
+    function connect_to_db() {
+        const dbname = $('#dbname').val();
+        const dbuser = $('#dbuser').val();
+        const dbpassword = $('#dbpassword').val();
+
+        $.ajax({
+            url: 'http://localhost:5000/login',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                'db_name': dbname,
+                'db_username': dbuser,
+                'db_password': dbpassword,
+            }),
+            success: function(response) {
+                response = JSON.parse(response);
+                if (response.status == 'error')
+                    $('#connection-db-status').text('Connection to database failed');
+                else
+                    $('#connection-db-status').text('Connected to database');
+            },
+            error: function(response) {
+                console.error('Connection to database failed', response);
+                $('#connection-db-status').text('Connection to database failed');
+            }
+        });
+
+    }
+
+    function set_input_validity(input: any, valid: boolean) {
+        if (valid) {
+            input.removeClass('is-invalid');
+            input.addClass('is-valid');
+        } else {
+            input.removeClass('is-valid');
+            input.addClass('is-invalid');
+        }
+    }
+
+
+    function set_error_message(message_id: string, valid: boolean) {
+        let message = $(`#${message_id}`);
+
+        if (valid)
+            message.addClass('hidden');
+        else
+            message.removeClass('hidden');
+
+        return valid;
+    }
+</script>
+
+<style>
+    .input-group-text {
+        min-width: 170px;
+        justify-content: right;
+    }
+
+/*
+    .input-group .form-control,
+    .input-group-text {
+        border-radius: 0;
+    }
+
+    .input-group:first-of-type .form-control:first-child,
+    .input-group:first-of-type .input-group-text:first-child {
+        border-top-left-radius: 0.375rem;
+    }
+    .input-group:first-of-type .form-control:last-child,
+    .input-group:first-of-type .input-group-text:last-child {
+        border-top-right-radius: 0.375rem;
+    }
+
+    .input-group:last-of-type .form-control:first-child,
+    .input-group:last-of-type .input-group-text:first-child {
+        border-bottom-left-radius: 0.375rem;
+    }
+    .input-group:last-of-type .form-control:last-child,
+    .input-group:last-of-type .input-group-text:last-child {
+        border-bottom-right-radius: 0.375rem;
+    }
+*/
+</style>

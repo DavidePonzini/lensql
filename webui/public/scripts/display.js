@@ -1,16 +1,22 @@
 function display(json_data) {
+    clear_result();
+    
     let data = JSON.parse(json_data);
-    let status = data['status'];
+    for (let i = 0; i < data.length; i++) {
+        let item = data[i];
+        // console.log(item);
+        let status = item['status'];
 
-    if (status === 'error') {
-        display_text(data['message']);
-    } else if (status === 'success') {
-        if (data['data']) {
-            display_table(data['data']);
-        } else if (data['affected_rows']) {
-            display_text(`Affected rows: ${data['affected_rows']}`);
+        if (status === 'exception') {
+            display_text(item['message']);
+        } else if (status === 'success_data') {
+            display_table(item['result']);
+        } else if (status === 'success_message') {
+            display_text(item['message']);
+        } else if (status === 'error') {
+            display_text(item['message']);
         } else {
-            console.warn(data);
+            console.error(item);
         }
     }
 
@@ -25,7 +31,7 @@ function display_table(json_data) {
     let rows = data['data'];
 
     let result = $('#result');
-    result.empty();
+    // result.empty();
 
     let table = $('<table></table>').addClass('table table-bordered table-hover table-responsive');
     let thead = $('<thead></thead>').addClass('table-dark');
@@ -59,7 +65,7 @@ function display_table(json_data) {
 
 function display_text(text) {
     let result = $('#result');
-    result.empty();
+    // result.empty();
 
     let pre = $('<pre></pre>').text(text);
     result.append(pre);

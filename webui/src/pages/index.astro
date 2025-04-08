@@ -2,7 +2,8 @@
 import Background from '../components/Background.astro';
 import Section from '../components/Section.astro';
 import Page from '../layouts/Page.astro';
-import Connection from '../components/Connection.astro';
+import ConnectionLensQL from '../components/ConnectionLensQL.astro';
+import ConnectionDB from '../components/ConnectionDB.astro';
 import Query from '../components/Query.astro';
 ---
 
@@ -11,10 +12,10 @@ import Query from '../components/Query.astro';
         <Section title="LensQL">
             <div class="row">
                 <div class="col">
-                    <Connection/>
+                    <ConnectionLensQL/>
                 </div>
                 <div class="col">
-
+                    <ConnectionDB/>
                 </div>
             </div>
         </Section>
