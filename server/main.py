@@ -4,8 +4,11 @@ from flask_cors import CORS
 import json
 
 import llm
-import db
+import db_lensql
+import db_users
 
+from sql_code import QueryResult
+from dav_tools import messages
 
 app = Flask(__name__)
 CORS(app)
@@ -13,9 +16,22 @@ CORS(app)
 
 def response(success: bool = True, **kwargs):
     return {
-        'status': 'success' if success else 'error',
+        'success': success,
         **kwargs
     }
+
+def response_query(*results: QueryResult, is_builtin: bool = False) -> str:
+    return json.dumps([
+        {
+            'success': query.success,
+            'builtin': is_builtin,
+            'query': query.query,
+            'type': query.type,
+            'data': query.result,
+            'id': query.id,
+        }
+        for query in results
+    ])
 
 OK = response()
 NOT_IMPLEMENTED = response(answer='This feature is not implemented yet. Please check back later.')
@@ -24,50 +40,102 @@ NOT_IMPLEMENTED = response(answer='This feature is not implemented yet. Please c
 @app.route('/login', methods=['POST'])
 def login():
     username = json.loads(request.form['username'])
+    password = json.loads(request.form['password'])
 
-    if db.can_login(username):
-        return OK
-    return response(False, message='Invalid username')
+    if not db_lensql.can_login(username):
+        return response(False, message='Cannot login. Please check your username and password.')
 
-@app.route('/log-query', methods=['POST'])
-def log_query():
+    if not db_users.create_connection(username, password):
+        return response(False, message='Cannot connect to the database. Please check your username and password.')
+
+    return OK
+    
+
+@app.route('/run-query', methods=['POST'])
+def run_query():
     username = json.loads(request.form['username'])
     query = json.loads(request.form['query'])
-    success = json.loads(request.form['success'])
 
-    query_id = db.log_query(
+    query_results = db_users.execute_queries(
         username=username,
-        query=query,
-        success=success
+        query_str=query
     )
 
-    return response(query_id=query_id)
+    for query_result in query_results:
+        query_id = db_lensql.log_query(
+            username=username,
+            query=query_result.query,
+            success=query_result.success
+            # type=query_result.type,
+            # result=query_result.result,
+        )
+
+        query_result.id = query_id
+
+    return response_query(*query_results)
 
 @app.route('/message-feedback', methods=['POST'])
 def feedback():
     message_id = json.loads(request.form['message_id'])
     feedback = json.loads(request.form['feedback'])
 
-    db.log_feedback(
+    db_lensql.log_feedback(
         message_id=message_id,
         feedback=feedback
     )
 
     return OK
 
+#################### Builtin ####################
+@app.route('/list-schemas', methods=['POST'])
+def list_schemas():
+    username = json.loads(request.form['username'])
+    
+    result = db_users.list_schemas(username)
+
+    query_id = db_lensql.log_query(
+        username=username,
+        query=result.query,
+        success=result.success
+        # type=result.type,
+        # result=result.result
+    )
+
+    result.id = query_id
+
+    return response_query(result, is_builtin=True)
+
+@app.route('/list-tables', methods=['POST'])
+def list_tables():
+    username = json.loads(request.form['username'])
+    
+    result = db_users.list_tables(username)
+
+    query_id = db_lensql.log_query(
+        username=username,
+        query=result.query,
+        success=result.success
+        # type=result.type,
+        # result=result.result
+    )
+
+    result.id = query_id
+
+    return response_query(result, is_builtin=True)
+
 #################### Syntax Error ####################
 @app.route('/explain-error-message', methods=['POST'])
 def explain_error_message():
-    username = json.loads(request.form['username'])
+    messages.warning(request.form)
     query_id = json.loads(request.form['query_id'])
     exception = json.loads(request.form['exception'])
     chat_id = json.loads(request.form['chat_id'])
     msg_id = json.loads(request.form['msg_id'])
     
-    query = db.get_query(query_id)
+    query = db_lensql.get_query(query_id)
     answer = llm.explain_error_message(query, exception)
 
-    db.log_message(
+    db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -85,10 +153,10 @@ def locate_error_cause():
     chat_id = json.loads(request.form['chat_id'])
     msg_id = json.loads(request.form['msg_id'])
 
-    query = db.get_query(query_id)
+    query = db_lensql.get_query(query_id)
     answer = llm.locate_error_cause(query, exception)
 
-    db.log_message(
+    db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -130,10 +198,10 @@ def fix_query():
     chat_id = json.loads(request.form['chat_id'])
     msg_id = json.loads(request.form['msg_id'])
 
-    query = db.get_query(query_id)
+    query = db_lensql.get_query(query_id)
     answer = llm.fix_query(query, exception)
 
-    db.log_message(
+    db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -151,10 +219,10 @@ def describe_my_query():
     chat_id = json.loads(request.form['chat_id'])
     msg_id = json.loads(request.form['msg_id'])
 
-    query = db.get_query(query_id)
+    query = db_lensql.get_query(query_id)
     answer = llm.describe_my_query(query)
 
-    db.log_message(
+    db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -171,10 +239,10 @@ def explain_my_query():
     chat_id = json.loads(request.form['chat_id'])
     msg_id = json.loads(request.form['msg_id'])
 
-    query = db.get_query(query_id)
+    query = db_lensql.get_query(query_id)
     answer = llm.explain_my_query(query)
 
-    db.log_message(
+    db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,

@@ -1,0 +1,36 @@
+.social {
+    margin-left: 4px;
+    margin-right: 4px;
+    font-size: 50px;
+    transition-timing-function: ease-in-out;
+    transition-duration: .1s;
+}
+
+.social-facebook {
+    color: #4267B2!important;
+}
+
+.social-instagram {
+    color: #bc2a8d!important;
+}
+
+.social-linkedin {
+    color: #0e76a8!important;
+}
+
+.social-github {
+    color:  #171515!important;
+}
+
+.social-email {
+    color: #c71610!important;
+}
+
+.social:hover {
+    color: #212529!important;
+    text-shadow: 5px 5px 3px #777;
+}
+
+.social-donation {
+    color: #068d6e!important;
+}

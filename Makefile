@@ -2,8 +2,6 @@ SHELL := /bin/bash
 
 VENV=./venv
 REQUIREMENTS_SERVER=server/requirements.txt
-REQUIREMENTS_DOCKER=docker/requirements.txt
-REQUIREMENTS_PYPI=pypi/requirements.txt
 
 ifeq ($(OS),Windows_NT)
 	VENV_BIN=$(VENV)/Scripts
@@ -11,25 +9,24 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade run start psql
+.PHONY: $(VENV)_upgrade start psql psql_users
 
 
 start:
 	docker compose down
-	docker rmi lensql-server
-	docker compose up -d
+	docker rmi lensql-server || :
+	make -C webui copy
+	docker compose up
 
 psql:
-	docker exec -it lensql-db-1 psql -U postgres
+	docker exec -it lensql_db psql -U postgres
 
-run: $(VENV)
-	make -C pypi install VENV=../$(VENV)
-	$(VENV_BIN)/jupyter-lab docker/notebook.ipynb
-
+psql_users:
+	docker exec -it lensql_db_users psql -U postgres
 
 $(VENV):
 	python -m venv $(VENV)
-	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS_SERVER) -r $(REQUIREMENTS_DOCKER) -r $(REQUIREMENTS_PYPI)
+	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS_SERVER)
 
 $(VENV)_upgrade: $(VENV)
-	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS_SERVER) -r $(REQUIREMENTS_DOCKER) -r $(REQUIREMENTS_PYPI)
+	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS_SERVER)

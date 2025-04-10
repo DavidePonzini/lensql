@@ -1,0 +1,53 @@
+---
+
+---
+
+<button class="btn btn-outline-primary" type="button" id="login">Login</button>
+
+
+<script>
+    let logged_in = false;
+
+    $('#login').on('click', function() {
+        if (logged_in) {
+            return;
+        }
+
+        let username = prompt('Insert username:');
+        if (!username) {
+            return;
+        }
+
+        let password = prompt('Insert password:');
+        if (!password) {
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: `${import.meta.env.BASE_URL}/api/login`,
+            data: {
+                'username': JSON.stringify(username),
+                'password': JSON.stringify(password),
+            },
+            success: function(d) {
+                let data = d;
+                
+                if (data.success) {
+                    logged_in = true;
+                
+                    $('#login').hide();
+        
+                    $('#username').text(username);
+
+                    $('#main').removeClass('disabled');
+        
+                    return;
+                }
+
+                alert(d.message);
+            },
+            error: () => alert('Could not connect to server.')
+        });
+    });
+</script>

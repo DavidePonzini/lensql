@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+      - db_users
     ports:
       - "5431:5000"
     environment:
@@ -13,17 +14,33 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=password
       - DB_NAME=postgres
+      - USER_DB_HOST=db_users
+      - USER_DB_PORT=5432
     env_file:
       - server/.env
 
   db:
     build: ./database
-    container_name: lensql_server_db
+    container_name: lensql_db
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - lensql_pgdata:/var/lib/postgresql/data
+
+  db_users:
+    build: ./database_users
+    command: -c 'max_connections=500'
+    container_name: lensql_db_users
+    restart: unless-stopped
+    ports:
+      - "5555:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - lensql_pgdata_users:/var/lib/postgresql/data
 
 volumes:
-  pgdata:
+  lensql_pgdata:
+  lensql_pgdata_users:
+  

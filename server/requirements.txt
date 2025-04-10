@@ -2,3 +2,6 @@ dav_tools==0.4.16
 sqlparse
 Flask>=3.1.0
 Flask_Cors>=5.0.0
+pandas
+sqlparse
+requests
