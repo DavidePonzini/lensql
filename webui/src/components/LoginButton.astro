@@ -2,25 +2,21 @@
 
 ---
 
-<button class="btn btn-outline-primary" type="button" id="login">Login</button>
+<!-- <button class="btn btn-outline-primary" type="button" id="login">Login</button> -->
 
 
 <script>
-    let logged_in = false;
-
-    $('#login').on('click', function() {
-        if (logged_in) {
-            return;
-        }
-
+    $(login);
+    
+    function login() {
         let username = prompt('Insert username:');
-        if (!username) {
-            return;
+        while (!username) {
+            username = prompt('Insert username:');
         }
 
         let password = prompt('Insert password:');
-        if (!password) {
-            return;
+        while (!password) {
+            password = prompt('Insert password:');
         }
 
         $.ajax({
@@ -34,8 +30,6 @@
                 let data = d;
                 
                 if (data.success) {
-                    logged_in = true;
-                
                     $('#login').hide();
         
                     $('#username').text(username);
@@ -46,8 +40,12 @@
                 }
 
                 alert(d.message);
+                login();
             },
-            error: () => alert('Could not connect to server.')
+            error: function() {
+                alert('Could not connect to server.')
+                login();
+            }
         });
-    });
+    }
 </script>

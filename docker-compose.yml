@@ -40,6 +40,7 @@ services:
     volumes:
       - lensql_pgdata_users:/var/lib/postgresql/data
 
+
 volumes:
   lensql_pgdata:
   lensql_pgdata_users:

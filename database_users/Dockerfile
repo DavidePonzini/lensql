@@ -1,5 +1,10 @@
 FROM postgres:latest
 
-WORKDIR /docker-entrypoint-initdb.d
+# set authentication to scram-sha-256
+COPY postgresql.conf /etc/postgresql/postgresql.conf
 
-COPY 20-setup_db_user.sql .
+WORKDIR /app
+
+COPY add_user .
+RUN chmod +x add_user
+

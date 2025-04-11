@@ -1,7 +1,7 @@
 let CHAT_ID = 0;
 
 class Message {
-    constructor(content, is_from_assistant, chat) {
+    constructor(content, is_from_assistant, chat, ask_feedback = false) {
         this.content = content;
         this.is_from_assistant = is_from_assistant;
         this.chat = chat;
@@ -21,7 +21,7 @@ class Message {
         
         this.html.append(message);
 
-        if (is_from_assistant) {
+        if (ask_feedback) {
             let feedback = $('<div></div>')
                 .addClass('message-feedback');
 
@@ -88,12 +88,12 @@ class Chat {
         return title;
     }
 
-    add_message(content, is_from_assistant) {
-        let message = new Message(content, is_from_assistant, this);
+    add_message(content, is_from_assistant, ask_feedback = false) {
+        let message = new Message(content, is_from_assistant, this, ask_feedback);
         this.messages.push(message);
         
         this.html.append(message.html);
-        this.html[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        this.html.children().last()[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         return message;
     }
@@ -178,7 +178,8 @@ class UserChat extends Chat {
         let buttons = $('<div></div>').addClass('buttons');
         
         this.buttons = buttons;
-        this.html.append(buttons);
+        let msg = this.messages[this.messages.length - 1];
+        $(msg.html).find('.message').append(buttons);
     }
 
     add_button(text, onclick) {
@@ -225,6 +226,7 @@ class ErrorChat extends UserChat {
     }
 
     show_buttons() {
+        this.add_message('Would you like to ask me something about this error?', true);
         super.show_buttons();
 
         this.add_button('Explain error', () => {
@@ -244,7 +246,7 @@ class ErrorChat extends UserChat {
                 success: (response) => {
                     console.log(response);
                     this.stop_thinking();
-                    this.add_message(response.answer, true);
+                    this.add_message(response.answer, true, true);
                     this.show_buttons();
                 },
                 error: (error) => {
@@ -256,21 +258,87 @@ class ErrorChat extends UserChat {
         });
 
         this.add_button('Show example', () => {
-            this.add_message('Show me a simpler example that can cause this error', false);
+            let msg = this.add_message('Show me a simpler example that can cause this error', false);
             this.remove_buttons();
             this.start_thinking();
+
+            $.ajax({
+                url: '/lensql/api/provide-error-example',
+                type: 'POST',
+                data: {
+                    'query_id': JSON.stringify(this.query_id),
+                    'exception': JSON.stringify(this.content),
+                    'chat_id': JSON.stringify(this.id),
+                    'msg_id': JSON.stringify(msg.msg_id),
+                },
+                success: (response) => {
+                    console.log(response);
+                    this.stop_thinking();
+                    this.add_message(response.answer, true, true);
+                    this.show_buttons();
+                },
+                error: (error) => {
+                    this.stop_thinking();
+                    this.add_message('Error: ' + error, true);
+                    this.show_buttons();
+                }
+            });
         });
 
         this.add_button('Where to look', () => {
-            this.add_message('Locate the error in the code', false);
+            let msg = this.add_message('Locate the error in the code', false);
             this.remove_buttons();
             this.start_thinking();
+
+            $.ajax({
+                url: '/lensql/api/locate-error-cause',
+                type: 'POST',
+                data: {
+                    'query_id': JSON.stringify(this.query_id),
+                    'exception': JSON.stringify(this.content),
+                    'chat_id': JSON.stringify(this.id),
+                    'msg_id': JSON.stringify(msg.msg_id),
+                },
+                success: (response) => {
+                    console.log(response);
+                    this.stop_thinking();
+                    this.add_message(response.answer, true, true);
+                    this.show_buttons();
+                },
+                error: (error) => {
+                    this.stop_thinking();
+                    this.add_message('Error: ' + error, true);
+                    this.show_buttons();
+                }
+            });
         });
 
         this.add_button('Suggest fix', () => {
-            this.add_message('Suggest a fix for the error', false);
+            let msg = this.add_message('Suggest a fix for the error', false);
             this.remove_buttons();
             this.start_thinking();
+
+            $.ajax({
+                url: '/lensql/api/fix-query',
+                type: 'POST',
+                data: {
+                    'query_id': JSON.stringify(this.query_id),
+                    'exception': JSON.stringify(this.content),
+                    'chat_id': JSON.stringify(this.id),
+                    'msg_id': JSON.stringify(msg.msg_id),
+                },
+                success: (response) => {
+                    console.log(response);
+                    this.stop_thinking();
+                    this.add_message(response.answer, true, true);
+                    this.show_buttons();
+                },
+                error: (error) => {
+                    this.stop_thinking();
+                    this.add_message('Error: ' + error, true);
+                    this.show_buttons();
+                }
+            });
         });
     }
 }
@@ -283,18 +351,61 @@ class ResultChat extends UserChat {
     }
 
     show_buttons() {
+        let msg = this.add_message('Would you like to ask me something about this result?', true);
         super.show_buttons();
 
         this.add_button('Describe query', () => {
-            this.add_message('Describe what this query does', false);
+            let msg = this.add_message('Describe what this query does', false);
             this.remove_buttons();
             this.start_thinking();
+
+            $.ajax({
+                url: '/lensql/api/describe-my-query',
+                type: 'POST',
+                data: {
+                    'query_id': JSON.stringify(this.query_id),
+                    'chat_id': JSON.stringify(this.id),
+                    'msg_id': JSON.stringify(msg.msg_id),
+                },
+                success: (response) => {
+                    console.log(response);
+                    this.stop_thinking();
+                    this.add_message(response.answer, true, true);
+                    this.show_buttons();
+                },
+                error: (error) => {
+                    this.stop_thinking();
+                    this.add_message('Error: ' + error, true);
+                    this.show_buttons();
+                }
+            });
         });
 
         this.add_button('Explain query', () => {
-            this.add_message('Explain step by step how this query works', false);
+            let msg = this.add_message('Explain step by step how this query works', false);
             this.remove_buttons();
             this.start_thinking();
+
+            $.ajax({
+                url: '/lensql/api/explain-my-query',
+                type: 'POST',
+                data: {
+                    'query_id': JSON.stringify(this.query_id),
+                    'chat_id': JSON.stringify(this.id),
+                    'msg_id': JSON.stringify(msg.msg_id),
+                },
+                success: (response) => {
+                    console.log(response);
+                    this.stop_thinking();
+                    this.add_message(response.answer, true, true);
+                    this.show_buttons();
+                },
+                error: (error) => {
+                    this.stop_thinking();
+                    this.add_message('Error: ' + error, true);
+                    this.show_buttons();
+                }
+            });
         });
     }
 }
