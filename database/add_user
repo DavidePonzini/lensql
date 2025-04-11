@@ -1,0 +1,18 @@
+#!/bin/bash
+# This script 
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <username>"
+    exit 1
+fi
+
+username="$1"
+
+if [ -z "$username" ]; then
+    echo "Username cannot be empty."
+    exit 1
+fi
+
+psql -U postgres -c "INSERT INTO lensql.users(username) VALUES('$username') ON CONFLICT (username) DO NOTHING;"
+
+echo "Added login credential '$username'."

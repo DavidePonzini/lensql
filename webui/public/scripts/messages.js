@@ -411,7 +411,7 @@ class ResultChat extends UserChat {
     constructor(query, query_id, content) {
         super(query, query_id, content);
 
-        this.html.addClass('alert-success');
+        this.html.addClass('alert-primary');
     }
 
     show_buttons() {

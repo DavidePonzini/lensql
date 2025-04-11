@@ -35,3 +35,5 @@ psql -U postgres -c "REVOKE CONNECT ON DATABASE template1 FROM $username;"
 psql -U postgres -c "REVOKE CONNECT ON DATABASE template0 FROM $username;"
 
 psql -U postgres "$username" -c "ALTER SCHEMA public OWNER TO $username;"
+
+echo "Created database and user '$username'."

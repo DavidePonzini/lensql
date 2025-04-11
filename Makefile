@@ -9,7 +9,10 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade start psql psql_users
+USER_FILE = users.txt
+USERS = $(shell cat $(USER_FILE))
+
+.PHONY: $(VENV)_upgrade start psql psql_users users
 
 
 start:
@@ -17,6 +20,12 @@ start:
 	docker rmi lensql-server || :
 	make -C webui copy
 	docker compose up
+
+users: $(USERS)
+
+%:
+	@docker exec lensql_db /app/add_user $@
+	@docker exec lensql_db_users /app/add_user $@
 
 psql:
 	docker exec -it lensql_db psql -U postgres
