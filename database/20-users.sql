@@ -3,10 +3,8 @@ BEGIN TRANSACTION;
 INSERT INTO lensql.users(username)
 VALUES
     ('dav'),
-    ('dev'),
-    ('test'),
-    ('barbara'),
-    ('giovanna')
+    ('giovanna'),
+    ('barbara')
 
 ON CONFLICT (username) DO NOTHING;
 

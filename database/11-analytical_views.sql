@@ -41,6 +41,7 @@ ORDER BY
 CREATE OR REPLACE VIEW v_feedbacks AS
 SELECT 
     button,
+    COUNT(*) AS times_pressed,
     COUNT(*) FILTER (WHERE feedback = TRUE) AS positive_feedback,
     COUNT(*) FILTER (WHERE feedback = FALSE) AS negative_feedback
 FROM

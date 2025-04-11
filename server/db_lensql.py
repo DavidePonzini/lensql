@@ -73,7 +73,7 @@ def get_query(query_id: int) -> str:
 
     return result[0][0]
 
-def log_feedback(message_id: int, feedback: str):
+def log_feedback(message_id: int, feedback: bool):
     query = database.sql.SQL('''
         UPDATE {schema}.messages
         SET feedback = {feedback}
@@ -88,4 +88,5 @@ def log_feedback(message_id: int, feedback: str):
         'feedback': feedback,
         'message_id': message_id
     })
+
 

@@ -34,7 +34,7 @@ def response_query(*results: QueryResult, is_builtin: bool = False) -> str:
     ])
 
 OK = response()
-NOT_IMPLEMENTED = response(answer='This feature is not implemented yet. Please check back later.')
+NOT_IMPLEMENTED = 'This feature is not implemented yet. Please check back later.'
 
 #################### Generic ####################
 @app.route('/login', methods=['POST'])
@@ -76,11 +76,11 @@ def run_query():
 
 @app.route('/message-feedback', methods=['POST'])
 def feedback():
-    message_id = json.loads(request.form['message_id'])
+    msg_id = json.loads(request.form['msg_id'])
     feedback = json.loads(request.form['feedback'])
 
     db_lensql.log_feedback(
-        message_id=message_id,
+        message_id=msg_id,
         feedback=feedback
     )
 
@@ -135,7 +135,7 @@ def explain_error_message():
     query = db_lensql.get_query(query_id)
     answer = llm.explain_error_message(query, exception)
 
-    db_lensql.log_message(
+    answer_id = db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -144,7 +144,7 @@ def explain_error_message():
         msg_id=msg_id
     )
 
-    return response(answer=answer)
+    return response(answer=answer, id=answer_id)
 
 @app.route('/locate-error-cause', methods=['POST'])
 def locate_error_cause():
@@ -156,7 +156,7 @@ def locate_error_cause():
     query = db_lensql.get_query(query_id)
     answer = llm.locate_error_cause(query, exception)
 
-    db_lensql.log_message(
+    answer_id = db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -165,31 +165,29 @@ def locate_error_cause():
         msg_id=msg_id
     )
 
-    return response(answer=answer)
+    return response(answer=answer, id=answer_id)
 
 @app.route('/provide-error-example', methods=['POST'])
 def provide_error_example():
-    # username = json.loads(request.form['username'])
-    # query_id = json.loads(request.form['query_id'])
-    # exception = json.loads(request.form['exception'])
-    # chat_id = json.loads(request.form['chat_id'])
-    # msg_id = json.loads(request.form['msg_id'])
+    query_id = json.loads(request.form['query_id'])
+    exception = json.loads(request.form['exception'])
+    chat_id = json.loads(request.form['chat_id'])
+    msg_id = json.loads(request.form['msg_id'])
 
-    # query = db.get_query(query_id)
+    query = db_lensql.get_query(query_id)
     # answer = llm.provide_error_example(query, exception)
+    answer = NOT_IMPLEMENTED
     
-    # db.log_button(
-    #     query_id=query_id,
-    #     content=answer
-    #     button=request.path,
-    #     data=None,
-    #     chat_id=chat_id,
-    #     msg_id=msg_id
-    # )
+    answer_id = db_lensql.log_message(
+        query_id=query_id,
+        content=answer,
+        button=request.path,
+        data=exception,
+        chat_id=chat_id,
+        msg_id=msg_id
+    )
 
-    # return response(answer=answer)
-
-    return NOT_IMPLEMENTED
+    return response(answer=answer, id=answer_id)
 
 @app.route('/fix-query', methods=['POST'])
 def fix_query():
@@ -201,16 +199,16 @@ def fix_query():
     query = db_lensql.get_query(query_id)
     answer = llm.fix_query(query, exception)
 
-    db_lensql.log_message(
+    answer_id = db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
-        data=None,
+        data=exception,
         chat_id=chat_id,
         msg_id=msg_id
     )
 
-    return response(answer=answer)
+    return response(answer=answer, id=answer_id)
 
 #################### Syntax OK ####################
 @app.route('/describe-my-query', methods=['POST'])
@@ -222,7 +220,7 @@ def describe_my_query():
     query = db_lensql.get_query(query_id)
     answer = llm.describe_my_query(query)
 
-    db_lensql.log_message(
+    answer_id = db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -231,7 +229,7 @@ def describe_my_query():
         msg_id=msg_id
     )
 
-    return response(answer=answer)
+    return response(answer=answer, id=answer_id)
 
 @app.route('/explain-my-query', methods=['POST'])
 def explain_my_query():
@@ -242,7 +240,7 @@ def explain_my_query():
     query = db_lensql.get_query(query_id)
     answer = llm.explain_my_query(query)
 
-    db_lensql.log_message(
+    answer_id = db_lensql.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -251,55 +249,10 @@ def explain_my_query():
         msg_id=msg_id
     )
 
-    return response(answer=answer)
-
-##################### Help #####################
-# @app.route('/list-users', methods=['POST'])
-# def list_users():
-#     username = json.loads(request.form['username'])
-
-#     db.log_message(
-#         username=username,
-#         button=request.path,
-#         data=None
-#     )
-
-#     return OK
-
-# @app.route('/list-schemas', methods=['POST'])
-# def list_schemas():
-#     username = json.loads(request.form['username'])
-
-#     db.log_message(
-#         username=username,
-#         button=request.path,
-#         data=None
-#     )
-
-#     return OK
-
-# @app.route('/list-tables', methods=['POST'])
-# def list_tables():
-#     username = json.loads(request.form['username'])
-
-#     db.log_message(
-#         username=username,
-#         button=request.path,
-#         data=None
-#     )
-
-#     return OK
+    return response(answer=answer, id=answer_id)
 
 
 ###################### Main #####################
-
-@app.route('/', methods=['GET'])
-def start():
-    with open('docker-compose.yml') as f:
-        docker_compose = f.read()
-    
-    return docker_compose
-
 
 if __name__ == '__main__':
     app.run(

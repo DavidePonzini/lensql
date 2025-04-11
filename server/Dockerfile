@@ -6,7 +6,6 @@ WORKDIR /app
 COPY *.py .
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
-COPY docker-compose.yml ./
 
 # Ports
 EXPOSE 5000

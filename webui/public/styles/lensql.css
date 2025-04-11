@@ -1,11 +1,8 @@
 html {
-    --chat-bg-color-success: lightblue;
-    --chat-bg-color-error: lightcoral;
-    --chat-bg-color-builtin: lightslategray;
-    --message-bg-color: #FFF4DB;
-    --message-bg-color-code: #FFFFFF;
-    --text-color: #000000;
-    --icon-width: 50px;
+    --message-bg-color: #fff4db;
+    --message-bg-color-code: #ffffff;
+    --text-color: var(--bs-body-color);
+    --icon-width: 60px;
     --icon-margin: 10px;
 }
 
@@ -16,17 +13,6 @@ html {
     margin-top: 1rem;
 }
 
-.chat.success {
-    background-color: var(--chat-bg-color-success);
-}
-
-.chat.error {
-    background-color: var(--chat-bg-color-error);
-}
-
-.chat.builtin {
-    background-color: var(--chat-bg-color-builtin);
-}
 
 .chat .thinking {
     animation: pulse 2s infinite ease-in-out;
@@ -114,9 +100,46 @@ table {
 }
 
 .code {
-    font-size: 1.4em;
     background: var(--message-bg-color-code);
     color: var(--text-color);
     padding-left: 1rem!important;
     padding-right: 1rem!important;
+}
+
+.message-feedback {
+    text-align: right;
+}
+
+.feedback {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 14pt;
+    color: slategray;
+    cursor: pointer;
+}
+
+.feedback.disabled {
+    color: gray;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.feedback-up.selected {
+    color: green;
+}
+
+.feedback-down.selected {
+    color: red;
+}
+
+.chat-title i {
+    margin-right: 1rem;
+}
+
+
+.buttons {
+    margin-top: 1rem;
+}
+.buttons button {
+    margin: 0 1px;
 }

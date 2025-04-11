@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# List of users - edit this array to add/remove users
+users=(
+  dav
+  giovanna
+  barbara
+)
+
+# Loop through each user and call the add_user script
+for user in "${users[@]}"; do
+  ./add_user "$user"
+done

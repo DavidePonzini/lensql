@@ -1,11 +1,12 @@
 let CHAT_ID = 0;
 
 class Message {
-    constructor(content, is_from_assistant, chat, ask_feedback = false) {
+    constructor(content, is_from_assistant, chat, id = null) {
         this.content = content;
         this.is_from_assistant = is_from_assistant;
         this.chat = chat;
         this.msg_id = chat.last_message_id() + 1;
+        this.id = id;
         this.feedback = null;
 
         this.html = $('<div></div>')
@@ -20,27 +21,93 @@ class Message {
             .html(content);
         
         this.html.append(message);
-
-        if (ask_feedback) {
-            let feedback = $('<div></div>')
-                .addClass('message-feedback');
-
-            let feedback_up = $('<span></span>')
-                .addClass('feedback-up')
-                .html('<i class="fas fa-thumbs-up"></i>');
-
-            let feedback_down = $('<span></span>')
-                .addClass('feedback-down')
-                .html('<i class="fas fa-thumbs-down"></i>');
-
-            feedback.append(feedback_up);
-            feedback.append(feedback_down);
-
-            message.append(feedback);
-        }
             
         if (!is_from_assistant)
             this.html.append(ICON_USER);
+
+        // if we have an id, it's an ai-generated message
+        if (id !== null) {
+            this.ask_feedback();
+        }
+    }
+
+    ask_feedback() {
+        let feedback = $('<div></div>')
+            .addClass('message-feedback')
+
+        this.feedback_up = $('<span></span>')
+            .addClass('feedback feedback-up')
+            .attr('data-bs-toggle', 'tooltip')
+            .attr('data-bs-placement', 'bottom')
+            .attr('data-bs-title', 'Helpful')
+            .html('<i class="far fa-thumbs-up"></i>');
+
+            
+        this.feedback_down = $('<span></span>')
+            .addClass('feedback feedback-down')
+            .attr('data-bs-toggle', 'tooltip')
+            .attr('data-bs-placement', 'bottom')
+            .attr('data-bs-title', 'Not helpful')
+            .html('<i class="far fa-thumbs-down"></i>');
+            
+        new bootstrap.Tooltip(this.feedback_up[0]);
+        new bootstrap.Tooltip(this.feedback_down[0]);
+        
+        feedback.append(this.feedback_up);
+        feedback.append(this.feedback_down);
+
+        this.feedback_up.on('click', () => {
+            this.send_feedback(true);
+        });
+
+        this.feedback_down.on('click', () => {
+            this.send_feedback(false);
+        });
+
+        $(this.html).find('.message').append(feedback);
+    }
+
+    send_feedback(feedback) {
+        if (this.feedback !== null)
+                return;
+
+        this.feedback_up.addClass('disabled');
+        this.feedback_down.addClass('disabled');
+        
+        let that = this;
+
+        $.ajax({
+            url: '/lensql/api/message-feedback',
+            type: 'POST',
+            data: {
+                'msg_id': JSON.stringify(this.id),
+                'feedback': JSON.stringify(feedback),
+            },
+            success: function(response) {
+                if (response.success) {
+
+                    that.feedback = true;
+                    
+                    if (feedback) {
+                        that.feedback_up.addClass('selected');
+                        that.feedback_up.find('i').removeClass('far').addClass('fas');
+                    } else {
+                        that.feedback_down.addClass('selected');
+                        that.feedback_down.find('i').removeClass('far').addClass('fas');
+                    }
+                }
+                else {
+                    console.error('Error: ' + response.error);
+                    that.feedback_up.removeClass('disabled');
+                    that.feedback_down.removeClass('disabled');
+                }
+            },
+            error: function(error) {
+                console.error('Error: ' + error);
+                that.feedback_up.removeClass('disabled');
+                that.feedback_down.removeClass('disabled');
+            }
+        });
     }
 
     set_feedback(feedback) {
@@ -63,6 +130,7 @@ class Chat {
 
         this.html = $('<div></div>')
             .addClass('chat')
+            .addClass('alert')
             .attr('id', `chat-${CHAT_ID}`);
 
             
@@ -88,8 +156,8 @@ class Chat {
         return title;
     }
 
-    add_message(content, is_from_assistant, ask_feedback = false) {
-        let message = new Message(content, is_from_assistant, this, ask_feedback);
+    add_message(content, is_from_assistant, id = null) {
+        let message = new Message(content, is_from_assistant, this, id);
         this.messages.push(message);
         
         this.html.append(message.html);
@@ -162,11 +230,11 @@ class UserChat extends Chat {
 
     add_title() {
         let title = super.add_title();
-        let icon = $('<i></i>')
-                .addClass('fas fa-user');
-            title.append(icon);
-            let pre = $('<pre></pre>').text(this.query);
-            title.append(pre);
+        let icon = $('<i></i>').addClass('fas fa-user');
+        title.append(icon);
+        title.append('<b>User query</b>');
+        let pre = $('<pre></pre>').text(this.query);
+        title.append(pre);
 
         return title;
     }
@@ -222,7 +290,7 @@ class ErrorChat extends UserChat {
     constructor(query, query_id, content) {
         super(query, query_id, content);
 
-        this.html.addClass('error');
+        this.html.addClass('alert-danger');
     }
 
     show_buttons() {
@@ -244,9 +312,8 @@ class ErrorChat extends UserChat {
                     'msg_id': JSON.stringify(msg.msg_id),
                 },
                 success: (response) => {
-                    console.log(response);
                     this.stop_thinking();
-                    this.add_message(response.answer, true, true);
+                    this.add_message(response.answer, true, response.id);
                     this.show_buttons();
                 },
                 error: (error) => {
@@ -272,9 +339,8 @@ class ErrorChat extends UserChat {
                     'msg_id': JSON.stringify(msg.msg_id),
                 },
                 success: (response) => {
-                    console.log(response);
                     this.stop_thinking();
-                    this.add_message(response.answer, true, true);
+                    this.add_message(response.answer, true, response.id);
                     this.show_buttons();
                 },
                 error: (error) => {
@@ -300,9 +366,8 @@ class ErrorChat extends UserChat {
                     'msg_id': JSON.stringify(msg.msg_id),
                 },
                 success: (response) => {
-                    console.log(response);
                     this.stop_thinking();
-                    this.add_message(response.answer, true, true);
+                    this.add_message(response.answer, true, response.id);
                     this.show_buttons();
                 },
                 error: (error) => {
@@ -328,9 +393,8 @@ class ErrorChat extends UserChat {
                     'msg_id': JSON.stringify(msg.msg_id),
                 },
                 success: (response) => {
-                    console.log(response);
                     this.stop_thinking();
-                    this.add_message(response.answer, true, true);
+                    this.add_message(response.answer, true, response.id);
                     this.show_buttons();
                 },
                 error: (error) => {
@@ -347,7 +411,7 @@ class ResultChat extends UserChat {
     constructor(query, query_id, content) {
         super(query, query_id, content);
 
-        this.html.addClass('success');
+        this.html.addClass('alert-success');
     }
 
     show_buttons() {
@@ -368,9 +432,8 @@ class ResultChat extends UserChat {
                     'msg_id': JSON.stringify(msg.msg_id),
                 },
                 success: (response) => {
-                    console.log(response);
                     this.stop_thinking();
-                    this.add_message(response.answer, true, true);
+                    this.add_message(response.answer, true, response.id);
                     this.show_buttons();
                 },
                 error: (error) => {
@@ -395,9 +458,8 @@ class ResultChat extends UserChat {
                     'msg_id': JSON.stringify(msg.msg_id),
                 },
                 success: (response) => {
-                    console.log(response);
                     this.stop_thinking();
-                    this.add_message(response.answer, true, true);
+                    this.add_message(response.answer, true, response.id);
                     this.show_buttons();
                 },
                 error: (error) => {
@@ -414,17 +476,17 @@ class BuiltinChat extends Chat {
     constructor(query, query_id, content) {
         super(query, query_id, content);
 
-        this.html.addClass('builtin');
+        this.html.addClass('alert-secondary');
     }
 
     add_title() {
         let title = super.add_title();
-        let icon = $('<i></i>')
-                .addClass('fas fa-search');
-            title.append(icon);
-            title.append('<br/>');
-            let span = $('<span></span>').text(this.query);
-            title.append(span);
+        let icon = $('<i></i>').addClass('fas fa-search');
+        title.append(icon);
+        title.append('<b>LensQL builtin function</b>');
+        title.append('<br/>');
+        let span = $('<span></span>').text(this.query);
+        title.append(span);
 
         return title;
     }
