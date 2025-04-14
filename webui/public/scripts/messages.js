@@ -250,7 +250,7 @@ class UserChat extends Chat {
         $(msg.html).find('.message').append(buttons);
     }
 
-    add_button(text, onclick) {
+    add_button(text, onclick, disabled = false) {
         if (!this.buttons)
             return;
 
@@ -258,6 +258,9 @@ class UserChat extends Chat {
             .addClass('btn btn-primary')
             .text(text)
             .on('click', onclick);
+
+        if (disabled)
+            button.prop('disabled', true);
         
         this.buttons.append(button);
     }
@@ -349,7 +352,7 @@ class ErrorChat extends UserChat {
                     this.show_buttons();
                 }
             });
-        });
+        }, true);
 
         this.add_button('Where to look', () => {
             let msg = this.add_message('Locate the error in the code', false);
