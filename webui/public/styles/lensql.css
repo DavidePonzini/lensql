@@ -6,6 +6,11 @@ html {
     --icon-margin: 10px;
 }
 
+table {
+    display: block;
+    min-height: 50px;
+}
+
 .chat {
     padding: 1rem;
     border-radius: 10px;

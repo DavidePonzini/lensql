@@ -3,6 +3,10 @@ from enum import Enum
 class Queries(Enum):
     '''Queries used for builtin operations.'''
     
+    SHOW_SEARCH_PATH = '''
+        SHOW search_path;
+    '''
+
     LIST_USERS = '''
         SELECT
             usename AS username

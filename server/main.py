@@ -123,6 +123,24 @@ def list_tables():
 
     return response_query(result, is_builtin=True)
 
+@app.route('/show-search-path', methods=['POST'])
+def show_search_path():
+    username = json.loads(request.form['username'])
+    
+    result = db_users.show_search_path(username)
+
+    query_id = db_lensql.log_query(
+        username=username,
+        query=result.query,
+        success=result.success
+        # type=result.type,
+        # result=result.result
+    )
+
+    result.id = query_id
+
+    return response_query(result, is_builtin=True)
+
 #################### Syntax Error ####################
 @app.route('/explain-error-message', methods=['POST'])
 def explain_error_message():

@@ -19,9 +19,8 @@ DB=
 
 start:
 	docker compose down
-	docker rmi davideponzini/lensql:server || :
 	make -C webui copy
-	docker compose up
+	docker compose up --build
 
 users: $(USERS)
 

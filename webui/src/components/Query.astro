@@ -16,7 +16,10 @@ import CodeEditor from "./CodeEditor.astro"
 </div>
 
 <script>
-    $("#run-query").on("click", function() {
+    let button = $("#run-query");
+    button.on("click", function() {
+        button.prop("disabled", true);
+
         let username = $('#username').text();
         
         if (username === "Not logged in") {
@@ -34,9 +37,15 @@ import CodeEditor from "./CodeEditor.astro"
                     'username': JSON.stringify(username),
                     'query': JSON.stringify(query),
                 },
-                success: display,
-                error: () => {
+                success: function(data) {
+                    button.prop("disabled", false);
+                    
+                    display(data)
+                },
+                error: function() {
                     alert("Could not connect to server.");
+                    
+                    button.prop("disabled", false);
                 }
             });
         }

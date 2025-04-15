@@ -1,4 +1,7 @@
+import datetime
 import os
+import threading
+import time
 import pandas as pd
 import psycopg2
 from psycopg2.extensions import connection
@@ -8,14 +11,84 @@ from dav_tools import messages
 from sql_code import SQLCode, SQLException, QueryResult, QueryResultDataset, QueryResultError, QueryResultMessage
 from queries import Queries
 
+
 HOST        =       os.getenv('USER_DB_HOST')
 PORT        =   int(os.getenv('USER_DB_PORT'))
 
+MAX_CONNECTION_AGE = datetime.timedelta(hours=4)
+CLEANUP_INTERVAL_SECONDS = 3600  # 1 hour
 
-connections: dict[str, connection] = {}
+
+class DBConnection:
+    def __init__(self, username: str, password: str, autocommit: bool = True):
+        self.username = username
+        self.password = password
+        self.autocommit = autocommit
+        
+        self.last_operation_ts = datetime.datetime.now()
+        self.connection = psycopg2.connect(
+            host=HOST,
+            port=PORT,
+            dbname=username,
+            user=username,
+            password=password
+        )
+
+        self.connection.autocommit = autocommit
+
+    def close(self):
+        try:
+            self.connection.close()
+        except Exception as e:
+            messages.error(f"Error closing connection for user {self.username}: {e}")
+
+    def cursor(self):
+        return self.connection.cursor()
+    
+    def rollback(self):
+        self.connection.rollback()
+
+    def commit(self):
+        self.connection.commit()
+    
+    def update_last_operation_ts(self):
+        self.last_operation_ts = datetime.datetime.now()
+
+    @property
+    def time_since_last_operation(self) -> datetime.timedelta:
+        return datetime.datetime.now() - self.last_operation_ts
+        
+
+connections: dict[str, DBConnection] = {}
 conn_lock = Lock()
 
-def get_connection(username: str) -> connection:
+
+
+def connection_cleanup_thread():
+    while True:
+        with conn_lock:
+            now = datetime.datetime.now()
+
+            for username, conn in connections.items():
+                if now - conn.last_operation_ts <= MAX_CONNECTION_AGE:
+                    continue
+
+                try:
+                    connections[username].close()
+                    del connections[username]
+                    messages.info(f"Closed expired connection for user: {username}")
+                except Exception as e:
+                    messages.error(f"Error closing connection for user {username}: {e}")
+
+        time.sleep(CLEANUP_INTERVAL_SECONDS)
+
+
+cleanup_thread = threading.Thread(target=connection_cleanup_thread, daemon=True)
+cleanup_thread.start()
+
+
+
+def get_connection(username: str) -> DBConnection:
     '''
     Returns the connection for the given username.
     If the connection does not exist, it raises an exception.
@@ -37,16 +110,7 @@ def create_connection(username: str, password: str, autocommit: bool = True) -> 
             return connections[username]
         
         try:
-            conn = psycopg2.connect(
-                host=HOST,
-                port=PORT,
-                dbname=username,
-                user=username,
-                password=password
-            )
-
-            conn.autocommit = autocommit
-
+            conn = DBConnection(username, password, autocommit)
             connections[username] = conn
             return conn
         except Exception as e:
@@ -91,7 +155,7 @@ def execute_queries(username: str, query_str: str) -> list[QueryResult]:
             result.append(QueryResultError(SQLException(e), statement.query))
             conn.rollback()
         finally:
-            cur.close()
+            conn.update_last_operation_ts()
 
     return result
 
@@ -106,10 +170,13 @@ def run_builtin_query(username: str, query: Queries) -> QueryResult:
             columns = [desc[0] for desc in cur.description]
             result = pd.DataFrame(rows, columns=columns)
 
+
         return QueryResultDataset(result, query.name)
     except Exception as e:
         conn.rollback()
         return QueryResultError(SQLException(e), query.name)
+    finally:
+        conn.update_last_operation_ts()
 
 def list_schemas(username: str) -> QueryResult:
     '''Lists all schemas in the database.'''
@@ -120,4 +187,9 @@ def list_tables(username: str) -> QueryResult:
     '''Lists all tables in the database.'''
 
     return run_builtin_query(username, Queries.LIST_TABLES)
+
+def show_search_path(username: str) -> QueryResult:
+    '''Shows the search path for the database.'''
+
+    return run_builtin_query(username, Queries.SHOW_SEARCH_PATH)
 
