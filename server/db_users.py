@@ -151,10 +151,11 @@ def execute_queries(username: str, query_str: str) -> list[QueryResult]:
 
                 # No number of affected rows, return the first token of the statement
                 result.append(QueryResultMessage(f'{statement.first_token}', statement.query))
+
+            conn.update_last_operation_ts()
         except Exception as e:
             result.append(QueryResultError(SQLException(e), statement.query))
             conn.rollback()
-        finally:
             conn.update_last_operation_ts()
 
     return result
@@ -171,12 +172,12 @@ def run_builtin_query(username: str, query: Queries) -> QueryResult:
             result = pd.DataFrame(rows, columns=columns)
 
 
+        conn.update_last_operation_ts()
         return QueryResultDataset(result, query.name)
     except Exception as e:
         conn.rollback()
-        return QueryResultError(SQLException(e), query.name)
-    finally:
         conn.update_last_operation_ts()
+        return QueryResultError(SQLException(e), query.name)
 
 def list_schemas(username: str) -> QueryResult:
     '''Lists all schemas in the database.'''
