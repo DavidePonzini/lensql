@@ -83,8 +83,12 @@ class QueryResultDataset(QueryResult):
         self._result = result
 
     @property
-    def result(self) -> pd.DataFrame:
-        return self._result.to_json(orient='split')
+    def result(self) -> str:
+        result = self._result.to_html(classes='table table-bordered table-hover table-responsive', show_dimensions=True)
+        result = result.replace('<thead>', '<thead class="table-dark">').replace('<tbody>', '<tbody class="table-group-divider">')
+        return result
+        
+        return self._result.to_json(orient='split', date_format='iso')
 
 class QueryResultMessage(QueryResult):
     '''Represents the result of a SQL query that returned a message.'''

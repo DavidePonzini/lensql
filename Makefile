@@ -12,6 +12,8 @@ endif
 USER_FILE = users.txt
 USERS = $(shell cat $(USER_FILE))
 
+DB=
+
 .PHONY: $(VENV)_upgrade start psql psql_users users
 
 
@@ -28,10 +30,10 @@ users: $(USERS)
 	@docker exec lensql_db_users /app/add_user $@
 
 psql:
-	docker exec -it lensql_db psql -U postgres
+	docker exec -it lensql_db psql -U postgres $(BD)
 
 psql_users:
-	docker exec -it lensql_db_users psql -U postgres
+	docker exec -it lensql_db_users psql -U postgres $(DB)
 
 $(VENV):
 	python -m venv $(VENV)

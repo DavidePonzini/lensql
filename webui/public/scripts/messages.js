@@ -167,6 +167,8 @@ class Chat {
     }
 
     display_content_as_table() {
+        this.html.append($(this.content));
+        return;
         let data = JSON.parse(this.content);
     
         let columns = data['columns'];
