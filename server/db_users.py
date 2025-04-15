@@ -15,8 +15,8 @@ from queries import Queries
 HOST        =       os.getenv('USER_DB_HOST')
 PORT        =   int(os.getenv('USER_DB_PORT'))
 
-MAX_CONNECTION_AGE = datetime.timedelta(hours=4)
-CLEANUP_INTERVAL_SECONDS = 3600  # 1 hour
+MAX_CONNECTION_AGE = datetime.timedelta(hours=float(os.getenv('MAX_CONNECTION_HOURS')))
+CLEANUP_INTERVAL_SECONDS = int(os.getenv('CLEANUP_INTERVAL_SECONDS'))
 
 
 class DBConnection:

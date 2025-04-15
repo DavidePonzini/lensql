@@ -17,6 +17,8 @@ services:
       - DB_NAME=postgres
       - USER_DB_HOST=db_users
       - USER_DB_PORT=5432
+      - MAX_CONNECTION_HOURS=4
+      - CLEANUP_INTERVAL_SECONDS=3600
     env_file:
       - server/.env
 
