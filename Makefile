@@ -19,7 +19,7 @@ DB=
 
 start:
 	docker compose down
-	docker rmi lensql-server || :
+	docker rmi davideponzini/lensql:server || :
 	make -C webui copy
 	docker compose up
 

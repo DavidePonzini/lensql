@@ -1,6 +1,7 @@
 services:
   server:
     build: ./server
+    image: davideponzini/lensql:server
     container_name: lensql_server
     restart: unless-stopped
     depends_on:
@@ -21,6 +22,7 @@ services:
 
   db:
     build: ./database
+    image: davideponzini/lensql:db
     container_name: lensql_db
     restart: unless-stopped
     environment:
@@ -30,6 +32,7 @@ services:
 
   db_users:
     build: ./database_users
+    image: davideponzini/lensql:db_users
     command: -c 'max_connections=500'
     container_name: lensql_db_users
     restart: unless-stopped
