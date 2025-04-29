@@ -28,3 +28,18 @@ import Content from '../components/Content.astro';
 
 <script is:inline src={`${import.meta.env.BASE_URL}/scripts/messages.js`}></script>
 <script is:inline src={`${import.meta.env.BASE_URL}/scripts/display.js`}></script>
+<script>
+    $(function() {
+        $(window).on('beforeunload', function(e) {
+            let query = window.getEditorContent().trim();
+            console.log(query);
+            if (query.length === 0) {
+                return;
+            }
+
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        });
+    });
+</script>
