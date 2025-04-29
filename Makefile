@@ -29,10 +29,13 @@ users: $(USERS)
 	@docker exec lensql_db_users /app/add_user $@
 
 psql:
-	docker exec -it lensql_db psql -U postgres $(BD)
+	docker exec -it lensql_db psql -U postgres $(DB)
 
 psql_users:
 	docker exec -it lensql_db_users psql -U postgres $(DB)
+
+dump:
+	docker exec -t lensql_db pg_dump -U postgres -n lensql > dump_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
 
 $(VENV):
 	python -m venv $(VENV)
