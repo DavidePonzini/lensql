@@ -75,4 +75,25 @@ GROUP BY
     button
 ORDER BY
     button;
+
+CREATE OR REPLACE VIEW v_active_users AS
+SELECT
+    username,
+    COUNT(*) AS queries_last_30_min,
+    TO_CHAR(
+        NOW() - MAX(ts),
+        'FMMI "minutes" SS "seconds ago"'
+    ) AS time_since_last_query
+FROM
+    queries
+WHERE
+    ts >= NOW() - INTERVAL '30 minutes'
+GROUP BY
+    username
+HAVING
+    COUNT(*) > 0
+ORDER BY
+    queries_last_30_min DESC,
+    username;
+
 COMMIT;
