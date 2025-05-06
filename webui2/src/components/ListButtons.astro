@@ -1,0 +1,72 @@
+---
+
+---
+
+<button class="btn btn-secondary" id="show-search-path">Show Search Path</button>
+<button class="btn btn-secondary" id="list-schemas">List Schemas</button>
+<button class="btn btn-secondary" id="list-tables">List Tables</button>
+<button class="btn btn-primary" id="clear">Clear output</button>
+
+
+<script>
+    $('#list-schemas').on('click', function() {
+        let username = $('#username').text();
+
+        if (username === "Not logged in") {
+            alert("You must be logged in to run queries.");
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: `${import.meta.env.BASE_URL}/api/list-schemas`,
+            data: {
+                'username': JSON.stringify(username),
+            },
+            success: display,
+            error: () => alert('Could not connect to server.')
+        });
+    });
+    
+    $('#list-tables').on('click', function() {
+        let username = $('#username').text();
+
+        if (username === "Not logged in") {
+            alert("You must be logged in to run queries.");
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: `${import.meta.env.BASE_URL}/api/list-tables`,
+            data: {
+                'username': JSON.stringify(username),
+            },
+            success: display,
+            error: () => alert('Could not connect to server.')
+        });
+    });
+
+    $('#show-search-path').on('click', function() {
+        let username = $('#username').text();
+
+        if (username === "Not logged in") {
+            alert("You must be logged in to run queries.");
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: `${import.meta.env.BASE_URL}/api/show-search-path`,
+            data: {
+                'username': JSON.stringify(username),
+            },
+            success: display,
+            error: () => alert('Could not connect to server.')
+        });
+    });
+
+    $('#clear').on('click', function() {
+        clear_result();
+    });
+</script>

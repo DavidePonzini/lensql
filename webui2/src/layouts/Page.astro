@@ -1,0 +1,70 @@
+---
+import Footer from '../components/Footer.astro';
+import Navbar from '../components/Navbar.astro';
+import Separator from '../components/Separator.astro';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}res/favicon.svg`} />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+
+		<!-- Bootstrap -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+
+		<!-- Boostrap icons -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+		<!-- Custom -->
+		<link rel="stylesheet" href={`${import.meta.env.BASE_URL}/styles/_common.css`}>
+		<link rel="stylesheet" href={`${import.meta.env.BASE_URL}/styles/social.css`}>
+		<link rel="stylesheet" href={`${import.meta.env.BASE_URL}/styles/code.css`}>
+		<link rel="stylesheet" href={`${import.meta.env.BASE_URL}/styles/colors.css`}>
+		<link rel="stylesheet" href={`${import.meta.env.BASE_URL}/styles/lensql.css`}>
+
+        <!-- Popper + Boostrap -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+
+		<!-- jQuery -->
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<slot name="banner" />
+
+		<Navbar>
+            <slot name="navbar" />
+        </Navbar>
+
+		<slot />
+
+		<Separator></Separator>
+
+		<Footer></Footer>
+	</body>
+</html>
+
+<style>
+	body {
+		background-color: var(--bg-color);
+	}
+</style>
+
+<script>
+	const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+	const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>

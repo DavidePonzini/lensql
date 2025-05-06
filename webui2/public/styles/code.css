@@ -1,0 +1,18 @@
+pre.code {
+    padding: 6px;
+}
+
+span.code {
+    padding: 0 6px;
+}
+
+.code {
+    background-color: rgba(148, 149, 150, .7);
+    color: black;
+}
+
+.code > comment {
+    color: darkgreen;
+    font-weight: 500;
+    font-style: italic;
+}

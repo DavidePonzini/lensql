@@ -1,0 +1,45 @@
+---
+import Page from '../layouts/Page.astro';
+import Query from '../components/Query.astro';
+import LoginButton from '../components/LoginButton.astro';
+import Content from '../components/Content.astro';
+
+---
+
+<Page title="LensQL">
+    <LoginButton />
+
+    <Fragment slot="navbar">
+        <div class="navbar-nav me-auto mb-2 mb-lg-0">
+        </div>
+        <div class="navbar-text">
+            <span class="mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Your username">
+                <i class="fa-solid fa-user"></i>
+                <span id="username">Not logged in</span>
+            </span>
+        </div>
+        <!-- <button class="btn btn-outline-primary mx-1" type="button" onclick="show_leaderboard()">Leaderboard</button> -->
+    </Fragment>
+
+    <Content id="main" disabled>
+        <Query/>
+    </Content>
+</Page>
+
+<script is:inline src={`${import.meta.env.BASE_URL}/scripts/messages.js`}></script>
+<script is:inline src={`${import.meta.env.BASE_URL}/scripts/display.js`}></script>
+<script>
+    $(function() {
+        $(window).on('beforeunload', function(e) {
+            let query = window.getEditorContent().trim();
+            console.log(query);
+            if (query.length === 0) {
+                return;
+            }
+
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        });
+    });
+</script>

@@ -1,0 +1,53 @@
+---
+import ListButtons from "./ListButtons.astro"
+import CodeEditor from "./CodeEditor.astro"
+
+---
+
+<CodeEditor id="editor"/>
+
+<div class="mt-3">
+    <button class="btn btn-primary" id="run-query" disabled>Execute</button>
+    <ListButtons></ListButtons>
+</div>
+
+<div class="mt-3">
+    <div id="result"></div>
+</div>
+
+<script>
+    let button = $("#run-query");
+    button.on("click", function() {
+        button.prop("disabled", true);
+
+        let username = $('#username').text();
+        
+        if (username === "Not logged in") {
+            alert("You must be logged in to run queries.");
+            return;
+        }
+
+        const query = window.getEditorContent();
+
+        if (query) {
+            $.ajax({
+                url: `${import.meta.env.BASE_URL}/api/run-query`,
+                type: 'POST',
+                data: {
+                    'username': JSON.stringify(username),
+                    'query': JSON.stringify(query),
+                },
+                success: function(data) {
+                    button.prop("disabled", false);
+                    
+                    display(data)
+                },
+                error: function() {
+                    alert("Could not connect to server.");
+                    
+                    button.prop("disabled", false);
+                }
+            });
+        }
+    });
+</script>

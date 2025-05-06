@@ -1,0 +1,52 @@
+---
+const { id } = Astro.props;
+---
+
+<div id={id}></div>
+
+<script type="module" define:vars={{ id }}>
+    import { basicSetup, EditorView } from 'https://esm.sh/codemirror';
+    import { sql, PostgreSQL } from 'https://esm.sh/@codemirror/lang-sql';
+    // import { oneDark } from 'https://esm.sh/@codemirror/theme-one-dark';
+    // import { lineNumbers } from 'https://esm.sh/@codemirror/gutter';
+
+    function onInputUpdate(update) {
+        if (update.docChanged) {
+            const content = update.state.doc.toString().trim();
+
+            if (content) {
+                $('#run-query').prop('disabled', false);
+            } else {
+                $('#run-query').prop('disabled', true);
+            }
+        }
+    }
+
+    const onInputExtension = EditorView.updateListener.of(onInputUpdate);
+
+    window.editor = new EditorView({
+        doc: '\n\n\n\n\n\n\n\n\n',
+        parent: document.getElementById(id),
+        extensions: [
+            basicSetup,
+            sql({
+                dialect: PostgreSQL
+            }),
+            // oneDark,  // Apply dark theme
+            // lineNumbers(),  // Enable line numbers in gutter
+            onInputExtension,
+        ]
+    });
+
+    window.getEditorContent = function() {
+        return window.editor.state.doc.toString();  // Fixed reference to the correct editor instance
+    };
+</script>
+
+<style>
+    div {
+        /* min-height: 300px; */
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+</style>
