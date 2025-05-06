@@ -1,0 +1,19 @@
+.footer {
+    width: 100%;
+    background-color: var(--bg-color);
+    padding: 12px;
+    position: sticky;
+    z-index: 51;
+}
+
+.footer a {
+    color: #777;
+}
+
+.footer a:hover {
+    color: black;
+}
+
+.footer > .container {
+    display: block;
+}
