@@ -40,3 +40,20 @@ class Queries(Enum):
             table_schema,
             table_name;
     '''
+
+    LIST_CONSTRAINTS = '''
+        SELECT
+            tc.table_schema AS schema,
+            tc.table_name AS table,
+            tc.constraint_name AS constraint,
+            tc.constraint_type AS type
+        FROM
+            information_schema.table_constraints AS tc
+        WHERE
+            tc.table_schema <> 'pg_catalog'
+            AND tc.table_schema <> 'information_schema'
+        ORDER BY
+            tc.table_schema,
+            tc.table_name,
+            tc.constraint_name;
+    '''

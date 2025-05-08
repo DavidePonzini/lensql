@@ -189,6 +189,11 @@ def list_tables(username: str) -> QueryResult:
 
     return run_builtin_query(username, Queries.LIST_TABLES)
 
+def list_constraints(username: str) -> QueryResult:
+    '''Lists all constraints in the database.'''
+
+    return run_builtin_query(username, Queries.LIST_CONSTRAINTS)
+
 def show_search_path(username: str) -> QueryResult:
     '''Shows the search path for the database.'''
 

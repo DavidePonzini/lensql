@@ -1,4 +1,5 @@
 import '../styles/Footer.css';
+import '../styles/FooterSocial.css';
 
 
 function FooterSocial() {

@@ -1,4 +1,14 @@
 services:
+  webui:
+    build: ./webui
+    image: davideponzini/lensql:webui
+    container_name: lensql_webui
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - server
+
   server:
     build: ./server
     image: davideponzini/lensql:server
@@ -7,8 +17,6 @@ services:
     depends_on:
       - db
       - db_users
-    ports:
-      - "5431:5000"
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -45,8 +53,8 @@ services:
     volumes:
       - lensql_pgdata_users:/var/lib/postgresql/data
 
-
 volumes:
   lensql_pgdata:
   lensql_pgdata_users:
+    
   

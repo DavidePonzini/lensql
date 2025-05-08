@@ -6,6 +6,10 @@ html {
     --icon-margin: 10px;
 }
 
+body {
+    background-color: var(--bg-color);
+}
+
 table {
     display: block;
     min-height: 50px;

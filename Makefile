@@ -19,7 +19,6 @@ DB=
 
 start:
 	docker compose down
-	make -C webui copy
 	docker compose up --build
 
 users: $(USERS)

@@ -1,4 +1,3 @@
-import os
 from flask import Flask, request
 from flask_cors import CORS
 import json
@@ -39,8 +38,9 @@ NOT_IMPLEMENTED = 'This feature is not implemented yet. Please check back later.
 #################### Generic ####################
 @app.route('/login', methods=['POST'])
 def login():
-    username = json.loads(request.form['username'])
-    password = json.loads(request.form['password'])
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
 
     if not db_lensql.can_login(username):
         return response(False, message='Cannot login. Please check your username and password.')
@@ -48,13 +48,16 @@ def login():
     if not db_users.create_connection(username, password):
         return response(False, message='Cannot connect to the database. Please check your username and password.')
 
-    return OK
+    return response(True, token={
+        'username': username,
+        })
     
 
 @app.route('/run-query', methods=['POST'])
 def run_query():
-    username = json.loads(request.form['username'])
-    query = json.loads(request.form['query'])
+    data = request.get_json()
+    username = data['username']
+    query = data['query']
 
     query_results = db_users.execute_queries(
         username=username,
@@ -76,8 +79,9 @@ def run_query():
 
 @app.route('/message-feedback', methods=['POST'])
 def feedback():
-    msg_id = json.loads(request.form['msg_id'])
-    feedback = json.loads(request.form['feedback'])
+    data = request.get_json()
+    msg_id = data['msg_id']
+    feedback = data['feedback']
 
     db_lensql.log_feedback(
         message_id=msg_id,
@@ -89,7 +93,8 @@ def feedback():
 #################### Builtin ####################
 @app.route('/list-schemas', methods=['POST'])
 def list_schemas():
-    username = json.loads(request.form['username'])
+    data = request.get_json()
+    username = data['username']
     
     result = db_users.list_schemas(username)
 
@@ -107,7 +112,8 @@ def list_schemas():
 
 @app.route('/list-tables', methods=['POST'])
 def list_tables():
-    username = json.loads(request.form['username'])
+    data = request.get_json()
+    username = data['username']
     
     result = db_users.list_tables(username)
 
@@ -123,9 +129,30 @@ def list_tables():
 
     return response_query(result, is_builtin=True)
 
+@app.route('/list-constraints', methods=['POST'])
+def list_constraints():
+    data = request.get_json()
+    username = data['username']
+    
+    result = db_users.list_constraints(username)
+
+    query_id = db_lensql.log_query(
+        username=username,
+        query=result.query,
+        success=result.success
+        # type=result.type,
+        # result=result.result
+    )
+
+    result.id = query_id
+
+    return response_query(result, is_builtin=True)
+
+
 @app.route('/show-search-path', methods=['POST'])
 def show_search_path():
-    username = json.loads(request.form['username'])
+    data = request.get_json()
+    username = data['username']
     
     result = db_users.show_search_path(username)
 
@@ -144,11 +171,11 @@ def show_search_path():
 #################### Syntax Error ####################
 @app.route('/explain-error-message', methods=['POST'])
 def explain_error_message():
-    messages.warning(request.form)
-    query_id = json.loads(request.form['query_id'])
-    exception = json.loads(request.form['exception'])
-    chat_id = json.loads(request.form['chat_id'])
-    msg_id = json.loads(request.form['msg_id'])
+    data = request.get_json()
+    query_id = data['query_id']
+    exception = data['exception']
+    chat_id = data['chat_id']
+    msg_id = data['msg_id']
     
     query = db_lensql.get_query(query_id)
     answer = llm.explain_error_message(query, exception)
@@ -166,10 +193,11 @@ def explain_error_message():
 
 @app.route('/locate-error-cause', methods=['POST'])
 def locate_error_cause():
-    query_id = json.loads(request.form['query_id'])
-    exception = json.loads(request.form['exception'])
-    chat_id = json.loads(request.form['chat_id'])
-    msg_id = json.loads(request.form['msg_id'])
+    data = request.get_json()
+    query_id = data['query_id']
+    exception = data['exception']
+    chat_id = data['chat_id']
+    msg_id = data['msg_id']
 
     query = db_lensql.get_query(query_id)
     answer = llm.locate_error_cause(query, exception)
@@ -187,10 +215,11 @@ def locate_error_cause():
 
 @app.route('/provide-error-example', methods=['POST'])
 def provide_error_example():
-    query_id = json.loads(request.form['query_id'])
-    exception = json.loads(request.form['exception'])
-    chat_id = json.loads(request.form['chat_id'])
-    msg_id = json.loads(request.form['msg_id'])
+    data = request.get_json()
+    query_id = data['query_id']
+    exception = data['exception']
+    chat_id = data['chat_id']
+    msg_id = data['msg_id']
 
     query = db_lensql.get_query(query_id)
     # answer = llm.provide_error_example(query, exception)
@@ -209,10 +238,11 @@ def provide_error_example():
 
 @app.route('/fix-query', methods=['POST'])
 def fix_query():
-    query_id = json.loads(request.form['query_id'])
-    exception = json.loads(request.form['exception'])
-    chat_id = json.loads(request.form['chat_id'])
-    msg_id = json.loads(request.form['msg_id'])
+    data = request.get_json()
+    query_id = data['query_id']
+    exception = data['exception']
+    chat_id = data['chat_id']
+    msg_id = data['msg_id']
 
     query = db_lensql.get_query(query_id)
     answer = llm.fix_query(query, exception)
@@ -231,9 +261,10 @@ def fix_query():
 #################### Syntax OK ####################
 @app.route('/describe-my-query', methods=['POST'])
 def describe_my_query():
-    query_id = json.loads(request.form['query_id'])
-    chat_id = json.loads(request.form['chat_id'])
-    msg_id = json.loads(request.form['msg_id'])
+    data = request.get_json()
+    query_id = data['query_id']
+    chat_id = data['chat_id']
+    msg_id = data['msg_id']
 
     query = db_lensql.get_query(query_id)
     answer = llm.describe_my_query(query)
@@ -251,9 +282,10 @@ def describe_my_query():
 
 @app.route('/explain-my-query', methods=['POST'])
 def explain_my_query():
-    query_id = json.loads(request.form['query_id'])
-    chat_id = json.loads(request.form['chat_id'])
-    msg_id = json.loads(request.form['msg_id'])
+    data = request.get_json()
+    query_id = data['query_id']
+    chat_id = data['chat_id']
+    msg_id = data['msg_id']
 
     query = db_lensql.get_query(query_id)
     answer = llm.explain_my_query(query)
