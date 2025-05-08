@@ -66,13 +66,12 @@ conn_lock = Lock()
 
 def connection_cleanup_thread():
     while True:
-        with conn_lock:
-            now = datetime.datetime.now()
-
-            for username, conn in connections.items():
-                if now - conn.last_operation_ts <= MAX_CONNECTION_AGE:
-                    continue
-
+        now = datetime.datetime.now()
+        for username, conn in connections.items():
+            if now - conn.last_operation_ts <= MAX_CONNECTION_AGE:
+                continue
+        
+            with conn_lock:
                 try:
                     connections[username].close()
                     del connections[username]
@@ -94,10 +93,12 @@ def get_connection(username: str) -> DBConnection:
     If the connection does not exist, it raises an exception.
     '''
 
+    return create_connection(username, '')
+
     with conn_lock:
         if username in connections:
             return connections[username]
-        raise Exception(f'User {username} does not have a connection to the database.')
+        raise Exception(f'User {username} is not connected to the database, try logging in again.')
     
 def create_connection(username: str, password: str, autocommit: bool = True) -> connection | None:
     '''
@@ -105,17 +106,14 @@ def create_connection(username: str, password: str, autocommit: bool = True) -> 
     If the connection does not exist, it creates a new one.
     '''
 
+    if username in connections:
+        return connections[username]
+
     with conn_lock:
-        if username in connections:
-            return connections[username]
-        
-        try:
-            conn = DBConnection(username, password, autocommit)
-            connections[username] = conn
-            return conn
-        except Exception as e:
-            messages.error('Error connecting to the database:', e)
-            return None
+        conn = DBConnection(username, password, autocommit)
+        connections[username] = conn
+
+    return conn
 
 def execute_queries(username: str, query_str: str) -> list[QueryResult]:
     '''
@@ -135,6 +133,11 @@ def execute_queries(username: str, query_str: str) -> list[QueryResult]:
     for statement in SQLCode(query_str).strip_comments().split():
         try:
             conn = get_connection(username)
+        except Exception as e:
+            result.append(QueryResultError(SQLException(e), statement.query))
+            return result
+        
+        try:
             with conn.cursor() as cur:
                 cur.execute(statement.query)
                     

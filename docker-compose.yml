@@ -15,10 +15,10 @@ services:
     container_name: lensql_server
     restart: unless-stopped
     depends_on:
-      - db
+      - db_admin
       - db_users
     environment:
-      - DB_HOST=db
+      - DB_HOST=db_admin
       - DB_PORT=5432
       - DB_USERNAME=postgres
       - DB_PASSWORD=password
@@ -30,10 +30,10 @@ services:
     env_file:
       - server/.env
 
-  db:
+  db_admin:
     build: ./database
-    image: davideponzini/lensql:db
-    container_name: lensql_db
+    image: davideponzini/lensql:db_admin
+    container_name: lensql_db_admin
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
@@ -50,11 +50,10 @@ services:
       - "5555:5432"
     environment:
       POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - lensql_pgdata_users:/var/lib/postgresql/data
 
 volumes:
   lensql_pgdata:
   lensql_pgdata_users:
-    
-  

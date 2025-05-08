@@ -21,11 +21,12 @@ start:
 	docker compose down
 	docker compose up --build
 
-users: $(USERS)
-
-%:
-	@docker exec lensql_db /app/add_user $@
-	@docker exec lensql_db_users /app/add_user $@
+users:
+	@while IFS=, read -r user password; do \
+		echo "Adding user: $$user $$password"; \
+		docker exec lensql_db_admin /app/add_user "$$user"; \
+		docker exec lensql_db_users /app/add_user "$$user" "$$password"; \
+	done < $(USER_FILE)
 
 psql:
 	docker exec -it lensql_db psql -U postgres $(BD)

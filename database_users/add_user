@@ -2,7 +2,7 @@
 # This script creates a new PostgreSQL user and database with the same name.
 # It also revokes the user's access to the default databases (postgres, template1, template0)
 
-if [ "$#" -ne 1 ]; then
+if [ "$#" -lt 1 ]; then
     echo "Usage: $0 <username> [<password>]"
     exit 1
 fi
