@@ -1,12 +1,13 @@
-#login {
-    background-color: #303030;
+.login {
+    background-color: var(--editor-bg-color);
 }
 
-#login .card {
+.login .card {
     border-radius: 1rem;
+    background-color: var(--bg-color);
 }
 
-#login .img {
+.login .img {
     border-radius: 1rem 0 0 1rem;
     background-image: url(../res/database.jpg);
     background-attachment: fixed;
@@ -17,10 +18,19 @@
     z-index: 100;
 }
 
-#login h5 {
+.login h5 {
     letter-spacing: 1px;
 }
 
-#login i {
-    color: #ff6219;
+.login .logo {
+    color: var(--logo-color);
+}
+
+
+.login .show-password {
+    cursor: pointer;
+}
+
+.login .show-password i {
+    width: 1.5rem;
 }

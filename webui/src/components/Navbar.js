@@ -1,6 +1,11 @@
+import useToken from '../hooks/useToken';
 import '../styles/Navbar.css';
+import { NavLink } from 'react-router-dom';
 
 function Navbar() {
+    const [token, setToken] = useToken();
+    const username = token ? token.username : 'Not logged in';
+
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container-fluid">
@@ -10,11 +15,32 @@ function Navbar() {
                 </button>
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <div className="navbar-nav me-auto mb-2 mb-lg-0">
+                        <NavLink
+                            className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+                            to="/"
+                            end
+                        >
+                            Home
+                        </NavLink>
+
+                        <NavLink
+                            className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+                            to="/profile"
+                        >
+                            Profile
+                        </NavLink>
+                        
+                        <NavLink
+                            className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+                            to="/assignments"
+                        >
+                            Assignments
+                        </NavLink>
                     </div>
                     <div className="navbar-text">
                         <span className="mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Your username">
                             <i className="fa-solid fa-user"></i>
-                            <span id="username">Not logged in</span>
+                            <span id="username">{username}</span>
                         </span>
                     </div>
                     {/* <button class="btn btn-outline-primary mx-1" type="button" onclick="show_leaderboard()">Leaderboard</button> */}
