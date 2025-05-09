@@ -1,9 +1,6 @@
-import { useState } from "react";
 import Chat from './Chat';
 
 function QueryResult({ result, builtin, queryId, query, success, message }) {
-    const [messages, setMessages] = useState([]);
-
     return (
         <div className={`chat alert ${builtin ? 'alert-secondary' : success ? 'alert-primary' : 'alert-danger'}`}>
             <div className="chat-title">
@@ -29,7 +26,7 @@ function QueryResult({ result, builtin, queryId, query, success, message }) {
             )}
 
             {!builtin && (
-                <Chat messages={messages} success={success} />
+                <Chat success={success} />
             )}
         </div>
     );

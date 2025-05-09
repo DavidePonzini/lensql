@@ -1,8 +1,8 @@
 import Message from './Message';
 
-function MessageBox({ children, assistant = false, feedback = false }) {
+function MessageBox({ children, assistant = false, feedback = false, thinking = false }) {
     return (
-        <div className={`messagebox ${assistant ? 'messagebox-assistant' : 'messagebox-user'}`}>
+        <div className={`messagebox ${assistant ? 'messagebox-assistant' : 'messagebox-user'} ${thinking ? 'thinking' : ''}`}>
             {assistant && (
                 <div className="icon">
                     <i className="fas fa-search" />

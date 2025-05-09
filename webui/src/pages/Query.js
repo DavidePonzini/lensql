@@ -9,14 +9,12 @@ import QueryResult from "../components/QueryResult";
 
 function Query() {
     const [sqlText, setSqlText] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
     const [token, setToken] = useToken();
 
     const displayResult = (data) => {
         setResult(data);
-        if (!data)
-            return;
 
         console.log(data);
     }
@@ -28,7 +26,7 @@ function Query() {
         const username = token.username;
         const query = sqlText;
 
-        setIsLoading(true);
+        setIsExecuting(true);
         try {
             const response = await fetch(`/api/run-query`, {
                 method: 'POST',
@@ -47,14 +45,14 @@ function Query() {
         } catch (error) {
             alert("Could not connect to server.");
         } finally {
-            setIsLoading(false);
+            setIsExecuting(false);
         }
     };
 
     const handleShowSearchPath = async () => {
         const username = token.username;
 
-        setIsLoading(true);
+        setIsExecuting(true);
 
         try {
             const response = await fetch(`/api/show-search-path`, {
@@ -73,14 +71,14 @@ function Query() {
         } catch (error) {
             alert("Could not connect to server.");
         } finally {
-            setIsLoading(false);
+            setIsExecuting(false);
         }
     }
 
     const handleListSchemas = async () => {
         const username = token.username;
 
-        setIsLoading(true);
+        setIsExecuting(true);
 
         try {
             const response = await fetch(`/api/list-schemas`, {
@@ -99,14 +97,14 @@ function Query() {
         } catch (error) {
             alert("Could not connect to server.");
         } finally {
-            setIsLoading(false);
+            setIsExecuting(false);
         }
     }
 
     const handleListTables = async () => {
         const username = token.username;
 
-        setIsLoading(true);
+        setIsExecuting(true);
 
         try {
             const response = await fetch(`/api/list-tables`, {
@@ -125,14 +123,14 @@ function Query() {
         } catch (error) {
             alert("Could not connect to server.");
         } finally {
-            setIsLoading(false);
+            setIsExecuting(false);
         }
     }
 
     const handleListConstraints = async () => {
         const username = token.username;
 
-        setIsLoading(true);
+        setIsExecuting(true);
 
         try {
             const response = await fetch(`/api/list-constraints`, {
@@ -151,7 +149,7 @@ function Query() {
         } catch (error) {
             alert("Could not connect to server.");
         } finally {
-            setIsLoading(false);
+            setIsExecuting(false);
         }
     }
 
@@ -168,7 +166,7 @@ function Query() {
             <div className="mt-3 support-buttons">
                 <Button
                     className="btn-primary me-1"
-                    disabled={isLoading || sqlText.trim().length === 0}
+                    disabled={isExecuting || sqlText.trim().length === 0}
                     onClick={handleExecute}
                 >
                     Execute
@@ -176,7 +174,7 @@ function Query() {
 
                 <Button
                     className="btn-secondary me-1"
-                    disabled={isLoading}
+                    disabled={isExecuting}
                     onClick={handleShowSearchPath}
                 >
                     Show Search Path
@@ -184,7 +182,7 @@ function Query() {
 
                 <Button
                     className="btn-secondary me-1"
-                    disabled={isLoading}
+                    disabled={isExecuting}
                     onClick={handleListSchemas}
                 >
                     List Schemas
@@ -192,7 +190,7 @@ function Query() {
 
                 <Button
                     className="btn-secondary me-1"
-                    disabled={isLoading}
+                    disabled={isExecuting}
                     onClick={handleListTables}
                 >
                     List Tables
@@ -200,7 +198,7 @@ function Query() {
 
                 <Button
                     className="btn-secondary me-1"
-                    disabled={isLoading}
+                    disabled={isExecuting}
                     onClick={handleListConstraints}
                 >
                     List Constraints
@@ -208,7 +206,7 @@ function Query() {
 
                 <Button
                     className="btn-primary"
-                    disabled={isLoading}
+                    disabled={isExecuting}
                     onClick={handleClearOutput}
                 >
                     Clear output
