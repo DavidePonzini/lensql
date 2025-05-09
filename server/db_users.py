@@ -20,18 +20,18 @@ CLEANUP_INTERVAL_SECONDS = int(os.getenv('CLEANUP_INTERVAL_SECONDS'))
 
 
 class DBConnection:
-    def __init__(self, username: str, password: str, autocommit: bool = True):
+    def __init__(self, dbname: str, username: str, autocommit: bool = True):
+        self.dbname = dbname
         self.username = username
-        self.password = password
         self.autocommit = autocommit
         
         self.last_operation_ts = datetime.datetime.now()
         self.connection = psycopg2.connect(
             host=HOST,
             port=PORT,
-            dbname=username,
+            dbname=dbname,
             user=username,
-            password=password
+            password='' # Password is not needed for the db_users
         )
 
         self.connection.autocommit = autocommit
@@ -53,6 +53,16 @@ class DBConnection:
     
     def update_last_operation_ts(self):
         self.last_operation_ts = datetime.datetime.now()
+
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is not None:
+            self.rollback()
+        else:
+            self.commit()
+        self.close()
 
     @property
     def time_since_last_operation(self) -> datetime.timedelta:
@@ -81,40 +91,29 @@ def connection_cleanup_thread():
 
         time.sleep(CLEANUP_INTERVAL_SECONDS)
 
+def start_cleanup_thread():
+    '''
+    Starts a thread that will periodically check for expired connections
+    and close them if they are older than MAX_CONNECTION_AGE.
+    '''
+    cleanup_thread = threading.Thread(target=connection_cleanup_thread, daemon=True)
+    cleanup_thread.start()
 
-cleanup_thread = threading.Thread(target=connection_cleanup_thread, daemon=True)
-cleanup_thread.start()
-
-
-
-def get_connection(username: str) -> DBConnection:
+def get_connection(username: str, autocommit: bool = True) -> DBConnection:
     '''
     Returns the connection for the given username.
     If the connection does not exist, it raises an exception.
-    '''
-
-    return create_connection(username, '')
-
-    with conn_lock:
-        if username in connections:
-            return connections[username]
-        raise Exception(f'User {username} is not connected to the database, try logging in again.')
-    
-def create_connection(username: str, password: str, autocommit: bool = True) -> connection | None:
-    '''
-    Returns a connection to the database for the given username.
-    If the connection does not exist, it creates a new one.
     '''
 
     if username in connections:
         return connections[username]
 
     with conn_lock:
-        conn = DBConnection(username, password, autocommit)
+        conn = DBConnection(dbname=username, username=username, autocommit=autocommit)
         connections[username] = conn
 
-    return conn
-
+        return conn
+    
 def execute_queries(username: str, query_str: str) -> list[QueryResult]:
     '''
     Executes the given SQL queries and returns the results.
@@ -133,11 +132,6 @@ def execute_queries(username: str, query_str: str) -> list[QueryResult]:
     for statement in SQLCode(query_str).strip_comments().split():
         try:
             conn = get_connection(username)
-        except Exception as e:
-            result.append(QueryResultError(SQLException(e), statement.query))
-            return result
-        
-        try:
             with conn.cursor() as cur:
                 cur.execute(statement.query)
                     
@@ -158,8 +152,11 @@ def execute_queries(username: str, query_str: str) -> list[QueryResult]:
             conn.update_last_operation_ts()
         except Exception as e:
             result.append(QueryResultError(SQLException(e), statement.query))
-            conn.rollback()
-            conn.update_last_operation_ts()
+            try:
+                conn.rollback()
+                conn.update_last_operation_ts()
+            except Exception as e:
+                messages.error(f"Error rolling back connection for user {username}: {e}")
 
     return result
 
@@ -178,8 +175,11 @@ def run_builtin_query(username: str, query: Queries) -> QueryResult:
         conn.update_last_operation_ts()
         return QueryResultDataset(result, query.name)
     except Exception as e:
-        conn.rollback()
-        conn.update_last_operation_ts()
+        try:
+            conn.rollback()
+            conn.update_last_operation_ts()
+        except Exception as e:
+            messages.error(f"Error rolling back connection for user {username}: {e}")
         return QueryResultError(SQLException(e), query.name)
 
 def list_schemas(username: str) -> QueryResult:

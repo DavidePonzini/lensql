@@ -23,9 +23,7 @@ start:
 
 users:
 	@while IFS=, read -r user password; do \
-		echo "Adding user: $$user $$password"; \
-		docker exec lensql_db_admin /app/add_user "$$user"; \
-		docker exec lensql_db_users /app/add_user "$$user" "$$password"; \
+		docker exec lensql_server python /app/add_user.py "$$user" "$$password"; \
 	done < $(USER_FILE)
 
 psql:

@@ -3,7 +3,7 @@ from flask_cors import CORS
 import json
 
 import llm
-import db_lensql
+import db_admin as db_admin
 import db_users
 
 from sql_code import QueryResult
@@ -42,11 +42,8 @@ def login():
     username = data['username']
     password = data['password']
 
-    if not db_lensql.can_login(username):
+    if not db_admin.can_login(username, password):
         return response(False, message='Cannot login. Please check your username and password.')
-
-    if not db_users.create_connection(username, password):
-        return response(False, message='Cannot connect to the database. Please check your username and password.')
 
     return response(True, token={
         'username': username,
@@ -65,7 +62,7 @@ def run_query():
     )
 
     for query_result in query_results:
-        query_id = db_lensql.log_query(
+        query_id = db_admin.log_query(
             username=username,
             query=query_result.query,
             success=query_result.success
@@ -83,7 +80,7 @@ def feedback():
     msg_id = data['msg_id']
     feedback = data['feedback']
 
-    db_lensql.log_feedback(
+    db_admin.log_feedback(
         message_id=msg_id,
         feedback=feedback
     )
@@ -98,7 +95,7 @@ def list_schemas():
     
     result = db_users.list_schemas(username)
 
-    query_id = db_lensql.log_query(
+    query_id = db_admin.log_query(
         username=username,
         query=result.query,
         success=result.success
@@ -117,7 +114,7 @@ def list_tables():
     
     result = db_users.list_tables(username)
 
-    query_id = db_lensql.log_query(
+    query_id = db_admin.log_query(
         username=username,
         query=result.query,
         success=result.success
@@ -136,7 +133,7 @@ def list_constraints():
     
     result = db_users.list_constraints(username)
 
-    query_id = db_lensql.log_query(
+    query_id = db_admin.log_query(
         username=username,
         query=result.query,
         success=result.success
@@ -156,7 +153,7 @@ def show_search_path():
     
     result = db_users.show_search_path(username)
 
-    query_id = db_lensql.log_query(
+    query_id = db_admin.log_query(
         username=username,
         query=result.query,
         success=result.success
@@ -177,10 +174,10 @@ def explain_error_message():
     chat_id = data['chat_id']
     msg_id = data['msg_id']
     
-    query = db_lensql.get_query(query_id)
+    query = db_admin.get_query(query_id)
     answer = llm.explain_error_message(query, exception)
 
-    answer_id = db_lensql.log_message(
+    answer_id = db_admin.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -199,10 +196,10 @@ def locate_error_cause():
     chat_id = data['chat_id']
     msg_id = data['msg_id']
 
-    query = db_lensql.get_query(query_id)
+    query = db_admin.get_query(query_id)
     answer = llm.locate_error_cause(query, exception)
 
-    answer_id = db_lensql.log_message(
+    answer_id = db_admin.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -221,11 +218,11 @@ def provide_error_example():
     chat_id = data['chat_id']
     msg_id = data['msg_id']
 
-    query = db_lensql.get_query(query_id)
+    query = db_admin.get_query(query_id)
     # answer = llm.provide_error_example(query, exception)
     answer = NOT_IMPLEMENTED
     
-    answer_id = db_lensql.log_message(
+    answer_id = db_admin.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -244,10 +241,10 @@ def fix_query():
     chat_id = data['chat_id']
     msg_id = data['msg_id']
 
-    query = db_lensql.get_query(query_id)
+    query = db_admin.get_query(query_id)
     answer = llm.fix_query(query, exception)
 
-    answer_id = db_lensql.log_message(
+    answer_id = db_admin.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -266,10 +263,10 @@ def describe_my_query():
     chat_id = data['chat_id']
     msg_id = data['msg_id']
 
-    query = db_lensql.get_query(query_id)
+    query = db_admin.get_query(query_id)
     answer = llm.describe_my_query(query)
 
-    answer_id = db_lensql.log_message(
+    answer_id = db_admin.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -287,10 +284,10 @@ def explain_my_query():
     chat_id = data['chat_id']
     msg_id = data['msg_id']
 
-    query = db_lensql.get_query(query_id)
+    query = db_admin.get_query(query_id)
     answer = llm.explain_my_query(query)
 
-    answer_id = db_lensql.log_message(
+    answer_id = db_admin.log_message(
         query_id=query_id,
         content=answer,
         button=request.path,
@@ -305,7 +302,10 @@ def explain_my_query():
 ###################### Main #####################
 
 if __name__ == '__main__':
+    db_users.start_cleanup_thread()
+    
     app.run(
     	host='0.0.0.0',
     	debug=True
     )
+

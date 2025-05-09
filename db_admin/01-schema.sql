@@ -16,6 +16,7 @@ SET search_path TO lensql;
 
 CREATE TABLE users (
     username VARCHAR(255) PRIMARY KEY,
+    password_hash VARCHAR(255) NOT NULL,
     can_login BOOLEAN NOT NULL DEFAULT TRUE,
     can_use_ai BOOLEAN NOT NULL DEFAULT TRUE
 );

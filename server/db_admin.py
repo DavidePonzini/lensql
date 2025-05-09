@@ -1,5 +1,6 @@
 from dav_tools import database
 import os
+import bcrypt
 
 SCHEMA = 'lensql'
 
@@ -11,9 +12,26 @@ db = database.PostgreSQL(
     password    =       os.getenv('DB_PASSWORD')
 )
 
-def can_login(username: str) -> bool:
+def register_user(username: str, password: str) -> None:
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
     query = database.sql.SQL('''
-        SELECT 1
+        INSERT INTO {schema}.users(username, password_hash)
+        VALUES ({username}, {password_hash})
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        password_hash=database.sql.Placeholder('password_hash')
+    )
+
+    db.execute(query, {
+        'username': username,
+        'password_hash': hashed_password
+    })
+
+def can_login(username: str, password: str) -> bool:
+    query = database.sql.SQL('''
+        SELECT password_hash
         FROM
             {schema}.users
         WHERE
@@ -28,7 +46,12 @@ def can_login(username: str) -> bool:
         'username': username
     })
 
-    return len(result) == 1    
+    if not result:
+        return False
+    
+    stored_hash = result[0][0]
+    return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
+
 
 def log_message(content: str, button: str, query_id: str, data: str, chat_id: int, msg_id: int) -> int:
     result = db.insert(SCHEMA, 'messages', {
