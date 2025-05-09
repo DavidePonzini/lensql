@@ -10,7 +10,7 @@ import QueryResult from "../components/QueryResult";
 function Query() {
     const [sqlText, setSqlText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [result, setResult] = useState(null);
+    const [result, setResult] = useState([]);
     const [token, setToken] = useToken();
 
     const displayResult = (data) => {
@@ -22,9 +22,8 @@ function Query() {
     }
 
     const handleExecute = async () => {
-        console.log("Executing SQL query:", sqlText);
-        if (!sqlText.trim()) return;
-        console.log(2)
+        if (!sqlText.trim())
+            return;
 
         const username = token.username;
         const query = sqlText;
@@ -157,7 +156,7 @@ function Query() {
     }
 
     const handleClearOutput = () => {
-        setResult(null);
+        setResult([]);
     }
 
     return (
@@ -217,7 +216,18 @@ function Query() {
             </div>
 
             <div className="mt-3">
-                <QueryResult />
+                {
+                    result.map((val, index) => (
+                        <QueryResult
+                            result={val.data}
+                            builtin={val.builtin}
+                            queryId={val.id}
+                            query={val.query}
+                            success={val.success}
+                            type={val.type}
+                        />
+                    ))
+                }
             </div>
         </>
     );
