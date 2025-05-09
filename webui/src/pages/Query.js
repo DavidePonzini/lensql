@@ -224,7 +224,7 @@ function Query() {
                             queryId={val.id}
                             query={val.query}
                             success={val.success}
-                            type={val.type}
+                            message={val.type === 'message'}
                         />
                     ))
                 }
