@@ -1,10 +1,10 @@
 import Chat from './Chat';
 
-function QueryResult({ result, builtin, queryId, query, success, message }) {
+function QueryResult({ result, isBuiltin, queryId, query, success, isMessage }) {
     return (
-        <div className={`chat alert ${builtin ? 'alert-secondary' : success ? 'alert-primary' : 'alert-danger'}`}>
+        <div className={`chat alert ${isBuiltin ? 'alert-secondary' : success ? 'alert-primary' : 'alert-danger'}`}>
             <div className="chat-title">
-                {builtin ? (
+                {isBuiltin ? (
                     <span>
                         <i className="fas fa-search" />
                         <b>LensQL builtin function</b>
@@ -19,14 +19,17 @@ function QueryResult({ result, builtin, queryId, query, success, message }) {
             </div>
             <hr />
 
-            {message ? (
+            {isMessage ? (
                 <pre>{result}</pre>
             ) : (
                 <div dangerouslySetInnerHTML={{ __html: result }} />
             )}
 
-            {!builtin && (
-                <Chat success={success} />
+            {!isBuiltin && (
+                <Chat
+                    queryId={queryId}
+                    success={success}
+                />
             )}
         </div>
     );

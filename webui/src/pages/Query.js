@@ -7,7 +7,7 @@ import SqlEditor from "../components/SqlEditor";
 import Button from "../components/Button";
 import QueryResult from "../components/QueryResult";
 
-function Query() {
+function Query({ exerciseId, exerciseText }) {
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
@@ -34,8 +34,9 @@ function Query() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username,
-                    query,
+                    'username': username,
+                    'query': query,
+                    'exercise_id': exerciseId,
                 }),
             });
 
@@ -43,7 +44,8 @@ function Query() {
             console.log(data);
             displayResult(data);
         } catch (error) {
-            alert("Could not connect to server.");
+            console.error(error);
+            alert(`Error: ${error}`);
         } finally {
             setIsExecuting(false);
         }
@@ -61,7 +63,8 @@ function Query() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username,
+                    'username': username,
+                    'exercise_id': exerciseId,
                 }),
             });
 
@@ -69,7 +72,8 @@ function Query() {
             console.log(data);
             displayResult(data);
         } catch (error) {
-            alert("Could not connect to server.");
+            console.error(error);
+            alert(`Error: ${error}`);
         } finally {
             setIsExecuting(false);
         }
@@ -87,7 +91,8 @@ function Query() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username,
+                    'username': username,
+                    'exercise_id': exerciseId,
                 }),
             });
 
@@ -95,7 +100,8 @@ function Query() {
             console.log(data);
             displayResult(data);
         } catch (error) {
-            alert("Could not connect to server.");
+            console.error(error);
+            alert(`Error: ${error}`);
         } finally {
             setIsExecuting(false);
         }
@@ -113,7 +119,8 @@ function Query() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username,
+                    'username': username,
+                    'exercise_id': exerciseId,
                 }),
             });
 
@@ -121,7 +128,8 @@ function Query() {
             console.log(data);
             displayResult(data);
         } catch (error) {
-            alert("Could not connect to server.");
+            console.error(error);
+            alert(`Error: ${error}`);
         } finally {
             setIsExecuting(false);
         }
@@ -139,7 +147,8 @@ function Query() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username,
+                    'username': username,
+                    'exercise_id': exerciseId
                 }),
             });
 
@@ -147,7 +156,8 @@ function Query() {
             console.log(data);
             displayResult(data);
         } catch (error) {
-            alert("Could not connect to server.");
+            console.error(error);
+            alert(`Error: ${error}`);
         } finally {
             setIsExecuting(false);
         }
@@ -159,7 +169,7 @@ function Query() {
 
     return (
         <>
-            <p className="lead">Find the users who are called Dav</p>
+            <p className="lead">#{} {exerciseText}</p>
 
             <SqlEditor onChange={setSqlText} onSubmit={handleExecute} />
 
@@ -218,11 +228,11 @@ function Query() {
                     result.map((val, index) => (
                         <QueryResult
                             result={val.data}
-                            builtin={val.builtin}
+                            isBuiltin={val.builtin}
                             queryId={val.id}
                             query={val.query}
                             success={val.success}
-                            message={val.type === 'message'}
+                            isMessage={val.type === 'message'}
                         />
                     ))
                 }

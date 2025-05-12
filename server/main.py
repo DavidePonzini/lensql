@@ -3,8 +3,9 @@ from flask_cors import CORS
 import json
 
 import llm
-import db_admin as db_admin
+import db_admi as db_admin
 import db_users
+from sql_code import SQLException
 
 from sql_code import QueryResult
 from dav_tools import messages
@@ -55,6 +56,12 @@ def run_query():
     data = request.get_json()
     username = data['username']
     query = data['query']
+    exercise_id = data['exercise_id']
+
+    batch_id = db_admin.log_query_batch(
+        username=username,
+        exercise_id=exercise_id if exercise_id > 0 else None
+    )
 
     query_results = db_users.execute_queries(
         username=username,
@@ -63,11 +70,10 @@ def run_query():
 
     for query_result in query_results:
         query_id = db_admin.log_query(
-            username=username,
+            batch_id=batch_id,
             query=query_result.query,
-            success=query_result.success
-            # type=query_result.type,
-            # result=query_result.result,
+            success=query_result.success,
+            result_str=str(query_result) if isinstance(query_result, SQLException) else query_result.result
         )
 
         query_result.id = query_id
@@ -77,30 +83,59 @@ def run_query():
 @app.route('/message-feedback', methods=['POST'])
 def feedback():
     data = request.get_json()
-    msg_id = data['msg_id']
+    message_id = data['message_id']
     feedback = data['feedback']
 
     db_admin.log_feedback(
-        message_id=msg_id,
+        message_id=message_id,
         feedback=feedback
     )
 
     return OK
 
 #################### Builtin ####################
+@app.route('/show-search-path', methods=['POST'])
+def show_search_path():
+    data = request.get_json()
+    username = data['username']
+    exercise_id = data['exercise_id']
+    
+    result = db_users.show_search_path(username)
+
+    batch_id = db_admin.log_query_batch(
+        username=username,
+        exercise_id=exercise_id if exercise_id > 0 else None
+    )
+
+    query_id = db_admin.log_query(
+        batch_id=batch_id,
+        query=result.query,
+        success=result.success,
+        result_str=result.result
+    )
+
+    result.id = query_id
+
+    return response_query(result, is_builtin=True)
+
 @app.route('/list-schemas', methods=['POST'])
 def list_schemas():
     data = request.get_json()
     username = data['username']
+    exercise_id = data['exercise_id']
     
     result = db_users.list_schemas(username)
 
-    query_id = db_admin.log_query(
+    batch_id = db_admin.log_query_batch(
         username=username,
+        exercise_id=exercise_id if exercise_id > 0 else None
+    )
+
+    query_id = db_admin.log_query(
+        batch_id=batch_id,
         query=result.query,
-        success=result.success
-        # type=result.type,
-        # result=result.result
+        success=result.success,
+        result_str=result.result
     )
 
     result.id = query_id
@@ -111,15 +146,20 @@ def list_schemas():
 def list_tables():
     data = request.get_json()
     username = data['username']
+    exercise_id = data['exercise_id']
     
     result = db_users.list_tables(username)
 
-    query_id = db_admin.log_query(
+    batch_id = db_admin.log_query_batch(
         username=username,
+        exercise_id=exercise_id if exercise_id > 0 else None
+    )
+
+    query_id = db_admin.log_query(
+        batch_id=batch_id,
         query=result.query,
-        success=result.success
-        # type=result.type,
-        # result=result.result
+        success=result.success,
+        result_str=result.result
     )
 
     result.id = query_id
@@ -130,35 +170,20 @@ def list_tables():
 def list_constraints():
     data = request.get_json()
     username = data['username']
+    exercise_id = data['exercise_id']
     
     result = db_users.list_constraints(username)
 
-    query_id = db_admin.log_query(
+    batch_id = db_admin.log_query_batch(
         username=username,
-        query=result.query,
-        success=result.success
-        # type=result.type,
-        # result=result.result
+        exercise_id=exercise_id if exercise_id > 0 else None
     )
 
-    result.id = query_id
-
-    return response_query(result, is_builtin=True)
-
-
-@app.route('/show-search-path', methods=['POST'])
-def show_search_path():
-    data = request.get_json()
-    username = data['username']
-    
-    result = db_users.show_search_path(username)
-
     query_id = db_admin.log_query(
-        username=username,
+        batch_id=batch_id,
         query=result.query,
-        success=result.success
-        # type=result.type,
-        # result=result.result
+        success=result.success,
+        result_str=result.result
     )
 
     result.id = query_id
@@ -170,20 +195,17 @@ def show_search_path():
 def explain_error_message():
     data = request.get_json()
     query_id = data['query_id']
-    exception = data['exception']
-    chat_id = data['chat_id']
-    msg_id = data['msg_id']
+    msg_idx = data['msg_idx']
     
     query = db_admin.get_query(query_id)
+    exception = db_admin.get_query_result(query_id)
     answer = llm.explain_error_message(query, exception)
 
     answer_id = db_admin.log_message(
-        query_id=query_id,
-        content=answer,
+        answer=answer,
         button=request.path,
-        data=exception,
-        chat_id=chat_id,
-        msg_id=msg_id
+        query_id=query_id,
+        msg_idx=msg_idx
     )
 
     return response(answer=answer, id=answer_id)
@@ -192,20 +214,17 @@ def explain_error_message():
 def locate_error_cause():
     data = request.get_json()
     query_id = data['query_id']
-    exception = data['exception']
-    chat_id = data['chat_id']
-    msg_id = data['msg_id']
+    msg_idx = data['msg_idx']
 
     query = db_admin.get_query(query_id)
+    exception = db_admin.get_query_result(query_id)
     answer = llm.locate_error_cause(query, exception)
 
     answer_id = db_admin.log_message(
-        query_id=query_id,
-        content=answer,
+        answer=answer,
         button=request.path,
-        data=exception,
-        chat_id=chat_id,
-        msg_id=msg_id
+        query_id=query_id,
+        msg_idx=msg_idx
     )
 
     return response(answer=answer, id=answer_id)
@@ -214,21 +233,18 @@ def locate_error_cause():
 def provide_error_example():
     data = request.get_json()
     query_id = data['query_id']
-    exception = data['exception']
-    chat_id = data['chat_id']
-    msg_id = data['msg_id']
+    msg_idx = data['msg_idx']
 
     query = db_admin.get_query(query_id)
+    exception = db_admin.get_query_result(query_id)
     # answer = llm.provide_error_example(query, exception)
     answer = NOT_IMPLEMENTED
     
     answer_id = db_admin.log_message(
-        query_id=query_id,
-        content=answer,
+        answer=answer,
         button=request.path,
-        data=exception,
-        chat_id=chat_id,
-        msg_id=msg_id
+        query_id=query_id,
+        msg_idx=msg_idx
     )
 
     return response(answer=answer, id=answer_id)
@@ -237,20 +253,17 @@ def provide_error_example():
 def fix_query():
     data = request.get_json()
     query_id = data['query_id']
-    exception = data['exception']
-    chat_id = data['chat_id']
-    msg_id = data['msg_id']
+    msg_idx = data['msg_idx']
 
     query = db_admin.get_query(query_id)
+    exception = db_admin.get_query_result(query_id)
     answer = llm.fix_query(query, exception)
 
     answer_id = db_admin.log_message(
-        query_id=query_id,
-        content=answer,
+        answer=answer,
         button=request.path,
-        data=exception,
-        chat_id=chat_id,
-        msg_id=msg_id
+        query_id=query_id,
+        msg_idx=msg_idx
     )
 
     return response(answer=answer, id=answer_id)
@@ -260,19 +273,16 @@ def fix_query():
 def describe_my_query():
     data = request.get_json()
     query_id = data['query_id']
-    chat_id = data['chat_id']
-    msg_id = data['msg_id']
+    msg_idx = data['msg_idx']
 
     query = db_admin.get_query(query_id)
     answer = llm.describe_my_query(query)
 
     answer_id = db_admin.log_message(
-        query_id=query_id,
-        content=answer,
+        answer=answer,
         button=request.path,
-        data=None,
-        chat_id=chat_id,
-        msg_id=msg_id
+        query_id=query_id,
+        msg_idx=msg_idx
     )
 
     return response(answer=answer, id=answer_id)
@@ -281,19 +291,16 @@ def describe_my_query():
 def explain_my_query():
     data = request.get_json()
     query_id = data['query_id']
-    chat_id = data['chat_id']
-    msg_id = data['msg_id']
+    msg_idx = data['msg_idx']
 
     query = db_admin.get_query(query_id)
     answer = llm.explain_my_query(query)
 
     answer_id = db_admin.log_message(
-        query_id=query_id,
-        content=answer,
+        answer=answer,
         button=request.path,
-        data=None,
-        chat_id=chat_id,
-        msg_id=msg_id
+        query_id=query_id,
+        msg_idx=msg_idx
     )
 
     return response(answer=answer, id=answer_id)

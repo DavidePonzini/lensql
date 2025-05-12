@@ -49,7 +49,6 @@ class SQLException:
     def __str__(self):
         return f'{self.name}: {self.description}'
 
-
 class QueryResult(ABC):
     '''Represents the result of a SQL query.'''
     def __init__(self, query: str, success: bool, query_type: str):

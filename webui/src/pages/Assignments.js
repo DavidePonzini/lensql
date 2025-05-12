@@ -5,7 +5,7 @@ function Assignments() {
         <>
             <h1>Assignments</h1>
             <div>
-                <AssignmentCard href="/assignments/q">
+                <AssignmentCard>
                     Sample Assignment 1
                 </AssignmentCard>
             </div>

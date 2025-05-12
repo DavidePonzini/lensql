@@ -9,7 +9,7 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-USER_FILE = users.txt
+USER_FILE = users.csv
 USERS = $(shell cat $(USER_FILE))
 
 DB=
@@ -27,7 +27,7 @@ users:
 	done < $(USER_FILE)
 
 psql:
-	docker exec -it lensql_db psql -U postgres $(BD)
+	docker exec -it lensql_db psql -U postgres
 
 psql_users:
 	docker exec -it lensql_db_users psql -U postgres $(DB)

@@ -53,25 +53,33 @@ def can_login(username: str, password: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
 
 
-def log_message(content: str, button: str, query_id: str, data: str, chat_id: int, msg_id: int) -> int:
+def log_message(answer: str, button: str, query_id: str, msg_idx: int) -> int:
     result = db.insert(SCHEMA, 'messages', {
         'query_id': query_id,
-        'content': content,
+        'answer': answer,
         'button': button,
-        'data': data,
-        'chat_id': chat_id,
-        'msg_id': msg_id,
+        'msg_idx': msg_idx,
     }, ['id'])
 
     message_id = result[0][0]
 
     return message_id
 
-def log_query(username: str, query: str, success: bool) -> int:
-    result = db.insert(SCHEMA, 'queries', {
+def log_query_batch(username: str, exercise_id: int) -> int:
+    result = db.insert(SCHEMA, 'query_batches', {
         'username': username,
+        'exercise_id': exercise_id,
+    }, ['id'])
+
+    batch_id = result[0][0]
+    return batch_id
+
+def log_query(batch_id: int, query: str, success: bool, result_str: str) -> int:
+    result = db.insert(SCHEMA, 'queries', {
+        'batch_id': batch_id,
         'query': query,
         'success': success,
+        'result': result_str
     }, ['id'])
 
     query_id = result[0][0]
@@ -81,6 +89,24 @@ def log_query(username: str, query: str, success: bool) -> int:
 def get_query(query_id: int) -> str:
     query = database.sql.SQL('''
         SELECT query
+        FROM {schema}.queries
+        WHERE id = {query_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        query_id=database.sql.Placeholder('query_id')
+    )
+    result = db.execute_and_fetch(query, {
+        'query_id': query_id
+    })
+
+    if len(result) == 0:
+        return None
+
+    return result[0][0]
+
+def get_query_result(query_id: int) -> str:
+    query = database.sql.SQL('''
+        SELECT result
         FROM {schema}.queries
         WHERE id = {query_id}
     ''').format(

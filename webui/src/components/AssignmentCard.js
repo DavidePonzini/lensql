@@ -1,4 +1,8 @@
-function AssignmentCard({ children, href, isGenerated = false }) {
+function AssignmentCard({ children, assignmentId, isGenerated = false }) {
+    function handleOpenAssignment() {
+        // TODO: replace this elem with Query assignment=this.assignment
+    }
+
     return (
         <div className="assignment">
             <div className="assignment-header">
@@ -7,7 +11,7 @@ function AssignmentCard({ children, href, isGenerated = false }) {
             </div>
             <div className="assignment-body">
                 <p>{children}</p>
-                <a href={href} className="btn btn-primary">View Assignment</a>
+                <button className="btn btn-primary" onClick={handleOpenAssignment()}>View Assignment</button>
             </div>
         </div>
     );

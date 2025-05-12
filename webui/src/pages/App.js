@@ -33,7 +33,7 @@ function App() {
                             <Routes>
                                 <Route path="/profile" element={<Profile />} />
                                 <Route path="/assignments" element={<Assignments />} />
-                                <Route path="/assignments/q" element={<Query />} />
+                                <Route path="/assignments/q" element={<Query exerciseId={0} exerciseText="Find the users who are called Davide"/>} />
                             </Routes>
                         </div>
                     </div>

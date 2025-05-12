@@ -3,7 +3,7 @@ import MessageBox from "./MessageBox";
 import Button from "./Button";
 
 
-function Chat({ success }) {
+function Chat({ queryId, success }) {
     const [messages, setMessages] = useState([
         {
             text: 'Would you like to ask me anything about this result?',
@@ -14,55 +14,82 @@ function Chat({ success }) {
     ]);
     const [isThinking, setIsThinking] = useState(false);
 
-    const addMessage = (text, isFromAssistant, askFeedback = false, thinking = false) => {
+    function addMessage(text, isFromAssistant, askFeedback = false, thinking = false, message_id = null) {
         setMessages((prevMessages) => [...prevMessages, {
             text,
             isFromAssistant,
             askFeedback,
             thinking,
+            message_id,
         }]);
-    }
+    };
 
-    const removeLastMessage = () => {
+    function removeLastMessage() {
         setMessages((prevMessages) => prevMessages.slice(0, -1));
     }
 
-    const startThinking = () => {
+    function startThinking() {
         addMessage("Thinking...", true, false, true);
         setIsThinking(true);
     }
 
-    const stopThinking = () => {
+    function stopThinking() {
         removeLastMessage();
         setIsThinking(false);
     }
 
-    const handleExplainQuery = () => {
+    function getLastMessageIdx() {
+        return messages.filter(m => !m.thinking).length;
+    };
+
+    async function handleExplainQuery() {
         addMessage("Explain query", false);
         startThinking();
+
+        try {
+            const response = await fetch('/api/explain-my-query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'query_id': queryId,
+                    'msg_idx': getLastMessageIdx(),
+                })
+
+            });
+
+            const data = await response.json();
+
+            stopThinking();
+            addMessage(data.answer, true, true, false, data.message_id);
+        } catch (error) {
+            stopThinking();
+            addMessage(`Error: ${error}`, true);
+        }
     }
 
-    const handleDescribeQuery = () => {
+    async function handleDescribeQuery() {
         addMessage("Describe query", false);
         startThinking();
     }
 
-    const handleExplainError = () => {
+    async function handleExplainError() {
         addMessage("Explain error", false);
         startThinking();
     }
 
-    const handleShowExample = () => {
+    async function handleShowExample() {
         addMessage("Show example", false);
         startThinking();
     }
 
-    const handleWhereToLook = () => {
+    async function handleWhereToLook() {
         addMessage("Where to look", false);
         startThinking();
     }
 
-    const handleSuggestFix = () => {
+    async function handleSuggestFix() {
         addMessage("Suggest fix", false);
         startThinking();
     }
@@ -88,7 +115,7 @@ function Chat({ success }) {
                                 Describe query
                             </Button>
 
-                            <Button className="btn-primary me-2" onClick={handleExplainError}>
+                            <Button className="btn-primary me-2" onClick={handleExplainQuery}>
                                 Explain query
                             </Button>
                         </>

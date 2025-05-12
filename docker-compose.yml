@@ -45,8 +45,6 @@ services:
     command: -c 'max_connections=500'
     container_name: lensql_db_users
     restart: unless-stopped
-    ports:
-      - "5555:5432"
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_HOST_AUTH_METHOD: trust

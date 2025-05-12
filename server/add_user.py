@@ -1,4 +1,4 @@
-import db_admin
+import db_admi as db_admin
 import db_users
 
 from dav_tools import argument_parser, messages
@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     try:
         db_admin.register_user(username, password)
-        messages.info(f'User creadentials added: {username}')
+        messages.info(f'User credentials added: {username}')
     except Exception as e:
         messages.error(f"Error adding credentials for user {username}: {e}")
 

@@ -21,23 +21,35 @@ CREATE TABLE users (
     can_use_ai BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE queries (
+CREATE TABLE exercises (
+    id SERIAL PRIMARY KEY,
+    request TEXT NOT NULL,
+    dataset TEXT NOT NULL,
+    expected_result TEXT NOT NULL
+);
+
+CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL REFERENCES users(username),
+    ts TIMESTAMP NOT NULL DEFAULT NOW(),
+    exercise_id INTEGER REFERENCES exercises(id)
+);
+
+CREATE TABLE queries (
+    id SERIAL PRIMARY KEY,
+    batch_id INTEGER NOT NULL REFERENCES query_batches(id),
     query TEXT NOT NULL,
     success BOOLEAN NOT NULL,
-    ts TIMESTAMP NOT NULL DEFAULT NOW(),
-    exercise_id INTEGER DEFAULT NULL
+    result TEXT DEFAULT NULL,
+    ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
     query_id INTEGER REFERENCES queries(id),
-    content TEXT NOT NULL,
+    answer TEXT NOT NULL,
     button VARCHAR(255) NOT NULL,
-    data TEXT DEFAULT NULL,
-    chat_id INTEGER NOT NULL,
-    msg_id INTEGER NOT NULL,
+    msg_idx INTEGER NOT NULL,
     ts TIMESTAMP NOT NULL DEFAULT NOW(),
     feedback BOOLEAN DEFAULT NULL,
     feedback_ts TIMESTAMP DEFAULT NULL
