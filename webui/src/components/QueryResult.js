@@ -1,9 +1,11 @@
 import Chat from './Chat';
 
+import '../styles/QueryResult.css';
+
 function QueryResult({ result, isBuiltin, queryId, query, success, isMessage }) {
     return (
-        <div className={`chat alert ${isBuiltin ? 'alert-secondary' : success ? 'alert-primary' : 'alert-danger'}`}>
-            <div className="chat-title">
+        <div className={`query-result alert ${isBuiltin ? 'alert-secondary' : success ? 'alert-primary' : 'alert-danger'}`}>
+            <div className="query-result-title">
                 {isBuiltin ? (
                     <span>
                         <i className="fas fa-search" />

@@ -1,6 +1,9 @@
 import Message from './Message';
 
-function MessageBox({ children, assistant = false, feedback = false, thinking = false }) {
+import '../styles/MessageBox.css';
+
+function MessageBox({ children, text, assistant = false, thinking = false, messageId = null }) {
+
     return (
         <div className={`messagebox ${assistant ? 'messagebox-assistant' : 'messagebox-user'} ${thinking ? 'thinking' : ''}`}>
             {assistant && (
@@ -11,7 +14,7 @@ function MessageBox({ children, assistant = false, feedback = false, thinking = 
                 </div>
             )}
 
-            <Message feedback={feedback}>
+            <Message messageId={messageId} text={text}>
                 {children}
             </Message>
 

@@ -12,8 +12,15 @@ import Query from './Query';
 import Profile from './Profile';
 import Assignments from './Assignments';
 
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+import useTooltipObserver from '../hooks/useTooltipObserver';
+
 
 function App() {
+    useTooltipObserver();
+
     const [token, setToken] = useToken();
 
     if (!token) {
@@ -33,7 +40,7 @@ function App() {
                             <Routes>
                                 <Route path="/profile" element={<Profile />} />
                                 <Route path="/assignments" element={<Assignments />} />
-                                <Route path="/assignments/q" element={<Query exerciseId={0} exerciseText="Find the users who are called Davide"/>} />
+                                <Route path="/assignments/q" element={<Query exerciseId={0} exerciseText="Find the users who are called Davide" />} />
                             </Routes>
                         </div>
                     </div>

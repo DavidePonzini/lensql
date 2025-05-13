@@ -1,0 +1,20 @@
+table {
+    width: auto!important;
+}
+
+/* table {
+    display: block;
+    min-height: 50px;
+} */
+
+
+.query-result {
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+}
+
+.query-result-title i {
+    margin-right: 1rem;
+}

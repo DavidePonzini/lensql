@@ -1,0 +1,32 @@
+.code {
+    background: var(--message-bg-color-code);
+    color: var(--text-color);
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+.message-feedback {
+    text-align: right;
+}
+
+.feedback {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 14pt;
+    color: slategray;
+    cursor: pointer;
+}
+
+.feedback.disabled {
+    color: gray;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.feedback-up.selected {
+    color: green;
+}
+
+.feedback-down.selected {
+    color: red;
+}

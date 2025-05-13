@@ -1,8 +1,6 @@
 import { useState } from "react";
 import useToken from "../hooks/useToken";
 
-import '../styles/Query.css';
-
 import SqlEditor from "../components/SqlEditor";
 import Button from "../components/Button";
 import QueryResult from "../components/QueryResult";

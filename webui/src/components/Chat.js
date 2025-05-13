@@ -8,28 +8,31 @@ function Chat({ queryId, success }) {
         {
             text: 'Would you like to ask me anything about this result?',
             isFromAssistant: true,
-            askFeedback: false,
-            thinking: false,
+            isThinking: false,
+            messageId: null,
         }
     ]);
     const [isThinking, setIsThinking] = useState(false);
 
-    function addMessage(text, isFromAssistant, askFeedback = false, thinking = false, message_id = null) {
+    function addMessage(text, isFromAssistant, isThinking = false, messageId = null) {
         setMessages((prevMessages) => [...prevMessages, {
             text,
             isFromAssistant,
-            askFeedback,
-            thinking,
-            message_id,
+            isThinking,
+            messageId,
         }]);
     };
+
+    function addFollowupPrompt() {
+        addMessage('Would you like to ask something else?', true);
+    }
 
     function removeLastMessage() {
         setMessages((prevMessages) => prevMessages.slice(0, -1));
     }
 
     function startThinking() {
-        addMessage("Thinking...", true, false, true);
+        addMessage("Thinking...", true, true);
         setIsThinking(true);
     }
 
@@ -39,11 +42,41 @@ function Chat({ queryId, success }) {
     }
 
     function getLastMessageIdx() {
-        return messages.filter(m => !m.thinking).length;
+        return messages.filter(m => !m.isFromAssistant).length;
     };
 
+    async function handleDescribeQuery() {
+        addMessage("Describe what my query does", false);
+        startThinking();
+
+        try {
+            const response = await fetch('/api/describe-my-query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'query_id': queryId,
+                    'msg_idx': getLastMessageIdx(),
+                })
+
+            });
+
+            const data = await response.json();
+
+            stopThinking();
+            console.log(data);
+            addMessage(data.answer, true, false, data.id);
+        } catch (error) {
+            stopThinking();
+            addMessage(`Error: ${error}`, true);
+        } finally {
+            addFollowupPrompt();
+        }
+    }
+
     async function handleExplainQuery() {
-        addMessage("Explain query", false);
+        addMessage("Explain what each clause in my query is doing", false);
         startThinking();
 
         try {
@@ -62,36 +95,129 @@ function Chat({ queryId, success }) {
             const data = await response.json();
 
             stopThinking();
-            addMessage(data.answer, true, true, false, data.message_id);
+            addMessage(data.answer, true, false, data.id);
         } catch (error) {
             stopThinking();
             addMessage(`Error: ${error}`, true);
+        } finally {
+            addFollowupPrompt();
         }
     }
 
-    async function handleDescribeQuery() {
-        addMessage("Describe query", false);
-        startThinking();
-    }
-
     async function handleExplainError() {
-        addMessage("Explain error", false);
+        addMessage("Explain what this error means", false);
         startThinking();
+
+        try {
+            const response = await fetch('/api/explain-error-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'query_id': queryId,
+                    'msg_idx': getLastMessageIdx(),
+                })
+
+            });
+
+            const data = await response.json();
+
+            stopThinking();
+            addMessage(data.answer, true, false, data.id);
+        } catch (error) {
+            stopThinking();
+            addMessage(`Error: ${error}`, true);
+        } finally {
+            addFollowupPrompt();
+        }
     }
 
     async function handleShowExample() {
-        addMessage("Show example", false);
+        addMessage("Show a simplified example that can cause this problem", false);
         startThinking();
+
+        try {
+            const response = await fetch('/api/provide-error-example', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'query_id': queryId,
+                    'msg_idx': getLastMessageIdx(),
+                })
+
+            });
+
+            const data = await response.json();
+
+            stopThinking();
+            addMessage(data.answer, true, false, data.id);
+        } catch (error) {
+            stopThinking();
+            addMessage(`Error: ${error}`, true);
+        } finally {
+            addFollowupPrompt();
+        }
     }
 
     async function handleWhereToLook() {
-        addMessage("Where to look", false);
+        addMessage("Show me which query part is causing this error", false);
         startThinking();
+
+        try {
+            const response = await fetch('/api/locate-error-cause', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'query_id': queryId,
+                    'msg_idx': getLastMessageIdx(),
+                })
+
+            });
+
+            const data = await response.json();
+
+            stopThinking();
+            addMessage(data.answer, true, false, data.id);
+        } catch (error) {
+            stopThinking();
+            addMessage(`Error: ${error}`, true);
+        } finally {
+            addFollowupPrompt();
+        }
     }
 
     async function handleSuggestFix() {
-        addMessage("Suggest fix", false);
+        addMessage("Suggest a fix for this error", false);
         startThinking();
+
+        try {
+            const response = await fetch('/api/fix-query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'query_id': queryId,
+                    'msg_idx': getLastMessageIdx(),
+                })
+
+            });
+
+            const data = await response.json();
+
+            stopThinking();
+            addMessage(data.answer, true, false, data.id);
+        } catch (error) {
+            stopThinking();
+            addMessage(`Error: ${error}`, true);
+        } finally {
+            addFollowupPrompt();
+        }
     }
 
     return (
@@ -99,47 +225,46 @@ function Chat({ queryId, success }) {
             {messages.map((message, index) => (
                 <MessageBox
                     assistant={message.isFromAssistant}
-                    feedback={message.askFeedback}
-                    thinking={message.thinking}
+                    thinking={message.isThinking}
+                    text={message.text}
+                    messageId={message.messageId}
                 >
-                    {message.text}
+                    {/* Buttons -- shown only on last message when not thinking */}
+                    {!isThinking && index === messages.length - 1 && (
+                        <div className="mt-2">
+                            {success ? (
+                                <>
+                                    <Button className="btn-primary me-2" onClick={handleDescribeQuery}>
+                                        Describe query
+                                    </Button>
+
+                                    <Button className="btn-primary me-2" onClick={handleExplainQuery}>
+                                        Explain query
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button className="btn-primary me-2" onClick={handleExplainError}>
+                                        Explain error
+                                    </Button>
+
+                                    <Button className="btn-primary me-2" onClick={handleShowExample} disabled={true}>
+                                        Show example
+                                    </Button>
+
+                                    <Button className="btn-primary me-2" onClick={handleWhereToLook}>
+                                        Where to look
+                                    </Button>
+
+                                    <Button className="btn-primary me-2" onClick={handleSuggestFix}>
+                                        Suggest fix
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </MessageBox>
             ))}
-
-            {/* Buttons -- shown only when not thinking */}
-            {!isThinking && (
-                <>
-                    {success ? (
-                        <>
-                            <Button className="btn-primary me-2" onClick={handleDescribeQuery}>
-                                Describe query
-                            </Button>
-
-                            <Button className="btn-primary me-2" onClick={handleExplainQuery}>
-                                Explain query
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <Button className="btn-primary me-2" onClick={handleExplainError}>
-                                Explain error
-                            </Button>
-
-                            <Button className="btn-primary me-2" onClick={handleShowExample} disabled={true}>
-                                Show example
-                            </Button>
-
-                            <Button className="btn-primary me-2" onClick={handleWhereToLook}>
-                                Where to look
-                            </Button>
-
-                            <Button className="btn-primary me-2" onClick={handleSuggestFix}>
-                                Suggest fix
-                            </Button>
-                        </>
-                    )}
-                </>
-            )}
         </div>
     );
 }
