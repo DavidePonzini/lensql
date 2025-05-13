@@ -5,9 +5,11 @@ services:
     container_name: lensql_webui
     restart: unless-stopped
     ports:
-      - "3001:80"
-    depends_on:
-      - server
+      - "3000:3000"
+    develop:
+      watch: 
+        - path: ./webui
+          action: rebuild
 
   server:
     build: ./server
@@ -29,6 +31,26 @@ services:
       - CLEANUP_INTERVAL_SECONDS=3600
     env_file:
       - server/.env
+    develop:
+      watch:
+        - path: ./server
+          action: rebuild
+
+  nginx:
+    build: ./nginx
+    image: davideponzini/lensql:nginx
+    container_name: lensql_nginx
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+      - "3002:443"
+    depends_on:
+      - webui
+      - server
+    develop:
+      watch:
+        - path: ./nginx
+          action: rebuild
 
   db_admin:
     build: ./db_admin

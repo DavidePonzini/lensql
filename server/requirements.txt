@@ -6,3 +6,4 @@ pandas
 sqlparse
 requests
 bcrypt
+flask-jwt-extended

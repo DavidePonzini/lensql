@@ -122,20 +122,29 @@ def get_query_result(query_id: int) -> str:
 
     return result[0][0]
 
-def log_feedback(message_id: int, feedback: bool):
-    query = database.sql.SQL('''
-        UPDATE {schema}.messages
-        SET feedback = {feedback}
-        WHERE id = {message_id}
+def log_feedback(message_id: int, feedback: bool, username: str) -> None:
+    query = database.sql.SQL(
+    '''
+        UPDATE {schema}.messages AS m
+        SET
+            feedback = {feedback},
+            feedback_ts = NOW()
+        FROM {schema}.queries AS q
+        JOIN {schema}.query_batches AS qb ON q.batch_id = qb.id
+        WHERE m.id = {message_id}
+        AND m.query_id = q.id
+        AND qb.username = {username}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         feedback=database.sql.Placeholder('feedback'),
-        message_id=database.sql.Placeholder('message_id')
+        message_id=database.sql.Placeholder('message_id'),
+        username=database.sql.Placeholder('username')
     )
 
     db.execute(query, {
         'feedback': feedback,
-        'message_id': message_id
+        'message_id': message_id,
+        'username': username
     })
 
 def get_assignments(username: str) -> list:
@@ -175,21 +184,26 @@ def get_assignments(username: str) -> list:
         for row in result
     ]
 
-def get_exercise(exercise_id: int) -> dict:
-    query = database.sql.SQL('''
+def get_exercise(exercise_id: int, username: str) -> dict:
+    query = database.sql.SQL(
+    '''
         SELECT
-            request,
-            dataset
+            e.request,
+            e.dataset
         FROM
-            {schema}.exercises
+            {schema}.exercises e
+            JOIN {schema}.assignments a ON e.id = a.exercise_id
         WHERE
-            id = {exercise_id}
+            e.id = {exercise_id}
+            AND a.username = {username} 
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id')
+        exercise_id=database.sql.Placeholder('exercise_id'),
+        username=database.sql.Placeholder('username'),
     )
     result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id
+        'exercise_id': exercise_id,
+        'username': username,
     })
     if len(result) == 0:
         return None

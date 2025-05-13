@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import useToken from '../hooks/useToken';
 
 import '../styles/Message.css';
 
 function Message({ children, text, messageId = null }) {
+    const [token] = useToken();
+
     const [feedback, setFeedback] = useState(null);
 
     async function handleSendFeedback(positive) {
@@ -21,7 +24,8 @@ function Message({ children, text, messageId = null }) {
             const response = await fetch('/api/message-feedback', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     'message_id': messageId,

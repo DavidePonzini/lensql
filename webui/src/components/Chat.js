@@ -1,9 +1,12 @@
 import { useState } from "react";
+import useToken from "../hooks/useToken";
 import MessageBox from "./MessageBox";
 import Button from "./Button";
 
 
 function Chat({ queryId, success }) {
+    const [token] = useToken();
+
     const [messages, setMessages] = useState([
         {
             text: 'Would you like to ask me anything about this result?',
@@ -53,7 +56,8 @@ function Chat({ queryId, success }) {
             const response = await fetch('/api/describe-my-query', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     'query_id': queryId,
@@ -83,7 +87,8 @@ function Chat({ queryId, success }) {
             const response = await fetch('/api/explain-my-query', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     'query_id': queryId,
@@ -112,7 +117,8 @@ function Chat({ queryId, success }) {
             const response = await fetch('/api/explain-error-message', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     'query_id': queryId,
@@ -141,7 +147,8 @@ function Chat({ queryId, success }) {
             const response = await fetch('/api/provide-error-example', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     'query_id': queryId,
@@ -170,7 +177,8 @@ function Chat({ queryId, success }) {
             const response = await fetch('/api/locate-error-cause', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     'query_id': queryId,
@@ -199,7 +207,8 @@ function Chat({ queryId, success }) {
             const response = await fetch('/api/fix-query', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     'query_id': queryId,

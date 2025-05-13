@@ -18,14 +18,15 @@ CREATE TABLE users (
     username VARCHAR(255) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
     can_login BOOLEAN NOT NULL DEFAULT TRUE,
-    can_use_ai BOOLEAN NOT NULL DEFAULT TRUE
+    can_use_ai BOOLEAN NOT NULL DEFAULT TRUE,
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
     request TEXT NOT NULL,
     dataset TEXT NOT NULL,
-    expected_result TEXT NOT NULL,
+    expected_answer TEXT NOT NULL,
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 

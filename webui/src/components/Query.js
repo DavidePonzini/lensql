@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useToken from "../hooks/useToken";
 
 import "../styles/Query.css";
 
@@ -7,6 +8,7 @@ import Button from "./Button";
 import QueryResult from "./QueryResult";
 
 function Query({ exerciseId, exerciseTitle, exerciseText }) {
+    const [token] = useToken();
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
@@ -46,9 +48,9 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    'username': sessionStorage.getItem('username'),
                     'query': query,
                     'exercise_id': exerciseId,
                 }),
@@ -73,9 +75,9 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    'username': sessionStorage.getItem('username'),
                     'exercise_id': exerciseId,
                 }),
             });
@@ -99,9 +101,9 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    'username': sessionStorage.getItem('username'),
                     'exercise_id': exerciseId,
                 }),
             });
@@ -125,9 +127,9 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    'username': sessionStorage.getItem('username'),
                     'exercise_id': exerciseId,
                 }),
             });
@@ -151,9 +153,9 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    'username': sessionStorage.getItem('username'),
                     'exercise_id': exerciseId
                 }),
             });

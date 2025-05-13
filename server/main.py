@@ -1,6 +1,7 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-import json
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+import os
 
 import llm
 import db_admi as db_admin
@@ -8,11 +9,12 @@ import db_users
 from sql_code import SQLException
 
 from sql_code import QueryResult
-from dav_tools import messages
 
 app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 CORS(app)
 
+jwt = JWTManager(app)
 
 def response(success: bool = True, **kwargs):
     return {
@@ -21,7 +23,7 @@ def response(success: bool = True, **kwargs):
     }
 
 def response_query(*results: QueryResult, is_builtin: bool = False) -> str:
-    return json.dumps([
+    return jsonify([
         {
             'success': query.success,
             'builtin': is_builtin,
@@ -45,32 +47,37 @@ def login():
 
     if not db_admin.can_login(username, password):
         return response(False, message='Cannot login. Please check your username and password.')
+    
+    access_token = create_access_token(identity=username)
 
-    return response(True, token=username)
+    return response(True, token=access_token)
 
 @app.route('/get-assignments', methods=['GET'])
+@jwt_required()
 def get_assignments():
-    data = request.args
-    username = data.get('username')
+    username = get_jwt_identity()
 
     assignments = db_admin.get_assignments(username)
 
     return response(True, data=assignments)
 
 @app.route('/get-exercise', methods=['GET'])
+@jwt_required()
 def get_exercise():
+    username = get_jwt_identity()
     data = request.args
     assignment_id = data.get('id')
 
-    result = db_admin.get_exercise(assignment_id)
+    result = db_admin.get_exercise(assignment_id, username)
 
     return response(True, data=result)
 
 
 @app.route('/run-query', methods=['POST'])
+@jwt_required()
 def run_query():
+    username = get_jwt_identity()
     data = request.get_json()
-    username = data['username']
     query = data['query']
     exercise_id = int(data['exercise_id'])
 
@@ -97,23 +104,27 @@ def run_query():
     return response_query(*query_results)
 
 @app.route('/message-feedback', methods=['POST'])
+@jwt_required()
 def feedback():
+    username = get_jwt_identity()
     data = request.get_json()
     message_id = data['message_id']
     feedback = data['feedback']
 
     db_admin.log_feedback(
         message_id=message_id,
-        feedback=feedback
+        feedback=feedback,
+        username=username,
     )
 
     return OK
 
 #################### Builtin ####################
 @app.route('/show-search-path', methods=['POST'])
+@jwt_required()
 def show_search_path():
+    username = get_jwt_identity()
     data = request.get_json()
-    username = data['username']
     exercise_id = int(data['exercise_id'])
     
     result = db_users.show_search_path(username)
@@ -135,9 +146,10 @@ def show_search_path():
     return response_query(result, is_builtin=True)
 
 @app.route('/list-schemas', methods=['POST'])
+@jwt_required()
 def list_schemas():
+    username = get_jwt_identity()
     data = request.get_json()
-    username = data['username']
     exercise_id = int(data['exercise_id'])
     
     result = db_users.list_schemas(username)
@@ -159,9 +171,10 @@ def list_schemas():
     return response_query(result, is_builtin=True)
 
 @app.route('/list-tables', methods=['POST'])
+@jwt_required()
 def list_tables():
+    username = get_jwt_identity()
     data = request.get_json()
-    username = data['username']
     exercise_id = int(data['exercise_id'])
     
     result = db_users.list_tables(username)
@@ -183,9 +196,10 @@ def list_tables():
     return response_query(result, is_builtin=True)
 
 @app.route('/list-constraints', methods=['POST'])
+@jwt_required()
 def list_constraints():
+    username = get_jwt_identity()
     data = request.get_json()
-    username = data['username']
     exercise_id = int(data['exercise_id'])
     
     result = db_users.list_constraints(username)
@@ -208,7 +222,9 @@ def list_constraints():
 
 #################### Syntax Error ####################
 @app.route('/explain-error-message', methods=['POST'])
+@jwt_required()
 def explain_error_message():
+    username = get_jwt_identity()
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
@@ -227,7 +243,9 @@ def explain_error_message():
     return response(answer=answer, id=answer_id)
 
 @app.route('/locate-error-cause', methods=['POST'])
+@jwt_required()
 def locate_error_cause():
+    username = get_jwt_identity()
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
@@ -246,7 +264,9 @@ def locate_error_cause():
     return response(answer=answer, id=answer_id)
 
 @app.route('/provide-error-example', methods=['POST'])
+@jwt_required()
 def provide_error_example():
+    username = get_jwt_identity()
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
@@ -266,7 +286,9 @@ def provide_error_example():
     return response(answer=answer, id=answer_id)
 
 @app.route('/fix-query', methods=['POST'])
+@jwt_required()
 def fix_query():
+    username = get_jwt_identity()
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
@@ -286,7 +308,9 @@ def fix_query():
 
 #################### Syntax OK ####################
 @app.route('/describe-my-query', methods=['POST'])
+@jwt_required()
 def describe_my_query():
+    username = get_jwt_identity()
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
@@ -304,7 +328,9 @@ def describe_my_query():
     return response(answer=answer, id=answer_id)
 
 @app.route('/explain-my-query', methods=['POST'])
+@jwt_required()
 def explain_my_query():
+    username = get_jwt_identity()
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']

@@ -1,28 +1,34 @@
 import { useState, useEffect } from 'react';
+import useToken from '../hooks/useToken';
 
 import AssignmentCard from '../components/AssignmentCard';
 
 function Assignments() {
     const [assignments, setAssignments] = useState([]);
+    const [token] = useToken();
 
+    useEffect(() => {
+        async function getAssignments() {
+            try {
+                const response = await fetch(`/api/get-assignments`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'authorization': `Bearer ${token}`,
+                    }
+                });
 
-    async function getAssignments() {
-        const username = sessionStorage.getItem('username');
-
-        try {
-            const response = await fetch(`/api/get-assignments?username=${username}`);
-
-            const data = await response.json();
-            console.log(data);
-            setAssignments(data.data);
-        } catch (error) {
-            alert('Error fetching assignments:', error);
-            console.error(error);
-            return [];
+                const data = await response.json();
+                setAssignments(data.data);
+            } catch (error) {
+                alert('Error fetching assignments:' + error);
+                console.error(error);
+                return [];
+            }
         }
-    }
 
-    useEffect(getAssignments, []);
+        getAssignments();
+    }, [token]);
 
     return (
         <>
@@ -33,7 +39,7 @@ function Assignments() {
                         <AssignmentCard
                             assignmentId={assignment.id}
                             isGenerated={assignment.is_ai_generated}
-
+                            key={assignment.id}
                         >
                             {assignment.request}
                         </AssignmentCard>
