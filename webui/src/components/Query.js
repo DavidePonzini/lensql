@@ -1,27 +1,43 @@
-import { useState } from "react";
-import useToken from "../hooks/useToken";
+import { useEffect, useState } from "react";
 
-import SqlEditor from "../components/SqlEditor";
-import Button from "../components/Button";
-import QueryResult from "../components/QueryResult";
+import "../styles/Query.css";
 
-function Query({ exerciseId, exerciseText }) {
+import SqlEditor from "./SqlEditor";
+import Button from "./Button";
+import QueryResult from "./QueryResult";
+
+function Query({ exerciseId, exerciseTitle, exerciseText }) {
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
-    const [token, setToken] = useToken();
 
-    const displayResult = (data) => {
+    function displayResult(data) {
         setResult(data);
 
         console.log(data);
     }
 
-    const handleExecute = async () => {
+    // Show a confirmation dialog when the user tries to leave the page with unsaved changes
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (sqlText.length > 0) {
+                e.preventDefault();
+                e.returnValue = ''; // Required for Chrome to show the confirmation dialog
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [sqlText]);
+
+
+    async function handleExecute() {
         if (!sqlText.trim())
             return;
 
-        const username = token.username;
         const query = sqlText;
 
         setIsExecuting(true);
@@ -32,7 +48,7 @@ function Query({ exerciseId, exerciseText }) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    'username': username,
+                    'username': sessionStorage.getItem('username'),
                     'query': query,
                     'exercise_id': exerciseId,
                 }),
@@ -49,9 +65,7 @@ function Query({ exerciseId, exerciseText }) {
         }
     };
 
-    const handleShowSearchPath = async () => {
-        const username = token.username;
-
+    async function handleShowSearchPath() {
         setIsExecuting(true);
 
         try {
@@ -61,7 +75,7 @@ function Query({ exerciseId, exerciseText }) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    'username': username,
+                    'username': sessionStorage.getItem('username'),
                     'exercise_id': exerciseId,
                 }),
             });
@@ -77,9 +91,7 @@ function Query({ exerciseId, exerciseText }) {
         }
     }
 
-    const handleListSchemas = async () => {
-        const username = token.username;
-
+    async function handleListSchemas() {
         setIsExecuting(true);
 
         try {
@@ -89,7 +101,7 @@ function Query({ exerciseId, exerciseText }) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    'username': username,
+                    'username': sessionStorage.getItem('username'),
                     'exercise_id': exerciseId,
                 }),
             });
@@ -105,9 +117,7 @@ function Query({ exerciseId, exerciseText }) {
         }
     }
 
-    const handleListTables = async () => {
-        const username = token.username;
-
+    async function handleListTables() {
         setIsExecuting(true);
 
         try {
@@ -117,7 +127,7 @@ function Query({ exerciseId, exerciseText }) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    'username': username,
+                    'username': sessionStorage.getItem('username'),
                     'exercise_id': exerciseId,
                 }),
             });
@@ -133,9 +143,7 @@ function Query({ exerciseId, exerciseText }) {
         }
     }
 
-    const handleListConstraints = async () => {
-        const username = token.username;
-
+    async function handleListConstraints() {
         setIsExecuting(true);
 
         try {
@@ -145,7 +153,7 @@ function Query({ exerciseId, exerciseText }) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    'username': username,
+                    'username': sessionStorage.getItem('username'),
                     'exercise_id': exerciseId
                 }),
             });
@@ -161,13 +169,14 @@ function Query({ exerciseId, exerciseText }) {
         }
     }
 
-    const handleClearOutput = () => {
+    function handleClearOutput() {
         setResult([]);
     }
 
     return (
         <>
-            <p className="lead">#{} {exerciseText}</p>
+            <h2 className="exercise-title">{exerciseTitle}</h2>
+            <p className="exercise-request">{exerciseText}</p>
 
             <SqlEditor onChange={setSqlText} onSubmit={handleExecute} />
 

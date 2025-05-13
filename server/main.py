@@ -46,17 +46,33 @@ def login():
     if not db_admin.can_login(username, password):
         return response(False, message='Cannot login. Please check your username and password.')
 
-    return response(True, token={
-        'username': username,
-        })
-    
+    return response(True, token=username)
+
+@app.route('/get-assignments', methods=['GET'])
+def get_assignments():
+    data = request.args
+    username = data.get('username')
+
+    assignments = db_admin.get_assignments(username)
+
+    return response(True, data=assignments)
+
+@app.route('/get-exercise', methods=['GET'])
+def get_exercise():
+    data = request.args
+    assignment_id = data.get('id')
+
+    result = db_admin.get_exercise(assignment_id)
+
+    return response(True, data=result)
+
 
 @app.route('/run-query', methods=['POST'])
 def run_query():
     data = request.get_json()
     username = data['username']
     query = data['query']
-    exercise_id = data['exercise_id']
+    exercise_id = int(data['exercise_id'])
 
     batch_id = db_admin.log_query_batch(
         username=username,
@@ -98,7 +114,7 @@ def feedback():
 def show_search_path():
     data = request.get_json()
     username = data['username']
-    exercise_id = data['exercise_id']
+    exercise_id = int(data['exercise_id'])
     
     result = db_users.show_search_path(username)
 
@@ -122,7 +138,7 @@ def show_search_path():
 def list_schemas():
     data = request.get_json()
     username = data['username']
-    exercise_id = data['exercise_id']
+    exercise_id = int(data['exercise_id'])
     
     result = db_users.list_schemas(username)
 
@@ -146,7 +162,7 @@ def list_schemas():
 def list_tables():
     data = request.get_json()
     username = data['username']
-    exercise_id = data['exercise_id']
+    exercise_id = int(data['exercise_id'])
     
     result = db_users.list_tables(username)
 
@@ -170,7 +186,7 @@ def list_tables():
 def list_constraints():
     data = request.get_json()
     username = data['username']
-    exercise_id = data['exercise_id']
+    exercise_id = int(data['exercise_id'])
     
     result = db_users.list_constraints(username)
 

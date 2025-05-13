@@ -29,6 +29,7 @@ function QueryResult({ result, isBuiltin, queryId, query, success, isMessage }) 
 
             {!isBuiltin && (
                 <Chat
+                    key={queryId}
                     queryId={queryId}
                     success={success}
                 />

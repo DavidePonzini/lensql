@@ -138,4 +138,81 @@ def log_feedback(message_id: int, feedback: bool):
         'message_id': message_id
     })
 
+def get_assignments(username: str) -> list:
+    query = database.sql.SQL(
+    '''
+        SELECT
+            e.id,
+            e.request,
+            a.deadline_ts,
+            a.submission_ts,
+            e.is_ai_generated
+        FROM
+            {schema}.assignments a
+            JOIN {schema}.exercises e ON a.exercise_id = e.id
+        WHERE
+            username = {username}
+        ORDER BY
+            CASE WHEN a.submission_ts IS NULL THEN 0 ELSE 1 END,
+            a.deadline_ts
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return [
+        {
+            'id': row[0],
+            'request': row[1],
+            'deadline_ts': row[2],
+            'submission_ts': row[3],
+            'is_ai_generated': row[4]
+        }
+        for row in result
+    ]
+
+def get_exercise(exercise_id: int) -> dict:
+    query = database.sql.SQL('''
+        SELECT
+            request,
+            dataset
+        FROM
+            {schema}.exercises
+        WHERE
+            id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+    result = db.execute_and_fetch(query, {
+        'exercise_id': exercise_id
+    })
+    if len(result) == 0:
+        return None
+    return {
+        'request': result[0][0],
+    }
+
+def get_exercise_dataset(exercise_id: int) -> str:
+    query = database.sql.SQL('''
+        SELECT dataset
+        FROM {schema}.exercises
+        WHERE id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'exercise_id': exercise_id
+    })
+
+    if len(result) == 0:
+        return None
+
+    return result[0][0]
 

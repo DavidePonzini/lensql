@@ -25,8 +25,19 @@ CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
     request TEXT NOT NULL,
     dataset TEXT NOT NULL,
-    expected_result TEXT NOT NULL
+    expected_result TEXT NOT NULL,
+    is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+CREATE TABLE assignments (
+    username VARCHAR(255) NOT NULL REFERENCES users(username),
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id),
+    creation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+    deadline_ts TIMESTAMP DEFAULT NULL,
+    submission_ts TIMESTAMP DEFAULT NULL,
+
+    PRIMARY KEY (username, exercise_id)
+);    
 
 CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,

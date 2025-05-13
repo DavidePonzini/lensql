@@ -5,14 +5,7 @@ from dav_tools import argument_parser, messages
 from dav_tools.database import sql
 
 
-if __name__ == '__main__':
-    argument_parser.set_description('Add a new user to the database')
-    argument_parser.add_argument('username', type=str, help='Username of the user to add')
-    argument_parser.add_argument('password', type=str, help='Password of the user to add')
-
-    username = argument_parser.args.username
-    password = argument_parser.args.password
-
+def add_user(username: str, password: str):
     try:
         db_admin.register_user(username, password)
         messages.info(f'User credentials added: {username}')
@@ -69,3 +62,14 @@ if __name__ == '__main__':
 
     except Exception as e:
         messages.error(f"Error creating database for user {username}: {e}")
+
+
+if __name__ == '__main__':
+    argument_parser.set_description('Add a new user to the database')
+    argument_parser.add_argument('username', type=str, help='Username of the user to add')
+    argument_parser.add_argument('password', type=str, help='Password of the user to add')
+
+    username = argument_parser.args.username
+    password = argument_parser.args.password
+
+    add_user(username, password)

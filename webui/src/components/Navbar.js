@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 
 function Navbar() {
     const [token, setToken] = useToken();
-    const username = token ? token.username : 'Not logged in';
+    const username = token ? sessionStorage.getItem('username') : 'Not logged in';
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">

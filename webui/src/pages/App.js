@@ -8,14 +8,15 @@ import Footer from "../components/Footer";
 import Separator from "../components/Separator";
 
 import Login from './Login';
-import Query from './Query';
 import Profile from './Profile';
 import Assignments from './Assignments';
+import Home from './Home';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import useTooltipObserver from '../hooks/useTooltipObserver';
+import Assignment from './Assignment';
 
 
 function App() {
@@ -38,9 +39,10 @@ function App() {
                     <div className="content">
                         <div className="container-md">
                             <Routes>
+                                <Route path="/" element={<Home />} />
                                 <Route path="/profile" element={<Profile />} />
                                 <Route path="/assignments" element={<Assignments />} />
-                                <Route path="/assignments/q" element={<Query exerciseId={0} exerciseText="Find the users who are called Davide" />} />
+                                <Route path="/assignments/:assignmentId" element={<Assignment />} />
                             </Routes>
                         </div>
                     </div>

@@ -4,16 +4,16 @@ import Button from '../components/Button';
 import Footer from '../components/Footer';
 
 function Login({ setToken }) {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [usernameInput, setUsernameInput] = useState('');
+    const [passwordInput, setPasswordInput] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
 
     async function handleLogin(event) {
         event.preventDefault();
 
-        const hasUsername = username.trim();
-        const hasPassword = password.trim();
+        const hasUsername = usernameInput.trim();
+        const hasPassword = passwordInput.trim();
 
         if (!hasUsername || !hasPassword) {
             setError('Please fill in both fields.');
@@ -26,7 +26,7 @@ function Login({ setToken }) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username: usernameInput, password: passwordInput })
             });
 
             const data = await response.json();
@@ -34,6 +34,7 @@ function Login({ setToken }) {
             if (data.success) {
                 setError('');
                 setToken(data.token);
+                sessionStorage.setItem('username', usernameInput);
             } else {
                 setError(data.message || 'Login failed');
             }
@@ -74,9 +75,9 @@ function Login({ setToken }) {
                                                     id="login-username"
                                                     className="form-control form-control-lg"
                                                     placeholder="Username"
-                                                    value={username}
+                                                    value={usernameInput}
                                                     onInput={(e) => {
-                                                        setUsername(e.target.value);
+                                                        setUsernameInput(e.target.value);
                                                     }}
                                                 />
                                             </div>
@@ -92,8 +93,8 @@ function Login({ setToken }) {
                                                         id="login-password"
                                                         className="form-control form-control-lg pe-5"
                                                         placeholder="Password"
-                                                        value={password}
-                                                        onChange={(e) => setPassword(e.target.value)}
+                                                        value={passwordInput}
+                                                        onChange={(e) => setPasswordInput(e.target.value)}
                                                     />
                                                     <div className="input-group-text show-password">
                                                         <i

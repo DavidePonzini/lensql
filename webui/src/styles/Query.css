@@ -1,0 +1,10 @@
+.exercise-request {
+    position: relative;
+    padding-left: 1rem;
+}
+
+.exercise-request::before {
+    content: "> ";
+    position: absolute;
+    left: 0;
+}
