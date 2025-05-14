@@ -22,11 +22,19 @@ CREATE TABLE users (
     is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
+CREATE TABLE teaches (
+    teacher VARCHAR(255) NOT NULL REFERENCES users(username),
+    student VARCHAR(255) NOT NULL REFERENCES users(username),
+
+    PRIMARY KEY (teacher, student)
+);
+
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
-    dataset TEXT NOT NULL,
-    expected_answer TEXT NOT NULL,
+    dataset TEXT NOT NULL DEFAULT '',
+    expected_answer TEXT NOT NULL DEFAULT '',
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 

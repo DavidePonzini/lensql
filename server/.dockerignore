@@ -1,0 +1,6 @@
+venv/
+.env.template
+.gitignore
+Dockerfile
+.dockerignore
+.env

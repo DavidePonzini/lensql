@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 import os
+from datetime import timedelta
 
 import llm
 import db_admi as db_admin
@@ -48,30 +49,18 @@ def login():
     if not db_admin.can_login(username, password):
         return response(False, message='Cannot login. Please check your username and password.')
     
-    access_token = create_access_token(identity=username)
+    access_token = create_access_token(identity=username, expires_delta=timedelta(minutes=15))
+    refresh_token = create_refresh_token(identity=username, expires_delta=timedelta(days=7))
 
-    return response(True, token=access_token)
+    return response(True, access_token=access_token, refresh_token=refresh_token)
 
-@app.route('/get-assignments', methods=['GET'])
-@jwt_required()
-def get_assignments():
-    username = get_jwt_identity()
+@app.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    current_user = get_jwt_identity()
+    access_token = create_access_token(identity=current_user, expires_delta=timedelta(minutes=15))
 
-    assignments = db_admin.get_assignments(username)
-
-    return response(True, data=assignments)
-
-@app.route('/get-exercise', methods=['GET'])
-@jwt_required()
-def get_exercise():
-    username = get_jwt_identity()
-    data = request.args
-    assignment_id = data.get('id')
-
-    result = db_admin.get_exercise(assignment_id, username)
-
-    return response(True, data=result)
-
+    return response(True, access_token=access_token)
 
 @app.route('/run-query', methods=['POST'])
 @jwt_required()
@@ -116,6 +105,49 @@ def feedback():
         feedback=feedback,
         username=username,
     )
+
+    return OK
+
+#################### Assignments ####################
+@app.route('/get-assignments', methods=['GET'])
+@jwt_required()
+def get_assignments():
+    username = get_jwt_identity()
+
+    assignments = db_admin.get_assignments(username)
+
+    return response(True, data=assignments)
+
+@app.route('/get-exercise', methods=['GET'])
+@jwt_required()
+def get_exercise():
+    username = get_jwt_identity()
+    data = request.args
+    assignment_id = data.get('id')
+
+    result = db_admin.get_exercise(assignment_id, username)
+
+    return response(True, data=result)
+
+@app.route('/submit-assignment', methods=['POST'])
+@jwt_required()
+def submit_exercise():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+
+    db_admin.submit_assignment(username, exercise_id)
+
+    return OK
+
+@app.route('/unsubmit-assignment', methods=['POST'])
+@jwt_required()
+def unsubmit_exercise():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+
+    db_admin.unsubmit_assignment(username, exercise_id)
 
     return OK
 

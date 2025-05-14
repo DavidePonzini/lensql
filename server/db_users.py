@@ -202,3 +202,4 @@ def show_search_path(username: str) -> QueryResult:
 
     return run_builtin_query(username, Queries.SHOW_SEARCH_PATH)
 
+    

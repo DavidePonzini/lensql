@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import useToken from '../hooks/useToken';
+import useAuth from '../hooks/useAuth';
 
 import '../styles/Message.css';
 
 function Message({ children, text, messageId = null }) {
-    const [token] = useToken();
+    const { apiRequest } = useAuth();
 
     const [feedback, setFeedback] = useState(null);
 
@@ -20,24 +20,12 @@ function Message({ children, text, messageId = null }) {
             return;
         }
 
-        try {
-            const response = await fetch('/api/message-feedback', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'message_id': messageId,
-                    'feedback': positive
-                })
-            });
+        await apiRequest('/api/message-feedback', 'POST', {
+            'message_id': messageId,
+            'feedback': positive
+        });
 
-            setFeedback(positive);
-        } catch (error) {
-            alert(`Error: ${error}`);
-            console.error(error);
-        }
+        setFeedback(positive);
     }
 
     return (
@@ -46,7 +34,7 @@ function Message({ children, text, messageId = null }) {
 
             {
                 messageId && (
-                    <div class="message-feedback">
+                    <div className="message-feedback">
                         <span
                             className={`feedback feedback-up ${feedback !== null ? 'disabled' : ''} ${feedback === true ? 'selected' : ''}`}
                             data-bs-toggle="tooltip"
@@ -54,7 +42,7 @@ function Message({ children, text, messageId = null }) {
                             data-bs-title="Helpful"
                             onClick={() => handleSendFeedback(true)}
                         >
-                            <i class={`${feedback === true ? 'fas' : 'far'} fa-thumbs-up`} />
+                            <i className={`${feedback === true ? 'fas' : 'far'} fa-thumbs-up`} />
                         </span>
 
                         <span
@@ -64,7 +52,7 @@ function Message({ children, text, messageId = null }) {
                             data-bs-title="Not helpful"
                             onClick={() => handleSendFeedback(false)}
                         >
-                            <i class={`${feedback === false ? 'fas' : 'far'} fa-thumbs-down`} />
+                            <i className={`${feedback === false ? 'fas' : 'far'} fa-thumbs-down`} />
                         </span>
                     </div>
                 )

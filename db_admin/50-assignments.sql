@@ -2,10 +2,10 @@ BEGIN;
 
 SET search_path TO lensql;
 
-INSERT INTO exercises (id, request, dataset, expected_answer) VALUES
-(1, 'Select this and that from the table t','', ''),
-(2, 'Select something from this other','', ''),
-(3, 'Select something else','', '');
+INSERT INTO exercises (id, title, request, dataset) VALUES
+(1, 'Progetto', 'Esegui qui tutte le query relative al tuo progetto finale', ''),
+(2, 'Modalità libera', 'Se hai delle query che non sono state richieste, ma che vuoi comunque eseguire, puoi farlo qui', ''),
+(3, 'Lab 1 - Es 1', 'Seleziona ...', '');
 
 INSERT INTO assignments(username, exercise_id) VALUES
 ('dav', 1),

@@ -1,51 +1,88 @@
 import { useState, useEffect } from 'react';
-import useToken from '../hooks/useToken';
+import useAuth from '../hooks/useAuth';
+
+import '../styles/Assignments.css';
 
 import AssignmentCard from '../components/AssignmentCard';
 
 function Assignments() {
-    const [assignments, setAssignments] = useState([]);
-    const [token] = useToken();
+    const { apiRequest } = useAuth();
+
+    const [unsubmittedAssignments, setUnsubmittedAssignments] = useState([]);
+    const [submittedAssignments, setSubmittedAssignments] = useState([]);
+
+    function handleSubmit(assignmentId) {
+        const assignment = unsubmittedAssignments.find((assignment) => assignment.id === assignmentId);
+        if (assignment) {
+            assignment.submission_ts = new Date().toISOString();
+            setUnsubmittedAssignments((prevAssignments) => prevAssignments.filter((assignment) => assignment.id !== assignmentId));
+            setSubmittedAssignments((prevAssignments) => [...prevAssignments, assignment]);
+        }
+    }
+
+    function handleUnsubmit(assignmentId) {
+        const assignment = submittedAssignments.find((assignment) => assignment.id === assignmentId);
+        if (assignment) {
+            assignment.submission_ts = null;
+            setSubmittedAssignments((prevAssignments) => prevAssignments.filter((assignment) => assignment.id !== assignmentId));
+            setUnsubmittedAssignments((prevAssignments) => [...prevAssignments, assignment]);
+        }
+    }
 
     useEffect(() => {
         async function getAssignments() {
-            try {
-                const response = await fetch(`/api/get-assignments`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'authorization': `Bearer ${token}`,
-                    }
-                });
+            const response = await apiRequest('/api/get-assignments', 'GET');
 
-                const data = await response.json();
-                setAssignments(data.data);
-            } catch (error) {
-                alert('Error fetching assignments:' + error);
-                console.error(error);
-                return [];
-            }
+            console.log(response);
+
+            const submitted = response.data.filter((assignment) => { return assignment.submission_ts });
+            const unsubmitted = response.data.filter((assignment) => { return !assignment.submission_ts });
+            setUnsubmittedAssignments(unsubmitted);
+            setSubmittedAssignments(submitted);
         }
 
         getAssignments();
-    }, [token]);
+    }, [sessionStorage.getItem('username')]);
 
     return (
         <>
-            <h1>Assignments</h1>
-            <div>
-                {assignments.map((assignment) => {
+            <h1>Incomplete</h1>
+            <div className="assignments assignments-incomplete">
+                {unsubmittedAssignments.map((assignment) => {
                     return (
                         <AssignmentCard
                             assignmentId={assignment.id}
                             isGenerated={assignment.is_ai_generated}
                             key={assignment.id}
+                            deadlineDate={assignment.deadline_ts}
+                            assignmentTitle={assignment.title}
+                            onSubmit={handleSubmit}
+                            onUnsubmit={handleUnsubmit}
                         >
                             {assignment.request}
                         </AssignmentCard>
                     );
-                })
-                }
+                })}
+            </div>
+
+            <h1 className="mt-2">Completed</h1>
+            <div className="assignments assignments-complete">
+                {submittedAssignments.map((assignment) => {
+                    return (
+                        <AssignmentCard
+                            assignmentId={assignment.id}
+                            isGenerated={assignment.is_ai_generated}
+                            key={assignment.id}
+                            deadlineDate={assignment.deadline_ts}
+                            submissionDate={assignment.submission_ts}
+                            assignmentTitle={assignment.title}
+                            onSubmit={handleSubmit}
+                            onUnsubmit={handleUnsubmit}
+                        >
+                            {assignment.request}
+                        </AssignmentCard>
+                    );
+                })}
             </div>
         </>
     );

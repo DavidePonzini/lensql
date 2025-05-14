@@ -1,10 +1,10 @@
-import useToken from '../hooks/useToken';
 import '../styles/Navbar.css';
 import { NavLink } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 function Navbar() {
-    const [token, setToken] = useToken();
-    const username = token ? sessionStorage.getItem('username') : 'Not logged in';
+    const { isloggedIn } = useAuth();
+    const username = isloggedIn ? sessionStorage.getItem('username') : 'Not logged in';
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">

@@ -152,6 +152,7 @@ def get_assignments(username: str) -> list:
     '''
         SELECT
             e.id,
+            e.title,
             e.request,
             a.deadline_ts,
             a.submission_ts,
@@ -176,10 +177,11 @@ def get_assignments(username: str) -> list:
     return [
         {
             'id': row[0],
-            'request': row[1],
-            'deadline_ts': row[2],
-            'submission_ts': row[3],
-            'is_ai_generated': row[4]
+            'title': row[1],
+            'request': row[2],
+            'deadline_ts': row[3],
+            'submission_ts': row[4],
+            'is_ai_generated': row[5]
         }
         for row in result
     ]
@@ -230,3 +232,121 @@ def get_exercise_dataset(exercise_id: int) -> str:
 
     return result[0][0]
 
+def get_students(username: str) -> list[str]:
+    query = database.sql.SQL(
+    '''
+        SELECT
+            student
+        FROM
+            {schema}.teaches
+        WHERE
+            teacher = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return [row[0] for row in result]
+
+def is_teacher(username: str) -> bool:
+    query = database.sql.SQL(
+    '''
+        SELECT 1
+        FROM
+            {schema}.teaches
+        WHERE
+            teacher = {username}
+        LIMIT 1
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return len(result) > 0
+
+def is_admin(username: str) -> bool:
+    query = database.sql.SQL(
+    '''
+        SELECT is_admin
+        FROM
+            {schema}.users
+        WHERE
+            username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    if len(result) == 0:
+        return False
+    return result[0][0]
+
+def create_exercise(title: str, request: str, dataset: str, expected_answer: str, is_ai_generated: bool) -> int:
+    result = db.insert(SCHEMA, 'exercises', {
+        'title': title,
+        'request': request,
+        'dataset': dataset,
+        'expected_answer': expected_answer,
+        'is_ai_generated': is_ai_generated
+    }, ['id'])
+
+    exercise_id = result[0][0]
+
+    return exercise_id
+
+def assign_exercise(username: str, exercise_id: int, deadline_ts: str) -> None:
+    db.insert(SCHEMA, 'assignments', {
+        'username': username,
+        'exercise_id': exercise_id,
+        'deadline_ts': deadline_ts
+    })
+
+def submit_assignment(username: str, exercise_id: int) -> None:
+    query = database.sql.SQL(
+    '''
+        UPDATE {schema}.assignments
+        SET submission_ts = NOW()
+        WHERE
+            username = {username}
+            AND exercise_id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    db.execute(query, {
+        'username': username,
+        'exercise_id': exercise_id
+    })
+
+def unsubmit_assignment(username: str, exercise_id: int) -> None:
+    query = database.sql.SQL(
+    '''
+        UPDATE {schema}.assignments
+        SET submission_ts = NULL
+        WHERE
+            username = {username}
+            AND exercise_id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    db.execute(query, {
+        'username': username,
+        'exercise_id': exercise_id
+    })

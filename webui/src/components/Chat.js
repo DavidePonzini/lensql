@@ -1,11 +1,11 @@
 import { useState } from "react";
-import useToken from "../hooks/useToken";
+import useAuth from "../hooks/useAuth";
 import MessageBox from "./MessageBox";
 import Button from "./Button";
 
 
 function Chat({ queryId, success }) {
-    const [token] = useToken();
+    const { apiRequest } = useAuth();
 
     const [messages, setMessages] = useState([
         {
@@ -52,181 +52,85 @@ function Chat({ queryId, success }) {
         addMessage("Describe what my query does", false);
         startThinking();
 
-        try {
-            const response = await fetch('/api/describe-my-query', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'query_id': queryId,
-                    'msg_idx': getLastMessageIdx(),
-                })
-
-            });
-
-            const data = await response.json();
-
-            stopThinking();
-            console.log(data);
-            addMessage(data.answer, true, false, data.id);
-        } catch (error) {
-            stopThinking();
-            addMessage(`Error: ${error}`, true);
-        } finally {
-            addFollowupPrompt();
-        }
+        const data = await apiRequest('/api/describe-my-query', 'POST', {
+            'query_id': queryId,
+            'msg_idx': getLastMessageIdx(),
+        });
+        
+        stopThinking();
+        addMessage(data.answer, true, false, data.id);
+        addFollowupPrompt();
     }
 
     async function handleExplainQuery() {
         addMessage("Explain what each clause in my query is doing", false);
         startThinking();
 
-        try {
-            const response = await fetch('/api/explain-my-query', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'query_id': queryId,
-                    'msg_idx': getLastMessageIdx(),
-                })
-
-            });
-
-            const data = await response.json();
-
-            stopThinking();
-            addMessage(data.answer, true, false, data.id);
-        } catch (error) {
-            stopThinking();
-            addMessage(`Error: ${error}`, true);
-        } finally {
-            addFollowupPrompt();
-        }
+        const data = await apiRequest('/api/explain-my-query', 'POST', {
+            'query_id': queryId,
+            'msg_idx': getLastMessageIdx(),
+        });
+        
+        stopThinking();
+        addMessage(data.answer, true, false, data.id);
+        addFollowupPrompt();
     }
 
     async function handleExplainError() {
         addMessage("Explain what this error means", false);
         startThinking();
 
-        try {
-            const response = await fetch('/api/explain-error-message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'query_id': queryId,
-                    'msg_idx': getLastMessageIdx(),
-                })
+        const data = await apiRequest('/api/explain-error-message', 'POST', {
+            'query_id': queryId,
+            'msg_idx': getLastMessageIdx(),
+        });
 
-            });
+        
 
-            const data = await response.json();
-
-            stopThinking();
-            addMessage(data.answer, true, false, data.id);
-        } catch (error) {
-            stopThinking();
-            addMessage(`Error: ${error}`, true);
-        } finally {
-            addFollowupPrompt();
-        }
+        stopThinking();
+        addMessage(data.answer, true, false, data.id);
     }
 
     async function handleShowExample() {
         addMessage("Show a simplified example that can cause this problem", false);
         startThinking();
 
-        try {
-            const response = await fetch('/api/provide-error-example', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'query_id': queryId,
-                    'msg_idx': getLastMessageIdx(),
-                })
-
-            });
-
-            const data = await response.json();
-
-            stopThinking();
-            addMessage(data.answer, true, false, data.id);
-        } catch (error) {
-            stopThinking();
-            addMessage(`Error: ${error}`, true);
-        } finally {
-            addFollowupPrompt();
-        }
+        const data = await apiRequest('/api/provide-error-example', 'POST', {
+            'query_id': queryId,
+            'msg_idx': getLastMessageIdx(),
+        });
+        
+        stopThinking();
+        addMessage(data.answer, true, false, data.id);
+        addFollowupPrompt();
     }
 
     async function handleWhereToLook() {
         addMessage("Show me which query part is causing this error", false);
         startThinking();
 
-        try {
-            const response = await fetch('/api/locate-error-cause', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'query_id': queryId,
-                    'msg_idx': getLastMessageIdx(),
-                })
-
-            });
-
-            const data = await response.json();
-
-            stopThinking();
-            addMessage(data.answer, true, false, data.id);
-        } catch (error) {
-            stopThinking();
-            addMessage(`Error: ${error}`, true);
-        } finally {
-            addFollowupPrompt();
-        }
+        const data = await apiRequest('/api/locate-error-cause', 'POST', {
+            'query_id': queryId,
+            'msg_idx': getLastMessageIdx(),
+        });
+        
+        stopThinking();
+        addMessage(data.answer, true, false, data.id);
+        addFollowupPrompt();
     }
 
     async function handleSuggestFix() {
         addMessage("Suggest a fix for this error", false);
         startThinking();
 
-        try {
-            const response = await fetch('/api/fix-query', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'query_id': queryId,
-                    'msg_idx': getLastMessageIdx(),
-                })
-
-            });
-
-            const data = await response.json();
-
-            stopThinking();
-            addMessage(data.answer, true, false, data.id);
-        } catch (error) {
-            stopThinking();
-            addMessage(`Error: ${error}`, true);
-        } finally {
-            addFollowupPrompt();
-        }
+        const data = await apiRequest('/api/fix-query', 'POST', {
+            'query_id': queryId,
+            'msg_idx': getLastMessageIdx(),
+        });
+        
+        stopThinking();
+        addMessage(data.answer, true, false, data.id);
+        addFollowupPrompt();
     }
 
     return (
@@ -237,6 +141,7 @@ function Chat({ queryId, success }) {
                     thinking={message.isThinking}
                     text={message.text}
                     messageId={message.messageId}
+                    key={message.messageId}
                 >
                     {/* Buttons -- shown only on last message when not thinking */}
                     {!isThinking && index === messages.length - 1 && (

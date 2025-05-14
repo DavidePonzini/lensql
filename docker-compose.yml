@@ -61,6 +61,10 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - lensql_pgdata:/var/lib/postgresql/data
+    develop:
+      watch:
+        - path: ./db_admin
+          action: rebuild
 
   db_users:
     image: postgres:latest

@@ -1,33 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-
-import useToken from '../hooks/useToken';
+import useAuth from '../hooks/useAuth';
 
 import Query from '../components/Query';
 
 function Assignment() {
-    const [token] = useToken();
+    const { apiRequest } = useAuth();
     const { assignmentId } = useParams();
     const [assignment, setAssignment] = useState(null);
 
     useEffect(() => {
         async function fetchAssignment() {
-            try {
-                const response = await fetch(`/api/get-exercise?id=${assignmentId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'authorization': `Bearer ${token}`,
-                    },
-                });
-                const data = await response.json();
-                setAssignment(data.data);
-            }
-            catch (error) {
-                alert('Error fetching assignment:', error);
-                console.error(error);
-                return;
-            }
+            const data = await apiRequest(`/api/get-exercise?id=${assignmentId}`, 'GET');
+
+            setAssignment(data.data);
         }
 
         fetchAssignment();

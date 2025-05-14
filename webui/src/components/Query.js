@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useToken from "../hooks/useToken";
+import useAuth from "../hooks/useAuth";
 
 import "../styles/Query.css";
 
@@ -8,7 +8,7 @@ import Button from "./Button";
 import QueryResult from "./QueryResult";
 
 function Query({ exerciseId, exerciseTitle, exerciseText }) {
-    const [token] = useToken();
+    const { apiRequest } = useAuth();
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
@@ -43,132 +43,52 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
         const query = sqlText;
 
         setIsExecuting(true);
-        try {
-            const response = await fetch(`/api/run-query`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'query': query,
-                    'exercise_id': exerciseId,
-                }),
-            });
-
-            const data = await response.json();
-            console.log(data);
-            displayResult(data);
-        } catch (error) {
-            console.error(error);
-            alert(`Error: ${error}`);
-        } finally {
-            setIsExecuting(false);
-        }
-    };
+        const data = await apiRequest('/api/run-query', 'POST', {
+            'query': query,
+            'exercise_id': exerciseId,
+        });
+        setIsExecuting(false);
+        displayResult(data);
+    }
 
     async function handleShowSearchPath() {
         setIsExecuting(true);
 
-        try {
-            const response = await fetch(`/api/show-search-path`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'exercise_id': exerciseId,
-                }),
-            });
-
-            const data = await response.json();
-            console.log(data);
-            displayResult(data);
-        } catch (error) {
-            console.error(error);
-            alert(`Error: ${error}`);
-        } finally {
-            setIsExecuting(false);
-        }
+        const data = await apiRequest('/api/show-search-path', 'POST', {
+            'exercise_id': exerciseId,
+        });
+        setIsExecuting(false);
+        displayResult(data);
     }
 
     async function handleListSchemas() {
         setIsExecuting(true);
 
-        try {
-            const response = await fetch(`/api/list-schemas`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'exercise_id': exerciseId,
-                }),
-            });
-
-            const data = await response.json();
-            console.log(data);
-            displayResult(data);
-        } catch (error) {
-            console.error(error);
-            alert(`Error: ${error}`);
-        } finally {
-            setIsExecuting(false);
-        }
+        const data = await apiRequest('/api/list-schemas', 'POST', {
+            'exercise_id': exerciseId,
+        });
+        setIsExecuting(false);
+        displayResult(data);
     }
 
     async function handleListTables() {
         setIsExecuting(true);
 
-        try {
-            const response = await fetch(`/api/list-tables`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'exercise_id': exerciseId,
-                }),
-            });
-
-            const data = await response.json();
-            console.log(data);
-            displayResult(data);
-        } catch (error) {
-            console.error(error);
-            alert(`Error: ${error}`);
-        } finally {
-            setIsExecuting(false);
-        }
+        const data = await apiRequest('/api/list-tables', 'POST', {
+            'exercise_id': exerciseId,
+        });
+        setIsExecuting(false);
+        displayResult(data);
     }
 
     async function handleListConstraints() {
         setIsExecuting(true);
 
-        try {
-            const response = await fetch(`/api/list-constraints`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    'exercise_id': exerciseId
-                }),
-            });
-
-            const data = await response.json();
-            console.log(data);
-            displayResult(data);
-        } catch (error) {
-            console.error(error);
-            alert(`Error: ${error}`);
-        } finally {
-            setIsExecuting(false);
-        }
+        const data = await apiRequest('/api/list-constraints', 'POST', {
+            'exercise_id': exerciseId,
+        });
+        setIsExecuting(false);
+        displayResult(data);
     }
 
     function handleClearOutput() {
@@ -240,6 +160,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
                             isBuiltin={val.builtin}
                             queryId={val.id}
                             query={val.query}
+                            key={val.id}
                             success={val.success}
                             isMessage={val.type === 'message'}
                         />

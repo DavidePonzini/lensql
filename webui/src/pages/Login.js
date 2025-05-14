@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import '../styles/Login.css';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
+import useAuth from '../hooks/useAuth';
 
-function Login({ setToken }) {
+function Login({ }) {
+    const { saveTokens } = useAuth();
+
     const [usernameInput, setUsernameInput] = useState('');
     const [passwordInput, setPasswordInput] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -33,7 +36,7 @@ function Login({ setToken }) {
 
             if (data.success) {
                 setError('');
-                setToken(data.token);
+                saveTokens(data.access_token, data.refresh_token);
                 sessionStorage.setItem('username', usernameInput);
             } else {
                 setError(data.message || 'Login failed');

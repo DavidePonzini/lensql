@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import useToken from '../hooks/useToken';
+import useAuth from '../hooks/useAuth';
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -18,15 +18,16 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import useTooltipObserver from '../hooks/useTooltipObserver';
 import Assignment from './Assignment';
 
+
  
 function App() {
+    const { isLoggedIn } = useAuth();
+
     useTooltipObserver();
 
-    const [token, setToken] = useToken();
-
-    if (!token) {
+    if (!isLoggedIn) {
         return (
-            <Login setToken={setToken} />
+            <Login />
         )
     }
 
