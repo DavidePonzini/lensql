@@ -1,26 +1,25 @@
-import { useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
-function useAuth() {
+const AuthContext = createContext();
+
+function AuthProvider({ children }) {
     const [accessToken, setAccessToken] = useState(sessionStorage.getItem('access_token'));
     const [refreshToken, setRefreshToken] = useState(sessionStorage.getItem('refresh_token'));
 
-    // Save tokens in sessionStorage and state
     function saveTokens(access, refresh) {
         sessionStorage.setItem('access_token', access);
         sessionStorage.setItem('refresh_token', refresh);
         setAccessToken(access);
         setRefreshToken(refresh);
-    };
+    }
 
-    // Logout function
-    function logout () {
+    function logout() {
         sessionStorage.removeItem('access_token');
         sessionStorage.removeItem('refresh_token');
         setAccessToken(null);
         setRefreshToken(null);
-    };
+    }
 
-    // Refresh token when needed
     async function refreshAccessToken() {
         if (!refreshToken) {
             logout();
@@ -45,9 +44,8 @@ function useAuth() {
             logout();
             throw new Error('Refresh token expired or invalid.');
         }
-    };
+    }
 
-    // API request wrapper with auto-refresh
     async function apiRequest(endpoint, method = 'GET', body = null) {
         let token = accessToken;
 
@@ -79,14 +77,23 @@ function useAuth() {
         }
 
         return response.json();
-    };
+    }
 
-    return {
-        isLoggedIn: !!accessToken,
-        saveTokens,
-        logout,
-        apiRequest,
-    };
+    return (
+        <AuthContext.Provider value={{
+            isLoggedIn: !!accessToken,
+            saveTokens,
+            logout,
+            apiRequest
+        }}>
+            {children}
+        </AuthContext.Provider>
+    );
 }
 
+function useAuth() {
+    return useContext(AuthContext);
+}
+
+export { AuthProvider, useAuth };
 export default useAuth;

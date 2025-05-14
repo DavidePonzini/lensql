@@ -1,7 +1,10 @@
 import ReactDOM from 'react-dom/client';
+import React from 'react';
 import reportWebVitals from './reportWebVitals';
 
 import App from './pages/App';
+
+import { AuthProvider } from './hooks/useAuth';
 
 // Boostrap CSS and JS
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -20,7 +23,11 @@ import './index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <App />
+    <AuthProvider>
+        <React.StrictMode>
+            <App />
+        </React.StrictMode>
+    </AuthProvider>
 );
 
 reportWebVitals();

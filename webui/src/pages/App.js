@@ -1,7 +1,6 @@
-import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import useAuth from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -19,7 +18,7 @@ import useTooltipObserver from '../hooks/useTooltipObserver';
 import Assignment from './Assignment';
 
 
- 
+
 function App() {
     const { isLoggedIn } = useAuth();
 
@@ -33,25 +32,23 @@ function App() {
 
     return (
         <>
-            <React.StrictMode>
-                <Router>
-                    <Navbar />
+            <Router>
+                <Navbar />
 
-                    <div className="content">
-                        <div className="container-md">
-                            <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/profile" element={<Profile />} />
-                                <Route path="/assignments" element={<Assignments />} />
-                                <Route path="/assignments/:assignmentId" element={<Assignment />} />
-                            </Routes>
-                        </div>
+                <div className="content">
+                    <div className="container-md">
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/profile" element={<Profile />} />
+                            <Route path="/assignments" element={<Assignments />} />
+                            <Route path="/assignments/:assignmentId" element={<Assignment />} />
+                        </Routes>
                     </div>
+                </div>
 
-                    <Separator />
-                    <Footer />
-                </Router>
-            </React.StrictMode>
+                <Separator />
+                <Footer />
+            </Router>
         </>
     )
 }

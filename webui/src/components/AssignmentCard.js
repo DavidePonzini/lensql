@@ -3,19 +3,17 @@ import '../styles/AssignmentCard.css';
 import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
 
-function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated = false, deadlineDate, submssionDate = null, onSubmit, onUnsubmit }) {
+function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated = false, deadlineDate, isSubmitted, onSubmit, onUnsubmit }) {
     const { apiRequest } = useAuth();
 
-    const [isSubmitted, setIsSubmitted] = useState(submssionDate !== null);
-    const remainingTime = deadlineDate ? new Date(deadlineDate) - new Date() : null;
-
+    const [submitted, setSubmitted] = useState(isSubmitted);
 
     async function handleSubmit() {
         const response = await apiRequest('/api/submit-assignment', 'POST', {
             'exercise_id': assignmentId,
         });
 
-        setIsSubmitted(true);
+        setSubmitted(true);
         onSubmit(assignmentId);
     }
 
@@ -24,7 +22,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
             'exercise_id': assignmentId,
         });
 
-        setIsSubmitted(false);
+        setSubmitted(false);
         onUnsubmit(assignmentId);
     }
 
@@ -34,7 +32,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
                 <h5 className="card-title">{assignmentTitle}</h5>
                 <p className="card-text">{children}</p>
 
-                {!isSubmitted && (
+                {!submitted && (
                     <a
                         href={`/assignments/${assignmentId}`}
                         className="btn btn-primary"
@@ -43,7 +41,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
                     </a>
                 )}
 
-                {isSubmitted ? (
+                {submitted ? (
                     <button
                         className="ms-2 btn btn-danger"
                         onClick={handleUnsubmit}

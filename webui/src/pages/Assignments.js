@@ -14,7 +14,6 @@ function Assignments() {
     function handleSubmit(assignmentId) {
         const assignment = unsubmittedAssignments.find((assignment) => assignment.id === assignmentId);
         if (assignment) {
-            assignment.submission_ts = new Date().toISOString();
             setUnsubmittedAssignments((prevAssignments) => prevAssignments.filter((assignment) => assignment.id !== assignmentId));
             setSubmittedAssignments((prevAssignments) => [...prevAssignments, assignment]);
         }
@@ -23,7 +22,6 @@ function Assignments() {
     function handleUnsubmit(assignmentId) {
         const assignment = submittedAssignments.find((assignment) => assignment.id === assignmentId);
         if (assignment) {
-            assignment.submission_ts = null;
             setSubmittedAssignments((prevAssignments) => prevAssignments.filter((assignment) => assignment.id !== assignmentId));
             setUnsubmittedAssignments((prevAssignments) => [...prevAssignments, assignment]);
         }
@@ -55,6 +53,7 @@ function Assignments() {
                             isGenerated={assignment.is_ai_generated}
                             key={assignment.id}
                             deadlineDate={assignment.deadline_ts}
+                            isSubmitted={false}
                             assignmentTitle={assignment.title}
                             onSubmit={handleSubmit}
                             onUnsubmit={handleUnsubmit}
@@ -74,7 +73,7 @@ function Assignments() {
                             isGenerated={assignment.is_ai_generated}
                             key={assignment.id}
                             deadlineDate={assignment.deadline_ts}
-                            submissionDate={assignment.submission_ts}
+                            isSubmitted={true}
                             assignmentTitle={assignment.title}
                             onSubmit={handleSubmit}
                             onUnsubmit={handleUnsubmit}

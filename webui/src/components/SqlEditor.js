@@ -1,6 +1,6 @@
 import '../styles/SqlEditor.css';
 
-import React, { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import Editor from '@monaco-editor/react';
 
 const SqlEditor = ({ onChange, onSubmit }) => {
