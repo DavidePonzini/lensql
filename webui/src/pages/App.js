@@ -43,7 +43,7 @@ function App() {
                                             {userInfo?.isTeacher && (
                                                 <Route path="manage" element={<ManageAssignments />} />
                                             )}
-                                            <Route path=":assignmentId" element={<Assignment />} />
+                                            <Route path="q/:assignmentId" element={<Assignment />} />
                                         </Route>
                                     </>
                                 ) : (

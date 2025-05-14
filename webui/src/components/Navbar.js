@@ -22,7 +22,7 @@ function Navbar() {
                         {isLoggedIn && (
                             <>
                                 <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/profile">Profile</NavLink>
-                                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments">Assignments</NavLink>
+                                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments" end>Assignments</NavLink>
                             </>
                         )}
 

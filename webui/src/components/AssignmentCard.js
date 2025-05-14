@@ -35,7 +35,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
 
                 {!submitted && (
                     <a
-                        href={`/assignments/${assignmentId}`}
+                        href={`/assignments/q/${assignmentId}`}
                         className="btn btn-primary"
                     >
                         View Assignment
