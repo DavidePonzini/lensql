@@ -2,8 +2,10 @@ import { useState } from 'react';
 import '../styles/Login.css';
 import Button from '../components/Button';
 import useAuth from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+    const navigate = useNavigate();
     const { saveTokens } = useAuth();
 
     const [usernameInput, setUsernameInput] = useState('');
@@ -36,7 +38,7 @@ function Login() {
             if (data.success) {
                 setError('');
                 saveTokens(data.access_token, data.refresh_token);
-                window.location.href = '/';
+                navigate('/');
             } else {
                 setError(data.message || 'Login failed');
             }

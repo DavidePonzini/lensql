@@ -42,7 +42,7 @@ function Assignments() {
 
     return (
         <>
-            <h1>Incomplete</h1>
+            <h1>To Do</h1>
             <div className="assignments assignments-incomplete">
                 {/* <AssignmentCard
                     assignmentId={0}

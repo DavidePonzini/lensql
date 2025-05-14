@@ -1,14 +1,13 @@
 function Home() {
-  return (
-    <div>
-      <h1>Welcome to <b>LensQL</b></h1>
-      <p>This page is under construction.</p>
-      <p>Check back later for updates!</p>
-      <p>For now, you can navigate to the Assignments page to view your assignments.</p>
-      <p>Use the navigation bar to access different sections of the application.</p>
-      <p>If you have any questions, feel free to reach out to the support team.</p>
-    </div>
-  );
+    return (
+        <div>
+            <h1>Welcome to <b>LensQL</b></h1>
+            <p>This page is under construction.</p>
+            <p>You will find more updates here soon.</p>
+            <p>In the meantime, you can start by logging in to your account.</p>
+            <p>Once logged in, you will be able to access your assignments and other features.</p>
+        </div>
+    );
 }
 
 export default Home;

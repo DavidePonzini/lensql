@@ -33,25 +33,23 @@ function App() {
                 <div className="content">
                     <div className="container-md">
                         <Routes>
-                            <Route path="/" element={<Home />} />
-
-                            {isLoggedIn ? (
-                                <>
-                                    <Route path="/" element={<Home />} />
-                                    <Route path="/profile" element={<Profile />} />
-                                    <Route path="/assignments">
-                                        <Route index element={<Assignments />} />
-                                        <Route path=":assignmentId" element={<Assignment />} />
-                                    </Route>
-
-                                    {userInfo?.isTeacher && (
-                                        <Route path="/manage" element={<ManageAssignments />} />
-                                    )}
-
-                                </>
-                            ) : (
-                                <Route path="*" element={<Login />} />
-                            )}
+                            <Route path="/">
+                                <Route index element={<Home />} />
+                                {isLoggedIn ? (
+                                    <>
+                                        <Route path="profile" element={<Profile />} />
+                                        <Route path="assignments">
+                                            <Route index element={<Assignments />} />
+                                            {userInfo?.isTeacher && (
+                                                <Route path="manage" element={<ManageAssignments />} />
+                                            )}
+                                            <Route path=":assignmentId" element={<Assignment />} />
+                                        </Route>
+                                    </>
+                                ) : (
+                                    <Route path="*" element={<Login />} />
+                                )}
+                            </Route>
                         </Routes>
                     </div>
                 </div>

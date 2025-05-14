@@ -1,9 +1,11 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
 import '../styles/Navbar.css';
 
 function Navbar() {
+    const navigate = useNavigate();
+
     const { isLoggedIn, logout, userInfo, loadingUser } = useAuth();
 
     return (
@@ -17,11 +19,15 @@ function Navbar() {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <div className="navbar-nav me-auto mb-2 mb-lg-0">
                         <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/" end>Home</NavLink>
-                        <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/profile">Profile</NavLink>
-                        <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments">Assignments</NavLink>
+                        {isLoggedIn && (
+                            <>
+                                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/profile">Profile</NavLink>
+                                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments">Assignments</NavLink>
+                            </>
+                        )}
 
                         {userInfo?.isTeacher && (
-                            <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/manage">Manage Assignments</NavLink>
+                            <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments/manage">Manage Assignments</NavLink>
                         )}
                     </div>
 
@@ -43,7 +49,7 @@ function Navbar() {
                                 </button>
                             </>
                         ) : (
-                            <button className="btn btn-primary mx-1" type="button" onClick={() => window.location.href = '/login'}>
+                            <button className="btn btn-primary mx-1" type="button" onClick={() => navigate('/login')}>
                                 Login
                             </button>
                         )}
