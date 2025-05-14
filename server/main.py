@@ -151,6 +151,16 @@ def unsubmit_exercise():
 
     return OK
 
+#################### User data ####################
+@app.route('/me', methods=['GET'])
+@jwt_required()
+def me():
+    username = get_jwt_identity()
+
+    result = db_admin.get_user_info(username)
+
+    return response(True, **result)
+
 #################### Builtin ####################
 @app.route('/show-search-path', methods=['POST'])
 @jwt_required()

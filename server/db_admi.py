@@ -252,32 +252,14 @@ def get_students(username: str) -> list[str]:
 
     return [row[0] for row in result]
 
-def is_teacher(username: str) -> bool:
+def get_user_info(username: str) -> dict:
     query = database.sql.SQL(
     '''
-        SELECT 1
+        SELECT
+            is_admin,
+            is_teacher
         FROM
-            {schema}.teaches
-        WHERE
-            teacher = {username}
-        LIMIT 1
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        username=database.sql.Placeholder('username')
-    )
-
-    result = db.execute_and_fetch(query, {
-        'username': username
-    })
-
-    return len(result) > 0
-
-def is_admin(username: str) -> bool:
-    query = database.sql.SQL(
-    '''
-        SELECT is_admin
-        FROM
-            {schema}.users
+            {schema}.v_user_info
         WHERE
             username = {username}
     ''').format(
@@ -290,8 +272,12 @@ def is_admin(username: str) -> bool:
     })
 
     if len(result) == 0:
-        return False
-    return result[0][0]
+        return None
+    return {
+        'username': username,
+        'is_admin': result[0][0],
+        'is_teacher': result[0][1],
+    }
 
 def create_exercise(title: str, request: str, dataset: str, expected_answer: str, is_ai_generated: bool) -> int:
     result = db.insert(SCHEMA, 'exercises', {

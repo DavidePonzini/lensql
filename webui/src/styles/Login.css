@@ -1,12 +1,3 @@
-.login {
-    background-color: var(--editor-bg-color);
-}
-
-.login .card {
-    border-radius: 1rem;
-    background-color: var(--bg-color);
-}
-
 .login .img {
     border-radius: 1rem 0 0 1rem;
     background-image: url(../res/database.jpg);

@@ -15,8 +15,6 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
 
     function displayResult(data) {
         setResult(data);
-
-        console.log(data);
     }
 
     // Show a confirmation dialog when the user tries to leave the page with unsaved changes

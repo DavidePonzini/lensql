@@ -2,6 +2,22 @@ BEGIN;
 
 SET search_path TO lensql;
 
+CREATE OR REPLACE VIEW lensql.v_user_info AS
+SELECT
+    u.username,
+    u.is_admin,
+    t.teacher IS NOT NULL AS is_teacher
+FROM
+    users u
+    LEFT JOIN (
+        SELECT DISTINCT
+            teacher
+        FROM
+            teaches
+    ) t ON u.username = t.teacher
+WHERE
+    u.can_login = TRUE;
+
 CREATE OR REPLACE VIEW lensql.v_active_users AS
 SELECT
     qb.username,

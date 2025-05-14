@@ -10,6 +10,7 @@ import Login from './Login';
 import Profile from './Profile';
 import Assignments from './Assignments';
 import Home from './Home';
+import ManageAssignments from './ManageAssignments';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -20,15 +21,9 @@ import Assignment from './Assignment';
 
 
 function App() {
-    const { isLoggedIn } = useAuth();
+    const { isLoggedIn, userInfo } = useAuth();
 
     useTooltipObserver();
-
-    if (!isLoggedIn) {
-        return (
-            <Login />
-        )
-    }
 
     return (
         <>
@@ -39,9 +34,24 @@ function App() {
                     <div className="container-md">
                         <Routes>
                             <Route path="/" element={<Home />} />
-                            <Route path="/profile" element={<Profile />} />
-                            <Route path="/assignments" element={<Assignments />} />
-                            <Route path="/assignments/:assignmentId" element={<Assignment />} />
+
+                            {isLoggedIn ? (
+                                <>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/profile" element={<Profile />} />
+                                    <Route path="/assignments">
+                                        <Route index element={<Assignments />} />
+                                        <Route path=":assignmentId" element={<Assignment />} />
+                                    </Route>
+
+                                    {userInfo?.isTeacher && (
+                                        <Route path="/manage" element={<ManageAssignments />} />
+                                    )}
+
+                                </>
+                            ) : (
+                                <Route path="*" element={<Login />} />
+                            )}
                         </Routes>
                     </div>
                 </div>

@@ -32,8 +32,8 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
                 <h5 className="card-title">{assignmentTitle}</h5>
                 <p className="card-text">{children}</p>
 
-               
- {!submitted && (
+
+                {!submitted && (
                     <a
                         href={`/assignments/${assignmentId}`}
                         className="btn btn-primary"
@@ -42,14 +42,15 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
                     </a>
                 )}
 
-                {submitted ? (
+                {submitted && onUnsubmit && (
                     <button
                         className="ms-2 btn btn-danger"
                         onClick={handleUnsubmit}
                     >
                         Unsubmit
                     </button>
-                ) : (
+                )}
+                {!submitted && onSubmit && (
                     <button
                         className="ms-2 btn btn-success"
                         onClick={handleSubmit}

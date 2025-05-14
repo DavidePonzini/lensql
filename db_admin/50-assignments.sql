@@ -15,4 +15,9 @@ INSERT INTO assignments(username, exercise_id) VALUES
 ('giovanna', 2),
 ('barbara', 3);
 
+INSERT INTO teaches (teacher, student) VALUES
+('dav', 'giovanna'),
+('dav', 'barbara'),
+('giovanna', 'barbara');
+
 COMMIT;

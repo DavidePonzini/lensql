@@ -44,6 +44,19 @@ function Assignments() {
         <>
             <h1>Incomplete</h1>
             <div className="assignments assignments-incomplete">
+                {/* <AssignmentCard
+                    assignmentId={0}
+                    isGenerated={false}
+                    key={-1}
+                    deadlineDate={null}
+                    isSubmitted={false}
+                    assignmentTitle="Modalità libera"
+                    onSubmit={null}
+                    onUnsubmit={null}
+                >
+                    Se hai delle query che non sono state richieste, ma che vuoi comunque eseguire, puoi farlo qui
+                </AssignmentCard> */}
+
                 {unsubmittedAssignments.map((assignment) => {
                     return (
                         <AssignmentCard
