@@ -8,7 +8,7 @@ function Assignment() {
     const { apiRequest } = useAuth();
     const { assignmentId } = useParams();
     const [assignment, setAssignment] = useState(null);
-
+    
     useEffect(() => {
         async function fetchAssignment() {
             const data = await apiRequest(`/api/get-exercise?id=${assignmentId}`, 'GET');
@@ -17,7 +17,7 @@ function Assignment() {
         }
 
         fetchAssignment();
-    }, [assignmentId]);
+    }, [assignmentId]);     // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!assignment) return (
         <div>Loading...</div>

@@ -9,7 +9,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
     const [submitted, setSubmitted] = useState(isSubmitted);
 
     async function handleSubmit() {
-        const response = await apiRequest('/api/submit-assignment', 'POST', {
+        await apiRequest('/api/submit-assignment', 'POST', {
             'exercise_id': assignmentId,
         });
 
@@ -18,7 +18,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
     }
 
     async function handleUnsubmit() {
-        const response = await apiRequest('/api/unsubmit-assignment', 'POST', {
+        await apiRequest('/api/unsubmit-assignment', 'POST', {
             'exercise_id': assignmentId,
         });
 
@@ -32,7 +32,8 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
                 <h5 className="card-title">{assignmentTitle}</h5>
                 <p className="card-text">{children}</p>
 
-                {!submitted && (
+               
+ {!submitted && (
                     <a
                         href={`/assignments/${assignmentId}`}
                         className="btn btn-primary"

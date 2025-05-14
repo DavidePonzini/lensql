@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import Footer from '../components/Footer';
 import useAuth from '../hooks/useAuth';
 
-function Login({ }) {
+function Login() {
     const { saveTokens } = useAuth();
 
     const [usernameInput, setUsernameInput] = useState('');

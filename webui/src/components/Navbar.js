@@ -3,8 +3,8 @@ import { NavLink } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
 function Navbar() {
-    const { isloggedIn } = useAuth();
-    const username = isloggedIn ? sessionStorage.getItem('username') : 'Not logged in';
+    const { isLoggedIn } = useAuth();
+    const username = isLoggedIn ? sessionStorage.getItem('username') : 'Not logged in';
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">

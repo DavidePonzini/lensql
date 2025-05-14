@@ -31,8 +31,6 @@ function Assignments() {
         async function getAssignments() {
             const response = await apiRequest('/api/get-assignments', 'GET');
 
-            console.log(response);
-
             const submitted = response.data.filter((assignment) => { return assignment.submission_ts });
             const unsubmitted = response.data.filter((assignment) => { return !assignment.submission_ts });
             setUnsubmittedAssignments(unsubmitted);
@@ -40,7 +38,7 @@ function Assignments() {
         }
 
         getAssignments();
-    }, [sessionStorage.getItem('username')]);
+    }, [sessionStorage.getItem('username')]);       // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>
