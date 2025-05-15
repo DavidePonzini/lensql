@@ -6,10 +6,6 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
-    develop:
-      watch: 
-        - path: ./webui
-          action: rebuild
 
   server:
     build: ./server
@@ -31,10 +27,6 @@ services:
       - CLEANUP_INTERVAL_SECONDS=3600
     env_file:
       - server/.env
-    develop:
-      watch:
-        - path: ./server
-          action: rebuild
 
   nginx:
     build: ./nginx
@@ -47,10 +39,6 @@ services:
     depends_on:
       - webui
       - server
-    develop:
-      watch:
-        - path: ./nginx
-          action: rebuild
 
   db_admin:
     build: ./db_admin
@@ -61,10 +49,6 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - lensql_pgdata:/var/lib/postgresql/data
-    develop:
-      watch:
-        - path: ./db_admin
-          action: rebuild
 
   db_users:
     image: postgres:latest

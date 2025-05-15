@@ -29,25 +29,21 @@ def add_user(username: str, password: str):
                 })
 
                 cur.execute(sql.SQL(
+                    '''ALTER USER {username} WITH CREATEROLE''').format(
+                    username=sql.Identifier(username),
+                ))
+
+                cur.execute(sql.SQL(
                     '''GRANT ALL PRIVILEGES ON DATABASE {username} TO {username}''').format(
                     username=sql.Identifier(username)
                 ))
 
-                cur.execute(sql.SQL(
-                    '''REVOKE CONNECT ON DATABASE postgres FROM {username}''').format(
-                    username=sql.Identifier(username)
-                ))
-
-                cur.execute(sql.SQL(
-                    '''REVOKE CONNECT ON DATABASE template1 FROM {username}''').format(
-                    username=sql.Identifier(username)
-                ))
-
-                cur.execute(sql.SQL(
-                    '''REVOKE CONNECT ON DATABASE template0 FROM {username}''').format(
-                    username=sql.Identifier(username)
-                ))
-
+                for db in ['postgres', 'template1', 'template0']:
+                    cur.execute(sql.SQL(
+                        '''REVOKE CONNECT ON DATABASE {db} FROM {username}''').format(
+                        db=sql.Identifier(db),
+                        username=sql.Identifier(username),
+                    ))
 
         with db_users.DBConnection(dbname=username, username='postgres') as user_conn:
             with user_conn.cursor() as cur:

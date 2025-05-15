@@ -27,6 +27,7 @@ function Assignment() {
         <Query
             exerciseId={assignmentId}
             exerciseText={assignment.request}
+            dataset={assignment.dataset}
         />
     );
 }

@@ -188,9 +188,14 @@ def list_schemas(username: str) -> QueryResult:
     return run_builtin_query(username, Queries.LIST_SCHEMAS)
 
 def list_tables(username: str) -> QueryResult:
-    '''Lists all tables in the database.'''
+    '''Lists tables in the current search_path.'''
 
     return run_builtin_query(username, Queries.LIST_TABLES)
+
+def list_all_tables(username: str) -> QueryResult:
+    '''Lists all tables in the database.'''
+
+    return run_builtin_query(username, Queries.LIST_ALL_TABLES)
 
 def list_constraints(username: str) -> QueryResult:
     '''Lists all constraints in the database.'''

@@ -118,14 +118,34 @@ def get_assignments():
 
     return response(True, data=assignments)
 
+@app.route('/get-assignment-students', methods=['POST'])
+@jwt_required()
+def get_assignment_students():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+
+    students = db_admin.get_assignment_students(username, exercise_id)
+
+    return response(True, students=students)
+
+@app.route('/get-all-exercises', methods=['GET'])
+@jwt_required()
+def get_all_exercises():
+    username = get_jwt_identity()
+
+    exercises = db_admin.get_all_exercises()
+
+    return response(True, data=exercises)
+
 @app.route('/get-exercise', methods=['GET'])
 @jwt_required()
 def get_exercise():
     username = get_jwt_identity()
     data = request.args
-    assignment_id = data.get('id')
+    exercise_id = data.get('id')
 
-    result = db_admin.get_exercise(assignment_id, username)
+    result = db_admin.get_exercise(exercise_id, username)
 
     return response(True, data=result)
 
@@ -151,6 +171,85 @@ def unsubmit_exercise():
 
     return OK
 
+#################### Exercises Management ####################
+
+@app.route('/add-exercise', methods=['POST'])
+@jwt_required()
+def add_exercise():
+    username = get_jwt_identity()
+    data = request.get_json()
+    title = data['title']
+    request_text = data['request']
+    dataset = data['dataset']
+    expected_answer = data['expected_answer']
+
+    db_admin.add_exercise(
+        title=title,
+        request=request_text,
+        dataset=dataset,
+        expected_answer=expected_answer
+    )
+
+    return OK
+
+@app.route('/edit-exercise', methods=['POST'])
+@jwt_required()
+def edit_exercise():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+    title = data['title']
+    request_text = data['request']
+    dataset = data['dataset']
+    expected_answer = data['expected_answer']
+
+    db_admin.edit_exercise(
+        exercise_id=exercise_id,
+        title=title,
+        request=request_text,
+        dataset=dataset,
+        expected_answer=expected_answer
+    )
+
+    return OK
+
+@app.route('/delete-exercise', methods=['POST'])
+@jwt_required()
+def delete_exercise():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+
+    db_admin.delete_exercise(
+        exercise_id=exercise_id
+    )
+
+    return OK
+
+@app.route('/assign-exercise', methods=['POST'])
+@jwt_required()
+def assign_exercise():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+    student_id = data['student_id']
+    value = data['value']
+
+    if value:
+        db_admin.assign_exercise(
+            teacher=username,
+            exercise_id=exercise_id,
+            student=student_id
+        )
+    else:
+        db_admin.unassign_exercise(
+            exercise_id=exercise_id,
+            student=student_id
+        )
+
+    return OK
+
+
 #################### User data ####################
 @app.route('/me', methods=['GET'])
 @jwt_required()
@@ -158,7 +257,9 @@ def me():
     username = get_jwt_identity()
 
     result = db_admin.get_user_info(username)
-
+    if result is None:
+        return response(False)
+    
     return response(True, **result)
 
 #################### Builtin ####################
@@ -220,6 +321,31 @@ def list_tables():
     exercise_id = int(data['exercise_id'])
     
     result = db_users.list_tables(username)
+
+    batch_id = db_admin.log_query_batch(
+        username=username,
+        exercise_id=exercise_id if exercise_id > 0 else None
+    )
+
+    query_id = db_admin.log_query(
+        batch_id=batch_id,
+        query=result.query,
+        success=result.success,
+        result_str=result.result
+    )
+
+    result.id = query_id
+
+    return response_query(result, is_builtin=True)
+
+@app.route('/list-all-tables', methods=['POST'])
+@jwt_required()
+def list_all_tables():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = int(data['exercise_id'])
+    
+    result = db_users.list_all_tables(username)
 
     batch_id = db_admin.log_query_batch(
         username=username,

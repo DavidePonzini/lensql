@@ -47,7 +47,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
                         className="ms-2 btn btn-danger"
                         onClick={handleUnsubmit}
                     >
-                        Unsubmit
+                        Unarchive
                     </button>
                 )}
                 {!submitted && onSubmit && (
@@ -55,7 +55,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
                         className="ms-2 btn btn-success"
                         onClick={handleSubmit}
                     >
-                        Submit
+                        Archive
                     </button>
                 )}
             </div>

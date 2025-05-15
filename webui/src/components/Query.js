@@ -4,10 +4,10 @@ import useAuth from "../hooks/useAuth";
 import "../styles/Query.css";
 
 import SqlEditor from "./SqlEditor";
-import Button from "./Button";
 import QueryResult from "./QueryResult";
+import ButtonModal from "./ButtonModal";
 
-function Query({ exerciseId, exerciseTitle, exerciseText }) {
+function Query({ exerciseId, exerciseTitle, exerciseText, dataset }) {
     const { apiRequest } = useAuth();
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
@@ -79,6 +79,16 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
         displayResult(data);
     }
 
+    async function handleListAllTables() {
+        setIsExecuting(true);
+
+        const data = await apiRequest('/api/list-all-tables', 'POST', {
+            'exercise_id': exerciseId,
+        });
+        setIsExecuting(false);
+        displayResult(data);
+    }
+
     async function handleListConstraints() {
         setIsExecuting(true);
 
@@ -98,56 +108,90 @@ function Query({ exerciseId, exerciseTitle, exerciseText }) {
             <h2 className="exercise-title">{exerciseTitle}</h2>
             <p className="exercise-request">{exerciseText}</p>
 
+            <div className="mb-3" style={{ justifySelf: 'end' }}>
+                <ButtonModal
+                    className="btn btn-secondary me-1"
+                    title="View Dataset"
+                    buttonText="Dataset"
+                >
+                    <pre className="code">
+                        {dataset}
+                    </pre>
+                </ButtonModal>
+            </div>
+
             <SqlEditor onChange={setSqlText} onSubmit={handleExecute} />
 
             <div className="mt-3 support-buttons">
-                <Button
-                    className="btn-primary me-1"
+                <button
+                    className="btn btn-primary me-1"
                     disabled={isExecuting || sqlText.trim().length === 0}
                     onClick={handleExecute}
                 >
                     Execute
-                </Button>
+                </button>
 
-                <Button
-                    className="btn-secondary me-1"
+                <button
+                    className="btn btn-secondary me-1"
                     disabled={isExecuting}
                     onClick={handleShowSearchPath}
                 >
                     Show Search Path
-                </Button>
+                </button>
 
-                <Button
-                    className="btn-secondary me-1"
+                <button
+                    className="btn btn-secondary me-1"
                     disabled={isExecuting}
                     onClick={handleListSchemas}
                 >
                     List Schemas
-                </Button>
+                </button>
 
-                <Button
-                    className="btn-secondary me-1"
-                    disabled={isExecuting}
-                    onClick={handleListTables}
-                >
-                    List Tables
-                </Button>
+                <div className="btn-group me-1" role="group">
+                    <button
+                        className="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        disabled={isExecuting}
+                    >
+                        List Tables
+                    </button>
+                    <ul className="dropdown-menu">
+                        <li>
+                            <button
+                                className="dropdown-item"
+                                onClick={handleListTables}
+                            >
+                                Current Schema
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                className="dropdown-item"
+                                onClick={handleListAllTables}
+                            >
+                                All Schemas
+                            </button>
+                        </li>
+                    </ul>
+                </div>
 
-                <Button
-                    className="btn-secondary me-1"
+                <button
+                    className="btn btn-secondary me-1"
                     disabled={isExecuting}
                     onClick={handleListConstraints}
                 >
                     List Constraints
-                </Button>
+                </button>
 
-                <Button
-                    className="btn-primary"
+                <button
+                    className="btn btn-primary"
                     disabled={isExecuting}
                     onClick={handleClearOutput}
                 >
                     Clear output
-                </Button>
+                </button>
             </div>
 
             <div className="mt-3">

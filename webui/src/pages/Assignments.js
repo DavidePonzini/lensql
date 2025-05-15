@@ -42,7 +42,7 @@ function Assignments() {
 
     return (
         <>
-            <h1>To Do</h1>
+            <h1>Assignments</h1>
             <div className="assignments assignments-incomplete">
                 {/* <AssignmentCard
                     assignmentId={0}
@@ -56,6 +56,8 @@ function Assignments() {
                 >
                     Se hai delle query che non sono state richieste, ma che vuoi comunque eseguire, puoi farlo qui
                 </AssignmentCard> */}
+                
+                {unsubmittedAssignments.length === 0 && <p className="no-assignments">No assignments</p>}
 
                 {unsubmittedAssignments.map((assignment) => {
                     return (
@@ -75,8 +77,10 @@ function Assignments() {
                 })}
             </div>
 
-            <h1 className="mt-2">Completed</h1>
+            <h1 className="mt-3">Archived</h1>
             <div className="assignments assignments-complete">
+                {submittedAssignments.length === 0 && <p className="no-assignments">No archived assignments</p>}
+                
                 {submittedAssignments.map((assignment) => {
                     return (
                         <AssignmentCard

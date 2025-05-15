@@ -1,7 +1,6 @@
 import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 import MessageBox from "./MessageBox";
-import Button from "./Button";
 
 
 function Chat({ queryId, success }) {
@@ -148,31 +147,31 @@ function Chat({ queryId, success }) {
                         <div className="mt-2">
                             {success ? (
                                 <>
-                                    <Button className="btn-primary me-2" onClick={handleDescribeQuery}>
+                                    <button className="btn btn-primary me-2" onClick={handleDescribeQuery}>
                                         Describe query
-                                    </Button>
+                                    </button>
 
-                                    <Button className="btn-primary me-2" onClick={handleExplainQuery}>
+                                    <button className="btn btn-primary me-2" onClick={handleExplainQuery}>
                                         Explain query
-                                    </Button>
+                                    </button>
                                 </>
                             ) : (
                                 <>
-                                    <Button className="btn-primary me-2" onClick={handleExplainError}>
+                                    <button className="btn btn-primary me-2" onClick={handleExplainError}>
                                         Explain error
-                                    </Button>
+                                    </button>
 
-                                    <Button className="btn-primary me-2" onClick={handleShowExample} disabled={true}>
+                                    <button className="btn btn-primary me-2" onClick={handleShowExample} disabled={true}>
                                         Show example
-                                    </Button>
+                                    </button>
 
-                                    <Button className="btn-primary me-2" onClick={handleWhereToLook}>
+                                    <button className="btn btn-primary me-2" onClick={handleWhereToLook}>
                                         Where to look
-                                    </Button>
+                                    </button>
 
-                                    <Button className="btn-primary me-2" onClick={handleSuggestFix}>
+                                    <button className="btn btn-primary me-2" onClick={handleSuggestFix}>
                                         Suggest fix
-                                    </Button>
+                                    </button>
                                 </>
                             )}
                         </div>

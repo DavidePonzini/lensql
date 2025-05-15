@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import '../styles/Login.css';
-import Button from '../components/Button';
 import useAuth from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
@@ -107,12 +106,12 @@ function Login() {
                             </div>
 
                             <div className="pt-1 mb-4">
-                                <Button
-                                    className="btn-primary btn-lg btn-block w-100"
+                                <button
+                                    className="btn btn-primary btn-lg btn-block w-100"
                                     onClick={handleLogin}
                                 >
                                     Login
-                                </Button>
+                                </button>
                             </div>
                         </form>
                     </div>
