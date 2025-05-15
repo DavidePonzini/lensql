@@ -11,7 +11,7 @@ INSERT INTO teaches (teacher, student) VALUES
 
 ('barbara', 'barbara'),
 ('barbara', 'giovanna'),
-('barbara', 'dav'),
+('barbara', 'dav')
 
 ON CONFLICT (teacher, student) DO NOTHING;
 
