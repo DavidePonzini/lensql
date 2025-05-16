@@ -32,7 +32,7 @@ psql_users:
 	docker exec -it lensql_db_users psql -U postgres
 
 dump:
-	docker exec -t lensql_db pg_dump -U postgres -n lensql > dump_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
+	docker exec -t lensql_db_admin pg_dump -U postgres -n lensql > dump_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
 
 $(VENV):
 	python -m venv $(VENV)
