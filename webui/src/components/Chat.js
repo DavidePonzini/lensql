@@ -55,9 +55,10 @@ function Chat({ queryId, success }) {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
-        
+
         stopThinking();
         addMessage(data.answer, true, false, data.id);
+        focusOnLastUserMessage();
         addFollowupPrompt();
     }
 
@@ -69,9 +70,10 @@ function Chat({ queryId, success }) {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
-        
+
         stopThinking();
         addMessage(data.answer, true, false, data.id);
+        focusOnLastUserMessage();
         addFollowupPrompt();
     }
 
@@ -84,10 +86,10 @@ function Chat({ queryId, success }) {
             'msg_idx': getLastMessageIdx(),
         });
 
-        
-
         stopThinking();
+        focusOnLastUserMessage();
         addMessage(data.answer, true, false, data.id);
+        addFollowupPrompt();
     }
 
     async function handleShowExample() {
@@ -98,9 +100,10 @@ function Chat({ queryId, success }) {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
-        
+
         stopThinking();
         addMessage(data.answer, true, false, data.id);
+        focusOnLastUserMessage();
         addFollowupPrompt();
     }
 
@@ -112,9 +115,10 @@ function Chat({ queryId, success }) {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
-        
+
         stopThinking();
         addMessage(data.answer, true, false, data.id);
+        focusOnLastUserMessage();
         addFollowupPrompt();
     }
 
@@ -126,21 +130,34 @@ function Chat({ queryId, success }) {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
-        
+
         stopThinking();
         addMessage(data.answer, true, false, data.id);
+        focusOnLastUserMessage();
         addFollowupPrompt();
     }
 
+    function focusOnLastUserMessage() {
+        // TODO does not select the last message for user 
+        // messagebox-user works, but selects the first
+        // messagebox-user:last-child returns null
+        const lastUserMessage = document.querySelector(`#chat-${queryId} .messagebox.messagebox-user:last-child`);  
+
+        if (lastUserMessage) {
+            lastUserMessage.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+
     return (
-        <div>
+        <div id={`chat-${queryId}`}>
             {messages.map((message, index) => (
                 <MessageBox
                     assistant={message.isFromAssistant}
                     thinking={message.isThinking}
                     text={message.text}
                     messageId={message.messageId}
-                    key={message.messageId}
+                    key={index}
                 >
                     {/* Buttons -- shown only on last message when not thinking */}
                     {!isThinking && index === messages.length - 1 && (

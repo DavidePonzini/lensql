@@ -196,17 +196,19 @@ def get_all_exercises() -> list[dict]:
     query = database.sql.SQL(
     '''
         SELECT
-            id,
-            title,
-            request,
-            dataset,
-            expected_answer,
-            is_ai_generated
+            e.id,
+            e.title,
+            e.request,
+            e.dataset_id,
+            d.name,
+            e.expected_answer,
+            e.is_ai_generated
         FROM
-            {schema}.exercises
+            {schema}.exercises e
+            LEFT JOIN {schema}.datasets d ON e.dataset_id = d.id
         ORDER BY
-            title,
-            id
+            e.title,
+            e.id
     ''').format(
         schema=database.sql.Identifier(SCHEMA)
     )
@@ -218,9 +220,10 @@ def get_all_exercises() -> list[dict]:
             'id': row[0],
             'title': row[1],
             'request': row[2],
-            'dataset': row[3],
-            'expected_answer': row[4],
-            'is_ai_generated': row[5]
+            'dataset_id': row[3],
+            'dataset_name': row[4] if row[3] else 'None',
+            'expected_answer': row[5],
+            'is_ai_generated': row[6]
         }
         for row in result
     ]
@@ -233,7 +236,7 @@ def get_exercise(exercise_id: int, username: str) -> dict:
     '''
         SELECT
             e.request,
-            e.dataset
+            e.dataset_id
         FROM
             {schema}.exercises e
             JOIN {schema}.assignments a ON e.id = a.exercise_id
@@ -253,16 +256,18 @@ def get_exercise(exercise_id: int, username: str) -> dict:
         return None
     return {
         'request': result[0][0],
-        'dataset': result[0][1]
+        'dataset_id': result[0][1]
     }
 
 def get_exercise_dataset(exercise_id: int) -> str:
     '''Get the dataset for a given exercise ID'''
 
-    query = database.sql.SQL('''
+    query = database.sql.SQL(
+        '''
         SELECT dataset
-        FROM {schema}.exercises
-        WHERE id = {exercise_id}
+        FROM {schema}.exercises e
+            JOIN {schema}.datasets d ON e.dataset_id = d.id                     
+        WHERE e.id = {exercise_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         exercise_id=database.sql.Placeholder('exercise_id')
@@ -273,9 +278,101 @@ def get_exercise_dataset(exercise_id: int) -> str:
     })
 
     if len(result) == 0:
-        return None
+        return '-- No dataset provided'
 
     return result[0][0]
+
+def get_dataset(dataset_id: int | None) -> str:
+    '''Get the dataset for a given dataset ID'''
+
+    if dataset_id is None:
+        return '-- No dataset provided'
+
+    query = database.sql.SQL(
+        '''
+        SELECT dataset
+        FROM {schema}.datasets
+        WHERE id = {dataset_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        dataset_id=database.sql.Placeholder('dataset_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'dataset_id': dataset_id
+    })
+
+    if len(result) == 0:
+        return '-- No dataset provided'
+
+    return result[0][0]
+
+def add_student(teacher: str, student: str) -> None:
+    '''Add a student to the teacher's list of students'''
+
+    query = database.sql.SQL(
+    '''
+        INSERT INTO {schema}.teaches(teacher, student)
+        VALUES ({teacher}, {student})
+        ON CONFLICT (teacher, student) DO NOTHING
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        teacher=database.sql.Placeholder('teacher'),
+        student=database.sql.Placeholder('student')
+    )
+
+    db.execute(query, {
+        'teacher': teacher,
+        'student': student
+    })
+
+def get_datasets(username: str) -> list[dict]:
+    '''Get all datasets visible to the user'''
+
+    query = database.sql.SQL(
+    '''
+        SELECT
+            d.id,
+            d.name
+        FROM
+            {schema}.datasets d
+            JOIN {schema}.has_dataset hd ON d.id = hd.dataset_id
+        WHERE
+            hd.username = {username}
+        ORDER BY
+            d.name
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+    return [
+        {
+            'id': row[0],
+            'name': row[1]
+        }
+        for row in result
+    ]
+
+def add_dataset(name: str, dataset: str) -> None:
+    '''Add a dataset to the database'''
+
+    query = database.sql.SQL(
+    '''
+        INSERT INTO {schema}.datasets(name, dataset)
+        VALUES ({name}, {dataset})
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        name=database.sql.Placeholder('name'),
+        dataset=database.sql.Placeholder('dataset')
+    )
+
+    db.execute(query, {
+        'name': name,
+        'dataset': dataset
+    })
 
 def get_assignment_students(username: str, exercise_id: int) -> dict:
     '''Get whether each student is assigned to the exercise'''
@@ -417,35 +514,35 @@ def unsubmit_assignment(username: str, exercise_id: int) -> None:
         'exercise_id': exercise_id
     })
 
-def add_exercise(title: str, request: str, dataset: str, expected_answer: str):
+def add_exercise(title: str, request: str, dataset_id: int | None, expected_answer: str):
     db.insert(SCHEMA, 'exercises', {
         'title': title,
         'request': request,
-        'dataset': dataset,
+        'dataset_id': dataset_id,
         'expected_answer': expected_answer,
         'is_ai_generated': False
     })
 
-def edit_exercise(exercise_id: int, title: str, request: str, dataset: str, expected_answer: str) -> None:
+def edit_exercise(exercise_id: int, title: str, request: str, dataset_id: int | None, expected_answer: str) -> None:
     query = database.sql.SQL('''
         UPDATE {schema}.exercises
         SET title = {title},
             request = {request},
-            dataset = {dataset},
+            dataset_id = {dataset_id},
             expected_answer = {expected_answer}
         WHERE id = {exercise_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         title=database.sql.Placeholder('title'),
         request=database.sql.Placeholder('request'),
-        dataset=database.sql.Placeholder('dataset'),
+        dataset_id=database.sql.Placeholder('dataset_id'),
         expected_answer=database.sql.Placeholder('expected_answer'),
         exercise_id=database.sql.Placeholder('exercise_id')
     )
     db.execute(query, {
         'title': title,
         'request': request,
-        'dataset': dataset,
+        'dataset_id': dataset_id,
         'expected_answer': expected_answer,
         'exercise_id': exercise_id
     })

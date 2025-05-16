@@ -78,6 +78,7 @@ function Login() {
                                     onInput={(e) => {
                                         setUsernameInput(e.target.value);
                                     }}
+                                    autoFocus={true}
                                 />
                             </div>
 

@@ -5,9 +5,9 @@ import "../styles/Query.css";
 
 import SqlEditor from "./SqlEditor";
 import QueryResult from "./QueryResult";
-import ButtonModal from "./ButtonModal";
+import ButtonShowDataset from "./ButtonShowDataset";
 
-function Query({ exerciseId, exerciseTitle, exerciseText, dataset }) {
+function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     const { apiRequest } = useAuth();
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
@@ -35,19 +35,58 @@ function Query({ exerciseId, exerciseTitle, exerciseText, dataset }) {
 
 
     async function handleExecute() {
-        if (!sqlText.trim())
-            return;
-
-        const query = sqlText;
+        if (!sqlText.trim()) return;
 
         setIsExecuting(true);
-        const data = await apiRequest('/api/run-query', 'POST', {
-            'query': query,
-            'exercise_id': exerciseId,
-        });
-        setIsExecuting(false);
-        displayResult(data);
+        setResult([]);
+
+        try {
+            const stream = await apiRequest('/api/run-query', 'POST', {
+                'query': sqlText,
+                'exercise_id': exerciseId,
+            }, { stream: true });
+
+            const reader = stream.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                if (value) {
+                    buffer += decoder.decode(value, { stream: true });
+
+                    let lines = buffer.split('\n');
+                    buffer = lines.pop(); // Keep last partial line
+
+                    for (let line of lines) {
+                        if (line.trim() === '') continue;
+                        try {
+                            const parsed = JSON.parse(line);
+                            setResult(prev => [...prev, parsed]);
+                        } catch (e) {
+                            console.error('Failed to parse line:', line);
+                        }
+                    }
+                }
+            }
+
+            if (buffer.trim() !== '') {
+                try {
+                    const parsed = JSON.parse(buffer);
+                    setResult(prev => [...prev, parsed]);
+                } catch (e) {
+                    console.error('Failed to parse last buffer:', buffer);
+                }
+            }
+
+        } catch (error) {
+            console.error('Streaming error:', error);
+        } finally {
+            setIsExecuting(false);
+        }
     }
+
 
     async function handleShowSearchPath() {
         setIsExecuting(true);
@@ -103,21 +142,75 @@ function Query({ exerciseId, exerciseTitle, exerciseText, dataset }) {
         setResult([]);
     }
 
+    async function handleCreateDataset() {
+        setIsExecuting(true);
+        setResult([]);
+
+        try {
+            const stream = await apiRequest('/api/create-dataset', 'POST', {
+                'exercise_id': exerciseId,
+            }, { stream: true });
+
+            const reader = stream.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                if (value) {
+                    buffer += decoder.decode(value, { stream: true });
+
+                    let lines = buffer.split('\n');
+                    buffer = lines.pop(); // Keep last partial line
+
+                    for (let line of lines) {
+                        if (line.trim() === '') continue;
+                        try {
+                            const parsed = JSON.parse(line);
+                            setResult(prev => [...prev, parsed]);
+                        } catch (e) {
+                            console.error('Failed to parse line:', line);
+                        }
+                    }
+                }
+            }
+
+            if (buffer.trim() !== '') {
+                try {
+                    const parsed = JSON.parse(buffer);
+                    setResult(prev => [...prev, parsed]);
+                } catch (e) {
+                    console.error('Failed to parse last buffer:', buffer);
+                }
+            }
+
+        } catch (error) {
+            console.error('Streaming error:', error);
+        } finally {
+            setIsExecuting(false);
+        }
+    }
+
     return (
         <>
             <h2 className="exercise-title">{exerciseTitle}</h2>
             <p className="exercise-request">{exerciseText}</p>
 
             <div className="mb-3" style={{ justifySelf: 'end' }}>
-                <ButtonModal
+                <ButtonShowDataset
                     className="btn btn-secondary me-1"
-                    title="View Dataset"
-                    buttonText="Dataset"
-                >
-                    <pre className="code">
-                        {dataset}
-                    </pre>
-                </ButtonModal>
+                    buttonText="View Dataset"
+                    datasetId={datasetId}
+                    footerButtons={[
+                        {
+                            text: 'Create',
+                            variant: 'primary',
+                            onClick: handleCreateDataset,
+                            autoClose: true,
+                        },
+                    ]}
+                />
             </div>
 
             <SqlEditor onChange={setSqlText} onSubmit={handleExecute} />
@@ -202,7 +295,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, dataset }) {
                             isBuiltin={val.builtin}
                             queryId={val.id}
                             query={val.query}
-                            key={val.id}
+                            key={val.id ? val.id : `i${index}`}
                             success={val.success}
                             isMessage={val.type === 'message'}
                         />

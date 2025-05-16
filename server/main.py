@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 import os
 from datetime import timedelta
+import json
 
 import llm
 import db_admi as db_admin
@@ -23,7 +24,7 @@ def response(success: bool = True, **kwargs):
         **kwargs
     }
 
-def response_query(*results: QueryResult, is_builtin: bool = False) -> str:
+def response_query(*results: QueryResult, is_builtin: bool = False) -> Response:
     return jsonify([
         {
             'success': query.success,
@@ -62,6 +63,10 @@ def refresh():
 
     return response(True, access_token=access_token)
 
+from flask import Response
+
+import time
+
 @app.route('/run-query', methods=['POST'])
 @jwt_required()
 def run_query():
@@ -75,22 +80,27 @@ def run_query():
         exercise_id=exercise_id if exercise_id > 0 else None
     )
 
-    query_results = db_users.execute_queries(
-        username=username,
-        query_str=query
-    )
+    def generate_results():
+        for query_result in db_users.execute_queries(username=username, query_str=query):
+            query_id = db_admin.log_query(
+                batch_id=batch_id,
+                query=query_result.query,
+                success=query_result.success,
+                result_str=str(query_result) if isinstance(query_result, SQLException) else query_result.result
+            )
+            query_result.id = query_id
 
-    for query_result in query_results:
-        query_id = db_admin.log_query(
-            batch_id=batch_id,
-            query=query_result.query,
-            success=query_result.success,
-            result_str=str(query_result) if isinstance(query_result, SQLException) else query_result.result
-        )
+            yield json.dumps({
+                'success': query_result.success,
+                'builtin': False,
+                'query': query_result.query,
+                'type': query_result.type,
+                'data': query_result.result,
+                'id': query_id,
+            }) + '\n'  # Important: one JSON object per line
 
-        query_result.id = query_id
+    return Response(generate_results(), content_type='application/x-ndjson')
 
-    return response_query(*query_results)
 
 @app.route('/message-feedback', methods=['POST'])
 @jwt_required()
@@ -107,6 +117,52 @@ def feedback():
     )
 
     return OK
+
+@app.route('/create-dataset', methods=['POST'])
+@jwt_required()
+def create_dataset():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+
+    dataset = db_admin.get_exercise_dataset(
+        exercise_id=exercise_id
+    )
+
+    def generate_results():
+        for query_result in db_users.execute_queries(username=username, query_str=dataset):
+            yield json.dumps({
+                'success': query_result.success,
+                'builtin': True,
+                'query': query_result.query,
+                'type': query_result.type,
+                'data': query_result.result,
+                'id': None,
+            }) + '\n'  # Important: one JSON object per line
+
+    return Response(generate_results(), content_type='application/x-ndjson')
+
+@app.route('/get-datasets', methods=['GET'])
+@jwt_required()
+def get_datasets():
+    username = get_jwt_identity()
+
+    datasets = db_admin.get_datasets(username)
+
+    return response(True, data=datasets)
+
+@app.route('/get-dataset', methods=['GET'])
+@jwt_required()
+def get_dataset():
+    username = get_jwt_identity()
+    data = request.args
+    dataset_id = data.get('id')
+    if dataset_id == '':
+        dataset_id = None
+
+    result = db_admin.get_dataset(dataset_id)
+
+    return response(True, data=result)
 
 #################### Assignments ####################
 @app.route('/get-assignments', methods=['GET'])
@@ -180,13 +236,13 @@ def add_exercise():
     data = request.get_json()
     title = data['title']
     request_text = data['request']
-    dataset = data['dataset']
+    dataset_id = data['dataset_id']
     expected_answer = data['expected_answer']
 
     db_admin.add_exercise(
         title=title,
         request=request_text,
-        dataset=dataset,
+        dataset_id=dataset_id,
         expected_answer=expected_answer
     )
 
@@ -200,14 +256,16 @@ def edit_exercise():
     exercise_id = data['exercise_id']
     title = data['title']
     request_text = data['request']
-    dataset = data['dataset']
+    dataset_id = data['dataset_id']
+    if dataset_id == '':
+        dataset_id = None
     expected_answer = data['expected_answer']
 
     db_admin.edit_exercise(
         exercise_id=exercise_id,
         title=title,
         request=request_text,
-        dataset=dataset,
+        dataset_id=dataset_id,
         expected_answer=expected_answer
     )
 

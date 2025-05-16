@@ -12,25 +12,33 @@ endif
 USER_FILE = users.csv
 USERS = $(shell cat $(USER_FILE))
 
-DB=
+DEV_DOCKER_COMPOSE_FILE = docker-compose.yml
+PROD_DOCKER_COMPOSE_FILE = docker-compose.prod.yml
 
-.PHONY: $(VENV)_upgrade start psql psql_users users
+.PHONY: $(VENV)_upgrade start start_prod psql psql_users setup
 
 
 start:
-	docker compose down
-	docker compose up --build
+	docker compose -f $(DEV_DOCKER_COMPOSE_FILE) down
+	docker compose -f $(DEV_DOCKER_COMPOSE_FILE) up --build
+
+deploy:
+	docker compose -f $(PROD_DOCKER_COMPOSE_FILE) down
+	docker compose -f $(PROD_DOCKER_COMPOSE_FILE) up -d --build
 
 users:
 	@while IFS=, read -r user password; do \
 		docker exec lensql_server python /app/add_user.py "$$user" "$$password"; \
 	done < $(USER_FILE)
 
+setup:
+	docker exec lensql_server python /app/setup.py
+
 psql:
 	docker exec -it lensql_db_admin psql -U postgres
 
 psql_users:
-	docker exec -it lensql_db_users psql -U postgres $(DB)
+	docker exec -it lensql_db_users psql -U postgres
 
 $(VENV):
 	python -m venv $(VENV)

@@ -1,22 +1,11 @@
 services:
   nginx:
-    build: ./nginx
+    build: .
     image: davideponzini/lensql:nginx
     container_name: lensql_nginx
     restart: unless-stopped
     ports:
       - "3001:80"
-    depends_on:
-      - webui
-      - server
-
-  webui:
-    build: ./webui
-    image: davideponzini/lensql:webui
-    container_name: lensql_webui
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
 
   server:
     build: ./server

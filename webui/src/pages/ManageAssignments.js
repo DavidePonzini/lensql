@@ -1,9 +1,25 @@
 import ButtonModal from '../components/ButtonModal';
+import ButtonShowDataset from '../components/ButtonShowDataset';
 import useAuth from '../hooks/useAuth';
 import { useEffect, useState } from 'react';
 
 // Data placeholder for exercise data
-function ExerciseData({ title, setTitle, request, setRequest, dataset, setDataset, answer, setAnswer }) {
+function ExerciseData({ title, setTitle, request, setRequest, datasetId, setDatasetId, answer, setAnswer }) {
+    const { apiRequest } = useAuth();
+    const [availableDatasets, setAvailableDatasets] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchDatasets() {
+            const data = await apiRequest('/api/get-datasets');
+            setAvailableDatasets(data.data);
+            setLoading(false);
+        }
+
+        fetchDatasets();
+    }
+        , []); // eslint-disable-line react-hooks/exhaustive-deps
+
     return (
         <>
             <div className="mb-3">
@@ -16,7 +32,18 @@ function ExerciseData({ title, setTitle, request, setRequest, dataset, setDatase
             </div>
             <div className="mb-3">
                 <label className="form-label">Dataset</label>
-                <textarea className="form-control" rows="3" defaultValue={dataset} onInput={(e) => setDataset(e.target.value)}></textarea>
+                {loading ? (
+                    <p>Loading datasets...</p>
+                ) : (
+                    <select className="form-select" aria-label="Default select example" onChange={(e) => setDatasetId(e.target.value)} value={datasetId ? datasetId : ''}>
+                        <option value=''>None</option>
+                        {availableDatasets.map((dataset) => (
+                            <option key={dataset.id} value={dataset.id}>
+                                {dataset.name}
+                            </option>
+                        ))}
+                    </select>
+                )}
             </div>
             <div className="mb-3">
                 <label className="form-label">Answer</label>
@@ -124,14 +151,14 @@ function AddExercise({ refreshAssignments }) {
     const { apiRequest } = useAuth();
     const [exerciseTitle, setExerciseTitle] = useState('');
     const [exerciseRequest, setExerciseRequest] = useState('');
-    const [exerciseDataset, setExerciseDataset] = useState('');
+    const [exerciseDatasetId, setExerciseDatasetId] = useState('');
     const [exerciseAnswer, setExerciseAnswer] = useState('');
 
     async function handleAddExercise() {
         await apiRequest('/api/add-exercise', 'POST', {
             'title': exerciseTitle,
             'request': exerciseRequest,
-            'dataset': exerciseDataset,
+            'dataset_id': exerciseDatasetId,
             'expected_answer': exerciseAnswer,
         });
 
@@ -144,7 +171,7 @@ function AddExercise({ refreshAssignments }) {
             buttonText="Add New Exercise"
             footerButtons={[
                 {
-                    label: 'Save',
+                    text: 'Save',
                     variant: 'primary',
                     onClick: handleAddExercise,
                     autoClose: true,
@@ -156,8 +183,8 @@ function AddExercise({ refreshAssignments }) {
                 setTitle={setExerciseTitle}
                 request={exerciseRequest}
                 setRequest={setExerciseRequest}
-                dataset={exerciseDataset}
-                setDataset={setExerciseDataset}
+                datasetId={exerciseDatasetId}
+                setDatasetId={setExerciseDatasetId}
                 answer={exerciseAnswer}
                 setAnswer={setExerciseAnswer}
             />
@@ -170,9 +197,10 @@ function ExerciseRow({ exercise, refreshAssignments }) {
     const { apiRequest } = useAuth();
 
     const exerciseId = exercise.id;
+    const exerciseDatasetName = exercise.dataset_name;
     const [exerciseTitle, setExerciseTitle] = useState(exercise.title);
     const [exerciseRequest, setExerciseRequest] = useState(exercise.request);
-    const [exerciseDataset, setExerciseDataset] = useState(exercise.dataset);
+    const [exerciseDatasetId, setExerciseDatasetId] = useState(exercise.dataset_id);
     const [exerciseAnswer, setExerciseAnswer] = useState(exercise.expected_answer);
     const isAiGenerated = exercise.is_ai_generated;
 
@@ -181,7 +209,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
             'exercise_id': exerciseId,
             'title': exerciseTitle,
             'request': exerciseRequest,
-            'dataset': exerciseDataset,
+            'dataset_id': exerciseDatasetId,
             'expected_answer': exerciseAnswer,
         });
 
@@ -201,6 +229,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
             <td>{exerciseTitle}</td>
             <td>{exerciseRequest}</td>
             <td>{exerciseAnswer}</td>
+            <td>{exerciseDatasetName}</td>
             <td>
                 <input
                     type="checkbox"
@@ -210,18 +239,13 @@ function ExerciseRow({ exercise, refreshAssignments }) {
                 />
             </td>
             <td>
-                <ButtonModal
-                    className="btn btn-secondary btn-sm me-1"
-                    title="View Dataset"
-                    buttonText="Dataset"
-                >
-                    <pre className="code">
-                        {exerciseDataset}
-                    </pre>
-                </ButtonModal>
+                <ButtonShowDataset
+                    datasetId={exerciseDatasetId}
+                    className="btn btn-secondary btn-sm me-1 mb-1"
+                />
 
                 <ButtonModal
-                    className="btn btn-primary btn-sm me-1"
+                    className="btn btn-primary btn-sm me-1 mb-1"
                     title="Assign Exercise"
                     buttonText="Assign"
                 >
@@ -229,12 +253,12 @@ function ExerciseRow({ exercise, refreshAssignments }) {
                 </ButtonModal>
 
                 <ButtonModal
-                    className="btn btn-warning btn-sm me-1"
+                    className="btn btn-warning btn-sm me-1 mb-1"
                     title="Edit Exercise"
                     buttonText="Edit"
                     footerButtons={[
                         {
-                            label: 'Save',
+                            text: 'Save',
                             variant: 'primary',
                             onClick: handleEditExercise,
                             autoClose: true,
@@ -246,15 +270,15 @@ function ExerciseRow({ exercise, refreshAssignments }) {
                         setTitle={setExerciseTitle}
                         request={exerciseRequest}
                         setRequest={setExerciseRequest}
-                        dataset={exerciseDataset}
-                        setDataset={setExerciseDataset}
+                        datasetId={exerciseDatasetId}
+                        setDatasetId={setExerciseDatasetId}
                         answer={exerciseAnswer}
                         setAnswer={setExerciseAnswer}
                     />
                 </ButtonModal>
 
 
-                <button className='btn btn-danger btn-sm me-1' onClick={handleDeleteExercise}>
+                <button className='btn btn-danger btn-sm me-1 mb-1' onClick={handleDeleteExercise}>
                     Delete
                 </button>
             </td>
@@ -289,8 +313,9 @@ function ManageAssignments() {
                         <th>Title</th>
                         <th>Request</th>
                         <th>Answer</th>
+                        <th>Dataset</th>
                         <th>AI</th>
-                        <th>Actions</th>
+                        <th style={{width: '264px'}}>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -304,7 +329,7 @@ function ManageAssignments() {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colSpan="4" className="text-center">
+                        <td colSpan="6" className="text-center">
                             <AddExercise refreshAssignments={fetchAssignments} />
                         </td>
                     </tr>

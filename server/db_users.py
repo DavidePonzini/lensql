@@ -4,8 +4,8 @@ import threading
 import time
 import pandas as pd
 import psycopg2
-from psycopg2.extensions import connection
 from threading import Lock
+from typing import Iterable
 from dav_tools import messages
 
 from sql_code import SQLCode, SQLException, QueryResult, QueryResultDataset, QueryResultError, QueryResultMessage
@@ -114,21 +114,19 @@ def get_connection(username: str, autocommit: bool = True) -> DBConnection:
 
         return conn
     
-def execute_queries(username: str, query_str: str) -> list[QueryResult]:
+
+def execute_queries(username: str, query_str: str) -> Iterable[QueryResult]:
     '''
     Executes the given SQL queries and returns the results.
     The queries will be separated into individual statements.
 
     Parameters:
-        query (str): The SQL query to execute.
-
+        username (str): The username of the database user.
+        query_str (str): The SQL query string to execute. The query string can contain multiple SQL statements separated by semicolons.
     Returns:
-        pd.DataFrame | str | SQLException: The result of the query.
-        str: The original query string.
-        bool: True if the query was successful, False otherwise.
+        Iterable[QueryResult]: An iterable of QueryResult objects.
     '''
 
-    result = []
     for statement in SQLCode(query_str).strip_comments().split():
         try:
             conn = get_connection(username)
@@ -138,27 +136,25 @@ def execute_queries(username: str, query_str: str) -> list[QueryResult]:
                 if cur.description:  # Check if the query has a result set
                     rows = cur.fetchall()
                     columns = [desc[0] for desc in cur.description]
-                    result.append(QueryResultDataset(pd.DataFrame(rows, columns=columns), statement.query))
+                    yield QueryResultDataset(pd.DataFrame(rows, columns=columns), statement.query)
                     continue
                 
                 # No result set, return the number of affected rows
                 if cur.rowcount >= 0:
-                    result.append(QueryResultMessage(f'{statement.first_token} {cur.rowcount}', statement.query))
+                    yield QueryResultMessage(f'{statement.first_token} {cur.rowcount}', statement.query)
                     continue
 
                 # No number of affected rows, return the first token of the statement
-                result.append(QueryResultMessage(f'{statement.first_token}', statement.query))
+                yield QueryResultMessage(f'{statement.first_token}', statement.query)
 
             conn.update_last_operation_ts()
         except Exception as e:
-            result.append(QueryResultError(SQLException(e), statement.query))
+            yield QueryResultError(SQLException(e), statement.query)
             try:
                 conn.rollback()
                 conn.update_last_operation_ts()
             except Exception as e:
                 messages.error(f"Error rolling back connection for user {username}: {e}")
-
-    return result
 
 def run_builtin_query(username: str, query: Queries) -> QueryResult:
     '''Runs a builtin query and returns the result.'''

@@ -29,11 +29,25 @@ CREATE TABLE teaches (
     PRIMARY KEY (teacher, student)
 );
 
+CREATE TABLE datasets (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    dataset TEXT NOT NULL DEFAULT '-- No dataset provided',
+    is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE has_dataset (
+    username VARCHAR(255) NOT NULL REFERENCES users(username),
+    dataset_id INTEGER NOT NULL REFERENCES datasets(id),
+
+    PRIMARY KEY (username, dataset_id)
+);
+
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
-    dataset TEXT NOT NULL DEFAULT '',
+    dataset_id INTEGER REFERENCES datasets(id) DEFAULT NULL,
     expected_answer TEXT NOT NULL DEFAULT '',
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );

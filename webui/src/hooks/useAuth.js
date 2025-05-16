@@ -47,25 +47,38 @@ function AuthProvider({ children }) {
         }
     }
 
-    async function apiRequest(endpoint, method = 'GET', body = null) {
+    async function apiRequest(endpoint, method = 'GET', body = null, { stream = false } = {}) {
         let token = accessToken;
-        let response = await fetch(endpoint, {
-            method,
-            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-            body: body ? JSON.stringify(body) : null,
-        });
 
-        if (response.status === 401) {
-            token = await refreshAccessToken();
-            response = await fetch(endpoint, {
+        async function doRequest(currentToken) {
+            return fetch(endpoint, {
                 method,
-                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                headers: { 'Authorization': 'Bearer ' + currentToken, 'Content-Type': 'application/json' },
                 body: body ? JSON.stringify(body) : null,
             });
         }
 
-        return response.json();
+        let response = await doRequest(token);
+
+        if (response.status === 401) {
+            token = await refreshAccessToken();
+            response = await doRequest(token);
+        }
+
+        if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+        }
+
+        if (stream) {
+            if (!response.body) {
+                throw new Error('No response body (streaming not supported)');
+            }
+            return response.body; // Return ReadableStream for caller to handle
+        } else {
+            return response.json(); // Standard JSON handling
+        }
     }
+
 
     // Load user info safely and only once if needed
     const loadUserInfo = useCallback(async () => {

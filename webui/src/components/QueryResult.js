@@ -4,7 +4,7 @@ import '../styles/QueryResult.css';
 
 function QueryResult({ result, isBuiltin, queryId, query, success, isMessage }) {
     return (
-        <div className={`query-result alert ${isBuiltin ? 'alert-secondary' : success ? 'alert-primary' : 'alert-danger'}`}>
+        <div className={`query-result alert ${success ? isBuiltin ? 'alert-secondary' : 'alert-primary' : 'alert-danger'}`}>
             <div className="query-result-title">
                 {isBuiltin ? (
                     <span>

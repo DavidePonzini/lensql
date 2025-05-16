@@ -36,7 +36,7 @@ function ButtonModal({
                                     if (btn.autoClose !== false) handleClose();
                                 }}
                             >
-                                {btn.label}
+                                {btn.text}
                             </Button>
                         ))
                     )}
