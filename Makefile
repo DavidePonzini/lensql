@@ -9,14 +9,10 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-USER_FILE = users.csv
-USERS = $(shell cat $(USER_FILE))
-
 DEV_DOCKER_COMPOSE_FILE = docker-compose.yml
 PROD_DOCKER_COMPOSE_FILE = docker-compose.prod.yml
 
 .PHONY: $(VENV)_upgrade start start_prod psql psql_users setup
-
 
 start:
 	docker compose -f $(DEV_DOCKER_COMPOSE_FILE) down
@@ -26,11 +22,6 @@ deploy:
 	docker compose -f $(PROD_DOCKER_COMPOSE_FILE) down
 	docker compose -f $(PROD_DOCKER_COMPOSE_FILE) up -d --build
 
-users:
-	@while IFS=, read -r user password; do \
-		docker exec lensql_server python /app/add_user.py "$$user" "$$password"; \
-	done < $(USER_FILE)
-
 setup:
 	docker exec lensql_server python /app/setup.py
 
@@ -39,6 +30,9 @@ psql:
 
 psql_users:
 	docker exec -it lensql_db_users psql -U postgres
+
+dump:
+	docker exec -t lensql_db pg_dump -U postgres -n lensql > dump_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
 
 $(VENV):
 	python -m venv $(VENV)
