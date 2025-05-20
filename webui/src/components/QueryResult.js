@@ -2,7 +2,7 @@ import Chat from './Chat';
 
 import '../styles/QueryResult.css';
 
-function QueryResult({ result, isBuiltin, queryId, query, success, isMessage }) {
+function QueryResult({ result, isBuiltin, queryId, query, success, isMessage, notices }) {
     return (
         <div className={`query-result alert ${success ? isBuiltin ? 'alert-secondary' : 'alert-primary' : 'alert-danger'}`}>
             <div className="query-result-title">
@@ -21,20 +21,41 @@ function QueryResult({ result, isBuiltin, queryId, query, success, isMessage }) 
             </div>
             <hr />
 
-            {isMessage ? (
-                <pre>{result}</pre>
-            ) : (
-                <div dangerouslySetInnerHTML={{ __html: result }} />
-            )}
+            {notices && notices.length > 0 && (
+                <>
+                    <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+                        {
+                            notices.map((notice, index) => (
+                                <li key={index} className='query-notice'>
+                                    <i>{notice}</i>
+                                </li>
+                            ))
+                        }
+                    </ul>
 
-            {!isBuiltin && (
-                <Chat
-                    key={queryId}
-                    queryId={queryId}
-                    success={success}
-                />
-            )}
-        </div>
+                    <hr />
+                </>
+            )
+            }
+
+            {
+                isMessage ? (
+                    <pre>{result}</pre>
+                ) : (
+                    <div dangerouslySetInnerHTML={{ __html: result }} />
+                )
+            }
+
+            {
+                !isBuiltin && (
+                    <Chat
+                        key={queryId}
+                        queryId={queryId}
+                        success={success}
+                    />
+                )
+            }
+        </div >
     );
 }
 

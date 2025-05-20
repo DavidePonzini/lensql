@@ -97,6 +97,7 @@ def run_query():
                 'type': query_result.type,
                 'data': query_result.result,
                 'id': query_id,
+                'notices': query_result.notices,
             }) + '\n'  # Important: one JSON object per line
 
     return Response(generate_results(), content_type='application/x-ndjson')

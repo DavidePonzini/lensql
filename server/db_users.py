@@ -67,6 +67,23 @@ class DBConnection:
     @property
     def time_since_last_operation(self) -> datetime.timedelta:
         return datetime.datetime.now() - self.last_operation_ts
+    
+    @property
+    def notices(self) -> list:
+        '''Returns the notices from the connection.'''
+        try:
+            return self.connection.notices
+        except AttributeError:
+            # Handle the case where notices are not available
+            return []
+        
+    def clear_notices(self):
+        '''Clears the notices from the connection.'''
+        try:
+            self.connection.notices = []
+        except AttributeError:
+            # Handle the case where notices are not available
+            pass
         
 
 connections: dict[str, DBConnection] = {}
@@ -106,7 +123,9 @@ def get_connection(username: str, autocommit: bool = True) -> DBConnection:
     '''
 
     if username in connections:
-        return connections[username]
+        conn = connections[username]
+        conn.clear_notices()
+        return conn
 
     with conn_lock:
         conn = DBConnection(dbname=username, username=username, autocommit=autocommit)
@@ -136,20 +155,26 @@ def execute_queries(username: str, query_str: str) -> Iterable[QueryResult]:
                 if cur.description:  # Check if the query has a result set
                     rows = cur.fetchall()
                     columns = [desc[0] for desc in cur.description]
-                    yield QueryResultDataset(pd.DataFrame(rows, columns=columns), statement.query)
-                    continue
-                
-                # No result set, return the number of affected rows
-                if cur.rowcount >= 0:
-                    yield QueryResultMessage(f'{statement.first_token} {cur.rowcount}', statement.query)
+                    yield QueryResultDataset(
+                        result=pd.DataFrame(rows, columns=columns),
+                        query=statement.query,
+                        notices=conn.notices)
                     continue
 
-                # No number of affected rows, return the first token of the statement
-                yield QueryResultMessage(f'{statement.first_token}', statement.query)
+                
+                # No result set, return message status 
+                # TODO return conn.notices
+                yield QueryResultMessage(
+                    message=f'{cur.statusmessage}',
+                    query=statement.query,
+                    notices=conn.notices)
 
             conn.update_last_operation_ts()
         except Exception as e:
-            yield QueryResultError(SQLException(e), statement.query)
+            yield QueryResultError(
+                exception=SQLException(e),
+                query=statement.query,
+                notices=conn.notices)
             try:
                 conn.rollback()
                 conn.update_last_operation_ts()
@@ -169,14 +194,20 @@ def run_builtin_query(username: str, query: Queries) -> QueryResult:
 
 
         conn.update_last_operation_ts()
-        return QueryResultDataset(result, query.name)
+        return QueryResultDataset(
+            result=result,
+            query=query.name,
+            notices=conn.notices)
     except Exception as e:
         try:
             conn.rollback()
             conn.update_last_operation_ts()
         except Exception as e:
             messages.error(f"Error rolling back connection for user {username}: {e}")
-        return QueryResultError(SQLException(e), query.name)
+        return QueryResultError(
+            exception=SQLException(e),
+            query=query.name,
+            notices=conn.notices)
 
 def list_schemas(username: str) -> QueryResult:
     '''Lists all schemas in the database.'''

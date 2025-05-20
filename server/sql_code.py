@@ -51,10 +51,11 @@ class SQLException:
 
 class QueryResult(ABC):
     '''Represents the result of a SQL query.'''
-    def __init__(self, query: str, success: bool, query_type: str):
+    def __init__(self, query: str, success: bool, notices: list, query_type: str):
         self.query = query
         self.success = success
         self.type = query_type
+        self.notices = notices
         self.id = None
 
     @property
@@ -67,8 +68,12 @@ class QueryResult(ABC):
 
 class QueryResultError(QueryResult):
     '''Represents the result of a SQL query that failed to execute.'''
-    def __init__(self, exception: SQLException, query: str):
-        super().__init__(query, False, 'message')
+    def __init__(self, exception: SQLException, query: str, notices: list = []):
+        super().__init__(
+            query=query,
+            success=False,
+            notices=notices,
+            query_type='message')
         self._result = exception
 
     @property
@@ -77,8 +82,12 @@ class QueryResultError(QueryResult):
 
 class QueryResultDataset(QueryResult):
     '''Represents the result of a SQL query that returned a dataset.'''
-    def __init__(self, result: pd.DataFrame, query: str):
-        super().__init__(query, True, 'dataset')
+    def __init__(self, result: pd.DataFrame, query: str, notices: list = []):
+        super().__init__(
+            query=query,
+            success=True,
+            notices=notices,
+            query_type='dataset')
         self._result = result
 
     @property
@@ -95,8 +104,12 @@ class QueryResultDataset(QueryResult):
 
 class QueryResultMessage(QueryResult):
     '''Represents the result of a SQL query that returned a message.'''
-    def __init__(self, message: str, query: str):
-        super().__init__(query, True, 'message')
+    def __init__(self, message: str, query: str, notices: list = []):
+        super().__init__(
+            query=query,
+            success=True,
+            notices=notices,
+            query_type='message')
         self._result = message
 
     @property
