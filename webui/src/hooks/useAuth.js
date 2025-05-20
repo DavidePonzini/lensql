@@ -2,7 +2,18 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const AuthContext = createContext();
 
+class RequestSizeError extends Error {
+    constructor(size, maxSize) {
+        super('Request size exceeds the maximum limit.');
+        this.size = size;
+        this.maxSize = maxSize;
+    }
+}
+
+
 function AuthProvider({ children }) {
+    const MAX_REQUEST_SIZE = 1024 * 1000; // a bit less than 1MB
+
     const [accessToken, setAccessToken] = useState(sessionStorage.getItem('access_token'));
     const [refreshToken, setRefreshToken] = useState(sessionStorage.getItem('refresh_token'));
     const [userInfo, setUserInfo] = useState(null);
@@ -51,10 +62,15 @@ function AuthProvider({ children }) {
         let token = accessToken;
 
         async function doRequest(currentToken) {
+            let content = body ? JSON.stringify(body) : null;
+            if (content && content.length > MAX_REQUEST_SIZE) {
+                throw new RequestSizeError(content.length, MAX_REQUEST_SIZE);
+            }
+
             return fetch(endpoint, {
                 method,
                 headers: { 'Authorization': 'Bearer ' + currentToken, 'Content-Type': 'application/json' },
-                body: body ? JSON.stringify(body) : null,
+                body: content,
             });
         }
 
@@ -66,7 +82,9 @@ function AuthProvider({ children }) {
         }
 
         if (!response.ok) {
-            throw new Error(`HTTP error ${response.status}`);
+            const error = new Error(`HTTP error ${response.status}`);
+            error.status = response.status;
+            throw error;
         }
 
         if (stream) {
@@ -125,5 +143,5 @@ function useAuth() {
     return useContext(AuthContext);
 }
 
-export { AuthProvider, useAuth };
+export { AuthProvider, useAuth, RequestSizeError };
 export default useAuth;

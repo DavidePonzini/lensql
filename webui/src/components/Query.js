@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useAuth from "../hooks/useAuth";
+import { useAuth, RequestSizeError } from "../hooks/useAuth";
 
 import "../styles/Query.css";
 
@@ -81,7 +81,12 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
             }
 
         } catch (error) {
-            console.error('Streaming error:', error);
+            if (error instanceof RequestSizeError) {
+                alert(`Query too large. Please try to split it into smaller parts. You need to remove at least ${error.size - error.maxSize} characters.`);
+            } else {
+                alert(error);
+                console.error('Streaming error:', error);
+            }
         } finally {
             setIsExecuting(false);
         }
@@ -186,6 +191,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
             }
 
         } catch (error) {
+            alert('Error when creating dataset. See console for details.\nIf the dataset is very large, you can try manually executing commands in smaller batches.');
             console.error('Streaming error:', error);
         } finally {
             setIsExecuting(false);

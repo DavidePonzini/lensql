@@ -17,7 +17,7 @@ function QueryResult({ result, isBuiltin, queryId, query, success, isMessage, no
                         <b>User query</b>
                     </span>
                 )}
-                <pre>{query}</pre>
+                <pre style={{maxHeight: '500px', overflow: 'auto'}}>{query}</pre>
             </div>
             <hr />
 
@@ -27,7 +27,12 @@ function QueryResult({ result, isBuiltin, queryId, query, success, isMessage, no
                         {
                             notices.map((notice, index) => (
                                 <li key={index} className='query-notice'>
-                                    <i>{notice}</i>
+                                    {notice.split('\n').map((line, i) => (
+                                        <span key={i}>
+                                            {line}
+                                            <br />
+                                        </span>
+                                    ))}
                                 </li>
                             ))
                         }

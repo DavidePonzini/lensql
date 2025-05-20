@@ -134,7 +134,7 @@ def get_connection(username: str, autocommit: bool = True) -> DBConnection:
         return conn
     
 
-def execute_queries(username: str, query_str: str) -> Iterable[QueryResult]:
+def execute_queries(username: str, query_str: str, *, strip_comments: bool = True) -> Iterable[QueryResult]:
     '''
     Executes the given SQL queries and returns the results.
     The queries will be separated into individual statements.
@@ -146,7 +146,14 @@ def execute_queries(username: str, query_str: str) -> Iterable[QueryResult]:
         Iterable[QueryResult]: An iterable of QueryResult objects.
     '''
 
-    for statement in SQLCode(query_str).strip_comments().split():
+    for statement in SQLCode(query_str).split():
+    
+        # NOTE: do not `strip_comments` from the SQL code for very large queries
+        #   as it takes the server too much time to parse the SQL code,
+        #   causing a timeout error in the client.
+        if strip_comments:
+            statement = statement.strip_comments()
+
         try:
             conn = get_connection(username)
             with conn.cursor() as cur:
@@ -163,7 +170,6 @@ def execute_queries(username: str, query_str: str) -> Iterable[QueryResult]:
 
                 
                 # No result set, return message status 
-                # TODO return conn.notices
                 yield QueryResultMessage(
                     message=f'{cur.statusmessage}',
                     query=statement.query,
@@ -171,15 +177,15 @@ def execute_queries(username: str, query_str: str) -> Iterable[QueryResult]:
 
             conn.update_last_operation_ts()
         except Exception as e:
-            yield QueryResultError(
-                exception=SQLException(e),
-                query=statement.query,
-                notices=conn.notices)
             try:
                 conn.rollback()
                 conn.update_last_operation_ts()
             except Exception as e:
                 messages.error(f"Error rolling back connection for user {username}: {e}")
+            yield QueryResultError(
+                exception=SQLException(e),
+                query=statement.query,
+                notices=conn.notices)
 
 def run_builtin_query(username: str, query: Queries) -> QueryResult:
     '''Runs a builtin query and returns the result.'''

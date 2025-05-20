@@ -1,15 +1,32 @@
 import sqlparse
-from typing import Self
+from typing import Iterable, Self
 from abc import ABC, abstractmethod
 import pandas as pd
+
+
+# Maximum length of SQL code to strip comments from
+STRIP_COMMENTS_MAX_LENGTH = 1000
 
 
 class SQLCode:
     def __init__(self, query: str):
         self.query = query
 
-    def strip_comments(self) -> Self:
-        '''Remove comments from the SQL query'''
+    def strip_comments(self, *, force: bool = False) -> Self:
+        '''
+            Remove comments from the SQL query
+            If the query is too long, it will not be stripped unless force is set to True.
+            This is to avoid performance issues with very large queries.
+
+            Parameters:
+                force (bool): If True, strip comments even if the query is too long.
+            Returns:
+                SQLCode: A new SQLCode object with comments stripped.
+        '''
+
+        if len(self.query) > STRIP_COMMENTS_MAX_LENGTH and not force:
+            return self
+        
         code = sqlparse.format(self.query, strip_comments=True)
         return SQLCode(code)
 
@@ -17,10 +34,10 @@ class SQLCode:
         '''Check if the SQL query has a specific clause'''
         return clause.upper() in self.query.upper()
 
-    def split(self) -> list[Self]:
+    def split(self) -> Iterable[Self]:
         '''Split the SQL query into individual statements'''
-        queries = sqlparse.split(self.query)
-        return [SQLCode(query) for query in queries]
+        for query in sqlparse.split(self.query, strip_semicolon=False):
+            yield SQLCode(query)
     
     @property
     def first_token(self) -> str:
@@ -51,7 +68,7 @@ class SQLException:
 
 class QueryResult(ABC):
     '''Represents the result of a SQL query.'''
-    def __init__(self, query: str, success: bool, notices: list, query_type: str):
+    def __init__(self, query: str, success: bool, notices: list[str], query_type: str):
         self.query = query
         self.success = success
         self.type = query_type

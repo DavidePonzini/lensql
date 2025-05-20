@@ -9,8 +9,9 @@ import llm
 import db_admi as db_admin
 import db_users
 from sql_code import SQLException
-
 from sql_code import QueryResult
+
+from dav_tools import messages
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
@@ -62,10 +63,6 @@ def refresh():
     access_token = create_access_token(identity=current_user, expires_delta=timedelta(minutes=15))
 
     return response(True, access_token=access_token)
-
-from flask import Response
-
-import time
 
 @app.route('/run-query', methods=['POST'])
 @jwt_required()
@@ -131,7 +128,8 @@ def create_dataset():
     )
 
     def generate_results():
-        for query_result in db_users.execute_queries(username=username, query_str=dataset):
+        for query_result in db_users.execute_queries(username=username, query_str=dataset, strip_comments=False):
+
             yield json.dumps({
                 'success': query_result.success,
                 'builtin': True,
