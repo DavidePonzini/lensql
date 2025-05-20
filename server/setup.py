@@ -41,5 +41,10 @@ if __name__ == '__main__':
         expected_answer='')
     messages.info('Esercizio 0) Modalità libera creato')
 
+    db_admin.add_exercise(
+        title='0) Versione vecchia LensQL',
+        request='Esegui qui le tue query',
+        dataset_id=None,
+        expected_answer='')        
 
 

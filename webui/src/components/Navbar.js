@@ -19,7 +19,7 @@ function Navbar() {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <div className="navbar-nav me-auto mb-2 mb-lg-0">
                         <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/" end>Home</NavLink>
-                        {isLoggedIn && (
+                        {isLoggedIn && userInfo?.isTeacher && (
                             <>
                                 <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/profile">Profile</NavLink>
                                 <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments" end>Assignments</NavLink>
