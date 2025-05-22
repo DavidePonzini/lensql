@@ -1,4 +1,6 @@
+__pycache__/
 venv/
+log/
 .env.template
 .gitignore
 Dockerfile
