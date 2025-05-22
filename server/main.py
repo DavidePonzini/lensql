@@ -15,6 +15,8 @@ from dav_tools import messages
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH', 1024*1024*20))   # 20MB
+
 CORS(app)
 
 jwt = JWTManager(app)

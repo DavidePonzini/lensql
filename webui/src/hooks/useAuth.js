@@ -12,7 +12,7 @@ class RequestSizeError extends Error {
 
 
 function AuthProvider({ children }) {
-    const MAX_REQUEST_SIZE = 1024 * 1000; // a bit less than 1MB
+    const MAX_REQUEST_SIZE = 1024 * 1024 * 20; // a bit less than 1MB
 
     const [accessToken, setAccessToken] = useState(sessionStorage.getItem('access_token'));
     const [refreshToken, setRefreshToken] = useState(sessionStorage.getItem('refresh_token'));
