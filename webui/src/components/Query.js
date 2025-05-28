@@ -41,7 +41,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
         setResult([]);
 
         try {
-            const stream = await apiRequest('/api/run-query', 'POST', {
+            const stream = await apiRequest('/api/queries/run', 'POST', {
                 'query': sqlText,
                 'exercise_id': exerciseId,
             }, { stream: true });
@@ -96,7 +96,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     async function handleShowSearchPath() {
         setIsExecuting(true);
 
-        const data = await apiRequest('/api/show-search-path', 'POST', {
+        const data = await apiRequest('/api/queries/builtin/show-search-path', 'POST', {
             'exercise_id': exerciseId,
         });
         setIsExecuting(false);
@@ -106,7 +106,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     async function handleListSchemas() {
         setIsExecuting(true);
 
-        const data = await apiRequest('/api/list-schemas', 'POST', {
+        const data = await apiRequest('/api/queries/builtin/list-schemas', 'POST', {
             'exercise_id': exerciseId,
         });
         setIsExecuting(false);
@@ -116,7 +116,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     async function handleListTables() {
         setIsExecuting(true);
 
-        const data = await apiRequest('/api/list-tables', 'POST', {
+        const data = await apiRequest('/api/queries/builtin/list-tables', 'POST', {
             'exercise_id': exerciseId,
         });
         setIsExecuting(false);
@@ -126,7 +126,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     async function handleListAllTables() {
         setIsExecuting(true);
 
-        const data = await apiRequest('/api/list-all-tables', 'POST', {
+        const data = await apiRequest('/api/queries/builtin/list-all-tables', 'POST', {
             'exercise_id': exerciseId,
         });
         setIsExecuting(false);
@@ -136,7 +136,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     async function handleListConstraints() {
         setIsExecuting(true);
 
-        const data = await apiRequest('/api/list-constraints', 'POST', {
+        const data = await apiRequest('/api/queries/builtin/list-constraints', 'POST', {
             'exercise_id': exerciseId,
         });
         setIsExecuting(false);
@@ -152,7 +152,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
         setResult([]);
 
         try {
-            const stream = await apiRequest('/api/create-dataset', 'POST', {
+            const stream = await apiRequest('/api/exercises/init-dataset', 'POST', {
                 'exercise_id': exerciseId,
             }, { stream: true });
 

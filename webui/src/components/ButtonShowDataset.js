@@ -11,7 +11,7 @@ function ButtonShowDataset({ datasetId, footerButtons, className = 'btn btn-seco
         async function fetchDataset() {
             setIsLoading(true);
             try {
-                const response = await apiRequest(`/api/get-dataset?id=${datasetId ? datasetId : ''}`);
+                const response = await apiRequest(`/api/datasets/?id=${datasetId ? datasetId : ''}`, 'GET');
                 setDataset(response.data);
             } catch (error) {
                 console.error('Error fetching dataset:', error);

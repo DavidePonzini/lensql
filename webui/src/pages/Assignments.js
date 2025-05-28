@@ -29,7 +29,7 @@ function Assignments() {
 
     useEffect(() => {
         async function getAssignments() {
-            const response = await apiRequest('/api/get-assignments', 'GET');
+            const response = await apiRequest('/api/assignments/list', 'GET');
 
             const submitted = response.data.filter((assignment) => { return assignment.submission_ts });
             const unsubmitted = response.data.filter((assignment) => { return !assignment.submission_ts });

@@ -11,7 +11,7 @@ function Assignment() {
     
     useEffect(() => {
         async function fetchAssignment() {
-            const data = await apiRequest(`/api/get-exercise?id=${assignmentId}`, 'GET');
+            const data = await apiRequest(`/api/exercises/?id=${assignmentId}`, 'GET');
 
             setAssignment(data.data);
         }

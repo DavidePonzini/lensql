@@ -1,5 +1,5 @@
-import db_admi as db_admin
-import add_user
+from . import db_admin
+from . import add_user
 
 from dav_tools import messages
 

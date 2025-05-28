@@ -9,7 +9,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
     const [submitted, setSubmitted] = useState(isSubmitted);
 
     async function handleSubmit() {
-        await apiRequest('/api/submit-assignment', 'POST', {
+        await apiRequest('/api/assignments/submit', 'POST', {
             'exercise_id': assignmentId,
         });
 
@@ -18,7 +18,7 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
     }
 
     async function handleUnsubmit() {
-        await apiRequest('/api/unsubmit-assignment', 'POST', {
+        await apiRequest('/api/assignments/unsubmit', 'POST', {
             'exercise_id': assignmentId,
         });
 

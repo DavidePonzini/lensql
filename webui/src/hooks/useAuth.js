@@ -42,7 +42,7 @@ function AuthProvider({ children }) {
             throw new Error('No refresh token.');
         }
 
-        const response = await fetch('/api/refresh', {
+        const response = await fetch('/api/auth/refresh', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + refreshToken, 'Content-Type': 'application/json' },
         });
@@ -69,7 +69,10 @@ function AuthProvider({ children }) {
 
             return fetch(endpoint, {
                 method,
-                headers: { 'Authorization': 'Bearer ' + currentToken, 'Content-Type': 'application/json' },
+                headers: {
+                    'Authorization': 'Bearer ' + currentToken,
+                    'Content-Type': 'application/json'
+                },
                 body: content,
             });
         }
@@ -103,7 +106,7 @@ function AuthProvider({ children }) {
         if (!accessToken) return;
         setLoadingUser(true);
         try {
-            const response = await apiRequest('/api/me');
+            const response = await apiRequest('/api/users/info');
             setUserInfo({
                 username: response.username,
                 isTeacher: response.is_teacher,

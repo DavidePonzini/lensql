@@ -66,7 +66,7 @@ CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL REFERENCES users(username),
     ts TIMESTAMP NOT NULL DEFAULT NOW(),
-    exercise_id INTEGER REFERENCES exercises(id)
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id)
 );
 
 CREATE TABLE queries (
@@ -80,7 +80,7 @@ CREATE TABLE queries (
 
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
-    query_id INTEGER REFERENCES queries(id),
+    query_id INTEGER NOT NULL REFERENCES queries(id),
     answer TEXT NOT NULL,
     button VARCHAR(255) NOT NULL,
     msg_idx INTEGER NOT NULL,

@@ -51,7 +51,7 @@ function Chat({ queryId, success }) {
         addMessage("Describe what my query does", false);
         startThinking();
 
-        const data = await apiRequest('/api/describe-my-query', 'POST', {
+        const data = await apiRequest('/api/messages/success/describe', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
@@ -66,7 +66,7 @@ function Chat({ queryId, success }) {
         addMessage("Explain what each clause in my query is doing", false);
         startThinking();
 
-        const data = await apiRequest('/api/explain-my-query', 'POST', {
+        const data = await apiRequest('/api/messages/success/explain', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
@@ -81,7 +81,7 @@ function Chat({ queryId, success }) {
         addMessage("Explain what this error means", false);
         startThinking();
 
-        const data = await apiRequest('/api/explain-error-message', 'POST', {
+        const data = await apiRequest('/api/messages/error/explain', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
@@ -96,7 +96,7 @@ function Chat({ queryId, success }) {
         addMessage("Show a simplified example that can cause this problem", false);
         startThinking();
 
-        const data = await apiRequest('/api/provide-error-example', 'POST', {
+        const data = await apiRequest('/api/messages/error/example', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
@@ -111,7 +111,7 @@ function Chat({ queryId, success }) {
         addMessage("Show me which query part is causing this error", false);
         startThinking();
 
-        const data = await apiRequest('/api/locate-error-cause', 'POST', {
+        const data = await apiRequest('/api/messages/error/locate', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
@@ -126,7 +126,7 @@ function Chat({ queryId, success }) {
         addMessage("Suggest a fix for this error", false);
         startThinking();
 
-        const data = await apiRequest('/api/fix-query', 'POST', {
+        const data = await apiRequest('/api/messages/error/fix', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });

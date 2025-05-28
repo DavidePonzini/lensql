@@ -1,5 +1,5 @@
-import db_admi as db_admin
-import db_users
+import server.db_admin as db_admin
+import server.db_users as db_users
 
 from dav_tools import argument_parser, messages
 from dav_tools.database import sql

@@ -20,7 +20,7 @@ function Message({ children, text, messageId = null }) {
             return;
         }
 
-        await apiRequest('/api/message-feedback', 'POST', {
+        await apiRequest('/api/messages/feedback', 'POST', {
             'message_id': messageId,
             'feedback': positive
         });

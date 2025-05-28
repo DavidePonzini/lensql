@@ -11,7 +11,7 @@ function ExerciseData({ title, setTitle, request, setRequest, datasetId, setData
 
     useEffect(() => {
         async function fetchDatasets() {
-            const data = await apiRequest('/api/get-datasets');
+            const data = await apiRequest('/api/datasets/list', 'GET');
             setAvailableDatasets(data.data);
             setLoading(false);
         }
@@ -60,7 +60,7 @@ function AssignExercise({ exerciseId }) {
     const [selectAll, setSelectAll] = useState(false);
 
     async function handleAssignExercise(studentId, value) {
-        await apiRequest('/api/assign-exercise', 'POST', {
+        await apiRequest('/api/exercises/assign', 'POST', {
             'exercise_id': exerciseId,
             'student_id': studentId,
             'value': value,
@@ -82,7 +82,7 @@ function AssignExercise({ exerciseId }) {
         // Send requests for all students
         await Promise.all(
             students.map((student) =>
-                apiRequest('/api/assign-exercise', 'POST', {
+                apiRequest('/api/exercises/assign', 'POST', {
                     'exercise_id': exerciseId,
                     'student_id': student.username,
                     'value': value,
@@ -93,9 +93,7 @@ function AssignExercise({ exerciseId }) {
 
     useEffect(() => {
         async function fetchStudents() {
-            const data = await apiRequest('/api/get-assignment-students', 'POST', {
-                'exercise_id': exerciseId,
-            });
+            const data = await apiRequest(`/api/assignments/students?id=${exerciseId}`, 'GET');
             setStudents(data.students);
             const allAssigned = data.students.length > 0 && data.students.every((s) => s.is_assigned);
             setSelectAll(allAssigned);
@@ -155,7 +153,7 @@ function AddExercise({ refreshAssignments }) {
     const [exerciseAnswer, setExerciseAnswer] = useState('');
 
     async function handleAddExercise() {
-        await apiRequest('/api/add-exercise', 'POST', {
+        await apiRequest('/api/exercises', 'POST', {
             'title': exerciseTitle,
             'request': exerciseRequest,
             'dataset_id': exerciseDatasetId,
@@ -205,7 +203,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
     const isAiGenerated = exercise.is_ai_generated;
 
     async function handleEditExercise() {
-        await apiRequest('/api/edit-exercise', 'POST', {
+        await apiRequest('/api/exercises', 'PUT', {
             'exercise_id': exerciseId,
             'title': exerciseTitle,
             'request': exerciseRequest,
@@ -217,7 +215,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
     }
 
     async function handleDeleteExercise() {
-        await apiRequest('/api/delete-exercise', 'POST', {
+        await apiRequest('/api/exercises', 'DELETE', {
             'exercise_id': exerciseId,
         });
 
@@ -294,7 +292,7 @@ function ManageAssignments() {
     const [loading, setLoading] = useState(true);
 
     const fetchAssignments = async () => {
-        const data = await apiRequest('/api/get-all-exercises');
+        const data = await apiRequest('/api/exercises/list', 'GET');
         setAssignments(data.data);
         setLoading(false);
     };

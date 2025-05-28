@@ -1,4 +1,4 @@
-import db_admi as db_admin
+import server.db_admin as db_admin
 
 from dav_tools import argument_parser, messages
 
