@@ -7,3 +7,4 @@ sqlparse
 requests
 bcrypt
 flask-jwt-extended
+gunicorn

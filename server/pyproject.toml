@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lensql"
+version = "1.0.0"
+authors = [
+  { name="Davide Ponzini", email="davide.ponzini95@gmail.com" },
+]
+description = "Various utilies to aid in program development."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "dav_tools",
+    "sqlparse",
+    "Flask",
+    "Flask_Cors",
+    "pandas",
+    "sqlparse",
+    "requests",
+    "bcrypt",
+    "flask-jwt-extended",
+]
+
+[project.urls]
+"Repository" = "https://github.com/DavidePonzini/lensql"
+"Documentation" = "https://lensql.readthedocs.io/en/latest/index.html"
+"Bug Tracker" = "https://github.com/DavidePonzini/lensql/issues"
