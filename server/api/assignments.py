@@ -29,6 +29,9 @@ def get_assignment_students():
 
     students = db.admin.assignments.get_students(username, exercise_id)
 
+    from dav_tools import messages
+    messages.debug(f'Assignment students for exercise {exercise_id}: {students}')
+
     return responses.response(True, students=students)
 
 

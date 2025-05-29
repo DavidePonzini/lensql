@@ -16,6 +16,7 @@ class ExerciseAPI(MethodView):
 
     def get(self):
         '''Get a specific exercise by its ID.'''
+
         username = get_jwt_identity()
         exercise_id = request.args.get('id')
         result = db.admin.exercises.get(exercise_id, username)
@@ -23,10 +24,11 @@ class ExerciseAPI(MethodView):
 
     def post(self):
         '''Add a new exercise.'''
+
         data = request.get_json()
         title = data['title']
         request_text = data['request']
-        dataset_id = data['dataset_id']
+        dataset_id = data['dataset_id'] or None
         expected_answer = data['expected_answer']
 
         db.admin.exercises.create(
@@ -40,13 +42,12 @@ class ExerciseAPI(MethodView):
 
     def put(self):
         '''Edit an existing exercise.'''
+
         data = request.get_json()
         exercise_id = data['exercise_id']
         title = data['title']
         request_text = data['request']
-        dataset_id = data['dataset_id']
-        if dataset_id == '':
-            dataset_id = None
+        dataset_id = data['dataset_id'] or None
         expected_answer = data['expected_answer']
 
         db.admin.exercises.update(
@@ -60,13 +61,15 @@ class ExerciseAPI(MethodView):
 
     def delete(self):
         '''Delete an exercise by its ID.'''
+
         data = request.get_json()
         exercise_id = data['exercise_id']
         db.admin.exercises.delete(exercise_id)
         return responses.response(True)
 
 # Register all methods (GET, POST, PUT, DELETE) on /
-exercise_bp.add_url_rule('/', view_func=ExerciseAPI.as_view('exercise_api'))
+#   Note: trailing slash causes nginx to redirect, leading to CORS error
+exercise_bp.add_url_rule('', view_func=ExerciseAPI.as_view('exercise_api'))
 
 @exercise_bp.route('/list', methods=['GET'])
 @jwt_required()
@@ -82,6 +85,7 @@ def get_all_exercises():
 @jwt_required()
 def assign_exercise():
     '''Assign or unassign an exercise to a student.'''
+
     username = get_jwt_identity()
     data = request.get_json()
     exercise_id = data['exercise_id']

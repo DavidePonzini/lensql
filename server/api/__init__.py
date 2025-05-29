@@ -16,7 +16,11 @@ def create_app() -> Flask:
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'key')
     app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH', 1024*1024*20))   # 20MB
 
-    CORS(app)
+    # CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True,
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     allow_headers=["Content-Type", "Authorization"])
+
     jwt.init_app(app)
 
     # Register blueprints

@@ -93,7 +93,7 @@ function AssignExercise({ exerciseId }) {
 
     useEffect(() => {
         async function fetchStudents() {
-            const data = await apiRequest(`/api/assignments/students?id=${exerciseId}`, 'GET');
+            const data = await apiRequest(`/api/assignments/students?exercise_id=${exerciseId}`, 'GET');
             setStudents(data.students);
             const allAssigned = data.students.length > 0 && data.students.every((s) => s.is_assigned);
             setSelectAll(allAssigned);
