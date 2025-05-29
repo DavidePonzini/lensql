@@ -75,6 +75,7 @@ CREATE TABLE queries (
     query TEXT NOT NULL,
     success BOOLEAN NOT NULL,
     result TEXT DEFAULT NULL,
+    query_type VARCHAR(50) NOT NULL,
     ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

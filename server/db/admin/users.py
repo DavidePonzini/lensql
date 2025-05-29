@@ -33,5 +33,35 @@ def get_info(username: str) -> dict:
 def get_learning_stats(username: str) -> dict:
     '''Get learning statistics for a user'''
 
-    # TODO
-    return {}
+    statement = database.sql.SQL(
+    '''
+        SELECT
+            query_type,
+            queries,
+            queries_d,
+            queries_success
+        FROM
+            {schema}.v_query_types_per_user
+        WHERE
+            username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+    result = db.execute_and_fetch(statement, {
+        'username': username
+    })
+
+    return {
+        'queries': sum(row[1] for row in result),
+        'queries_d': sum(row[2] for row in result),
+        'queries_success': sum(row[3] for row in result),
+        'query_types': [
+            {
+                'type': row[0],
+                'count': row[1],
+                'count_d': row[2],
+                'success': row[3]
+            } for row in result
+        ]
+    }

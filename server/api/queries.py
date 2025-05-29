@@ -5,6 +5,7 @@ import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server import db
+from server.sql.result import QueryResult
 from .util import responses
 
 query_bp = Blueprint('query', __name__)
@@ -33,7 +34,8 @@ def run_query():
                 batch_id=batch_id,
                 query=query_result.query,
                 success=query_result.success,
-                result_str=query_result.result
+                result_str=query_result.result,
+                query_type=query_result.query_type,
             )
             query_result.id = query_id
 
@@ -41,7 +43,7 @@ def run_query():
                 'success': query_result.success,
                 'builtin': False,
                 'query': query_result.query,
-                'type': query_result.type,
+                'type': query_result.query_type,
                 'data': query_result.result,
                 'id': query_id,
                 'notices': query_result.notices,
@@ -50,15 +52,11 @@ def run_query():
     return responses.streaming_response(generate_results())
 
 
-@query_bp.route('/builtin/show-search-path', methods=['POST'])
-@jwt_required()
-def show_search_path():
-    username = get_jwt_identity()
-    data = request.get_json()
-    exercise_id = int(data['exercise_id'])
-    
-    result = db.users.queries.builtin.show_search_path(username)
-
+def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> int:
+    '''
+    Log a built-in query result and return the query ID.
+    This function is used to log the results of built-in queries executed by users.
+    '''
     batch_id = db.admin.queries.log_batch(
         username=username,
         exercise_id=exercise_id if exercise_id > 0 else None
@@ -68,10 +66,21 @@ def show_search_path():
         batch_id=batch_id,
         query=result.query,
         success=result.success,
-        result_str=result.result
+        result_str=result.result,
+        query_type=result.query_type,
     )
 
-    result.id = query_id
+    return query_id
+
+@query_bp.route('/builtin/show-search-path', methods=['POST'])
+@jwt_required()
+def show_search_path():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = int(data['exercise_id'])
+    
+    result = db.users.queries.builtin.show_search_path(username)
+    result.id = log_builtin_query(username, exercise_id, result)
 
     return responses.response_query(result, is_builtin=True)
 
@@ -83,20 +92,7 @@ def list_schemas():
     exercise_id = int(data['exercise_id'])
     
     result = db.users.queries.builtin.list_schemas(username)
-
-    batch_id = db.admin.queries.log_batch(
-        username=username,
-        exercise_id=exercise_id if exercise_id > 0 else None
-    )
-
-    query_id = db.admin.queries.log(
-        batch_id=batch_id,
-        query=result.query,
-        success=result.success,
-        result_str=result.result
-    )
-
-    result.id = query_id
+    result.id = log_builtin_query(username, exercise_id, result)
 
     return responses.response_query(result, is_builtin=True)
 
@@ -108,20 +104,7 @@ def list_tables():
     exercise_id = int(data['exercise_id'])
     
     result = db.users.queries.builtin.list_tables(username)
-
-    batch_id = db.admin.queries.log_batch(
-        username=username,
-        exercise_id=exercise_id if exercise_id > 0 else None
-    )
-
-    query_id = db.admin.queries.log(
-        batch_id=batch_id,
-        query=result.query,
-        success=result.success,
-        result_str=result.result
-    )
-
-    result.id = query_id
+    result.id = log_builtin_query(username, exercise_id, result)
 
     return responses.response_query(result, is_builtin=True)
 
@@ -133,20 +116,7 @@ def list_all_tables():
     exercise_id = int(data['exercise_id'])
     
     result = db.users.queries.builtin.list_all_tables(username)
-
-    batch_id = db.admin.queries.log_batch(
-        username=username,
-        exercise_id=exercise_id if exercise_id > 0 else None
-    )
-
-    query_id = db.admin.queries.log(
-        batch_id=batch_id,
-        query=result.query,
-        success=result.success,
-        result_str=result.result
-    )
-
-    result.id = query_id
+    result.id = log_builtin_query(username, exercise_id, result)
 
     return responses.response_query(result, is_builtin=True)
 
@@ -158,19 +128,6 @@ def list_constraints():
     exercise_id = int(data['exercise_id'])
     
     result = db.users.queries.builtin.list_constraints(username)
-
-    batch_id = db.admin.queries.log_batch(
-        username=username,
-        exercise_id=exercise_id if exercise_id > 0 else None
-    )
-
-    query_id = db.admin.queries.log(
-        batch_id=batch_id,
-        query=result.query,
-        success=result.success,
-        result_str=result.result
-    )
-
-    result.id = query_id
+    result.id = log_builtin_query(username, exercise_id, result)
 
     return responses.response_query(result, is_builtin=True)

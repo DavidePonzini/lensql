@@ -4,10 +4,11 @@ from .code import SQLException
 
 class QueryResult(ABC):
     '''Represents the result of a SQL query.'''
-    def __init__(self, query: str, success: bool, notices: list[str], query_type: str):
+    def __init__(self, query: str, success: bool, query_type: str, data_type: str, notices: list[str]):
         self.query = query
         self.success = success
-        self.type = query_type
+        self.query_type = query_type
+        self.data_type = data_type
         self.notices = notices
         self.id = None
 
@@ -21,12 +22,13 @@ class QueryResult(ABC):
 
 class QueryResultError(QueryResult):
     '''Represents the result of a SQL query that failed to execute.'''
-    def __init__(self, exception: SQLException, query: str, notices: list = []):
+    def __init__(self, exception: SQLException, query: str, query_type: str, notices: list = []):
         super().__init__(
             query=query,
             success=False,
+            query_type=query_type,
             notices=notices,
-            query_type='message')
+            data_type='message')
         self._result = exception
 
     @property
@@ -35,12 +37,13 @@ class QueryResultError(QueryResult):
 
 class QueryResultDataset(QueryResult):
     '''Represents the result of a SQL query that returned a dataset.'''
-    def __init__(self, result: pd.DataFrame, query: str, notices: list = []):
+    def __init__(self, result: pd.DataFrame, query: str, query_type: str, notices: list = []):
         super().__init__(
             query=query,
             success=True,
+            query_type=query_type,
             notices=notices,
-            query_type='dataset')
+            data_type='dataset')
         self._result = result
 
     @property
@@ -57,12 +60,13 @@ class QueryResultDataset(QueryResult):
 
 class QueryResultMessage(QueryResult):
     '''Represents the result of a SQL query that returned a message.'''
-    def __init__(self, message: str, query: str, notices: list = []):
+    def __init__(self, message: str, query: str, query_type: str, notices: list = []):
         super().__init__(
             query=query,
             success=True,
+            query_type=query_type,
             notices=notices,
-            query_type='message')
+            data_type='message')
         self._result = message
 
     @property

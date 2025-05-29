@@ -51,6 +51,19 @@ class SQLCode:
     def __str__(self) -> str:
         return self.query
     
+    @property
+    def query_type(self) -> str:
+        '''Get the type of the SQL query (e.g., SELECT, INSERT, UPDATE, DELETE)'''
+        statement = sqlparse.parse(self.query)[0]
+        first_token = statement.token_first(skip_cm=True).value.upper()
+        
+        # We need an additional token to differentiate these statements
+        if first_token in ('CREATE', 'ALTER', 'DROP'):
+            second_token = statement.token_next(0, skip_cm=True)[1].value.upper()
+            return f'{first_token} {second_token}'
+        
+        return first_token
+
 class SQLException:
     def __init__(self, exception: Exception):
         self.exception = exception

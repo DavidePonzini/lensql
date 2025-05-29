@@ -16,3 +16,14 @@ def get_user_info():
         return responses.response(False)
     
     return responses.response(True, **result)
+
+@user_bp.route('/learning-stats', methods=['GET'])
+@jwt_required()
+def get_learning_stats():
+    username = get_jwt_identity()
+
+    result = db.admin.users.get_learning_stats(username)
+    if result is None:
+        return responses.response(False)
+    
+    return responses.response(True, data=result)

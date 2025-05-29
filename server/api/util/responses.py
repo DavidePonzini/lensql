@@ -16,7 +16,7 @@ def response_query(*results: _QueryResult, is_builtin: bool = False) -> _Respons
             'success': query.success,
             'builtin': is_builtin,
             'query': query.query,
-            'type': query.type,
+            'type': query.query_type,
             'data': query.result,
             'id': query.id,
         }

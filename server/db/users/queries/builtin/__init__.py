@@ -22,6 +22,7 @@ def _execute_builtin(username: str, query: _Queries) -> QueryResult:
         return QueryResultDataset(
             result=result,
             query=query.name,
+            query_type='BUILTIN',
             notices=conn.notices)
     except Exception as e:
         try:
@@ -32,6 +33,7 @@ def _execute_builtin(username: str, query: _Queries) -> QueryResult:
         return QueryResultError(
             exception=SQLException(e),
             query=query.name,
+            query_type='BUILTIN',
             notices=conn.notices)
 
 def list_schemas(username: str) -> QueryResult:

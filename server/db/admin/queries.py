@@ -12,14 +12,15 @@ def log_batch(username: str, exercise_id: int) -> int:
     batch_id = result[0][0]
     return batch_id
 
-def log(batch_id: int, query: str, success: bool, result_str: str) -> int:
+def log(batch_id: int, query: str, success: bool, result_str: str, query_type: str) -> int:
     '''Log a new query with its result and success status.'''
 
     result = db.insert(SCHEMA, 'queries', {
         'batch_id': batch_id,
         'query': query,
         'success': success,
-        'result': result_str
+        'result': result_str,
+        'query_type': query_type
     }, ['id'])
 
     query_id = result[0][0]

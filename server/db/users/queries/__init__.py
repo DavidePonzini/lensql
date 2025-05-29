@@ -38,6 +38,7 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                     yield QueryResultDataset(
                         result=pd.DataFrame(rows, columns=columns),
                         query=statement.query,
+                        query_type=statement.query_type,
                         notices=conn.notices)
                     continue
 
@@ -46,6 +47,7 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                 yield QueryResultMessage(
                     message=f'{cur.statusmessage}',
                     query=statement.query,
+                    query_type=statement.query_type,
                     notices=conn.notices)
 
             conn.update_last_operation_ts()
@@ -58,4 +60,5 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
             yield QueryResultError(
                 exception=SQLException(e),
                 query=statement.query,
+                query_type=statement.query_type,
                 notices=conn.notices)

@@ -39,10 +39,5 @@ ORDER BY
     2 DESC,
     1;
 
--- CREATE OR REPLACE VIEW lensql.v_user_stats AS
--- SELECT
---     u.username,
---     COUNT(
-
 
 COMMIT;
