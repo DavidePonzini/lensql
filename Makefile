@@ -12,7 +12,7 @@ endif
 DEV_DOCKER_COMPOSE_FILE = docker-compose.yml
 PROD_DOCKER_COMPOSE_FILE = docker-compose.prod.yml
 
-.PHONY: $(VENV)_upgrade start start_prod psql psql_users setup
+.PHONY: $(VENV)_upgrade start deploy setup psql psql_users active_users dump
 
 start:
 	docker compose -f $(DEV_DOCKER_COMPOSE_FILE) down
@@ -30,6 +30,9 @@ psql:
 
 psql_users:
 	docker exec -it lensql_db_users psql -U postgres
+
+active_users:
+	docker exec -t lensql_db_admin psql -U postgres -c "SELECT * FROM lensql.v_active_users;"
 
 dump:
 	docker exec -t lensql_db_admin pg_dump -U postgres -n lensql > dump_admin_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
