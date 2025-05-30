@@ -75,7 +75,11 @@ class SQLCode:
         }
 
 
-        statement = sqlparse.parse(self.query)[0]
+        statements = sqlparse.parse(self.query)
+        if len(statements) == 0:
+            return 'EMPTY'
+
+        statement = statements[0]
         query_type = statement.get_type()
 
         # CREATE OR REPLACE is treated as CREATE
