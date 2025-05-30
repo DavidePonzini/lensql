@@ -1,8 +1,6 @@
 import sqlparse
 from typing import Iterable, Self
 
-from ._sql_tokens import allowed_types
-
 
 # Maximum length of SQL code to strip comments from
 STRIP_COMMENTS_MAX_LENGTH = 1000
