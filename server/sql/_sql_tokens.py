@@ -3,7 +3,7 @@
 allowed_types = {
     'ABORT', # — abort the current transaction
     'ALTER',
-    # ANALYZE — collect statistics about a database
+    'ANALYZE', # — collect statistics about a database
     'BEGIN', # — start a transaction block
     'CALL', # — invoke a procedure
     # CHECKPOINT — force a write-ahead log checkpoint
@@ -29,7 +29,7 @@ allowed_types = {
     # LISTEN — listen for a notification
     # LOAD — load a shared library file
     # LOCK — lock a table
-    # MERGE — conditionally insert, update, or delete rows of a table
+    'MERGE', # — conditionally insert, update, or delete rows of a table
     # MOVE — position a cursor
     # NOTIFY — generate a notification
     # PREPARE — prepare a statement for execution
