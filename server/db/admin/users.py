@@ -35,15 +35,22 @@ def get_learning_stats(username: str) -> dict:
 
     statement = database.sql.SQL(
     '''
-        SELECT
-            query_type,
-            queries,
-            queries_d,
-            queries_success
-        FROM
-            {schema}.v_query_types_per_user
-        WHERE
-            username = {username}
+    SELECT
+        q.query_type,
+        COUNT(q.id) AS queries,
+        COUNT(DISTINCT q.query) AS queries_d,
+        SUM(CASE WHEN q.success THEN 1 ELSE 0 END) AS queries_success
+    FROM
+        {schema}.queries q
+        JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+    WHERE
+        qb.username = {username}
+        AND q.query_type <> 'BUILTIN'
+    GROUP BY
+        q.query_type
+    ORDER BY
+        -- q.query_type;
+        queries DESC;
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username')

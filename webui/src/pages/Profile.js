@@ -1,11 +1,30 @@
 import { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, PieChart, Pie, Cell } from 'recharts';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import BootstrapTooltip from 'react-bootstrap/Tooltip';
+
+function StatCard({ title, children, value, tooltip }) {
+    return (
+        <Col>
+            <OverlayTrigger
+                placement="bottom"
+                overlay={<BootstrapTooltip>{tooltip}</BootstrapTooltip>}
+            >
+                <Card bg="light" text="dark">
+                    <Card.Body>
+                        <Card.Title>{title}</Card.Title>
+                        {children}
+                        {value && <Card.Text>{value}</Card.Text>}
+                    </Card.Body>
+                </Card>
+            </OverlayTrigger>
+        </Col>
+    );
+}
 
 function Profile() {
     const { apiRequest, userInfo } = useAuth();
@@ -24,7 +43,7 @@ function Profile() {
         fetchProfileData();
     }, [apiRequest]);   // eslint-disable-line react-hooks/exhaustive-deps
 
-    const processedData = profileData?.query_types.map(({ type, count, success }) => ({
+    const queryTypesData = profileData?.query_types.map(({ type, count, success }) => ({
         type,
         success,
         fail: count - success,
@@ -34,25 +53,25 @@ function Profile() {
     const tootlipFormatter = (value, name) => {
         if (name === 'success') {
             if (value === 1)
-                return [`${value} query`, 'Executed Successfully'];
-            return [`${value} queries`, 'Executed Successfully'];
+                return [`${value} query`, 'Successful'];
+            return [`${value} queries`, 'Successful'];
         } else if (name === 'fail') {
             if (value === 1)
-                return [`${value} query`, 'Execution Failed'];
-            return [`${value} queries`, 'Execution Failed'];
+                return [`${value} query`, 'Failed'];
+            return [`${value} queries`, 'Failed'];
         }
         return [value, name];
     }
 
-    const successRate = profileData ? ((profileData.queries_success / profileData.queries) * 100).toFixed(2) : 0;
-    const totalQueries = profileData ? profileData.queries : 0;
-    const uniqueQueries = profileData ? profileData.queries_d : 0;
+    const totalQueries = profileData?.queries || 0;
+    const uniqueQueries = profileData?.queries_d || 0;
 
-    function renderTooltip(msg) {
-        return (
-            <BootstrapTooltip>{msg}</BootstrapTooltip>
-        );
-    }
+    const querySuccessData = [
+        { name: 'Success', value: profileData?.queries_success || 0 },
+        { name: 'Fail', value: (profileData?.queries || 0) - (profileData?.queries_success || 0) },
+    ];
+    const COLORS = ['#198754', '#dc3545']; // Bootstrap green and red
+    const successRate = totalQueries > 0 ? ((profileData.queries_success / totalQueries) * 100).toFixed(0) : 0;
 
     if (loading) {
         return <div>Loading...</div>;
@@ -68,60 +87,57 @@ function Profile() {
             {profileData && (
                 <>
                     <Row className="mb-4">
-                        <Col md={4}>
-                            <OverlayTrigger
-                                placement="bottom"
-                                overlay={renderTooltip('Total number of queries executed, including repeated ones.')}
-                            >
-                                <Card bg="light" text="dark">
-                                    <Card.Body>
-                                        <Card.Title>Total Queries</Card.Title>
-                                        <Card.Text>{totalQueries}</Card.Text>
-                                    </Card.Body>
-                                </Card>
-                            </OverlayTrigger>
-                        </Col>
-                        <Col md={4}>
-                            <OverlayTrigger
-                                placement="bottom"
-                                overlay={renderTooltip('Number of distinct queries executed, regardless of how many times they were repeated.')}
-                            >
-                                <Card bg="light" text="dark">
-                                    <Card.Body>
-                                        <Card.Title>Unique Queries</Card.Title>
-                                        <Card.Text>{uniqueQueries}</Card.Text>
-                                    </Card.Body>
-                                </Card>
-                            </OverlayTrigger>
-                        </Col>
-                        <Col md={4}>
-                            <OverlayTrigger
-                                placement="bottom"
-                                overlay={renderTooltip('Percentage of total queries that were executed successfully.')}
-                            >
-                                <Card bg="light" text="dark">
-                                    <Card.Body>
-                                        <Card.Title>Success Rate</Card.Title>
-                                        <Card.Text>{successRate}%</Card.Text>
-                                    </Card.Body>
-                                </Card>
-                            </OverlayTrigger>
-                        </Col>
+                        <StatCard
+                            title="Total Queries"
+                            tooltip="Total number of queries executed, including repeated ones."
+                            value={totalQueries}
+                        />
+                        <StatCard
+                            title="Unique Queries"
+                            tooltip="Number of distinct queries executed, regardless of how many times they were repeated."
+                            value={uniqueQueries}
+                        />
+                        <StatCard
+                            title="Success Rate"
+                            tooltip="Percentage of total queries that were executed successfully."
+                        >
+                            <ResponsiveContainer width="100%" height={100}>
+                                <PieChart>
+                                    <Pie
+                                        data={querySuccessData}
+                                        dataKey="value"
+                                        innerRadius={25}
+                                        outerRadius={50}
+                                        startAngle={90}
+                                        endAngle={-270}
+                                    >
+                                        {querySuccessData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                </PieChart>
+                            </ResponsiveContainer>
+                            <div style={{
+                                textAlign: 'center',
+                                fontSize: '1.2rem',
+                                fontWeight: 'bold'
+                            }}>
+                                {successRate}%
+                            </div>
+                        </StatCard>
                     </Row>
-                    
-                    <Row>
+
+                    <Row className="mb-4">
                         <Col>
                             <Card>
                                 <Card.Body>
                                     <Card.Title>Query Type Breakdown</Card.Title>
-                                    <ResponsiveContainer width="100%" height={40* profileData.query_types.length}>
-                                        <BarChart layout="vertical" data={processedData} margin={{ left: 40, right: 60 }}>
+                                    <ResponsiveContainer width="100%" height={40 * profileData.query_types.length}>
+                                        <BarChart layout="vertical" data={queryTypesData} margin={{ left: 40, right: 60 }}>
                                             <XAxis type="number" hide />
                                             <YAxis dataKey="type" type="category" />
                                             <Tooltip formatter={tootlipFormatter} />
-                                            <Bar dataKey="success" stackId="a" fill="#198754">
-                                                <LabelList dataKey="total" position="right" fill="#000" />
-                                            </Bar>
+                                            <Bar dataKey="success" stackId="a" fill="#198754" />
                                             <Bar dataKey="fail" stackId="a" fill="#dc3545">
                                                 <LabelList dataKey="total" position="right" fill="#000" />
                                             </Bar>
@@ -130,6 +146,19 @@ function Profile() {
                                 </Card.Body>
                             </Card>
                         </Col>
+                    </Row>
+
+                    <Row className="mb-4">
+                        <StatCard
+                            title="Times help was used"
+                            tooltip="Number of times the help feature was used."
+                            value='0'
+                        />
+                        <StatCard
+                            title="Feedback given"
+                            tooltip="Number of times feedback was provided to the messages generated by LensQL."
+                            value='0%'
+                        />
                     </Row>
                 </>
             )}
