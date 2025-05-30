@@ -55,6 +55,8 @@ class SQLCode:
     def query_type(self) -> str:
         '''Get the type of the SQL query (e.g., SELECT, INSERT, UPDATE, DELETE)'''
 
+        # Documentation for SQL query types: 
+
         expandable_types = {'CREATE', 'ALTER', 'DROP'}
         expandable_types_keywords = {
             'TABLE', 'VIEW', 'INDEX', 'SEQUENCE', 'FUNCTION', 'PROCEDURE',
@@ -65,7 +67,7 @@ class SQLCode:
             'SET', 'SHOW', 'RESET',
             'EXPLAIN',
             'ANALYZE',
-            'DO', 'CALL',
+            'DO', 'CALL', 'PERFORM',
             'COPY',
             'CLUSTER',
             'GRANT', 'REVOKE',
