@@ -66,10 +66,12 @@ class SQLCode:
         allowed_types = {
             'SET', 'SHOW', 'RESET',
             'EXPLAIN',
-            'DO',
+            'ANALYZE',
+            'DO', 'CALL',
+            'COPY',
             'CLUSTER',
             'GRANT', 'REVOKE',
-            'BEGIN', 'COMMIT', 'ROLLBACK',
+            'BEGIN', 'COMMIT', 'ROLLBACK', 'ABORT',
         }
 
 
