@@ -34,12 +34,12 @@ function Profile() {
     const tootlipFormatter = (value, name) => {
         if (name === 'success') {
             if (value === 1)
-                return [`${value} query`, 'No Syntax Errors'];
-            return [`${value} queries`, 'No Syntax Errors'];
+                return [`${value} query`, 'Executed Successfully'];
+            return [`${value} queries`, 'Executed Successfully'];
         } else if (name === 'fail') {
             if (value === 1)
-                return [`${value} query`, 'Syntax Errors'];
-            return [`${value} queries`, 'Syntax Errors'];
+                return [`${value} query`, 'Execution Failed'];
+            return [`${value} queries`, 'Execution Failed'];
         }
         return [value, name];
     }
@@ -114,7 +114,7 @@ function Profile() {
                             <Card>
                                 <Card.Body>
                                     <Card.Title>Query Type Breakdown</Card.Title>
-                                    <ResponsiveContainer width="100%" height={300}>
+                                    <ResponsiveContainer width="100%" height={40* profileData.query_types.length}>
                                         <BarChart layout="vertical" data={processedData} margin={{ left: 40, right: 60 }}>
                                             <XAxis type="number" hide />
                                             <YAxis dataKey="type" type="category" />
