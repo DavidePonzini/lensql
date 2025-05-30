@@ -8,3 +8,5 @@ venv/
 # documentation
 docs/_build
 .pytest_cache
+
+q.csv

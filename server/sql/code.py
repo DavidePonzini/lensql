@@ -1,6 +1,8 @@
 import sqlparse
 from typing import Iterable, Self
 
+from ._sql_tokens import allowed_types
+
 
 # Maximum length of SQL code to strip comments from
 STRIP_COMMENTS_MAX_LENGTH = 1000
@@ -54,15 +56,29 @@ class SQLCode:
     @property
     def query_type(self) -> str:
         '''Get the type of the SQL query (e.g., SELECT, INSERT, UPDATE, DELETE)'''
-        statement = sqlparse.parse(self.query)[0]
-        first_token = statement.token_first(skip_cm=True).value.upper()
-        
-        # We need an additional token to differentiate these statements
-        if first_token in ('CREATE', 'ALTER', 'DROP'):
-            second_token = statement.token_next(0, skip_cm=True)[1].value.upper()
-            return f'{first_token} {second_token}'
-        
-        return first_token
+
+        try:
+            statement = sqlparse.parse(self.query)[0]
+            first_token = statement.token_first(skip_cm=True)
+
+            while type(first_token) is sqlparse.sql.Parenthesis:
+                # If the first token is a parenthesis, we need to get the token inside it (skipping the parenthesis itself)
+                first_token = first_token.token_next(0, skip_cm=True)[1]
+            first_token_str = first_token.value.upper()
+
+            # Categorization errors or unusual statements
+            if first_token_str not in allowed_types:
+                return 'OTHER'
+            
+            # We need an additional token to differentiate these statements
+            if first_token_str in {'CREATE', 'ALTER', 'DROP'}:
+                second_token = statement.token_next(0, skip_cm=True)[1]
+                second_token_str = second_token.value.upper()
+                return f'{first_token_str} {second_token_str}'
+            
+            return first_token_str
+        except Exception as e:
+            return 'UNKNOWN'
 
 class SQLException:
     def __init__(self, exception: Exception):
