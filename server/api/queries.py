@@ -67,7 +67,7 @@ def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> i
         query=result.query,
         success=result.success,
         result_str=result.result,
-        query_type=result.query_type,
+        query_type='BUILTIN',
     )
 
     return query_id

@@ -1,23 +1,42 @@
-import pandas as pd
 from server.sql import SQLCode
+from server.db.admin.connection import db, SCHEMA
 from tqdm import tqdm
-from dav_tools import argument_parser
+from dav_tools import database
 
-def categorize_queries(filename_in: str, filename_out: str):
-    '''Categorize SQL queries in a CSV file by their type. The results are saved to a new CSV file.'''
+def categorize_all_queries():
+    '''Categorize SQL queries by their type, if they are not already categorized.'''
+    query = database.sql.SQL('''
+        SELECT id, query
+        FROM {schema}.queries
+        WHERE query_type IS NULL
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA)
+    )
 
-    df = pd.read_csv(filename_in)
+    result = db.execute_and_fetch(query)
 
-    for idx, row in tqdm(df.iterrows(), total=len(df)):
-        if pd.isna(row['query_type']):
-            df.at[idx, 'query_type'] = SQLCode(row['query']).query_type
+    for row in tqdm(result, total=len(result)):
+        query_id = row[0]
+        query_text = row[1]
 
-    df.to_csv(filename_out, index=False)
+        sql_code = SQLCode(query_text)
+        query_type = sql_code.query_type
+
+        update_query = database.sql.SQL('''
+            UPDATE {schema}.queries
+            SET query_type = {query_type}
+            WHERE id = {query_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            query_type=database.sql.Placeholder('query_type'),
+            query_id=database.sql.Placeholder('query_id')
+        )
+
+        db.execute(update_query, {
+            'query_type': query_type,
+            'query_id': query_id
+        })
 
 if __name__ == '__main__':
-    argument_parser.add_argument('filename_in', type=str, help='Input CSV file with SQL queries')
-    argument_parser.add_argument('filename_out', type=str, help='Output CSV file to save categorized queries')
-    argument_parser.args
-
-    categorize_queries(argument_parser.args.filename_in, argument_parser.args.filename_out)
+    categorize_all_queries()
     
