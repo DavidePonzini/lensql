@@ -1,8 +1,13 @@
-import '../styles/Separator.css';
-
 function Separator() {
     return (
-        <div className="separator"></div>
+        <div style={{
+            minHeight: 56,
+            padding: 12,
+            backgroundColor: '#212529',
+            position: 'sticky',
+            zIndex: 50,
+            textAlign: 'center',
+        }}></div>
     );
 }
 

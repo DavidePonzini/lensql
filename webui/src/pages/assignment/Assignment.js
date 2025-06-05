@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
+import useAuth from '../../hooks/useAuth';
 
-import Query from '../components/Query';
+import Query from './Query';
 
 function Assignment() {
     const { apiRequest } = useAuth();

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import useAuth from '../hooks/useAuth';
+import useAuth from '../../hooks/useAuth';
 
-import '../styles/Message.css';
+import './Message.css';
 
 function Message({ children, text, messageId = null }) {
     const { apiRequest } = useAuth();

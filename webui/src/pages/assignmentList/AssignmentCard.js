@@ -1,7 +1,5 @@
-import '../styles/AssignmentCard.css';
-
 import { useState } from 'react';
-import useAuth from '../hooks/useAuth';
+import useAuth from '../../hooks/useAuth';
 
 function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated = false, deadlineDate, isSubmitted, onSubmit, onUnsubmit }) {
     const { apiRequest } = useAuth();
@@ -27,7 +25,13 @@ function AssignmentCard({ children, assignmentTitle, assignmentId, isGenerated =
     }
 
     return (
-        <div className="card" >
+        <div className="card" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: 8,
+            padding: 16,
+            margin: 8,
+        }} >
             <div className="card-body">
                 <h5 className="card-title">{assignmentTitle}</h5>
                 <p className="card-text">{children}</p>

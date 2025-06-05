@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import '../styles/Login.css';
 import useAuth from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+
+import bg from '../res/database.jpg';
 
 function Login() {
     const navigate = useNavigate();
@@ -47,17 +48,26 @@ function Login() {
     }
 
     return (
-        <section className="login">
+        <section>
             <div className="row g-0">
-                <div className="col-md-6 col-lg-5 d-none d-md-block img"></div>
+                <div className="col-md-6 col-lg-5 d-none d-md-block" style={{
+                    borderRadius: '1rem 0 0 1rem',
+                    backgroundImage: `url(${bg})`,
+                    backgroundAttachment: 'fixed',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'cover',
+                    position: 'sticky',
+                    zIndex: 100,
+                }}></div>
                 <div className="col-md-6 col-lg-7 d-flex align-items-center">
                     <div className="card-body p-4 p-lg-5 text-black">
                         <form onSubmit={handleLogin} noValidate>
                             <div className="d-flex align-items-center mb-3 pb-1">
-                                <i className="fas fa-search fa-2x me-3 logo" />
+                                <i className="fas fa-search fa-2x me-3" style={{ color: 'var(--logo-color)' }} />
                                 <span className="h1 fw-bold mb-0">LensQL</span>
                             </div>
-                            <h5 className="fw-normal mb-3 pb-3">Sign into your account</h5>
+                            <h5 className="fw-normal mb-3 pb-3" style={{ letterSpacing: 1 }}>Sign into your account</h5>
 
                             {error && (
                                 <div className="alert alert-danger" role="alert">
@@ -96,11 +106,12 @@ function Login() {
                                         value={passwordInput}
                                         onChange={(e) => setPasswordInput(e.target.value)}
                                     />
-                                    <div className="input-group-text show-password">
+                                    <div className="input-group-text" style={{ cursor: 'pointer' }}>
                                         <i
                                             className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
                                             onClick={() => setShowPassword(!showPassword)}
                                             aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                            style={{ width: '1.5rem' }}
                                         ></i>
                                     </div>
                                 </div>

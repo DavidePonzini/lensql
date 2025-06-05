@@ -1,6 +1,6 @@
 import Message from './Message';
 
-import '../styles/MessageBox.css';
+import './MessageBox.css';
 
 function MessageBox({ children, text, assistant = false, thinking = false, messageId = null }) {
 

@@ -7,16 +7,16 @@ import Footer from "../components/Footer";
 import Separator from "../components/Separator";
 
 import Login from './Login';
-import Profile from './Profile';
-import Assignments from './Assignments';
 import Home from './Home';
-import ManageAssignments from './ManageAssignments';
+import Profile from './profile/Profile';
+import AssignmentList from './assignmentList/AssignmentList';
+import ManageAssignments from './manageAssignments/ManageAssignments';
+import Assignment from './assignment/Assignment';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import useTooltipObserver from '../hooks/useTooltipObserver';
-import Assignment from './Assignment';
 
 
 
@@ -39,7 +39,7 @@ function App() {
                                     <>
                                         <Route path="profile" element={<Profile />} />
                                         <Route path="assignments">
-                                            <Route index element={<Assignments />} />
+                                            <Route index element={<AssignmentList />} />
                                             {userInfo?.isTeacher && (
                                                 <Route path="manage" element={<ManageAssignments />} />
                                             )}

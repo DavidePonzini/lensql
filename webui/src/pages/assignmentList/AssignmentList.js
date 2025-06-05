@@ -1,11 +1,21 @@
 import { useState, useEffect } from 'react';
-import useAuth from '../hooks/useAuth';
+import useAuth from '../../hooks/useAuth';
 
-import '../styles/Assignments.css';
+import AssignmentCard from './AssignmentCard';
 
-import AssignmentCard from '../components/AssignmentCard';
+function CardList({ children }) {
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+        }}>
+            {children}
+        </div>
+    );
+}
 
-function Assignments() {
+function AssignmentList() {
     const { apiRequest } = useAuth();
 
     const [unsubmittedAssignments, setUnsubmittedAssignments] = useState([]);
@@ -43,20 +53,7 @@ function Assignments() {
     return (
         <>
             <h1>Assignments</h1>
-            <div className="assignments assignments-incomplete">
-                {/* <AssignmentCard
-                    assignmentId={0}
-                    isGenerated={false}
-                    key={-1}
-                    deadlineDate={null}
-                    isSubmitted={false}
-                    assignmentTitle="Modalità libera"
-                    onSubmit={null}
-                    onUnsubmit={null}
-                >
-                    Se hai delle query che non sono state richieste, ma che vuoi comunque eseguire, puoi farlo qui
-                </AssignmentCard> */}
-                
+            <CardList>
                 {unsubmittedAssignments.length === 0 && <p className="no-assignments">No assignments</p>}
 
                 {unsubmittedAssignments.map((assignment) => {
@@ -75,12 +72,12 @@ function Assignments() {
                         </AssignmentCard>
                     );
                 })}
-            </div>
+            </CardList>
 
             <h1 className="mt-3">Archived</h1>
-            <div className="assignments assignments-complete">
+            <CardList>
                 {submittedAssignments.length === 0 && <p className="no-assignments">No archived assignments</p>}
-                
+
                 {submittedAssignments.map((assignment) => {
                     return (
                         <AssignmentCard
@@ -97,9 +94,9 @@ function Assignments() {
                         </AssignmentCard>
                     );
                 })}
-            </div>
+            </CardList>
         </>
     );
 }
 
-export default Assignments;
+export default AssignmentList;

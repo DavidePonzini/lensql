@@ -1,6 +1,6 @@
 import Chat from './Chat';
 
-import '../styles/QueryResult.css';
+import './QueryResult.css';
 
 function QueryResult({ result, isBuiltin, queryId, query, success, isMessage, notices }) {
     return (

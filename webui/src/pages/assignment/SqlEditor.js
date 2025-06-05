@@ -1,5 +1,3 @@
-import '../styles/SqlEditor.css';
-
 import { useRef } from 'react';
 import Editor from '@monaco-editor/react';
 
@@ -24,7 +22,12 @@ const SqlEditor = ({ onChange, onSubmit }) => {
     };
 
     return (
-        <div className='sql-editor'>
+        <div style={{
+            backgroundColor: '#1E1E1E',
+            padding: '10px 0',
+            borderRadius: 12,
+            boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+        }}>
             <Editor
                 height="400px"
                 defaultLanguage="sql"

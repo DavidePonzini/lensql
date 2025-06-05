@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useAuth, RequestSizeError } from "../hooks/useAuth";
+import { useAuth, RequestSizeError } from "../../hooks/useAuth";
 
-import "../styles/Query.css";
+import "./Query.css";
 
 import SqlEditor from "./SqlEditor";
 import QueryResult from "./QueryResult";
-import ButtonShowDataset from "./ButtonShowDataset";
+import ButtonShowDataset from "../../components/ButtonShowDataset";
 
 function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     const { apiRequest } = useAuth();
@@ -201,7 +201,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     return (
         <>
             <h2 className="exercise-title">{exerciseTitle}</h2>
-            <p className="exercise-request">{exerciseText}</p>
+            <p className="exercise-request" style={{ position: 'relative', paddingLeft: '1rem' }}>{exerciseText}</p>
 
             <div className="mb-3" style={{ justifySelf: 'end' }}>
                 <ButtonShowDataset
