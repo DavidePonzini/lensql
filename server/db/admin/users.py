@@ -95,7 +95,7 @@ def get_learning_stats(username: str) -> dict:
         ],
         'messages': result_messages[0],
         'messages_select': result_messages[1],
-        'messages_success': result_messages[2],
-        'messages_error': result_messages[0] - result_messages[2],
-        'messages_feedback_perc': result_messages[3] / result_messages[0] if result_messages[0] > 0 else 0,
+        'messages_success_rate': result_messages[2] / result_messages[0] if result_messages[0] > 0 else 0,
+        'messages_error_rate': (result_messages[0] - result_messages[2]) / result_messages[0] if result_messages[0] > 0 else 0,
+        'messages_feedback_rate': result_messages[3] / result_messages[0] if result_messages[0] > 0 else 0,
     }

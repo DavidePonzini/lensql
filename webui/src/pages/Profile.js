@@ -74,122 +74,111 @@ function Profile() {
     // Help box
     const messagesTotal = profileData?.messages || 0;
     const messagesSelect = profileData?.messages_select || 0;
-    const messagesSuccess = profileData?.messages_success || 0;
-    const messagesError = profileData?.messages_error || 0;
+    const messagesSuccessRate = profileData?.messages_success_rate || 0;
+    const messagesErrorRate = profileData?.messages_error_rate || 0;
 
-    const messagesFeedbackRate = profileData?.messages_feedback_perc || 0;
+    const messagesBreakdownData = [
+        { name: 'Understanding results', value: messagesSuccessRate },
+        { name: 'Understanding errors', value: messagesErrorRate },
+    ];
+
+    const messagesFeedbackRate = profileData?.messages_feedback_rate || 0;
+    
     // Feedback box
     const messagesFeedbackData = [
-        { name: 'Given', value: messagesFeedbackRate },
-        { name: 'Not Given', value: 1 - messagesFeedbackRate },
+        { name: 'Feedback Given', value: messagesFeedbackRate },
+        { name: 'Feedback Not Given', value: 1 - messagesFeedbackRate },
     ];
 
     return (
         <>
-            <h1>
-                {userInfo?.username}
-            </h1>
-
+            <h1>Welcome back, {userInfo?.username || 'user'}!</h1>
+            <p>Here's a quick look at your SQL progress — keep going strong!</p>
             <hr />
 
             <h2>Let's look at your queries</h2>
             <Row className="mb-4">
-                <Col xs={3}>
-                    <Card bg="light" text="dark">
+                <Col xs={4}>
+                    <Card bg="light" text="dark" style={{ height: '100%' }}>
                         <Card.Header>
-                            <Card.Title>Total Queries</Card.Title>
+                            <Card.Title>Your SQL Journey</Card.Title>
                         </Card.Header>
                         <Card.Body>
-                            <OverlayTooltip
-                                text="Total number of queries executed."
-                            >
-                                <Card.Text>
-                                    All queries: {totalQueries}
-                                    <br />
-                                    Excluding repetitions: {uniqueQueries}
-                                </Card.Text>
-                            </OverlayTooltip>
+                            <div>
+                                <strong>Total queries run:</strong> {totalQueries}
+                                <br />
+                                <strong>Distinct queries tried:</strong> {uniqueQueries}
+                            </div>
+                            <div className="mt-2 text-muted" style={{ fontSize: '0.9rem' }}>
+                                Every attempt helps — even retries are part of the learning curve.
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
                 <Col>
-                    <Card bg="light" text="dark">
+                    <Card bg="light" text="dark" style={{ height: '100%' }}>
                         <Card.Header>
-                            <Card.Title>Success Rate</Card.Title>
+                            <Card.Title>How often things worked</Card.Title>
                         </Card.Header>
                         <Card.Body>
                             <Row>
                                 <Col>
-                                    <OverlayTooltip
-                                        text="Percentage of SELECT queries that were executed successfully."
-                                    >
-                                        <div style={{
-                                            textAlign: 'center',
-                                            fontSize: '1.2rem',
-                                            fontWeight: 'bold'
-                                        }}>
-                                            SELECT Queries
-                                        </div>
-                                        <ResponsiveContainer width="100%" height={100}>
-                                            <PieChart>
-                                                <Pie
-                                                    data={querySuccessDataSelect}
-                                                    dataKey="value"
-                                                    innerRadius={25}
-                                                    outerRadius={50}
-                                                    startAngle={90}
-                                                    endAngle={-270}
-                                                >
-                                                    {querySuccessDataSelect.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                    ))}
-                                                </Pie>
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                        <div style={{
-                                            textAlign: 'center',
-                                            fontSize: '1.2rem',
-                                            fontWeight: 'bold'
-                                        }}>
-                                            {(successRateSelect * 100).toFixed(2)}%
-                                        </div>
-                                    </OverlayTooltip>
+                                    <div style={{
+                                        textAlign: 'center',
+                                        fontSize: '1.2rem',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        SELECT Queries
+                                    </div>
+                                    <ResponsiveContainer width="100%" height={100}>
+                                        <PieChart>
+                                            <Pie
+                                                data={querySuccessDataSelect}
+                                                dataKey="value"
+                                                innerRadius={25}
+                                                outerRadius={50}
+                                                startAngle={90}
+                                                endAngle={-270}
+                                            >
+                                                {querySuccessDataSelect.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip formatter={(value, name) => [`${value * 100}%`, name]} />
+                                            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
+                                                {(successRateSelect * 100).toFixed(0)}%
+                                            </text>
+                                        </PieChart>
+                                    </ResponsiveContainer>
                                 </Col>
                                 <Col>
-                                    <OverlayTooltip
-                                        text="Percentage of total queries that were executed successfully."
-                                    >
-                                        <div style={{
-                                            textAlign: 'center',
-                                            fontSize: '1.2rem',
-                                            fontWeight: 'bold'
-                                        }}>
-                                            All Queries
-                                        </div>
-                                        <ResponsiveContainer width="100%" height={100}>
-                                            <PieChart>
-                                                <Pie
-                                                    data={querySuccessDataAll}
-                                                    dataKey="value"
-                                                    innerRadius={25}
-                                                    outerRadius={50}
-                                                    startAngle={90}
-                                                    endAngle={-270}
-                                                >
-                                                    {querySuccessDataAll.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                    ))}
-                                                </Pie>
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                        <div style={{
-                                            textAlign: 'center',
-                                            fontSize: '1.2rem',
-                                            fontWeight: 'bold'
-                                        }}>
-                                            {(successRateAll * 100).toFixed(2)}%
-                                        </div>
-                                    </OverlayTooltip>
+                                    <div style={{
+                                        textAlign: 'center',
+                                        fontSize: '1.2rem',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        All Queries
+                                    </div>
+                                    <ResponsiveContainer width="100%" height={100}>
+                                        <PieChart>
+                                            <Pie
+                                                data={querySuccessDataAll}
+                                                dataKey="value"
+                                                innerRadius={25}
+                                                outerRadius={50}
+                                                startAngle={90}
+                                                endAngle={-270}
+                                            >
+                                                {querySuccessDataAll.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip formatter={(value, name) => [`${value * 100}%`, name]} />
+                                            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
+                                                {(successRateAll * 100).toFixed(0)}%
+                                            </text>
+                                        </PieChart>
+                                    </ResponsiveContainer>
                                 </Col>
                             </Row>
                         </Card.Body>
@@ -201,7 +190,10 @@ function Profile() {
                 <Col>
                     <Card>
                         <Card.Header>
-                            <Card.Title>Query Type Breakdown</Card.Title>
+                            <Card.Title>What kind of queries are you running?</Card.Title>
+                            <Card.Subtitle className="text-muted">
+                                Here's the mix of SQL commands you've used, and how they turned out.
+                            </Card.Subtitle>
                         </Card.Header>
                         <Card.Body>
                             <ResponsiveContainer width="100%" height={40 * queryTypesData?.length || 1}>
@@ -221,58 +213,94 @@ function Profile() {
             </Row>
 
             <hr />
-            <h2>
-                Help and Feedback
-            </h2>
+            <h2>Turning Questions Into Progress</h2>
             <Row className="mb-4">
-                <Col xs={3}>
-                    <OverlayTooltip text="Number of times the help feature was used.">
-                        <Card>
-                            <Card.Header>
-                                <Card.Title>Times help was used</Card.Title>
-                            </Card.Header>
-                            <Card.Body>
-                                Total: {messagesTotal}<br />
-                                SELECT queries: {messagesSelect}<br />
-                                Help with results: {messagesSuccess}<br />
-                                Help with errors: {messagesError}<br />
-                            </Card.Body>
-                        </Card>
-                    </OverlayTooltip>
+                <Col xs={6}>
+                    <Card style={{ height: '100%' }}>
+                        <Card.Header>
+                            <Card.Title>You asked, we explained</Card.Title>
+                            <Card.Subtitle className="text-muted">
+                                Got stuck or curious? Here's when you asked for explanations or guidance on your queries.
+                            </Card.Subtitle>
+                        </Card.Header>
+                        <Card.Body>
+                            <Row>
+                                <Col>
+                                    <strong>When you asked for help:</strong>
+                                    <ul style={{ paddingLeft: '1.2em', marginBottom: '0.5rem' }}>
+                                        <li>Total requests: {messagesTotal}</li>
+                                        <li>On SELECT queries: {messagesSelect}</li>
+                                    </ul>
+                                </Col>
+                                <Col>
+                                    <strong>What you were looking for:</strong>
+                                    <div style={{ width: '100%', height: '90px', overflow: 'hidden' }}>
+                                        <ResponsiveContainer width="100%" height={140}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={messagesBreakdownData}
+                                                    dataKey="value"
+                                                    innerRadius={40}
+                                                    outerRadius={60}
+                                                    startAngle={180}
+                                                    endAngle={0}
+                                                    paddingAngle={2}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                >
+                                                    <Cell fill="#0d6efd" /> {/* Blue for results */}
+                                                    <Cell fill="#ffc107" /> {/* Yellow for errors */}
+                                                </Pie>
+                                                <Tooltip formatter={(value, name) => [`${value * 100}%`, name]} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div className="text-center text-muted" style={{ fontSize: '0.9rem' }}>
+                                        <span style={{ color: '#0d6efd', fontWeight: 'bold' }}>Understanding results</span>:&nbsp;
+                                        {(messagesSuccessRate * 100).toFixed(0)}%
+                                        <br />
+                                        <span style={{ color: '#ffc107', fontWeight: 'bold' }}>Understanding errors</span>:&nbsp;
+                                        {(messagesErrorRate * 100).toFixed(0)}%
+                                    </div>
+                                </Col>
+                            </Row>
+                        </Card.Body>
+                    </Card>
                 </Col>
-                <Col xs={3}>
-                    <OverlayTooltip text="Number of times feedback was provided to the messages generated by LensQL.">
-                        <Card>
-                            <Card.Header>
-                                <Card.Title>Feedback given</Card.Title>
-                            </Card.Header>
-                            <Card.Body>
-                                <ResponsiveContainer width="100%" height={100}>
-                                    <PieChart>
-                                        <Pie
-                                            data={messagesFeedbackData}
-                                            dataKey="value"
-                                            innerRadius={25}
-                                            outerRadius={50}
-                                            startAngle={90}
-                                            endAngle={-270}
-                                        >
-                                            {messagesFeedbackData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                    </PieChart>
-                                </ResponsiveContainer>
-                                <div style={{
-                                    textAlign: 'center',
-                                    fontSize: '1.2rem',
-                                    fontWeight: 'bold'
-                                }}>
-                                    {(messagesFeedbackRate * 100).toFixed(2)}%
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </OverlayTooltip>
+                <Col></Col>
+                <Col xs={4}>
+                    <Card style={{ height: '100%' }}>
+                        <Card.Header>
+                            <Card.Title>
+                                You rated the replies
+                            </Card.Title>
+                            <Card.Subtitle className="text-muted">
+                                You gave a thumbs-up or down on the explanations — that helps us improve.
+                            </Card.Subtitle>
+                        </Card.Header>
+                        <Card.Body>
+                            <ResponsiveContainer width="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={messagesFeedbackData}
+                                        dataKey="value"
+                                        innerRadius={35}
+                                        outerRadius={70}
+                                        startAngle={90}
+                                        endAngle={-270}
+                                    >
+                                        {messagesFeedbackData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value, name) => [`${value} times`, name]} />
+                                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
+                                        {(messagesFeedbackRate * 100).toFixed(0)}%
+                                    </text>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
         </>
