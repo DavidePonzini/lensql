@@ -106,7 +106,7 @@ function Profile() {
                                 <Card.Text>
                                     All queries: {totalQueries}
                                     <br />
-                                    Exluding repetitions: {uniqueQueries}
+                                    Excluding repetitions: {uniqueQueries}
                                 </Card.Text>
                             </OverlayTooltip>
                         </Card.Body>
