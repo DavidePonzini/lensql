@@ -17,12 +17,42 @@ def get_user_info():
     
     return responses.response(True, **result)
 
-@user_bp.route('/learning-stats', methods=['GET'])
+@user_bp.route('/stats/queries', methods=['GET'])
 @jwt_required()
-def get_learning_stats():
+def get_query_stats():
     username = get_jwt_identity()
 
-    result = db.admin.users.get_learning_stats(username)
+    result = db.admin.users.get_query_stats(username)
+    if result is None:
+        return responses.response(False)
+    
+    return responses.response(True, data=result)
+
+@user_bp.route('/stats/unique_queries', methods=['GET'])
+@jwt_required()
+def get_unique_queries_count():
+    username = get_jwt_identity()
+
+    count = db.admin.users.get_unique_queries_count(username)
+    return responses.response(True, data=count)
+
+@user_bp.route('/stats/messages', methods=['GET'])
+@jwt_required()
+def get_message_stats():
+    username = get_jwt_identity()
+
+    result = db.admin.users.get_message_stats(username)
+    if result is None:
+        return responses.response(False)
+    
+    return responses.response(True, data=result)
+
+@user_bp.route('/stats/errors', methods=['GET'])
+@jwt_required()
+def get_error_stats():
+    username = get_jwt_identity()
+
+    result = db.admin.users.get_error_stats(username)
     if result is None:
         return responses.response(False)
     

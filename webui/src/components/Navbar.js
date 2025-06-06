@@ -12,7 +12,7 @@ function Navbar() {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container-fluid">
-                <a className="navbar-brand" href="/"><AppName/></a>
+                <a className="navbar-brand" href="/"><AppName /></a>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
@@ -20,15 +20,28 @@ function Navbar() {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <div className="navbar-nav me-auto mb-2 mb-lg-0">
                         <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/" end>Home</NavLink>
-                        {isLoggedIn && userInfo?.isTeacher && (
+                        {isLoggedIn && (
                             <>
-                                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/profile">Profile</NavLink>
-                                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments" end>Assignments</NavLink>
+                                {userInfo?.isTeacher && (
+                                    <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/profile">
+                                        <i className="fa-solid fa-user-circle"></i> Profile
+                                    </NavLink>
+                                )}
+                                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/learning">
+                                    <i className="fa-solid fa-chart-line"></i> Learning Insights
+                                </NavLink>
+                                {userInfo?.isTeacher && (
+                                    <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments" end>
+                                        <i className="fa-solid fa-tasks"></i> Assignments
+                                    </NavLink>
+                                )}
                             </>
                         )}
 
                         {userInfo?.isTeacher && (
-                            <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments/manage">Manage Assignments</NavLink>
+                            <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments/manage">
+                                <i className="fa-solid fa-cogs"></i> Manage Assignments
+                            </NavLink>
                         )}
                     </div>
 

@@ -9,6 +9,7 @@ import Separator from "../components/Separator";
 import Login from './Login';
 import Home from './Home';
 import Profile from './profile/Profile';
+import Learning from './learning/Learning';
 import AssignmentList from './assignmentList/AssignmentList';
 import ManageAssignments from './manageAssignments/ManageAssignments';
 import Assignment from './assignment/Assignment';
@@ -38,6 +39,7 @@ function App() {
                                 {isLoggedIn ? (
                                     <>
                                         <Route path="profile" element={<Profile />} />
+                                        <Route path="learning" element={<Learning />} />
                                         <Route path="assignments">
                                             <Route index element={<AssignmentList />} />
                                             {userInfo?.isTeacher && (

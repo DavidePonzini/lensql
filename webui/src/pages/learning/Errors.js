@@ -1,13 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, PieChart, Pie, Cell } from 'recharts';
+import ObservedOnce from "../../components/ObservedOnce";
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-function Errors({ data }) {
+function Errors() {
+    const { apiRequest } = useAuth();
+    const [data, setData] = useState(null);
+
+    async function fetchData() {
+        const response = await apiRequest('/api/users/stats/errors', 'GET');
+        setData(response.data)
+    }
+
     return (
-        <>
+        <ObservedOnce onFirstVisible={fetchData}>
             <Row className="mb-4">
                 <Col>
                     <Card style={{ height: '100%' }}>
@@ -52,7 +60,7 @@ function Errors({ data }) {
                     </Card>
                 </Col>
             </Row>
-        </>
+        </ObservedOnce>
     );
 }
 
