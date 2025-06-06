@@ -94,4 +94,10 @@ def get_connection(username: str, autocommit: bool = True) -> DBConnection:
 
         return conn
     
-    
+def get_admin_connection(dbname: str = 'postgres', autocommit: bool = True) -> DBConnection:
+    '''
+    Returns the admin connection for the postgres user.
+    This connection is not added to the connection pool.
+    '''
+
+    return DBConnection(dbname=dbname, username='postgres', autocommit=autocommit)

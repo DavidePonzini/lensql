@@ -3,8 +3,31 @@ from .connection import db, SCHEMA
 
 import bcrypt
 
-def register_user(username: str, password: str) -> None:
+def user_exists(username: str) -> bool:
+    '''Check if a user exists in the database'''
+
+    query = database.sql.SQL('''
+        SELECT 1
+        FROM {schema}.users
+        WHERE username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+    
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return len(result) > 0
+
+def register_user(username: str, password: str) -> bool:
     '''Register a new user'''
+
+    if user_exists(username):
+        from dav_tools import messages
+        messages.debug(f'User {username} already exists.')
+        return False
 
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -20,6 +43,23 @@ def register_user(username: str, password: str) -> None:
     db.execute(query, {
         'username': username,
         'password_hash': hashed_password
+    })
+    
+    return True
+
+def delete_user(username: str) -> None:
+    '''Delete a user'''
+
+    query = database.sql.SQL('''
+        DELETE FROM {schema}.users
+        WHERE username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute(query, {
+        'username': username
     })
 
 def can_login(username: str, password: str) -> bool:
