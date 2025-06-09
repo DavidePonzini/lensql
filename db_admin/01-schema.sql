@@ -79,6 +79,20 @@ CREATE TABLE queries (
     ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE errors (
+    id INTEGER PRIMARY KEY,
+    category VARCHAR(255) NOT NULL,
+    subcategory VARCHAR(255) NOT NULL,
+    error VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE has_error(
+    query_id INTEGER NOT NULL REFERENCES queries(id),
+    error_id INTEGER NOT NULL REFERENCES errors(id),
+
+    PRIMARY KEY (query_id, error_id)
+);
+
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
     query_id INTEGER NOT NULL REFERENCES queries(id),

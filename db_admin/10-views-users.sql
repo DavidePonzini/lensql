@@ -39,5 +39,19 @@ ORDER BY
     2 DESC,
     1;
 
+CREATE OR REPLACE VIEW lensql.v_daily_users AS
+SELECT
+    DATE(qb.ts) AS day,
+    COUNT(DISTINCT username) AS users,
+    COUNT(*) AS queries
+FROM
+    query_batches qb
+    JOIN queries q ON qb.id = q.batch_id
+WHERE
+    username <> 'dav'
+GROUP BY
+    DATE(qb.ts)
+ORDER BY
+    day DESC;
 
 COMMIT;
