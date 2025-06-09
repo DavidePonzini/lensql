@@ -48,7 +48,7 @@ FROM
     query_batches qb
     JOIN queries q ON qb.id = q.batch_id
 WHERE
-    username <> 'dav'
+    username NOT IN ('dav', 'giovanna', 'barbara') 
 GROUP BY
     DATE(qb.ts)
 ORDER BY
