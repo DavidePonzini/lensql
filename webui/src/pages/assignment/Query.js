@@ -6,12 +6,20 @@ import "./Query.css";
 import SqlEditor from "./SqlEditor";
 import QueryResult from "./QueryResult";
 import ButtonShowDataset from "../../components/ButtonShowDataset";
+import ButtonAction from "../../components/ButtonAction";
+import ButtonActionDropdown from "../../components/ButtonActionDropdown";
 
 function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     const { apiRequest } = useAuth();
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
+
+    const buttonShowSearchPathLocked = false;
+    const buttonListSchemasLocked = false;
+    const buttonListTablesLocked = false;
+    const buttonListAllTablesLocked = false;
+    const buttonListConstraintsLocked = false;
 
     function displayResult(data) {
         setResult(data);
@@ -222,75 +230,76 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
             <SqlEditor onChange={setSqlText} onSubmit={handleExecute} />
 
             <div className="mt-3 support-buttons">
-                <button
-                    className="btn btn-primary me-1"
-                    disabled={isExecuting || sqlText.trim().length === 0}
+                <ButtonAction
+                    variant="primary"
+                    className="me-1 mb-1"
                     onClick={handleExecute}
+                    disabled={isExecuting || sqlText.trim().length === 0}
                 >
                     Execute
-                </button>
+                </ButtonAction>
 
-                <button
-                    className="btn btn-secondary me-1"
-                    disabled={isExecuting}
+                <ButtonAction
+                    variant="secondary"
+                    className="me-1 mb-1"
                     onClick={handleShowSearchPath}
+                    disabled={isExecuting}
+                    locked={buttonShowSearchPathLocked}
                 >
                     Show Search Path
-                </button>
+                </ButtonAction>
 
-                <button
-                    className="btn btn-secondary me-1"
-                    disabled={isExecuting}
+                <ButtonAction
+                    variant="secondary"
+                    className="me-1 mb-1"
                     onClick={handleListSchemas}
+                    disabled={isExecuting}
+                    locked={buttonListSchemasLocked}
+                    cost={10}
                 >
                     List Schemas
-                </button>
+                </ButtonAction>
 
-                <div className="btn-group me-1" role="group">
-                    <button
-                        className="btn btn-secondary dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                        disabled={isExecuting}
-                    >
-                        List Tables
-                    </button>
-                    <ul className="dropdown-menu">
-                        <li>
-                            <button
-                                className="dropdown-item"
-                                onClick={handleListTables}
-                            >
-                                Current Schema
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className="dropdown-item"
-                                onClick={handleListAllTables}
-                            >
-                                All Schemas
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-
-                <button
-                    className="btn btn-secondary me-1"
+                <ButtonActionDropdown
+                    title="List Tables"
                     disabled={isExecuting}
+                    locked={buttonListTablesLocked && buttonListAllTablesLocked}
+                    variant="secondary"
+                    className="me-1 mb-1"
+                    buttons={[
+                        {
+                            label: 'Current Schema',
+                            onClick: handleListTables,
+                            disabled: isExecuting,
+                            locked: buttonListTablesLocked,
+                        },
+                        {
+                            label: 'All Schemas',
+                            onClick: handleListAllTables,
+                            disabled: isExecuting,
+                            locked: buttonListAllTablesLocked,
+                        },
+                    ]}
+                />
+
+                <ButtonAction
+                    variant="secondary"
+                    className="me-1 mb-1"
                     onClick={handleListConstraints}
+                    disabled={isExecuting}
+                    locked={buttonListConstraintsLocked}
                 >
                     List Constraints
-                </button>
+                </ButtonAction>
 
-                <button
-                    className="btn btn-primary"
-                    disabled={isExecuting}
+                <ButtonAction
+                    variant="primary"
+                    className="me-1 mb-1"
                     onClick={handleClearOutput}
+                    disabled={isExecuting || result.length === 0}
                 >
                     Clear output
-                </button>
+                </ButtonAction>
             </div>
 
             <div className="mt-3">

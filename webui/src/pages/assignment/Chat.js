@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import MessageBox from "./MessageBox";
+import ButtonAction from "../../components/ButtonAction";
 
 
 function Chat({ queryId, success }) {
@@ -164,31 +165,62 @@ function Chat({ queryId, success }) {
                         <div className="mt-2">
                             {success ? (
                                 <>
-                                    <button className="btn btn-primary me-2" onClick={handleDescribeQuery}>
+                                    <ButtonAction
+                                        onClick={handleDescribeQuery}
+                                        className="me-2 mb-1"
+                                        variant="primary"
+                                        cost={1}
+                                    >
                                         Describe query
-                                    </button>
+                                    </ButtonAction>
 
-                                    <button className="btn btn-primary me-2" onClick={handleExplainQuery}>
+                                    <ButtonAction
+                                        onClick={handleExplainQuery}
+                                        className="me-2 mb-1"
+                                        variant="primary"
+                                        cost={3}
+                                    >
                                         Explain query
-                                    </button>
+                                    </ButtonAction>
                                 </>
                             ) : (
                                 <>
-                                    <button className="btn btn-primary me-2" onClick={handleExplainError}>
+                                    <ButtonAction
+                                        onClick={handleExplainError}
+                                        className="me-2 mb-1"
+                                        variant="primary"
+                                        cost={3}
+                                    >
                                         Explain error
-                                    </button>
+                                    </ButtonAction>
 
-                                    <button className="btn btn-primary me-2" onClick={handleShowExample} disabled={true}>
+                                    <ButtonAction
+                                        onClick={handleShowExample}
+                                        className="me-2 mb-1"
+                                        variant="primary"
+                                        cost={3}
+                                        locked={true}
+                                    >
                                         Show example
-                                    </button>
+                                    </ButtonAction>
 
-                                    <button className="btn btn-primary me-2" onClick={handleWhereToLook}>
+                                    <ButtonAction
+                                        onClick={handleWhereToLook}
+                                        className="me-2 mb-1"
+                                        variant="primary"
+                                        cost={5}
+                                    >
                                         Where to look
-                                    </button>
+                                    </ButtonAction>
 
-                                    <button className="btn btn-primary me-2" onClick={handleSuggestFix}>
+                                    <ButtonAction
+                                        onClick={handleSuggestFix}
+                                        className="me-2 mb-1"
+                                        variant="primary"
+                                        cost={20}
+                                    >
                                         Suggest fix
-                                    </button>
+                                    </ButtonAction>
                                 </>
                             )}
                         </div>

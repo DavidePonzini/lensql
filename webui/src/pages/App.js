@@ -20,7 +20,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import useTooltipObserver from '../hooks/useTooltipObserver';
 
 
-
 function App() {
     const { isLoggedIn, userInfo } = useAuth();
 
