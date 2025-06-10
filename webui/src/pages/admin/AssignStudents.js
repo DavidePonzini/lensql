@@ -18,6 +18,7 @@ function AssignStudents({ teacher }) {
     async function assignStudent(student, value) {
         await apiRequest('/api/admin/assign-student', 'POST', {
             student,
+            teacher,
             value,
         });
     };

@@ -61,9 +61,11 @@ def set_teacher():
 @jwt_required()
 def list_students():
     """List student status for a given teacher."""
-    teacher = get_jwt_identity()
+    username = get_jwt_identity()
+    data = request.args
+    teacher = data.get('teacher')
 
-    if not db.admin.users.is_teacher(teacher):
+    if not db.admin.users.is_teacher(username):
         return responses.response(False, message="Access denied: Teacher privileges required.")
 
     students = db.admin.teachers.get_students_status(teacher)
@@ -74,17 +76,22 @@ def list_students():
 @jwt_required()
 def assign_student():
     """Assign a student to a teacher."""
-    teacher = get_jwt_identity()
+    username = get_jwt_identity()
     data = request.get_json()
     student = data['student']
+    teacher = data['teacher']
     value = data['value']
 
-    if not db.admin.users.is_teacher(teacher):
+    if not db.admin.users.is_teacher(username):
         return responses.response(False, message="Access denied: Teacher privileges required.")
 
     if value:
+        from dav_tools import messages
+        messages.debug(f"Assigning student {student} to teacher {teacher}")
         db.admin.teachers.add_student(teacher, student)
     else:
+        from dav_tools import messages
+        messages.debug(f"Removing student {student} from teacher {teacher}")
         db.admin.teachers.remove_student(teacher, student)
 
     return responses.response(True)
