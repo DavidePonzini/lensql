@@ -6,10 +6,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from server import db
 from .util import responses
 
-assignment_bp = Blueprint('assignment', __name__)
+bp = Blueprint('assignment', __name__)
 
 
-@assignment_bp.route('/list', methods=['GET'])
+@bp.route('/list', methods=['GET'])
 @jwt_required()
 def get_assignments():
     '''Get a list of assignments visible to the user.'''
@@ -19,7 +19,7 @@ def get_assignments():
 
     return responses.response(True, data=assignments)
 
-@assignment_bp.route('/students', methods=['GET'])
+@bp.route('/students', methods=['GET'])
 @jwt_required()
 def get_assignment_students():
     '''Get whether each student is assigned to an exercise.'''
@@ -32,7 +32,7 @@ def get_assignment_students():
     return responses.response(True, students=students)
 
 
-@assignment_bp.route('/submit', methods=['POST'])
+@bp.route('/submit', methods=['POST'])
 @jwt_required()
 def submit_exercise():
     '''Submit an assignment'''
@@ -44,7 +44,7 @@ def submit_exercise():
 
     return responses.response(True)
 
-@assignment_bp.route('/unsubmit', methods=['POST'])
+@bp.route('/unsubmit', methods=['POST'])
 @jwt_required()
 def unsubmit_exercise():
     '''Unsubmit an assignment'''

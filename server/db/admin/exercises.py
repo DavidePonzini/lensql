@@ -94,7 +94,7 @@ def get_dataset(exercise_id: int) -> str:
 
     return result[0][0]
 
-def create(title: str, request: str, dataset_id: int | None, expected_answer: str, is_ai_generated: bool, learning_objectives: list[str]) -> int:
+def create(title: str, request: str, dataset_id: int | None, expected_answer: str, is_ai_generated: bool) -> int:
     '''Create a new exercise'''
 
     result = db.insert(SCHEMA, 'exercises', {
@@ -106,12 +106,6 @@ def create(title: str, request: str, dataset_id: int | None, expected_answer: st
     }, ['id'])
 
     exercise_id = result[0][0]
-
-    for lo in learning_objectives:
-        db.insert(SCHEMA, 'has_learning_objective', {
-            'exercise_id': exercise_id,
-            'objective': lo
-        })
 
     return exercise_id
 

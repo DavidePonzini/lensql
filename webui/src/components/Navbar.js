@@ -20,7 +20,7 @@ function GamificationStats({ userInfo }) {
                     {userInfo.xp}/{userInfo.xpToNextLevel}
                 </span>
             )}
-            
+
             {userInfo?.coins && (
                 <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="LensCoins">
                     <i className="fa fa-coins text-warning" />
@@ -37,6 +37,7 @@ function Navbar() {
 
     const { isLoggedIn, logout, userInfo, loadingUser } = useAuth();
 
+    // TODO placeholder data for testing
     if (userInfo) {
         userInfo.coins = 75;
         userInfo.xp = 1500;
@@ -57,25 +58,28 @@ function Navbar() {
                         <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/" end>Home</NavLink>
                         {isLoggedIn && (
                             <>
-                                {userInfo?.isTeacher && (
-                                    <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/profile">
-                                        <i className="fa-solid fa-user-circle"></i> Profile
-                                    </NavLink>
-                                )}
+                                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/profile">
+                                    <i className="fa-solid fa-user-circle"></i> Profile
+                                </NavLink>
+
                                 <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/learning">
                                     <i className="fa-solid fa-chart-line"></i> Learning Insights
                                 </NavLink>
-                                {userInfo?.isTeacher && (
-                                    <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments" end>
-                                        <i className="fa-solid fa-tasks"></i> Assignments
-                                    </NavLink>
-                                )}
+                                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments" end>
+                                    <i className="fa-solid fa-tasks"></i> Assignments
+                                </NavLink>
                             </>
                         )}
 
                         {userInfo?.isTeacher && (
                             <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/assignments/manage">
                                 <i className="fa-solid fa-cogs"></i> Manage Assignments
+                            </NavLink>
+                        )}
+
+                        {userInfo?.isAdmin && (
+                            <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/admin">
+                                <i className="fa-solid fa-shield-alt"></i> Admin
                             </NavLink>
                         )}
                     </div>
@@ -95,7 +99,7 @@ function Navbar() {
                                     <i className="fa fa-chalkboard-teacher text-success mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Teacher"></i>
                                 )}
 
-                                <div className='vr mx-1'/>
+                                <div className='vr mx-1' />
 
                                 <GamificationStats userInfo={userInfo} />
 

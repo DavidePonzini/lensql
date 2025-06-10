@@ -2,22 +2,6 @@ BEGIN;
 
 SET search_path TO lensql;
 
-CREATE OR REPLACE VIEW lensql.v_user_info AS
-SELECT
-    u.username,
-    u.is_admin,
-    t.teacher IS NOT NULL AS is_teacher
-FROM
-    users u
-    LEFT JOIN (
-        SELECT DISTINCT
-            teacher
-        FROM
-            teaches
-    ) t ON u.username = t.teacher
-WHERE
-    u.can_login = TRUE;
-
 CREATE OR REPLACE VIEW lensql.v_active_users AS
 SELECT
     qb.username,
@@ -42,13 +26,15 @@ ORDER BY
 CREATE OR REPLACE VIEW lensql.v_daily_users AS
 SELECT
     DATE(qb.ts) AS day,
-    COUNT(DISTINCT username) AS users,
+    COUNT(DISTINCT u.username) AS users,
     COUNT(*) AS queries
 FROM
     query_batches qb
     JOIN queries q ON qb.id = q.batch_id
+    JOIN users u ON qb.username = u.username
 WHERE
-    username NOT IN ('dav', 'giovanna', 'barbara') 
+    NOT u.is_teacher
+    AND NOT u.is_admin 
 GROUP BY
     DATE(qb.ts)
 ORDER BY

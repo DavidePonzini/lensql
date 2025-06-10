@@ -17,9 +17,11 @@ SET search_path TO lensql;
 CREATE TABLE users (
     username VARCHAR(255) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
-    can_login BOOLEAN NOT NULL DEFAULT TRUE,
-    can_use_ai BOOLEAN NOT NULL DEFAULT TRUE,
-    is_admin BOOLEAN NOT NULL DEFAULT FALSE
+    is_disabled BOOLEAN NOT NULL DEFAULT FALSE,
+    is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    experience INTEGER NOT NULL DEFAULT 0,
+    coins INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE teaches (

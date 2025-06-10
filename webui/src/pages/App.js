@@ -18,6 +18,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import useTooltipObserver from '../hooks/useTooltipObserver';
+import Admin from './admin/Admin';
 
 
 function App() {
@@ -41,11 +42,17 @@ function App() {
                                         <Route path="learning" element={<Learning />} />
                                         <Route path="assignments">
                                             <Route index element={<AssignmentList />} />
+                                            <Route path="q/:assignmentId" element={<Assignment />} />
+
                                             {userInfo?.isTeacher && (
                                                 <Route path="manage" element={<ManageAssignments />} />
                                             )}
-                                            <Route path="q/:assignmentId" element={<Assignment />} />
+
                                         </Route>
+
+                                        {userInfo?.isAdmin && (
+                                            <Route path="admin" element={<Admin />} />
+                                        )}
                                     </>
                                 ) : (
                                     <Route path="*" element={<Login />} />

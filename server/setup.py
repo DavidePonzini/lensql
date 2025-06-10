@@ -3,41 +3,36 @@ from server import db
 from dav_tools import messages
 
 if __name__ == '__main__':
-    for user, password in [
-        ('dav', 'd'),
-        ('giovanna', 'g'),
-        ('barbara', 'b'),
-        ('student', 's'),
+    for user, password, is_teacher, is_admin in [
+        ('lens', 'l', False, True),
+        ('dav', 'd', True, True),
+        ('giovanna', 'g', True, False),
+        ('barbara', 'b', True, False),
+        ('student', 's', False, False),
     ]:
-        db.register_user(user, password)
+        if db.register_user(user, password, is_teacher=is_teacher, is_admin=is_admin):
+            messages.info(f'User {user} registered successfully')
 
-    for teacher, student in [
-        ('dav', 'dav'),
-        ('dav', 'student'),
-        ('giovanna', 'giovanna'),
-        ('giovanna', 'barbara'),
-        ('giovanna', 'dav'),
-        ('giovanna', 'student'),
-        ('barbara', 'barbara'),
-        ('barbara', 'giovanna'),
-        ('barbara', 'dav'),
-        ('barbara', 'student'),
+    for teacher, students in [
+        ('dav', ['student']),
+        ('giovanna', ['barbara', 'dav', 'student']),
+        ('barbara', ['giovanna', 'dav', 'student']),
     ]:
-        db.admin.teachers.add_student(teacher, student)
-        messages.info(f'Added teacher {teacher} for student {student}')
+        for student in students:
+            db.admin.teachers.add_student(teacher, student)
+            messages.info(f'Added teacher {teacher} for student {student}')
 
-    for title, request, learning_objectives in [
-        ('0) Progetto', 'Esegui qui tutte le query relative al tuo progetto finale', ['Simple Select']),
-        ('0) Modalità libera', 'Se hai delle query che non sono state richieste, ma che vuoi comunque eseguire, puoi farlo qui', []),
-        ('0) Versione vecchia LensQL', 'Esegui qui le tue query', []),
+    for title, request in [
+        ('0) Progetto', 'Esegui qui tutte le query relative al tuo progetto finale',),
+        ('0) Modalità libera', 'Se hai delle query che non sono state richieste, ma che vuoi comunque eseguire, puoi farlo qui'),
+        ('0) Versione vecchia LensQL', 'Esegui qui le tue query'),
     ]:
         db.admin.exercises.create(
             title=title,
             request=request,
             dataset_id=None,
             expected_answer='',
-            is_ai_generated=False,
-            learning_objectives=learning_objectives
+            is_ai_generated=False
         )
         messages.info(f'Exercise {title} created')
 

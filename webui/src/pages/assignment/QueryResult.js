@@ -47,7 +47,7 @@ function QueryResult({ result, isBuiltin, queryId, query, success, isMessage, no
                 isMessage ? (
                     <pre>{result}</pre>
                 ) : (
-                    <div dangerouslySetInnerHTML={{ __html: result }} />
+                    <div className='query-result' dangerouslySetInnerHTML={{ __html: result }} />
                 )
             }
 

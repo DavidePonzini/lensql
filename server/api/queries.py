@@ -8,10 +8,10 @@ from server import db
 from server.sql.result import QueryResult
 from .util import responses
 
-query_bp = Blueprint('query', __name__)
+bp = Blueprint('query', __name__)
 
 
-@query_bp.route('/run', methods=['POST'])
+@bp.route('/run', methods=['POST'])
 @jwt_required()
 def run_query():
     '''
@@ -72,7 +72,7 @@ def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> i
 
     return query_id
 
-@query_bp.route('/builtin/show-search-path', methods=['POST'])
+@bp.route('/builtin/show-search-path', methods=['POST'])
 @jwt_required()
 def show_search_path():
     username = get_jwt_identity()
@@ -84,7 +84,7 @@ def show_search_path():
 
     return responses.response_query(result, is_builtin=True)
 
-@query_bp.route('/builtin/list-schemas', methods=['POST'])
+@bp.route('/builtin/list-schemas', methods=['POST'])
 @jwt_required()
 def list_schemas():
     username = get_jwt_identity()
@@ -96,7 +96,7 @@ def list_schemas():
 
     return responses.response_query(result, is_builtin=True)
 
-@query_bp.route('/builtin/list-tables', methods=['POST'])
+@bp.route('/builtin/list-tables', methods=['POST'])
 @jwt_required()
 def list_tables():
     username = get_jwt_identity()
@@ -108,7 +108,7 @@ def list_tables():
 
     return responses.response_query(result, is_builtin=True)
 
-@query_bp.route('/builtin/list-all-tables', methods=['POST'])
+@bp.route('/builtin/list-all-tables', methods=['POST'])
 @jwt_required()
 def list_all_tables():
     username = get_jwt_identity()
@@ -120,7 +120,7 @@ def list_all_tables():
 
     return responses.response_query(result, is_builtin=True)
 
-@query_bp.route('/builtin/list-constraints', methods=['POST'])
+@bp.route('/builtin/list-constraints', methods=['POST'])
 @jwt_required()
 def list_constraints():
     username = get_jwt_identity()

@@ -9,7 +9,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from .util import responses
 from server import db
 
-exercise_bp = Blueprint('exercise', __name__)
+bp = Blueprint('exercise', __name__)
 
 class ExerciseAPI(MethodView):
     decorators = [jwt_required()]
@@ -69,9 +69,9 @@ class ExerciseAPI(MethodView):
 
 # Register all methods (GET, POST, PUT, DELETE) on /
 #   Note: trailing slash causes nginx to redirect, leading to CORS error
-exercise_bp.add_url_rule('', view_func=ExerciseAPI.as_view('exercise_api'))
+bp.add_url_rule('', view_func=ExerciseAPI.as_view('exercise_api'))
 
-@exercise_bp.route('/list', methods=['GET'])
+@bp.route('/list', methods=['GET'])
 @jwt_required()
 def get_all_exercises():
     '''Get a list of all exercises.'''
@@ -81,7 +81,7 @@ def get_all_exercises():
     exercises = db.admin.exercises.list_all(username)
     return responses.response(True, data=exercises)
 
-@exercise_bp.route('/assign', methods=['POST'])
+@bp.route('/assign', methods=['POST'])
 @jwt_required()
 def assign():
     '''Assign or unassign an exercise to a student.'''
@@ -107,7 +107,7 @@ def assign():
 
     return responses.response(True)
 
-@exercise_bp.route('/objective', methods=['POST'])
+@bp.route('/objective', methods=['POST'])
 @jwt_required()
 def set_learning_objective():
     '''Set learning objective for an exercise.'''
@@ -134,7 +134,7 @@ def set_learning_objective():
     return responses.response(True)
 
 
-@exercise_bp.route('/list-objectives', methods=['GET'])
+@bp.route('/list-objectives', methods=['GET'])
 @jwt_required()
 def list_learning_objectives():
     '''List learning objectives for an exercise.'''
@@ -146,7 +146,7 @@ def list_learning_objectives():
 
     return responses.response(True, data=objectives)
 
-@exercise_bp.route('/init-dataset', methods=['POST'])
+@bp.route('/init-dataset', methods=['POST'])
 @jwt_required()
 def init_dataset():
     '''Initialize the exercise dataset.'''

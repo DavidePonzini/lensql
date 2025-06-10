@@ -4,9 +4,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from server import db
 from .util import responses
 
-user_bp = Blueprint('user', __name__)
+bp = Blueprint('user', __name__)
 
-@user_bp.route('/info', methods=['GET'])
+@bp.route('/info', methods=['GET'])
 @jwt_required()
 def get_user_info():
     username = get_jwt_identity()
@@ -17,7 +17,7 @@ def get_user_info():
     
     return responses.response(True, **result)
 
-@user_bp.route('/stats/queries', methods=['GET'])
+@bp.route('/stats/queries', methods=['GET'])
 @jwt_required()
 def get_query_stats():
     username = get_jwt_identity()
@@ -28,7 +28,7 @@ def get_query_stats():
     
     return responses.response(True, data=result)
 
-@user_bp.route('/stats/unique_queries', methods=['GET'])
+@bp.route('/stats/unique_queries', methods=['GET'])
 @jwt_required()
 def get_unique_queries_count():
     username = get_jwt_identity()
@@ -36,7 +36,7 @@ def get_unique_queries_count():
     count = db.admin.users.get_unique_queries_count(username)
     return responses.response(True, data=count)
 
-@user_bp.route('/stats/messages', methods=['GET'])
+@bp.route('/stats/messages', methods=['GET'])
 @jwt_required()
 def get_message_stats():
     username = get_jwt_identity()
@@ -47,7 +47,7 @@ def get_message_stats():
     
     return responses.response(True, data=result)
 
-@user_bp.route('/stats/errors', methods=['GET'])
+@bp.route('/stats/errors', methods=['GET'])
 @jwt_required()
 def get_error_stats():
     username = get_jwt_identity()

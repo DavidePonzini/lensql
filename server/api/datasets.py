@@ -7,9 +7,9 @@ from .util import responses
 from server import db
 
 
-dataset_bp = Blueprint('dataset', __name__)
+bp = Blueprint('dataset', __name__)
 
-@dataset_bp.route('/', methods=['GET'])
+@bp.route('/', methods=['GET'])
 @jwt_required()
 def get_dataset():
     '''Get a dataset by ID.'''
@@ -24,7 +24,7 @@ def get_dataset():
 
     return responses.response(True, data=result)
 
-@dataset_bp.route('/list', methods=['GET'])
+@bp.route('/list', methods=['GET'])
 @jwt_required()
 def list_datasets():
     '''List all datasets available to the user.'''

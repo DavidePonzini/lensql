@@ -24,21 +24,16 @@ def create_app() -> Flask:
     jwt.init_app(app)
 
     # Register blueprints
-    from .assignments import assignment_bp
-    from .auth import auth_bp
-    from .datasets import dataset_bp
-    from .exercises import exercise_bp
-    from .messages import message_bp
-    from .queries import query_bp
-    from .users import user_bp
+    from . import admin, assignments, auth, datasets, exercises, messages, queries, users
 
-    app.register_blueprint(assignment_bp, url_prefix='/assignments')
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(dataset_bp, url_prefix='/datasets')
-    app.register_blueprint(exercise_bp, url_prefix='/exercises')
-    app.register_blueprint(message_bp, url_prefix='/messages')
-    app.register_blueprint(query_bp, url_prefix='/queries')
-    app.register_blueprint(user_bp, url_prefix='/users')
+    app.register_blueprint(admin.bp, url_prefix='/admin')
+    app.register_blueprint(assignments.bp, url_prefix='/assignments')
+    app.register_blueprint(auth.bp, url_prefix='/auth')
+    app.register_blueprint(datasets.bp, url_prefix='/datasets')
+    app.register_blueprint(exercises.bp, url_prefix='/exercises')
+    app.register_blueprint(messages.bp, url_prefix='/messages')
+    app.register_blueprint(queries.bp, url_prefix='/queries')
+    app.register_blueprint(users.bp, url_prefix='/users')
 
     # Run cleanup thread
     if os.getenv('GUNICORN_WORKER_ID', '0') == '0':

@@ -6,10 +6,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from server import db, llm
 from .util import responses
 
-message_bp = Blueprint('message', __name__)
+bp = Blueprint('message', __name__)
 
 
-@message_bp.route('/feedback', methods=['POST'])
+@bp.route('/feedback', methods=['POST'])
 @jwt_required()
 def feedback():
     '''Log feedback for a message.'''
@@ -27,7 +27,7 @@ def feedback():
     return responses.response(True)
 
 
-@message_bp.route('/error/explain', methods=['POST'])
+@bp.route('/error/explain', methods=['POST'])
 @jwt_required()
 def explain_error_message():
     username = get_jwt_identity()
@@ -48,7 +48,7 @@ def explain_error_message():
 
     return responses.response(answer=answer, id=answer_id)
 
-@message_bp.route('/error/locate', methods=['POST'])
+@bp.route('/error/locate', methods=['POST'])
 @jwt_required()
 def locate_error_cause():
     username = get_jwt_identity()
@@ -69,7 +69,7 @@ def locate_error_cause():
 
     return responses.response(answer=answer, id=answer_id)
 
-@message_bp.route('/error/example', methods=['POST'])
+@bp.route('/error/example', methods=['POST'])
 @jwt_required()
 def provide_error_example():
     username = get_jwt_identity()
@@ -91,7 +91,7 @@ def provide_error_example():
 
     return responses.response(answer=answer, id=answer_id)
 
-@message_bp.route('/error/fix', methods=['POST'])
+@bp.route('/error/fix', methods=['POST'])
 @jwt_required()
 def fix_query():
     username = get_jwt_identity()
@@ -112,7 +112,7 @@ def fix_query():
 
     return responses.response(answer=answer, id=answer_id)
 
-@message_bp.route('/success/describe', methods=['POST'])
+@bp.route('/success/describe', methods=['POST'])
 @jwt_required()
 def describe_my_query():
     username = get_jwt_identity()
@@ -132,7 +132,7 @@ def describe_my_query():
 
     return responses.response(answer=answer, id=answer_id)
 
-@message_bp.route('/success/explain', methods=['POST'])
+@bp.route('/success/explain', methods=['POST'])
 @jwt_required()
 def explain_my_query():
     username = get_jwt_identity()

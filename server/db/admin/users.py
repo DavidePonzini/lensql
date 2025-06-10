@@ -1,18 +1,17 @@
 from dav_tools import database
 from .connection import db, SCHEMA
 
-def get_info(username: str) -> dict:
-    '''Get general information about a user'''
+def is_admin(username: str) -> bool:
+    '''Check if a user is an admin'''
 
-    query = database.sql.SQL(
-    '''
+    query = database.sql.SQL('''
         SELECT
-            is_admin,
-            is_teacher
+            is_admin
         FROM
-            {schema}.v_user_info
+            {schema}.users
         WHERE
             username = {username}
+            AND NOT is_disabled
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username')
@@ -23,18 +22,48 @@ def get_info(username: str) -> dict:
     })
 
     if len(result) == 0:
-        return None
+        return False
+    
+    return result[0][0]
+
+def is_teacher(username: str) -> bool:
+    '''Check if a user is a teacher'''
+
+    query = database.sql.SQL('''
+        SELECT
+            is_teacher
+        FROM
+            {schema}.users
+        WHERE
+            username = {username}
+            AND NOT is_disabled
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    if len(result) == 0:
+        return False
+    
+    return result[0][0]
+
+def get_info(username: str) -> dict:
+    '''Get general information about a user'''
+
     return {
         'username': username,
-        'is_admin': result[0][0],
-        'is_teacher': result[0][1],
+        'is_admin': is_admin(username),
+        'is_teacher': is_teacher(username),
     }
 
 def get_unique_queries_count(username: str) -> int:
     '''Get the amount of unique queries run by the user'''
 
-    query = database.sql.SQL(
-    '''
+    query = database.sql.SQL('''
         SELECT
             COUNT(DISTINCT q.query)
         FROM
@@ -57,8 +86,7 @@ def get_unique_queries_count(username: str) -> int:
 def get_query_stats(username: str) -> dict:
     '''Get, for each query type, the amount of queries run by the user'''
 
-    query = database.sql.SQL(
-    '''
+    query = database.sql.SQL('''
     SELECT
         q.query_type,
         COUNT(q.id) AS queries,

@@ -7,10 +7,10 @@ from datetime import timedelta
 from server import db
 from .util import responses
 
-auth_bp = Blueprint('auth', __name__)
+bp = Blueprint('auth', __name__)
 
 
-@auth_bp.route('/login', methods=['POST'])
+@bp.route('/login', methods=['POST'])
 def login():
     '''Login endpoint to authenticate users and return JWT tokens.'''
     data = request.get_json()
@@ -25,14 +25,16 @@ def login():
 
     return responses.response(True, access_token=access_token, refresh_token=refresh_token)
 
-@auth_bp.route('/register', methods=['POST'])
+@bp.route('/register', methods=['POST'])
 def register():
     '''Register a new user and return JWT tokens.'''
     data = request.get_json()
     username = data['username']
     password = data['password']
+    is_teacher = data['is_teacher']
+    is_admin = data['is_admin']
 
-    if not db.register_user(username, password):
+    if not db.register_user(username, password, is_teacher=is_teacher, is_admin=is_admin):
         return responses.response(False, message='Registration failed. Please try again.')
     
     access_token = create_access_token(identity=username, expires_delta=timedelta(minutes=15))
@@ -40,7 +42,7 @@ def register():
     
     return responses.response(True, access_token=access_token, refresh_token=refresh_token)
 
-@auth_bp.route('/refresh', methods=['POST'])
+@bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh():
     '''Refresh the access token using the refresh token.'''
