@@ -4,6 +4,8 @@ import useAuth from '../../hooks/useAuth';
 import { useState } from 'react';
 import AssignExercise from './AssignExercise';
 import ExerciseData from './ExerciseData';
+import SetLearningObjectives from './SetLearningObjectives';
+
 
 // A single row in the exercise list + buttons
 function ExerciseRow({ exercise, refreshAssignments }) {
@@ -54,7 +56,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
             <td>
                 <ButtonShowDataset
                     datasetId={exerciseDatasetId}
-                    className="btn btn-secondary btn-sm me-1 mb-1"
+                    className="btn-sm me-1 mb-1"
                 />
 
                 <ButtonModal
@@ -63,6 +65,14 @@ function ExerciseRow({ exercise, refreshAssignments }) {
                     buttonText="Assign"
                 >
                     <AssignExercise exerciseId={exerciseId} />
+                </ButtonModal>
+
+                <ButtonModal
+                    className="btn btn-primary btn-sm me-1 mb-1"
+                    title="Set Learning Objectives"
+                    buttonText="Objectives"
+                >
+                    <SetLearningObjectives exerciseId={exerciseId} />
                 </ButtonModal>
 
                 <ButtonModal

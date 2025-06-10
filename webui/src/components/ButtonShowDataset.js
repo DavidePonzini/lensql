@@ -25,6 +25,7 @@ function ButtonShowDataset({ datasetId, footerButtons, className = 'btn btn-seco
 
     return (
         <ButtonModal
+            variant="secondary"
             className={className}
             title="Dataset"
             buttonText={buttonText}

@@ -62,11 +62,11 @@ function AssignmentList() {
                             assignmentId={assignment.id}
                             isGenerated={assignment.is_ai_generated}
                             key={assignment.id}
-                            deadlineDate={assignment.deadline_ts}
                             isSubmitted={false}
                             assignmentTitle={assignment.title}
                             onSubmit={handleSubmit}
                             onUnsubmit={handleUnsubmit}
+                            learningObjectives={assignment.learning_objectives}
                         >
                             {assignment.request}
                         </AssignmentCard>
@@ -84,11 +84,11 @@ function AssignmentList() {
                             assignmentId={assignment.id}
                             isGenerated={assignment.is_ai_generated}
                             key={assignment.id}
-                            deadlineDate={assignment.deadline_ts}
                             isSubmitted={true}
                             assignmentTitle={assignment.title}
                             onSubmit={handleSubmit}
                             onUnsubmit={handleUnsubmit}
+                            learningObjectives={assignment.learning_objectives}
                         >
                             {assignment.request}
                         </AssignmentCard>

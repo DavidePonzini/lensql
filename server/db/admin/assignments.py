@@ -11,17 +11,15 @@ def list_all(username: str) -> list:
             e.id,
             e.title,
             e.request,
-            a.deadline_ts,
             a.submission_ts,
             e.is_ai_generated
         FROM
-            {schema}.assignments a
+            {schema}.assigned_to a
             JOIN {schema}.exercises e ON a.exercise_id = e.id
         WHERE
             username = {username}
         ORDER BY
             CASE WHEN a.submission_ts IS NULL THEN 0 ELSE 1 END,
-            a.deadline_ts,
             e.title,
             e.id
     ''').format(
@@ -38,9 +36,9 @@ def list_all(username: str) -> list:
             'id': row[0],
             'title': row[1],
             'request': row[2],
-            'deadline_ts': row[3],
-            'submission_ts': row[4],
-            'is_ai_generated': row[5]
+            'submission_ts': row[3],
+            'is_ai_generated': row[4],
+            'learning_objectives': get_learning_objectives(row[0])
         }
         for row in result
     ]
@@ -50,7 +48,7 @@ def submit(username: str, exercise_id: int) -> None:
 
     query = database.sql.SQL(
     '''
-        UPDATE {schema}.assignments
+        UPDATE {schema}.assigned_to
         SET submission_ts = NOW()
         WHERE
             username = {username}
@@ -71,7 +69,7 @@ def unsubmit(username: str, exercise_id: int) -> None:
 
     query = database.sql.SQL(
     '''
-        UPDATE {schema}.assignments
+        UPDATE {schema}.assigned_to
         SET submission_ts = NULL
         WHERE
             username = {username}
@@ -98,7 +96,7 @@ def get_students(teacher: str, exercise_id: int) -> dict:
         FROM
             {schema}.teaches t
         LEFT JOIN
-            {schema}.assignments a ON a.username = t.student AND a.exercise_id = {exercise_id}
+            {schema}.assigned_to a ON a.username = t.student AND a.exercise_id = {exercise_id}
         WHERE
             t.teacher = {username}
     ''').format(
@@ -115,4 +113,33 @@ def get_students(teacher: str, exercise_id: int) -> dict:
     return [{
         'username': row[0],
         'is_assigned': row[1]
+    } for row in result]
+
+def get_learning_objectives(exercise_id: int) -> list:
+    '''Get the learning objectives of an exercise'''
+
+    query = database.sql.SQL(
+    '''
+        SELECT
+            lo.objective,
+            lo.description
+        FROM
+            {schema}.learning_objectives lo
+            JOIN {schema}.has_learning_objective hlo ON lo.objective = hlo.objective
+        WHERE
+            hlo.exercise_id = {exercise_id}
+        ORDER BY
+            hlo.objective
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'exercise_id': exercise_id
+    })
+
+    return [{
+        'objective': row[0],
+        'description': row[1]
     } for row in result]

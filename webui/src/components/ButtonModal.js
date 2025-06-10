@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 
 function ButtonModal({
+    variant = "primary",
     className,
     title,
     buttonText,
@@ -16,15 +17,17 @@ function ButtonModal({
 
     return (
         <>
-            <button type="button" className={className} onClick={handleShow}>
+            <Button variant={variant} className={className} onClick={handleShow}>
                 {buttonText}
-            </button>
+            </Button>
 
             <Modal show={showModal} onHide={(handleClose)} centered size={size}>
                 <Modal.Header closeButton>
                     <Modal.Title>{title}</Modal.Title>
                 </Modal.Header>
+
                 <Modal.Body>{children}</Modal.Body>
+                
                 <Modal.Footer>
                     {footerButtons && (
                         footerButtons.map((btn, index) => (

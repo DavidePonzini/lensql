@@ -17,6 +17,13 @@ function Chat({ queryId, success }) {
     ]);
     const [isThinking, setIsThinking] = useState(false);
 
+    const buttonSuccessDescribeLocked = false;
+    const buttonSuccessExplainLocked = false;
+    const buttonErrorExplainLocked = false;
+    const buttonErrorExampleLocked = true;
+    const buttonErrorLocateLocked = false;
+    const buttonErrorFixLocked = false;
+
     function addMessage(text, isFromAssistant, isThinking = false, messageId = null) {
         setMessages((prevMessages) => [...prevMessages, {
             text,
@@ -170,6 +177,7 @@ function Chat({ queryId, success }) {
                                         className="me-2 mb-1"
                                         variant="primary"
                                         cost={1}
+                                        locked={buttonSuccessDescribeLocked}
                                     >
                                         Describe query
                                     </ButtonAction>
@@ -179,6 +187,7 @@ function Chat({ queryId, success }) {
                                         className="me-2 mb-1"
                                         variant="primary"
                                         cost={3}
+                                        locked={buttonSuccessExplainLocked}
                                     >
                                         Explain query
                                     </ButtonAction>
@@ -190,6 +199,7 @@ function Chat({ queryId, success }) {
                                         className="me-2 mb-1"
                                         variant="primary"
                                         cost={3}
+                                        locked={buttonErrorExplainLocked}
                                     >
                                         Explain error
                                     </ButtonAction>
@@ -199,7 +209,7 @@ function Chat({ queryId, success }) {
                                         className="me-2 mb-1"
                                         variant="primary"
                                         cost={3}
-                                        locked={true}
+                                        locked={buttonErrorExampleLocked}
                                     >
                                         Show example
                                     </ButtonAction>
@@ -209,6 +219,7 @@ function Chat({ queryId, success }) {
                                         className="me-2 mb-1"
                                         variant="primary"
                                         cost={5}
+                                        locked={buttonErrorLocateLocked}
                                     >
                                         Where to look
                                     </ButtonAction>
@@ -218,6 +229,7 @@ function Chat({ queryId, success }) {
                                         className="me-2 mb-1"
                                         variant="primary"
                                         cost={20}
+                                        locked={buttonErrorFixLocked}
                                     >
                                         Suggest fix
                                     </ButtonAction>

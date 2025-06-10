@@ -23,8 +23,8 @@ CREATE TABLE users (
 );
 
 CREATE TABLE teaches (
-    teacher VARCHAR(255) NOT NULL REFERENCES users(username),
-    student VARCHAR(255) NOT NULL REFERENCES users(username),
+    teacher VARCHAR(255) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
+    student VARCHAR(255) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
 
     PRIMARY KEY (teacher, student)
 );
@@ -37,8 +37,8 @@ CREATE TABLE datasets (
 );
 
 CREATE TABLE has_dataset (
-    username VARCHAR(255) NOT NULL REFERENCES users(username),
-    dataset_id INTEGER NOT NULL REFERENCES datasets(id),
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
+    dataset_id INTEGER NOT NULL REFERENCES datasets(id) ON DELETE CASCADE,
 
     PRIMARY KEY (username, dataset_id)
 );
@@ -52,15 +52,25 @@ CREATE TABLE exercises (
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE assignments (
+CREATE TABLE assigned_to (
     username VARCHAR(255) NOT NULL REFERENCES users(username),
     exercise_id INTEGER NOT NULL REFERENCES exercises(id),
-    creation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-    deadline_ts TIMESTAMP DEFAULT NULL,
     submission_ts TIMESTAMP DEFAULT NULL,
 
     PRIMARY KEY (username, exercise_id)
-);    
+);
+
+CREATE TABLE learning_objectives (
+    objective VARCHAR(255) NOT NULL PRIMARY KEY,
+    description TEXT NOT NULL
+);
+
+CREATE TABLE has_learning_objective (
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
+    objective VARCHAR(255) NOT NULL REFERENCES learning_objectives(objective),
+
+    PRIMARY KEY (exercise_id, objective)
+);
 
 CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,

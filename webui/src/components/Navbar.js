@@ -4,10 +4,45 @@ import useAuth from '../hooks/useAuth';
 
 import './Navbar.css';
 
+function GamificationStats({ userInfo }) {
+    return (
+        <>
+            {userInfo?.level && (
+                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Level">
+                    <i className="fa fa-trophy text-primary" />
+                    {userInfo.level}
+                </span>
+            )}
+
+            {userInfo?.xp && userInfo?.xpToNextLevel && (
+                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Experience points">
+                    <i className="fa fa-star text-info" />
+                    {userInfo.xp}/{userInfo.xpToNextLevel}
+                </span>
+            )}
+            
+            {userInfo?.coins && (
+                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="LensCoins">
+                    <i className="fa fa-coins text-warning" />
+                    {userInfo.coins}
+                </span>
+            )}
+        </>
+    );
+}
+
+
 function Navbar() {
     const navigate = useNavigate();
 
     const { isLoggedIn, logout, userInfo, loadingUser } = useAuth();
+
+    if (userInfo) {
+        userInfo.coins = 75;
+        userInfo.xp = 1500;
+        userInfo.xpToNextLevel = 2000;
+        userInfo.level = 5;
+    }
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
@@ -48,8 +83,9 @@ function Navbar() {
                     <div className="navbar-text">
                         {isLoggedIn ? (
                             <>
-                                <span className="mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Your username">
-                                    <i className="fa-solid fa-user"></i>
+                                {/* User info */}
+                                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Your username">
+                                    <i className="fa-solid fa-user" />
                                     <span>{loadingUser ? 'Loading...' : userInfo?.username || 'Unknown'}</span>
                                 </span>
                                 {userInfo?.isAdmin && (
@@ -58,6 +94,11 @@ function Navbar() {
                                 {userInfo?.isTeacher && (
                                     <i className="fa fa-chalkboard-teacher text-success mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Teacher"></i>
                                 )}
+
+                                <div className='vr mx-1'/>
+
+                                <GamificationStats userInfo={userInfo} />
+
                                 <button className="btn btn-outline-danger mx-1" type="button" onClick={logout}>
                                     Logout
                                 </button>

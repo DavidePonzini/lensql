@@ -16,9 +16,9 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
     const [result, setResult] = useState([]);
 
     const buttonShowSearchPathLocked = false;
-    const buttonListSchemasLocked = false;
     const buttonListTablesLocked = false;
     const buttonListAllTablesLocked = false;
+    const buttonListSchemasLocked = false;
     const buttonListConstraintsLocked = false;
 
     function displayResult(data) {
@@ -211,22 +211,6 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
             <h2 className="exercise-title">{exerciseTitle}</h2>
             <p className="exercise-request" style={{ position: 'relative', paddingLeft: '1rem' }}>{exerciseText}</p>
 
-            <div className="mb-3" style={{ justifySelf: 'end' }}>
-                <ButtonShowDataset
-                    className="btn btn-secondary me-1"
-                    buttonText="View Dataset"
-                    datasetId={datasetId}
-                    footerButtons={[
-                        {
-                            text: 'Create',
-                            variant: 'primary',
-                            onClick: handleCreateDataset,
-                            autoClose: true,
-                        },
-                    ]}
-                />
-            </div>
-
             <SqlEditor onChange={setSqlText} onSubmit={handleExecute} />
 
             <div className="mt-3 support-buttons">
@@ -239,6 +223,20 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
                     Execute
                 </ButtonAction>
 
+                <ButtonShowDataset
+                    className="me-1 mb-1"
+                    buttonText="View Dataset"
+                    datasetId={datasetId}
+                    footerButtons={[
+                        {
+                            text: 'Create',
+                            variant: 'primary',
+                            onClick: handleCreateDataset,
+                            autoClose: true,
+                        },
+                    ]}
+                />
+
                 <ButtonAction
                     variant="secondary"
                     className="me-1 mb-1"
@@ -247,17 +245,6 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
                     locked={buttonShowSearchPathLocked}
                 >
                     Show Search Path
-                </ButtonAction>
-
-                <ButtonAction
-                    variant="secondary"
-                    className="me-1 mb-1"
-                    onClick={handleListSchemas}
-                    disabled={isExecuting}
-                    locked={buttonListSchemasLocked}
-                    cost={10}
-                >
-                    List Schemas
                 </ButtonAction>
 
                 <ButtonActionDropdown
@@ -281,6 +268,17 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
                         },
                     ]}
                 />
+
+                <ButtonAction
+                    variant="secondary"
+                    className="me-1 mb-1"
+                    onClick={handleListSchemas}
+                    disabled={isExecuting}
+                    locked={buttonListSchemasLocked}
+                >
+                    List Schemas
+                </ButtonAction>
+
 
                 <ButtonAction
                     variant="secondary"

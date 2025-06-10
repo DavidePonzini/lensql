@@ -76,14 +76,14 @@ exercise_bp.add_url_rule('', view_func=ExerciseAPI.as_view('exercise_api'))
 def get_all_exercises():
     '''Get a list of all exercises.'''
 
-    # TODO: only return exercises that the user has access to
+    username = get_jwt_identity()
 
-    exercises = db.admin.exercises.list_all()
+    exercises = db.admin.exercises.list_all(username)
     return responses.response(True, data=exercises)
 
 @exercise_bp.route('/assign', methods=['POST'])
 @jwt_required()
-def assign_exercise():
+def assign():
     '''Assign or unassign an exercise to a student.'''
 
     username = get_jwt_identity()
@@ -106,6 +106,45 @@ def assign_exercise():
         )
 
     return responses.response(True)
+
+@exercise_bp.route('/objective', methods=['POST'])
+@jwt_required()
+def set_learning_objective():
+    '''Set learning objective for an exercise.'''
+
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+    objective = data['objective']
+    value = data['value']
+
+    if value:
+        db.admin.exercises.set_learning_objective(
+            teacher=username,
+            exercise_id=exercise_id,
+            objective=objective
+        )
+    else:
+        db.admin.exercises.unset_learning_objective(
+            teacher=username,
+            exercise_id=exercise_id,
+            objective=objective
+        )
+
+    return responses.response(True)
+
+
+@exercise_bp.route('/list-objectives', methods=['GET'])
+@jwt_required()
+def list_learning_objectives():
+    '''List learning objectives for an exercise.'''
+
+    username = get_jwt_identity()
+    exercise_id = request.args.get('exercise_id')
+
+    objectives = db.admin.exercises.list_learning_objectives(exercise_id)
+
+    return responses.response(True, data=objectives)
 
 @exercise_bp.route('/init-dataset', methods=['POST'])
 @jwt_required()

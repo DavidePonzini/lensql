@@ -14,6 +14,8 @@ function Errors() {
         setData(response.data)
     }
 
+    if (data); // TODO: display data when available
+
     return (
         <ObservedOnce onFirstVisible={fetchData}>
             <Row className="mb-4">

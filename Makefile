@@ -23,7 +23,7 @@ deploy:
 	docker compose -f $(PROD_DOCKER_COMPOSE_FILE) up -d --build
 
 setup:
-	docker exec lensql_server python /app/setup.py
+	docker exec lensql_server python /app/server/setup.py
 
 psql:
 	docker exec -it lensql_db_admin psql -U postgres

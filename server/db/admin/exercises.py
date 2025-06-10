@@ -1,9 +1,9 @@
 from dav_tools import database
 from .connection import db, SCHEMA
 
-# TODO: is this needed?
-def list_all() -> list[dict]:
-    '''Get all exercises in the database'''
+# TODO: show only exercises the user is assigned to
+def list_all(username: str) -> list[dict]:
+    '''Get all exercises in the database the user has access to'''
 
     query = database.sql.SQL(
     '''
@@ -51,7 +51,7 @@ def get(exercise_id: int, username: str) -> dict:
             e.dataset_id
         FROM
             {schema}.exercises e
-            JOIN {schema}.assignments a ON e.id = a.exercise_id
+            JOIN {schema}.assigned_to a ON e.id = a.exercise_id
         WHERE
             e.id = {exercise_id}
             AND a.username = {username} 
@@ -94,7 +94,7 @@ def get_dataset(exercise_id: int) -> str:
 
     return result[0][0]
 
-def create(title: str, request: str, dataset_id: int | None, expected_answer: str, is_ai_generated: bool) -> int:
+def create(title: str, request: str, dataset_id: int | None, expected_answer: str, is_ai_generated: bool, learning_objectives: list[str]) -> int:
     '''Create a new exercise'''
 
     result = db.insert(SCHEMA, 'exercises', {
@@ -107,9 +107,15 @@ def create(title: str, request: str, dataset_id: int | None, expected_answer: st
 
     exercise_id = result[0][0]
 
+    for lo in learning_objectives:
+        db.insert(SCHEMA, 'has_learning_objective', {
+            'exercise_id': exercise_id,
+            'objective': lo
+        })
+
     return exercise_id
 
-def update(exercise_id: int, title: str, request: str, dataset_id: int | None, expected_answer: str) -> None:
+def update(exercise_id: int, title: str, request: str, dataset_id: int | None, expected_answer: str, learning_objectives: list[str]) -> None:
     '''Update an existing exercise'''
 
     query = database.sql.SQL('''
@@ -135,6 +141,25 @@ def update(exercise_id: int, title: str, request: str, dataset_id: int | None, e
         'exercise_id': exercise_id
     })
 
+    # Delete existing learning objectives and insert new ones
+    query_delete_lo = database.sql.SQL('''
+        DELETE FROM {schema}.has_learning_objective
+        WHERE exercise_id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    db.execute(query_delete_lo, {
+        'exercise_id': exercise_id
+    })
+
+    for lo in learning_objectives:
+        db.insert(SCHEMA, 'has_learning_objective', {
+            'exercise_id': exercise_id,
+            'objective': lo
+        })
+
 def delete(exercise_id: int) -> None:
     '''Delete an exercise'''
 
@@ -159,7 +184,7 @@ def assign(teacher: str, exercise_id: int, student: str) -> None:
 
     # Check if already assigned, skip if exists (optional safeguard)
     query_check = database.sql.SQL('''
-        SELECT 1 FROM {schema}.assignments
+        SELECT 1 FROM {schema}.assigned_to
         WHERE username = {student} AND exercise_id = {exercise_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
@@ -173,7 +198,7 @@ def assign(teacher: str, exercise_id: int, student: str) -> None:
     if exists:
         return
 
-    db.insert(SCHEMA, 'assignments', {
+    db.insert(SCHEMA, 'assigned_to', {
         'username': student,
         'exercise_id': exercise_id
     })
@@ -184,7 +209,7 @@ def unassign(teacher: str, exercise_id: int, student: str) -> None:
     # TODO: Check if teacher is allowed to unassign exercises from the student
 
     query = database.sql.SQL('''
-        DELETE FROM {schema}.assignments
+        DELETE FROM {schema}.assigned_to
         WHERE username = {student}
         AND exercise_id = {exercise_id}
     ''').format(
@@ -196,3 +221,69 @@ def unassign(teacher: str, exercise_id: int, student: str) -> None:
         'student': student,
         'exercise_id': exercise_id
     })
+
+def set_learning_objective(teacher: str, exercise_id: int, objective: str) -> None:
+    '''Set a learning objective for an exercise'''
+
+    query = database.sql.SQL('''
+        INSERT INTO {schema}.has_learning_objective (exercise_id, objective)
+        VALUES ({exercise_id}, {objective})
+        ON CONFLICT (exercise_id, objective) DO NOTHING
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id'),
+        objective=database.sql.Placeholder('objective')
+    )
+
+    db.execute(query, {
+        'exercise_id': exercise_id,
+        'objective': objective
+    })
+
+def unset_learning_objective(teacher: str, exercise_id: int, objective: str) -> None:
+    '''Unset a learning objective for an exercise'''
+
+    query = database.sql.SQL('''
+        DELETE FROM {schema}.has_learning_objective
+        WHERE exercise_id = {exercise_id}
+        AND objective = {objective}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id'),
+        objective=database.sql.Placeholder('objective')
+    )
+
+    db.execute(query, {
+        'exercise_id': exercise_id,
+        'objective': objective
+    })
+
+def list_learning_objectives(exercise_id: int) -> list[str]:
+    '''List learning objectives for an exercise'''
+
+    query = database.sql.SQL('''
+        SELECT
+            lo.objective AS objective,
+            lo.description AS description,
+            (hlo.objective IS NOT NULL) AS is_set
+        FROM
+            {schema}.learning_objectives lo
+            LEFT JOIN {schema}.has_learning_objective hlo ON lo.objective = hlo.objective AND hlo.exercise_id = {exercise_id}
+        ORDER BY
+            lo.objective
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'exercise_id': exercise_id
+    })
+
+    return [{
+        'objective': row[0],
+        'description': row[1],
+        'is_set': row[2]
+    } for row in result]
+
+                             

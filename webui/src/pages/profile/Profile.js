@@ -43,6 +43,28 @@ function Profile() {
 
             <hr />
             <h2>Achievements</h2>
+            <ul className="list-group mb-3">
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                    First Query
+                    <span className="badge bg-success rounded-pill">Unlocked</span>
+                </li>
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                    100 Queries
+                    <span className="badge bg-secondary rounded-pill">Locked</span>
+                </li>
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                    SQL Master
+                    <span className="badge bg-secondary rounded-pill">Locked</span>
+                </li>
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                    LensCoins Collector
+                    <span className="badge bg-secondary rounded-pill">Locked</span>
+                </li>
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                    Daily Challenger
+                    <span className="badge bg-secondary rounded-pill">Locked</span>
+                </li>
+            </ul>
         </>
     );
 }
