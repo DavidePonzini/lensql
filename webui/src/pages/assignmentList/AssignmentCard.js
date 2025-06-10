@@ -40,30 +40,42 @@ function AssignmentCard({
             <Card.Header>
                 <h5 className="card-title">{assignmentTitle}</h5>
             </Card.Header>
-            
+
             <Card.Body>
                 <Card.Text>
                     {children}
                 </Card.Text>
 
-                {learningObjectives.length > 0 && (
-                    <div className='my-2'>
-                        <b>Learning Objectives:</b>
-                        <div>
-                            {learningObjectives.map(({ objective, description }, index) => (
-                                <span
-                                    key={index}
-                                    className="badge bg-secondary me-1"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="bottom"
-                                    data-bs-title={description}
-                                >
-                                    {objective}
-                                </span>
-                            ))}
-                        </div>
+                <div className='row my-2'>
+                    {learningObjectives.length > 0 && (
+                        <>
+                            <div className='col'>
+                                <b>Learning Objectives:</b>
+                                <div>
+                                    {learningObjectives.map(({ objective, description }, index) => (
+                                        <span
+                                            key={index}
+                                            className="badge bg-secondary me-1"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom"
+                                            data-bs-title={description}
+                                        >
+                                            {objective}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className='col-auto d-flex'>
+                                <div className='vr'></div>
+                            </div>
+                        </>
+
+                    )}
+                    <div className='col'>
+
                     </div>
-                )}
+                </div>
 
                 {isGenerated && (
                     <span className="badge bg-info mx-1 my-2">
