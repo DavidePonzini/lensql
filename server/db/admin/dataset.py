@@ -1,24 +1,24 @@
 from dav_tools import database
 from .connection import db, SCHEMA
 
-def get(dataset_id: int | None) -> str:
+def get(dataset_name: str | None) -> str:
     '''Get the dataset for a given dataset ID'''
 
-    if dataset_id is None:
+    if dataset_name is None:
         return '-- No dataset provided'
 
     query = database.sql.SQL(
         '''
         SELECT dataset
         FROM {schema}.datasets
-        WHERE id = {dataset_id}
+        WHERE name = {dataset_name}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
-        dataset_id=database.sql.Placeholder('dataset_id')
+        dataset_name=database.sql.Placeholder('dataset_name')
     )
 
     result = db.execute_and_fetch(query, {
-        'dataset_id': dataset_id
+        'dataset_name': dataset_name
     })
 
     if len(result) == 0:
@@ -32,15 +32,13 @@ def list_all(username: str) -> list[dict]:
     query = database.sql.SQL(
     '''
         SELECT
-            d.id,
-            d.name
+            dataset_name
         FROM
-            {schema}.datasets d
-            JOIN {schema}.has_dataset hd ON d.id = hd.dataset_id
+            {schema}.has_dataset
         WHERE
-            hd.username = {username}
+            username = {username}
         ORDER BY
-            d.name
+            dataset_name
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username')
@@ -48,13 +46,7 @@ def list_all(username: str) -> list[dict]:
     result = db.execute_and_fetch(query, {
         'username': username
     })
-    return [
-        {
-            'id': row[0],
-            'name': row[1]
-        }
-        for row in result
-    ]
+    return [ row[0] for row in result ]
 
 def add(name: str, dataset: str) -> None:
     '''Add a dataset to the database'''

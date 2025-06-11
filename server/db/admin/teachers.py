@@ -94,3 +94,71 @@ def get_students_status(teacher: str) -> list[dict]:
         }
         for row in result
     ]
+
+def get_datasets_status(teacher: str) -> list[dict]:
+    '''List datasets status for a given teacher'''
+
+    query = database.sql.SQL('''
+        SELECT
+            d.name,
+            (hd.username IS NOT NULL) AS is_assigned
+        FROM
+            {schema}.datasets AS d
+        LEFT JOIN
+            {schema}.has_dataset AS hd ON d.name = hd.dataset_name AND hd.username = {teacher}
+        ORDER BY
+            d.name
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        teacher=database.sql.Placeholder('teacher')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'teacher': teacher
+    })
+
+    return [
+        {
+            'name': row[0],
+            'is_assigned': row[1],
+        }
+        for row in result
+    ]
+
+def assign_dataset(teacher: str, dataset_name: str) -> None:
+    '''Assign a dataset to a teacher'''
+
+    query = database.sql.SQL(
+    '''
+        INSERT INTO {schema}.has_dataset(username, dataset_name)
+        VALUES ({username}, {dataset_name})
+        ON CONFLICT (username, dataset_name) DO NOTHING
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        dataset_name=database.sql.Placeholder('dataset_name')
+    )
+
+    db.execute(query, {
+        'username': teacher,
+        'dataset_name': dataset_name
+    })
+
+def remove_dataset(teacher: str, dataset_name: str) -> None:
+    '''Remove a dataset from a teacher's assignments'''
+
+    query = database.sql.SQL(
+    '''
+        DELETE FROM {schema}.has_dataset
+        WHERE username = {username} AND dataset_name = {dataset_name}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        dataset_name=database.sql.Placeholder('dataset_name')
+    )
+
+    db.execute(query, {
+        'username': teacher,
+        'dataset_name': dataset_name
+    })
+

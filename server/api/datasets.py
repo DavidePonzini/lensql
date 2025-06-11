@@ -16,11 +16,9 @@ def get_dataset():
     
     username = get_jwt_identity()
     data = request.args
-    dataset_id = data.get('id')
-    if dataset_id == '':
-        dataset_id = None
+    dataset_name = data.get('name') or None
 
-    result = db.admin.dataset.get(dataset_id)
+    result = db.admin.dataset.get(dataset_name)
 
     return responses.response(True, data=result)
 

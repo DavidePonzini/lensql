@@ -9,6 +9,7 @@ function ButtonModal({
     children,
     footerButtons, // Array of buttons to render in the footer
     size = "md",
+    disabled = false,
 }) {
     const [showModal, setShowModal] = useState(false);
 
@@ -17,7 +18,7 @@ function ButtonModal({
 
     return (
         <>
-            <Button variant={variant} className={className} onClick={handleShow}>
+            <Button variant={variant} className={className} onClick={handleShow} disabled={disabled}>
                 {buttonText}
             </Button>
 
@@ -34,6 +35,7 @@ function ButtonModal({
                             <Button
                                 key={index}
                                 variant={btn.variant || "secondary"}
+                                disabled={btn.disabled || false}
                                 onClick={() => {
                                     btn.onClick?.();
                                     if (btn.autoClose !== false) handleClose();

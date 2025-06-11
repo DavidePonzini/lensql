@@ -2,7 +2,7 @@ import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import ExerciseRow from './ExerciseRow';
 import AddExercise from './AddExercise';
-
+import Table from 'react-bootstrap/Table';
 
 // Main page component
 function ManageAssignments() {
@@ -23,7 +23,7 @@ function ManageAssignments() {
     if (loading) return <p>Loading...</p>;
 
     return (
-        <table className="table table-striped table-hover">
+        <Table striped borderless hover>
             <thead className="table-dark">
                 <tr>
                     <th>Title</th>
@@ -50,7 +50,7 @@ function ManageAssignments() {
                     </td>
                 </tr>
             </tfoot>
-        </table>
+        </Table>
     );
 }
 

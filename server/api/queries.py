@@ -131,3 +131,17 @@ def list_constraints():
     result.id = log_builtin_query(username, exercise_id, result)
 
     return responses.response_query(result, is_builtin=True)
+
+@bp.route('/builtin/view-expected-result', methods=['POST'])
+@jwt_required()
+def view_expected_result():
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = int(data['exercise_id'])
+
+    exercise = db.admin.exercises.get(exercise_id)
+    
+    result = db.users.queries.builtin.view_expected_result(username, exercise_id)
+    result.id = log_builtin_query(username, exercise_id, result)
+
+    return responses.response_query(result, is_builtin=True)

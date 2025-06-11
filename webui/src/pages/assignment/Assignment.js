@@ -27,7 +27,7 @@ function Assignment() {
         <Query
             exerciseId={assignmentId}
             exerciseText={assignment.request}
-            datasetId={assignment.dataset_id}
+            datasetName={assignment.dataset_name}
         />
     );
 }

@@ -1,6 +1,7 @@
 from dav_tools import database
 from .connection import db, SCHEMA
 
+
 # TODO: show only exercises the user is assigned to
 def list_all(username: str) -> list[dict]:
     '''Get all exercises in the database the user has access to'''
@@ -11,13 +12,11 @@ def list_all(username: str) -> list[dict]:
             e.id,
             e.title,
             e.request,
-            e.dataset_id,
-            d.name,
+            e.dataset_name,
             e.expected_answer,
             e.is_ai_generated
         FROM
             {schema}.exercises e
-            LEFT JOIN {schema}.datasets d ON e.dataset_id = d.id
         ORDER BY
             e.title,
             e.id
@@ -32,10 +31,9 @@ def list_all(username: str) -> list[dict]:
             'id': row[0],
             'title': row[1],
             'request': row[2],
-            'dataset_id': row[3],
-            'dataset_name': row[4] if row[3] else 'None',
-            'expected_answer': row[5],
-            'is_ai_generated': row[6]
+            'dataset_name': row[3],
+            'expected_answer': row[4],
+            'is_ai_generated': row[5]
         }
         for row in result
     ]
@@ -48,7 +46,7 @@ def get(exercise_id: int, username: str) -> dict:
     '''
         SELECT
             e.request,
-            e.dataset_id
+            e.dataset_name
         FROM
             {schema}.exercises e
             JOIN {schema}.assigned_to a ON e.id = a.exercise_id
@@ -66,9 +64,12 @@ def get(exercise_id: int, username: str) -> dict:
     })
     if len(result) == 0:
         return None
+    
+    result = result[0]
+
     return {
-        'request': result[0][0],
-        'dataset_id': result[0][1]
+        'request': result[0],
+        'dataset_name': result[1]
     }
 
 def get_dataset(exercise_id: int) -> str:
@@ -78,7 +79,7 @@ def get_dataset(exercise_id: int) -> str:
         '''
         SELECT dataset
         FROM {schema}.exercises e
-            JOIN {schema}.datasets d ON e.dataset_id = d.id                     
+            JOIN {schema}.datasets d ON e.dataset_name = d.name                     
         WHERE e.id = {exercise_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
@@ -94,13 +95,13 @@ def get_dataset(exercise_id: int) -> str:
 
     return result[0][0]
 
-def create(title: str, request: str, dataset_id: int | None, expected_answer: str, is_ai_generated: bool) -> int:
+def create(title: str, request: str, dataset_name: str | None, expected_answer: str | None, is_ai_generated: bool) -> int:
     '''Create a new exercise'''
 
     result = db.insert(SCHEMA, 'exercises', {
         'title': title,
         'request': request,
-        'dataset_id': dataset_id,
+        'dataset_name': dataset_name,
         'expected_answer': expected_answer,
         'is_ai_generated': is_ai_generated
     }, ['id'])
@@ -109,50 +110,31 @@ def create(title: str, request: str, dataset_id: int | None, expected_answer: st
 
     return exercise_id
 
-def update(exercise_id: int, title: str, request: str, dataset_id: int | None, expected_answer: str, learning_objectives: list[str]) -> None:
+def update(exercise_id: int, title: str, request: str, dataset_name: str | None, expected_answer: str | None) -> None:
     '''Update an existing exercise'''
 
     query = database.sql.SQL('''
         UPDATE {schema}.exercises
         SET title = {title},
             request = {request},
-            dataset_id = {dataset_id},
+            dataset_name = {dataset_name},
             expected_answer = {expected_answer}
         WHERE id = {exercise_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         title=database.sql.Placeholder('title'),
         request=database.sql.Placeholder('request'),
-        dataset_id=database.sql.Placeholder('dataset_id'),
+        dataset_name=database.sql.Placeholder('dataset_name'),
         expected_answer=database.sql.Placeholder('expected_answer'),
         exercise_id=database.sql.Placeholder('exercise_id')
     )
     db.execute(query, {
         'title': title,
         'request': request,
-        'dataset_id': dataset_id,
+        'dataset_name': dataset_name,
         'expected_answer': expected_answer,
         'exercise_id': exercise_id
     })
-
-    # Delete existing learning objectives and insert new ones
-    query_delete_lo = database.sql.SQL('''
-        DELETE FROM {schema}.has_learning_objective
-        WHERE exercise_id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
-
-    db.execute(query_delete_lo, {
-        'exercise_id': exercise_id
-    })
-
-    for lo in learning_objectives:
-        db.insert(SCHEMA, 'has_learning_objective', {
-            'exercise_id': exercise_id,
-            'objective': lo
-        })
 
 def delete(exercise_id: int) -> None:
     '''Delete an exercise'''
@@ -175,6 +157,7 @@ def assign(teacher: str, exercise_id: int, student: str) -> None:
     '''Assign an exercise to a student'''
 
     # TODO: Check if teacher is allowed to assign exercises to the student
+
 
     # Check if already assigned, skip if exists (optional safeguard)
     query_check = database.sql.SQL('''
@@ -280,4 +263,9 @@ def list_learning_objectives(exercise_id: int) -> list[str]:
         'is_set': row[2]
     } for row in result]
 
-                             
+def get_expected_result():
+    # TODO
+    pass
+
+
+                   

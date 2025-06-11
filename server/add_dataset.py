@@ -1,4 +1,4 @@
-import server.db_admin as db_admin
+from server import db
 
 from dav_tools import argument_parser, messages
 
@@ -13,7 +13,7 @@ def add_dataset(name: str, path: str):
         with open(path, 'r') as file:
             content = file.read()
 
-        db_admin.add_dataset(name, content)
+        db.admin.dataset.add(name, content)
 
         messages.info(f'Dataset {name} added successfully.')
     except Exception as e:

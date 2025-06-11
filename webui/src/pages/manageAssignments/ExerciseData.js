@@ -2,7 +2,7 @@ import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 
 // Data placeholder for exercise data
-function ExerciseData({ title, setTitle, request, setRequest, datasetId, setDatasetId, answer, setAnswer }) {
+function ExerciseData({ title, setTitle, request, setRequest, datasetName, setDatasetName, answer, setAnswer }) {
     const { apiRequest } = useAuth();
     const [availableDatasets, setAvailableDatasets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -33,11 +33,11 @@ function ExerciseData({ title, setTitle, request, setRequest, datasetId, setData
                 {loading ? (
                     <p>Loading datasets...</p>
                 ) : (
-                    <select className="form-select" aria-label="Default select example" onChange={(e) => setDatasetId(e.target.value)} value={datasetId ? datasetId : ''}>
+                    <select className="form-select" aria-label="Default select example" onChange={(e) => setDatasetName(e.target.value)} value={datasetName ? datasetName : ''}>
                         <option value=''>None</option>
                         {availableDatasets.map((dataset) => (
-                            <option key={dataset.id} value={dataset.id}>
-                                {dataset.name}
+                            <option key={dataset} value={dataset}>
+                                {dataset}
                             </option>
                         ))}
                     </select>

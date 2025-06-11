@@ -32,25 +32,24 @@ CREATE TABLE teaches (
 );
 
 CREATE TABLE datasets (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL PRIMARY KEY,
     dataset TEXT NOT NULL DEFAULT '-- No dataset provided',
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE has_dataset (
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
-    dataset_id INTEGER NOT NULL REFERENCES datasets(id) ON DELETE CASCADE,
+    dataset_name VARCHAR(255) NOT NULL REFERENCES datasets(name) ON DELETE CASCADE,
 
-    PRIMARY KEY (username, dataset_id)
+    PRIMARY KEY (username, dataset_name)
 );
 
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
-    dataset_id INTEGER REFERENCES datasets(id) DEFAULT NULL,
-    expected_answer TEXT NOT NULL DEFAULT '',
+    dataset_name VARCHAR(255) REFERENCES datasets(name) DEFAULT NULL,
+    expected_answer TEXT DEFAULT NULL,
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 

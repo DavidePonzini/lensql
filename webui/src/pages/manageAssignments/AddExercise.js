@@ -32,6 +32,7 @@ function AddExercise({ refreshAssignments }) {
                     variant: 'primary',
                     onClick: handleAddExercise,
                     autoClose: true,
+                    disabled: !exerciseTitle || !exerciseRequest,
                 },
             ]}
         >

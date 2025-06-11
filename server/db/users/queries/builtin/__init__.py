@@ -60,3 +60,9 @@ def show_search_path(username: str) -> QueryResult:
     '''Shows the search path for the database.'''
 
     return _execute_builtin(username, _Queries.SHOW_SEARCH_PATH)
+
+def view_expected_result(username: str, exercise_id: int) -> QueryResult:
+    '''Views the expected result for a given exercise.'''
+
+    # TODO
+    return _execute_builtin(username, _Queries.VIEW_EXPECTED_RESULT(exercise_id))

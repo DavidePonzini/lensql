@@ -12,10 +12,9 @@ function ExerciseRow({ exercise, refreshAssignments }) {
     const { apiRequest } = useAuth();
 
     const exerciseId = exercise.id;
-    const exerciseDatasetName = exercise.dataset_name;
     const [exerciseTitle, setExerciseTitle] = useState(exercise.title);
     const [exerciseRequest, setExerciseRequest] = useState(exercise.request);
-    const [exerciseDatasetId, setExerciseDatasetId] = useState(exercise.dataset_id);
+    const [exerciseDatasetName, setExerciseDatasetName] = useState(exercise.dataset_name);
     const [exerciseAnswer, setExerciseAnswer] = useState(exercise.expected_answer);
     const isAiGenerated = exercise.is_ai_generated;
 
@@ -24,7 +23,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
             'exercise_id': exerciseId,
             'title': exerciseTitle,
             'request': exerciseRequest,
-            'dataset_id': exerciseDatasetId,
+            'dataset_name': exerciseDatasetName,
             'expected_answer': exerciseAnswer,
         });
 
@@ -55,7 +54,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
             </td>
             <td>
                 <ButtonShowDataset
-                    datasetId={exerciseDatasetId}
+                    datasetId={exerciseDatasetName}
                     className="btn-sm me-1 mb-1"
                 />
 
@@ -93,8 +92,8 @@ function ExerciseRow({ exercise, refreshAssignments }) {
                         setTitle={setExerciseTitle}
                         request={exerciseRequest}
                         setRequest={setExerciseRequest}
-                        datasetId={exerciseDatasetId}
-                        setDatasetId={setExerciseDatasetId}
+                        datasetName={exerciseDatasetName}
+                        setDatasetName={setExerciseDatasetName}
                         answer={exerciseAnswer}
                         setAnswer={setExerciseAnswer}
                     />

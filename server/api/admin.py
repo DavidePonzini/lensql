@@ -86,12 +86,48 @@ def assign_student():
         return responses.response(False, message="Access denied: Teacher privileges required.")
 
     if value:
-        from dav_tools import messages
-        messages.debug(f"Assigning student {student} to teacher {teacher}")
         db.admin.teachers.add_student(teacher, student)
     else:
-        from dav_tools import messages
-        messages.debug(f"Removing student {student} from teacher {teacher}")
         db.admin.teachers.remove_student(teacher, student)
+
+    return responses.response(True)
+
+
+@bp.route('/datasets', methods=['GET'])
+@jwt_required()
+def list_datasets():
+    """List dataset assignment status for a given teacher."""
+    
+    username = get_jwt_identity()
+    
+    data = request.args
+    teacher = data.get('teacher')
+
+    if not db.admin.users.is_teacher(username):
+        return responses.response(False, message="Access denied: Teacher privileges required.")
+
+    datasets = db.admin.teachers.get_datasets_status(teacher)
+
+    return responses.response(True, data=datasets)
+
+@bp.route('/assign-dataset', methods=['POST'])
+@jwt_required()
+def assign_dataset():
+    """Assign a dataset to a teacher."""
+    
+    username = get_jwt_identity()
+
+    data = request.get_json()
+    teacher = data['teacher']
+    dataset = data['dataset']
+    value = data['value']
+
+    if not db.admin.users.is_teacher(username):
+        return responses.response(False, message="Access denied: Teacher privileges required.")
+
+    if value:
+        db.admin.teachers.assign_dataset(teacher, dataset)
+    else:
+        db.admin.teachers.remove_dataset(teacher, dataset)
 
     return responses.response(True)

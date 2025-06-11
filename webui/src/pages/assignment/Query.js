@@ -9,7 +9,7 @@ import ButtonShowDataset from "../../components/ButtonShowDataset";
 import ButtonAction from "../../components/ButtonAction";
 import ButtonActionDropdown from "../../components/ButtonActionDropdown";
 
-function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
+function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
     const { apiRequest } = useAuth();
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
@@ -100,6 +100,15 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
         }
     }
 
+    async function handleViewExpectedResult() {
+        setIsExecuting(true);
+
+        const data = await apiRequest('/api/queries/builtin/view-expected-result', 'POST', {
+            'exercise_id': exerciseId,
+        });
+        setIsExecuting(false);
+        displayResult(data);
+    }
 
     async function handleShowSearchPath() {
         setIsExecuting(true);
@@ -214,90 +223,112 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetId }) {
             <SqlEditor onChange={setSqlText} onSubmit={handleExecute} />
 
             <div className="mt-3 support-buttons">
-                <ButtonAction
-                    variant="primary"
-                    className="me-1 mb-1"
-                    onClick={handleExecute}
-                    disabled={isExecuting || sqlText.trim().length === 0}
-                >
-                    Execute
-                </ButtonAction>
+                <div className="row">
+                    <div className="col">
+                        <ButtonAction
+                            variant="primary"
+                            className="me-1 mb-1"
+                            onClick={handleExecute}
+                            disabled={isExecuting || sqlText.trim().length === 0}
+                        >
+                            Execute
+                        </ButtonAction>
 
-                <ButtonShowDataset
-                    className="me-1 mb-1"
-                    buttonText="View Dataset"
-                    datasetId={datasetId}
-                    footerButtons={[
-                        {
-                            text: 'Create',
-                            variant: 'primary',
-                            onClick: handleCreateDataset,
-                            autoClose: true,
-                        },
-                    ]}
-                />
+                        <ButtonAction
+                            variant="outline-primary"
+                            className="me-1 mb-1"
+                            onClick={handleClearOutput}
+                            disabled={isExecuting || result.length === 0}
+                        >
+                            Clear output
+                        </ButtonAction>
 
-                <ButtonAction
-                    variant="secondary"
-                    className="me-1 mb-1"
-                    onClick={handleShowSearchPath}
-                    disabled={isExecuting}
-                    locked={buttonShowSearchPathLocked}
-                >
-                    Show Search Path
-                </ButtonAction>
+                                                <ButtonAction
+                            variant="warning"
+                            className="me-1 mb-1"
+                            onClick={handleViewExpectedResult}
+                            disabled={isExecuting}
+                        >
+                            Check Result | Expected Result
+                        </ButtonAction>
+                    </div>
 
-                <ButtonActionDropdown
-                    title="List Tables"
-                    disabled={isExecuting}
-                    locked={buttonListTablesLocked && buttonListAllTablesLocked}
-                    variant="secondary"
-                    className="me-1 mb-1"
-                    buttons={[
-                        {
-                            label: 'Current Schema',
-                            onClick: handleListTables,
-                            disabled: isExecuting,
-                            locked: buttonListTablesLocked,
-                        },
-                        {
-                            label: 'All Schemas',
-                            onClick: handleListAllTables,
-                            disabled: isExecuting,
-                            locked: buttonListAllTablesLocked,
-                        },
-                    ]}
-                />
+                    <div className="col-auto">
+                        <ButtonShowDataset
+                            variant="info"
+                            className="me-1 mb-1"
+                            buttonText="Dataset"
+                            datasetName={datasetName}
+                            disabled={isExecuting}
+                            footerButtons={[
+                                {
+                                    text: 'Create',
+                                    variant: 'primary',
+                                    onClick: handleCreateDataset,
+                                    autoClose: true,
+                                    disabled: isExecuting,
+                                },
+                            ]}
+                        />
+                    </div>
+                </div>
 
-                <ButtonAction
-                    variant="secondary"
-                    className="me-1 mb-1"
-                    onClick={handleListSchemas}
-                    disabled={isExecuting}
-                    locked={buttonListSchemasLocked}
-                >
-                    List Schemas
-                </ButtonAction>
+                <div className="row">
+                    <div className="col">
 
+                        <ButtonAction
+                            variant="secondary"
+                            className="me-1 mb-1"
+                            onClick={handleShowSearchPath}
+                            disabled={isExecuting}
+                            locked={buttonShowSearchPathLocked}
+                        >
+                            Show Search Path
+                        </ButtonAction>
 
-                <ButtonAction
-                    variant="secondary"
-                    className="me-1 mb-1"
-                    onClick={handleListConstraints}
-                    disabled={isExecuting}
-                    locked={buttonListConstraintsLocked}
-                >
-                    List Constraints
-                </ButtonAction>
+                        <ButtonActionDropdown
+                            title="List Tables"
+                            disabled={isExecuting}
+                            locked={buttonListTablesLocked && buttonListAllTablesLocked}
+                            variant="secondary"
+                            className="me-1 mb-1"
+                            buttons={[
+                                {
+                                    label: 'Current Schema',
+                                    onClick: handleListTables,
+                                    disabled: isExecuting,
+                                    locked: buttonListTablesLocked,
+                                },
+                                {
+                                    label: 'All Schemas',
+                                    onClick: handleListAllTables,
+                                    disabled: isExecuting,
+                                    locked: buttonListAllTablesLocked,
+                                },
+                            ]}
+                        />
 
-                <ButtonAction
-                    variant="primary"
-                    className="me-1 mb-1"
-                    onClick={handleClearOutput}
-                    disabled={isExecuting || result.length === 0}
-                >
-                    Clear output
-                </ButtonAction>
+                        <ButtonAction
+                            variant="secondary"
+                            className="me-1 mb-1"
+                            onClick={handleListSchemas}
+                            disabled={isExecuting}
+                            locked={buttonListSchemasLocked}
+                        >
+                            List Schemas
+                        </ButtonAction>
+
+                        <ButtonAction
+                            variant="secondary"
+                            className="me-1 mb-1"
+                            onClick={handleListConstraints}
+                            disabled={isExecuting}
+                            locked={buttonListConstraintsLocked}
+                        >
+                            List Constraints
+                        </ButtonAction>
+                    </div>
+                </div>
             </div>
 
             <div className="mt-3">
