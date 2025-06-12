@@ -8,14 +8,14 @@ function AddExercise({ refreshAssignments }) {
     const { apiRequest } = useAuth();
     const [exerciseTitle, setExerciseTitle] = useState('');
     const [exerciseRequest, setExerciseRequest] = useState('');
-    const [exerciseDatasetId, setExerciseDatasetId] = useState('');
+    const [exerciseDatasetName, setExerciseDatasetName] = useState('');
     const [exerciseAnswer, setExerciseAnswer] = useState('');
 
     async function handleAddExercise() {
         await apiRequest('/api/exercises', 'POST', {
             'title': exerciseTitle,
             'request': exerciseRequest,
-            'dataset_id': exerciseDatasetId,
+            'dataset_name': exerciseDatasetName,
             'solution': exerciseAnswer,
         });
 
@@ -41,8 +41,7 @@ function AddExercise({ refreshAssignments }) {
                 setTitle={setExerciseTitle}
                 request={exerciseRequest}
                 setRequest={setExerciseRequest}
-                datasetId={exerciseDatasetId}
-                setDatasetId={setExerciseDatasetId}
+                setDatasetName={setExerciseDatasetName}
                 answer={exerciseAnswer}
                 setAnswer={setExerciseAnswer}
             />
