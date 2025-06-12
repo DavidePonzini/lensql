@@ -16,7 +16,7 @@ function AddExercise({ refreshAssignments }) {
             'title': exerciseTitle,
             'request': exerciseRequest,
             'dataset_id': exerciseDatasetId,
-            'expected_answer': exerciseAnswer,
+            'solution': exerciseAnswer,
         });
 
         refreshAssignments();

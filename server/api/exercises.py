@@ -29,13 +29,13 @@ class ExerciseAPI(MethodView):
         title = data['title']
         request_text = data['request']
         dataset_name = data['dataset_name'] or None
-        expected_answer = data['expected_answer']
+        solution = data['solution']
 
         db.admin.exercises.create(
             title=title,
             request=request_text,
             dataset_name=dataset_name,
-            expected_answer=expected_answer,
+            solution=solution,
             is_ai_generated=False
         )
         return responses.response(True)
@@ -48,14 +48,14 @@ class ExerciseAPI(MethodView):
         title = data['title']
         request_text = data['request']
         dataset_name = data['dataset_name'] or None
-        expected_answer = data['expected_answer']
+        solution = data['solution']
 
         db.admin.exercises.update(
             exercise_id=exercise_id,
             title=title,
             request=request_text,
             dataset_name=dataset_name,
-            expected_answer=expected_answer
+            solution=solution
         )
         return responses.response(True)
 

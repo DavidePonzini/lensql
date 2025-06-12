@@ -28,7 +28,6 @@ function ManageAssignments() {
                 <tr>
                     <th>Title</th>
                     <th>Request</th>
-                    <th>Answer</th>
                     <th>Dataset</th>
                     <th>AI</th>
                     <th style={{ width: '353px' }}>Actions</th>

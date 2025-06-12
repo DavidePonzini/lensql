@@ -9,6 +9,22 @@ import ButtonShowDataset from "../../components/ButtonShowDataset";
 import ButtonAction from "../../components/ButtonAction";
 import ButtonActionDropdown from "../../components/ButtonActionDropdown";
 
+function ButtonCategory({ text, className, iconClassName }) {
+    return (
+        <div
+            className={`col-auto ${className}`}
+            style={{
+                alignContent: 'center',
+                marginBottom: '0.25rem',
+                width: 120,
+            }}
+        >
+            <i className={`${iconClassName} mx-1`}></i>
+            {text}:
+        </div>
+    );
+}
+
 function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
     const { apiRequest } = useAuth();
     const [sqlText, setSqlText] = useState('');
@@ -100,7 +116,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
         }
     }
 
-    async function handleViewExpectedResult() {
+    async function handleCheckResult() {
         setIsExecuting(true);
 
         const data = await apiRequest('/api/queries/builtin/view-expected-result', 'POST', {
@@ -224,6 +240,12 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
 
             <div className="mt-3 support-buttons">
                 <div className="row">
+                    <ButtonCategory
+                        text="Query"
+                        iconClassName='fas fa-align-left'
+                        className="text-primary"
+                    />
+
                     <div className="col">
                         <ButtonAction
                             variant="primary"
@@ -242,18 +264,17 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
                         >
                             Clear output
                         </ButtonAction>
-
-                                                <ButtonAction
-                            variant="warning"
-                            className="me-1 mb-1"
-                            onClick={handleViewExpectedResult}
-                            disabled={isExecuting}
-                        >
-                            Check Result | Expected Result
-                        </ButtonAction>
                     </div>
+                </div>
 
-                    <div className="col-auto">
+                <div className="row">
+                    <ButtonCategory
+                        text="Exercise"
+                        iconClassName='fas fa-tasks'
+                        className="text-info"
+                    />
+
+                    <div className="col">
                         <ButtonShowDataset
                             variant="info"
                             className="me-1 mb-1"
@@ -270,10 +291,24 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
                                 },
                             ]}
                         />
+
+                        <ButtonAction
+                            variant="warning"
+                            className="me-1 mb-1"
+                            onClick={handleCheckResult}
+                            disabled={isExecuting}
+                        >
+                            Check Result
+                        </ButtonAction>
                     </div>
                 </div>
 
                 <div className="row">
+                    <ButtonCategory
+                        text="Database"
+                        iconClassName='fas fa-database'
+                        className="text-secondary"
+                    />
                     <div className="col">
 
                         <ButtonAction
@@ -329,7 +364,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
                         </ButtonAction>
                     </div>
                 </div>
-            </div>
+            </div >
 
             <div className="mt-3">
                 {

@@ -1,6 +1,6 @@
 import sqlparse
 from typing import Iterable, Self
-
+from .query_goal import QueryGoal
 
 # Maximum length of SQL code to strip comments from
 STRIP_COMMENTS_MAX_LENGTH = 1000
@@ -9,6 +9,7 @@ STRIP_COMMENTS_MAX_LENGTH = 1000
 class SQLCode:
     def __init__(self, query: str):
         self.query = query
+        self._query_type_cache = None
 
     def strip_comments(self, *, force: bool = False) -> Self:
         '''
@@ -55,7 +56,11 @@ class SQLCode:
     def query_type(self) -> str:
         '''Get the type of the SQL query (e.g., SELECT, INSERT, UPDATE, DELETE)'''
 
-        # Documentation for SQL query types: 
+        # Use cache to avoid re-parsing the query
+        if self._query_type_cache is not None:
+            return self._query_type_cache
+
+        # Documentation for SQL query types: https://www.postgresql.org/docs/current/sql-commands.html
 
         expandable_types = {'CREATE', 'ALTER', 'DROP'}
         expandable_types_keywords = {
@@ -77,7 +82,8 @@ class SQLCode:
 
         statements = sqlparse.parse(self.query)
         if len(statements) == 0:
-            return 'EMPTY'
+            self._query_type_cache = 'EMPTY'
+            return self._query_type_cache
 
         statement = statements[0]
         query_type = statement.get_type()
@@ -97,7 +103,8 @@ class SQLCode:
                     for next_token in tokens[i+1:]:
                         if next_token.ttype in (sqlparse.tokens.Keyword, sqlparse.tokens.DDL) and next_token.normalized in expandable_types_keywords:
                             next_token_str = next_token.normalized
-                            return f'{query_type} {next_token_str}'
+                            self._query_type_cache = f'{query_type} {next_token_str}'
+                            return query_type
                     break
 
         # Extract more types
@@ -113,7 +120,21 @@ class SQLCode:
                         if next_token and next_token.normalized == 'ANALYZE':
                             query_type = 'EXPLAIN ANALYZE'
 
+        self._query_type_cache = query_type
         return query_type
+    
+    @property
+    def query_goal(self) -> str | None:
+        '''Get the goal of the SQL query'''
+
+        # Only consider SELECT queries
+        if self.query_type != 'SELECT':
+            return None
+        
+        # TODO
+        
+
+
 
 class SQLException:
     def __init__(self, exception: Exception):

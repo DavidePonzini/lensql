@@ -13,7 +13,7 @@ def list_all(username: str) -> list[dict]:
             e.title,
             e.request,
             e.dataset_name,
-            e.expected_answer,
+            e.solution,
             e.is_ai_generated
         FROM
             {schema}.exercises e
@@ -32,7 +32,7 @@ def list_all(username: str) -> list[dict]:
             'title': row[1],
             'request': row[2],
             'dataset_name': row[3],
-            'expected_answer': row[4],
+            'solution': row[4],
             'is_ai_generated': row[5]
         }
         for row in result
@@ -95,14 +95,14 @@ def get_dataset(exercise_id: int) -> str:
 
     return result[0][0]
 
-def create(title: str, request: str, dataset_name: str | None, expected_answer: str | None, is_ai_generated: bool) -> int:
+def create(title: str, request: str, *, dataset_name: str | None = None, solution: str | None = None, is_ai_generated: bool = False) -> int:
     '''Create a new exercise'''
 
     result = db.insert(SCHEMA, 'exercises', {
         'title': title,
         'request': request,
         'dataset_name': dataset_name,
-        'expected_answer': expected_answer,
+        'solution': solution,
         'is_ai_generated': is_ai_generated
     }, ['id'])
 
@@ -110,7 +110,7 @@ def create(title: str, request: str, dataset_name: str | None, expected_answer: 
 
     return exercise_id
 
-def update(exercise_id: int, title: str, request: str, dataset_name: str | None, expected_answer: str | None) -> None:
+def update(exercise_id: int, title: str, request: str, dataset_name: str | None, solution: str | None) -> None:
     '''Update an existing exercise'''
 
     query = database.sql.SQL('''
@@ -118,21 +118,21 @@ def update(exercise_id: int, title: str, request: str, dataset_name: str | None,
         SET title = {title},
             request = {request},
             dataset_name = {dataset_name},
-            expected_answer = {expected_answer}
+            solution = {solution}
         WHERE id = {exercise_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         title=database.sql.Placeholder('title'),
         request=database.sql.Placeholder('request'),
         dataset_name=database.sql.Placeholder('dataset_name'),
-        expected_answer=database.sql.Placeholder('expected_answer'),
+        solution=database.sql.Placeholder('solution'),
         exercise_id=database.sql.Placeholder('exercise_id')
     )
     db.execute(query, {
         'title': title,
         'request': request,
         'dataset_name': dataset_name,
-        'expected_answer': expected_answer,
+        'solution': solution,
         'exercise_id': exercise_id
     })
 
@@ -263,9 +263,26 @@ def list_learning_objectives(exercise_id: int) -> list[str]:
         'is_set': row[2]
     } for row in result]
 
-def get_expected_result():
-    # TODO
-    pass
+def get_solution(exercise_id: int) -> str | None:
+    '''Get the solution for an exercise, if it exists'''
+
+    query = database.sql.SQL('''
+        SELECT solution
+        FROM {schema}.exercises
+        WHERE id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'exercise_id': exercise_id
+    })
+
+    if len(result) == 0:
+        return None
+
+    return result[0][0]
 
 
                    

@@ -36,6 +36,7 @@ def run_query():
                 success=query_result.success,
                 result_str=query_result.result,
                 query_type=query_result.query_type,
+                query_goal=query_result.query_goal
             )
             query_result.id = query_id
 
@@ -68,6 +69,7 @@ def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> i
         success=result.success,
         result_str=result.result,
         query_type='BUILTIN',
+        query_goal='BUILTIN'
     )
 
     return query_id

@@ -30,9 +30,6 @@ if __name__ == '__main__':
         db.admin.exercises.create(
             title=title,
             request=request,
-            dataset_name=None,
-            expected_answer='',
-            is_ai_generated=False
         )
         messages.info(f'Exercise {title} created')
 

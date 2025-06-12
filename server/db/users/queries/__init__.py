@@ -39,6 +39,7 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                         result=pd.DataFrame(rows, columns=columns),
                         query=statement.query,
                         query_type=statement.query_type,
+                        query_goal=statement.query_goal,
                         notices=conn.notices)
                     continue
 
@@ -48,6 +49,7 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                     message=f'{cur.statusmessage}',
                     query=statement.query,
                     query_type=statement.query_type,
+                    query_goal=statement.query_goal,
                     notices=conn.notices)
 
             conn.update_last_operation_ts()
@@ -61,4 +63,5 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                 exception=SQLException(e),
                 query=statement.query,
                 query_type=statement.query_type,
+                query_goal=statement.query_goal,
                 notices=conn.notices)

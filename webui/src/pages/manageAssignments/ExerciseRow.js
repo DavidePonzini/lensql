@@ -15,7 +15,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
     const [exerciseTitle, setExerciseTitle] = useState(exercise.title);
     const [exerciseRequest, setExerciseRequest] = useState(exercise.request);
     const [exerciseDatasetName, setExerciseDatasetName] = useState(exercise.dataset_name);
-    const [exerciseAnswer, setExerciseAnswer] = useState(exercise.expected_answer);
+    const [exerciseAnswer, setExerciseAnswer] = useState(exercise.solution);
     const isAiGenerated = exercise.is_ai_generated;
 
     async function handleEditExercise() {
@@ -24,7 +24,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
             'title': exerciseTitle,
             'request': exerciseRequest,
             'dataset_name': exerciseDatasetName,
-            'expected_answer': exerciseAnswer,
+            'solution': exerciseAnswer,
         });
 
         refreshAssignments();
@@ -42,8 +42,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
         <tr key={exerciseId}>
             <td>{exerciseTitle}</td>
             <td>{exerciseRequest}</td>
-            <td>{exerciseAnswer}</td>
-            <td>{exerciseDatasetName}</td>
+            <td>{exerciseDatasetName ? exerciseDatasetName : <i>None</i>}</td>
             <td>
                 <input
                     type="checkbox"
@@ -54,7 +53,7 @@ function ExerciseRow({ exercise, refreshAssignments }) {
             </td>
             <td>
                 <ButtonShowDataset
-                    datasetId={exerciseDatasetName}
+                    datasetName={exerciseDatasetName}
                     className="btn-sm me-1 mb-1"
                 />
 

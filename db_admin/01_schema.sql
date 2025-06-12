@@ -49,7 +49,7 @@ CREATE TABLE exercises (
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
     dataset_name VARCHAR(255) REFERENCES datasets(name) DEFAULT NULL,
-    expected_answer TEXT DEFAULT NULL,
+    solution TEXT DEFAULT NULL,
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 
@@ -87,6 +87,7 @@ CREATE TABLE queries (
     success BOOLEAN NOT NULL,
     result TEXT DEFAULT NULL,
     query_type VARCHAR(50) NOT NULL,
+    query_goal VARCHAR(255) DEFAULT NULL,
     ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
