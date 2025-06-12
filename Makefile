@@ -12,7 +12,7 @@ endif
 DEV_DOCKER_COMPOSE_FILE = docker-compose.yml
 PROD_DOCKER_COMPOSE_FILE = docker-compose.prod.yml
 
-.PHONY: $(VENV)_upgrade start deploy setup psql psql_users active_users dump
+.PHONY: $(VENV)_upgrade start deploy setup psql psql_users active_users dump clean
 
 start:
 	docker compose -f $(DEV_DOCKER_COMPOSE_FILE) down
@@ -44,3 +44,7 @@ $(VENV):
 
 $(VENV)_upgrade: $(VENV)
 	$(VENV_BIN)/python -m pip install --upgrade -r $(REQUIREMENTS_SERVER)
+
+clean:
+	find . -type d -name '__pycache__' -print0 | xargs -0 rm -r
+
