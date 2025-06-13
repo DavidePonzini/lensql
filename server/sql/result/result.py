@@ -1,8 +1,6 @@
-from .util import Column
 from abc import ABC, abstractmethod
 
-from server.sql.query_goal import QueryGoal
-
+from ..query_goal import QueryGoal
 
 class QueryResult(ABC):
     '''Represents the result of a SQL query.'''
@@ -21,10 +19,16 @@ class QueryResult(ABC):
 
     @property
     @abstractmethod
-    def result(self) -> str:
-        '''Returns the result of the query as a string representation.'''
+    def result_html(self) -> str:
+        '''Returns the result of the query as HTML.'''
         pass
-    
+
+    @property
+    @abstractmethod
+    def result_text(self) -> dict | None:
+        '''Returns the result of the query as a dictionary.'''
+        pass
+
     def __repr__(self):
-        return f'QueryResult(result="{self.result[:10]}", query="{self.query[:10]}", success={self.success})'
+        return f'QueryResult(result="{self.result_html[:10]}", query="{self.query[:10]}", success={self.success})'
     

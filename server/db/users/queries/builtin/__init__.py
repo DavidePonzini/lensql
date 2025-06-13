@@ -33,8 +33,8 @@ def _execute_builtin(username: str, query: _Queries) -> QueryResult:
         try:
             conn.rollback()
             conn.update_last_operation_ts()
-        except Exception as e:
-            messages.error(f"Error rolling back connection for user {username}: {e}")
+        except Exception as e2:
+            messages.error(f"Error rolling back connection for user {username}: {e2}")
         return QueryResultError(
             exception=SQLException(e),
             query=query.name,

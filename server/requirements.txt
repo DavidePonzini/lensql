@@ -8,3 +8,4 @@ requests
 bcrypt
 flask-jwt-extended
 gunicorn
+pyarrow

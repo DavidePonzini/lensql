@@ -164,7 +164,7 @@ def init_dataset():
                 'builtin': True,
                 'query': query_result.query,
                 'type': query_result.query_type,
-                'data': query_result.result,
+                'data': query_result.result_html,
                 'id': None,
             }) + '\n'  # Important: one JSON object per line
 

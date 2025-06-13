@@ -1,4 +1,4 @@
-from . import builtin
+from . import builtin, metadata
 from ..connection import get_connection
 from server.sql import SQLCode, SQLException, QueryResult, QueryResultDataset, QueryResultError, QueryResultMessage, Column
 
@@ -59,8 +59,9 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
             try:
                 conn.rollback()
                 conn.update_last_operation_ts()
-            except Exception as e:
-                messages.error(f"Error rolling back connection for user {username}: {e}")
+            except Exception as e2:
+                messages.error(f"Error rolling back connection for user {username}: {e2}")
+            
             yield QueryResultError(
                 exception=SQLException(e),
                 query=statement.query,

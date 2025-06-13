@@ -1,4 +1,5 @@
-from server.sql.code import SQLException
+from ..exception import SQLException
+import json
 
 from .result import QueryResult
 
@@ -18,6 +19,9 @@ class QueryResultError(QueryResult):
         self._result = exception
 
     @property
-    def result(self) -> str:
+    def result_html(self) -> str:
         return str(self._result)
 
+    @property
+    def result_text(self) -> dict:
+        return self.result_html

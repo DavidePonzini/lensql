@@ -1,5 +1,4 @@
 from .result import QueryResult
-from .message import QueryResultMessage
 from .util import Column
 
 from typing import Self
@@ -24,7 +23,7 @@ class QueryResultDataset(QueryResult):
         self.columns = columns
 
     @property
-    def result(self) -> str:
+    def result_html(self) -> str:
         result = self._result.replace({None: 'NULL'})
 
         result = result.to_html(
@@ -34,6 +33,10 @@ class QueryResultDataset(QueryResult):
         )
         result = result.replace('<thead>', '<thead class="table-dark">').replace('<tbody>', '<tbody class="table-group-divider">')
         return result
+    
+    @property
+    def result_text(self) -> str:
+        return self._result.replace({None: 'NULL'}).to_csv()
     
     def has_same_columns(self, other: Self) -> bool:
         '''Checks if the columns of this result are the same as those of another result.'''

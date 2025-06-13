@@ -14,7 +14,7 @@ if __name__ == '__main__':
             messages.info(f'User {user} registered successfully')
 
     for teacher, students in [
-        ('dav', ['student']),
+        ('dav', ['student', 'dav']),
         ('giovanna', ['barbara', 'dav', 'student']),
         ('barbara', ['giovanna', 'dav', 'student']),
     ]:

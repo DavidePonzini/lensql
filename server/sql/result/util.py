@@ -1,6 +1,5 @@
 from typing import Any
 
-
 class Column:
     '''Represents a column in a SQL query result.'''
     def __init__(self, name: str, data_type: Any):

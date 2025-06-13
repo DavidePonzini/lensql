@@ -1,4 +1,5 @@
 from .result import QueryResult
+import json
 
 class QueryResultMessage(QueryResult):
     '''Represents the result of a SQL query that returned a message.'''
@@ -16,5 +17,10 @@ class QueryResultMessage(QueryResult):
         self._result = message
 
     @property
-    def result(self) -> str:
+    def result_html(self) -> str:
         return self._result
+    
+    @property
+    def result_text(self) -> dict:
+        return self._result
+        

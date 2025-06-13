@@ -5,7 +5,7 @@ import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server import db
-from server.sql.result import QueryResult
+from server.sql.result import QueryResult, QueryResultDataset
 from .util import responses
 
 bp = Blueprint('query', __name__)
@@ -30,22 +30,33 @@ def run_query():
 
     def generate_results():
         for query_result in db.users.queries.execute(username=username, query_str=query):
+
+            from dav_tools import messages
+            messages.debug(f'Query result: {query_result}')
+            
             query_id = db.admin.queries.log(
                 batch_id=batch_id,
                 query=query_result.query,
+                search_path=db.users.queries.metadata.get_search_path(username),
                 success=query_result.success,
-                result_str=query_result.result,
+                result=query_result.result_text,
                 query_type=query_result.query_type,
                 query_goal=query_result.query_goal
             )
             query_result.id = query_id
+
+            db.admin.queries.log_context(
+                query_id=query_id,
+                columns=db.users.queries.metadata.get_columns(username),
+                unique_columns=db.users.queries.metadata.get_unique_columns(username)
+            )
 
             yield json.dumps({
                 'success': query_result.success,
                 'builtin': False,
                 'query': query_result.query,
                 'type': query_result.query_type,
-                'data': query_result.result,
+                'data': query_result.result_html,
                 'id': query_id,
                 'notices': query_result.notices,
             }) + '\n'  # Important: one JSON object per line
@@ -67,7 +78,7 @@ def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> i
         batch_id=batch_id,
         query=result.query,
         success=result.success,
-        result_str=result.result,
+        result=result.result_text,
         query_type='BUILTIN',
         query_goal='BUILTIN'
     )
