@@ -1,11 +1,11 @@
-from ..connection import get_connection
 from . import builtin
+from ..connection import get_connection
+from server.sql import SQLCode, SQLException, QueryResult, QueryResultDataset, QueryResultError, QueryResultMessage, Column
 
 import pandas as pd
 from typing import Iterable
-from dav_tools import messages
 
-from server.sql import SQLCode, SQLException, QueryResult, QueryResultDataset, QueryResultError, QueryResultMessage
+from dav_tools import messages
 
 def execute(username: str, query_str: str, *, strip_comments: bool = True) -> Iterable[QueryResult]:
     '''
@@ -35,8 +35,10 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                 if cur.description:  # Check if the query has a result set
                     rows = cur.fetchall()
                     columns = [desc[0] for desc in cur.description]
+
                     yield QueryResultDataset(
                         result=pd.DataFrame(rows, columns=columns),
+                        columns=[Column(name=col.name, data_type=col.type_code) for col in cur.description] if cur.description else [],
                         query=statement.query,
                         query_type=statement.query_type,
                         query_goal=statement.query_goal,
@@ -65,3 +67,5 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                 query_type=statement.query_type,
                 query_goal=statement.query_goal,
                 notices=conn.notices)
+
+

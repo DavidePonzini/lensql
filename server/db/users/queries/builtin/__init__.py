@@ -1,6 +1,8 @@
-from ...connection import get_connection as _get_connection
 from ._queries import Queries as _Queries
-from server.sql import SQLException, QueryResult, QueryResultDataset, QueryResultError
+from ...connection import get_connection as _get_connection
+from server.sql import SQLException, QueryResult, QueryResultDataset, QueryResultError, Column
+from . import solution
+
 import pandas as pd
 
 from dav_tools import messages
@@ -15,12 +17,14 @@ def _execute_builtin(username: str, query: _Queries) -> QueryResult:
             cur.execute(query.value)
             rows = cur.fetchall()
             columns = [desc[0] for desc in cur.description]
-            result = pd.DataFrame(rows, columns=columns)
 
+        result = pd.DataFrame(rows, columns=columns)
 
         conn.update_last_operation_ts()
+
         return QueryResultDataset(
             result=result,
+            columns=[Column(name=col.name, data_type=col.type_code) for col in cur.description] if cur.description else [],
             query=query.name,
             query_type='BUILTIN',
             query_goal='BUILTIN',
@@ -63,8 +67,3 @@ def show_search_path(username: str) -> QueryResult:
 
     return _execute_builtin(username, _Queries.SHOW_SEARCH_PATH)
 
-def view_expected_result(username: str, exercise_id: int) -> QueryResult:
-    '''Views the expected result for a given exercise.'''
-
-    # TODO
-    return _execute_builtin(username, _Queries.VIEW_EXPECTED_RESULT(exercise_id))

@@ -120,6 +120,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
         setIsExecuting(true);
 
         const data = await apiRequest('/api/queries/builtin/view-expected-result', 'POST', {
+            'query': sqlText,
             'exercise_id': exerciseId,
         });
         setIsExecuting(false);
@@ -296,7 +297,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
                             variant="warning"
                             className="me-1 mb-1"
                             onClick={handleCheckResult}
-                            disabled={isExecuting}
+                            disabled={isExecuting || sqlText.trim().length === 0}
                         >
                             Check Result
                         </ButtonAction>

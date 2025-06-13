@@ -132,8 +132,6 @@ class SQLCode:
             return None
         
         # TODO
-        
-
 
 
 class SQLException:

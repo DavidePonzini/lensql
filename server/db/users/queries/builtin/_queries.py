@@ -68,3 +68,5 @@ class Queries(Enum):
             tc.table_name,
             tc.constraint_name;
     '''
+
+    CHECK_SOLUTION = '' # This query is not defined here as it is dynamic based on the exercise solution.

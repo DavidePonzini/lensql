@@ -139,11 +139,12 @@ def list_constraints():
 def view_expected_result():
     username = get_jwt_identity()
     data = request.get_json()
+    query = data['query']
     exercise_id = int(data['exercise_id'])
 
-    exercise = db.admin.exercises.get(exercise_id)
+    solution = db.admin.exercises.get_solution(exercise_id)
     
-    result = db.users.queries.builtin.view_expected_result(username, exercise_id)
+    result = db.users.queries.builtin.solution.check(username, query_user=query, query_solution=solution)
     result.id = log_builtin_query(username, exercise_id, result)
 
     return responses.response_query(result, is_builtin=True)

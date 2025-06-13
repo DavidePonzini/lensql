@@ -2,6 +2,7 @@ from . import admin, users
 
 from dav_tools import messages
 
+
 def register_user(username: str, password: str, *, is_teacher: bool = False, is_admin: bool = False) -> bool:
     '''
     Register a new user.
