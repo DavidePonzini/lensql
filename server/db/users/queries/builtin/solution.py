@@ -1,7 +1,6 @@
 import pandas as pd
 from . import util
-from server.sql import QueryResult, QueryResultDataset, QueryResultMessage
-from server.sql import SQLCode, Column
+from server.sql import QueryResult, QueryResultDataset, QueryResultMessage, SQLCode, Column, get_datatype_name
 from server.db.users.connection import get_connection
 from dav_tools import messages
 
@@ -77,7 +76,7 @@ def check(username: str, query_user: str, query_solution: str) -> QueryResult:
     result_user = _execute(username, query_user)
     if result_user is None:
         return QueryResultMessage(
-            message=f'User query is not supported',
+            message=f'<i class="fa fa-exclamation-triangle text-danger me-1"></i>User query is not supported. Please ensure it is a valid SQL SELECT query.',
             query=NAME,
             query_type='BUILTIN',
             query_goal='BUILTIN',
@@ -94,7 +93,8 @@ def check(username: str, query_user: str, query_solution: str) -> QueryResult:
 
     # ensure both results have the same columns
     if not result_user.compare_column_names(result_solution):
-        message = 'Columns do not match.<br/>'
+        message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+        message += 'Your query has different columns from the solution. Cannot compare results.<br/>'
         message += f'Expected: <code>{"</code>, <code>".join([col.name for col in result_solution.columns])}</code><br/>'
         message += f'Your query: <code>{"</code>, <code>".join([col.name for col in result_user.columns])}</code><br/>'
 
@@ -109,9 +109,10 @@ def check(username: str, query_user: str, query_solution: str) -> QueryResult:
     wrong_types = result_user.compare_column_types(result_solution)
 
     if wrong_types:
-        message = 'Columns do not match in data types.<br/>'
-        message += f'Expected: <code>{"</code>, <code>".join([f"{col.name} ({col.data_type})" for col in result_solution.columns])}</code><br/>'
-        message += f'Your query: <code>{"</code>, <code>".join([f"{col.name} ({col.data_type})" for col in result_user.columns])}</code><br/>'
+        message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+        message += 'Your query has different data types from the solution. Cannot compare results.<br/>'
+        message += f'Expected: <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_solution.columns])}</code><br/>'
+        message += f'Your query: <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_user.columns])}</code><br/>'
 
         return QueryResultMessage(
             message=message,
@@ -124,7 +125,7 @@ def check(username: str, query_user: str, query_solution: str) -> QueryResult:
 
     if has_same_result:
         return QueryResultMessage(
-            message=f'Solution is correct.',
+            message=f'<i class="fa fa-check text-success me-1" ></i>Solution is correct.',
             query=NAME,
             query_type='BUILTIN',
             query_goal='BUILTIN')
