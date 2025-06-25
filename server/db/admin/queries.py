@@ -46,6 +46,8 @@ def log_context(query_id: int, columns: list[dict], unique_columns: list[dict]) 
             'table_name': column['table_name'],
             'column_name': column['column_name'],
             'column_type': column['column_type'],
+            'numeric_precision': column['numeric_precision'],
+            'numeric_scale': column['numeric_scale'],
             'is_nullable': column['is_nullable'],
             'foreign_key_schema': column['foreign_key_schema'],
             'foreign_key_table': column['foreign_key_table'],

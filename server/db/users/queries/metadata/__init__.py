@@ -33,10 +33,12 @@ def get_columns(username: str) -> list[dict]:
             'table_name': row[1],
             'column_name': row[2],
             'column_type': row[3],
-            'is_nullable': row[4],
-            'foreign_key_schema': row[5],
-            'foreign_key_table': row[6],
-            'foreign_key_column': row[7]
+            'numeric_precision': row[4],
+            'numeric_scale': row[5],
+            'is_nullable': row[6],
+            'foreign_key_schema': row[7],
+            'foreign_key_table': row[8],
+            'foreign_key_column': row[9],
         }
         for row in result
     ]

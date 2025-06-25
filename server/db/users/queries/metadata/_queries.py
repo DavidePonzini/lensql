@@ -32,6 +32,8 @@ class Queries(Enum):
             cols.table_name,
             cols.column_name,
             cols.data_type AS column_type,
+            cols.numeric_precision,
+            cols.numeric_scale,
             (cols.is_nullable = 'YES') AS is_nullable,
             fk.foreign_table_schema AS foreign_key_schema,
             fk.foreign_table_name AS foreign_key_table,

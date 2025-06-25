@@ -25,8 +25,8 @@ CREATE TABLE users (
 );
 
 CREATE TABLE teaches (
-    teacher VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE,
-    student VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE,
+    teacher VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
+    student VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
 
     PRIMARY KEY (teacher, student)
 );
@@ -38,8 +38,8 @@ CREATE TABLE datasets (
 );
 
 CREATE TABLE has_dataset (
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE,
-    dataset_name VARCHAR(255) NOT NULL REFERENCES datasets(name) ON UPDATE CASCADE,
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
+    dataset_name VARCHAR(255) NOT NULL REFERENCES datasets(name) ON UPDATE CASCADE ON DELETE CASCADE,
 
     PRIMARY KEY (username, dataset_name)
 );
@@ -48,14 +48,14 @@ CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
-    dataset_name VARCHAR(255) REFERENCES datasets(name) ON UPDATE CASCADE DEFAULT NULL,
+    dataset_name VARCHAR(255) REFERENCES datasets(name) ON UPDATE CASCADE ON DELETE SET NULL DEFAULT NULL,
     solution TEXT DEFAULT NULL,
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE assigned_to (
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE,
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id),
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
     submission_ts TIMESTAMP DEFAULT NULL,
 
     PRIMARY KEY (username, exercise_id)
@@ -68,21 +68,21 @@ CREATE TABLE learning_objectives (
 
 CREATE TABLE has_learning_objective (
     exercise_id INTEGER NOT NULL REFERENCES exercises(id),
-    objective VARCHAR(255) NOT NULL REFERENCES learning_objectives(objective) ON UPDATE CASCADE,
+    objective VARCHAR(255) NOT NULL REFERENCES learning_objectives(objective) ON UPDATE CASCADE ON DELETE CASCADE,
 
     PRIMARY KEY (exercise_id, objective)
 );
 
 CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE,
+    username VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE SET NULL,
     ts TIMESTAMP NOT NULL DEFAULT NOW(),
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id)
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE CASCADE
 );
 
 CREATE TABLE queries (
     id SERIAL PRIMARY KEY,
-    batch_id INTEGER NOT NULL REFERENCES query_batches(id),
+    batch_id INTEGER NOT NULL REFERENCES query_batches(id) ON DELETE CASCADE,
     query TEXT NOT NULL,
     search_path TEXT DEFAULT NULL,
     success BOOLEAN NOT NULL,
@@ -94,22 +94,22 @@ CREATE TABLE queries (
 
 CREATE TABLE query_context_columns (
     id SERIAL PRIMARY KEY,
-    query_id INTEGER NOT NULL REFERENCES queries(id),
+    query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
     schema_name TEXT NOT NULL,
     table_name TEXT NOT NULL,
     column_name TEXT NOT NULL,
     column_type TEXT NOT NULL,
-    is_primary_key BOOLEAN NOT NULL DEFAULT FALSE,
+    numeric_precision INTEGER,
+    numeric_scale INTEGER,
     foreign_key_schema TEXT DEFAULT NULL,
     foreign_key_table TEXT DEFAULT NULL,
     foreign_key_column TEXT DEFAULT NULL,
-    is_nullable BOOLEAN NOT NULL DEFAULT TRUE,
-    is_unique BOOLEAN NOT NULL DEFAULT FALSE
+    is_nullable BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE query_context_columns_unique (
     id SERIAL PRIMARY KEY,
-    query_id INTEGER NOT NULL REFERENCES queries(id),
+    query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
     schema_name TEXT NOT NULL,
     table_name TEXT NOT NULL,
     constraint_type VARCHAR(32) NOT NULL,
@@ -125,15 +125,15 @@ CREATE TABLE errors (
 );
 
 CREATE TABLE has_error(
-    query_id INTEGER NOT NULL REFERENCES queries(id),
-    error_id INTEGER NOT NULL REFERENCES errors(id),
+    query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
+    error_id INTEGER NOT NULL REFERENCES errors(id) ON DELETE CASCADE,
 
     PRIMARY KEY (query_id, error_id)
 );
 
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
-    query_id INTEGER NOT NULL REFERENCES queries(id),
+    query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
     answer TEXT NOT NULL,
     button VARCHAR(255) NOT NULL,
     msg_idx INTEGER NOT NULL,
