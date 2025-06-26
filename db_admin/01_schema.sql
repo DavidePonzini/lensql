@@ -55,7 +55,7 @@ CREATE TABLE exercises (
 
 CREATE TABLE assigned_to (
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if assigned to users
     submission_ts TIMESTAMP DEFAULT NULL,
 
     PRIMARY KEY (username, exercise_id)
@@ -77,7 +77,7 @@ CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE SET NULL,
     ts TIMESTAMP NOT NULL DEFAULT NOW(),
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE CASCADE
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT   -- prevent deletion of exercise if queries exist
 );
 
 CREATE TABLE queries (
@@ -104,7 +104,7 @@ CREATE TABLE query_context_columns (
     foreign_key_schema TEXT DEFAULT NULL,
     foreign_key_table TEXT DEFAULT NULL,
     foreign_key_column TEXT DEFAULT NULL,
-    is_nullable BOOLEAN NOT NULL DEFAULT TRUE
+    is_nullable BOOLEAN NOT NULL
 );
 
 CREATE TABLE query_context_columns_unique (
