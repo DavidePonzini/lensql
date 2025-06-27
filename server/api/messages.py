@@ -79,8 +79,7 @@ def provide_error_example():
 
     query = db.admin.queries.get(query_id)
     exception = db.admin.queries.get_result(query_id)
-    # answer = llm.provide_error_example(query, exception)
-    answer = responses.NOT_IMPLEMENTED
+    answer = llm.provide_error_example(query, exception)
     
     answer_id = db.admin.messages.log(
         answer=answer,

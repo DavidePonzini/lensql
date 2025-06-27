@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import useAuth from "../../hooks/useAuth";
 import MessageBox from "./MessageBox";
 import ButtonAction from "../../components/ButtonAction";
@@ -16,13 +16,22 @@ function Chat({ queryId, success }) {
         }
     ]);
     const [isThinking, setIsThinking] = useState(false);
+    const messagesEndRef = useRef(null);
 
     const buttonSuccessDescribeLocked = false;
     const buttonSuccessExplainLocked = false;
     const buttonErrorExplainLocked = false;
-    const buttonErrorExampleLocked = true;
+    const buttonErrorExampleLocked = false;
     const buttonErrorLocateLocked = false;
     const buttonErrorFixLocked = false;
+
+    // Scroll to the bottom of the message list when new messages are added
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]);
+
 
     function addMessage(text, isFromAssistant, isThinking = false, messageId = null) {
         setMessages((prevMessages) => [...prevMessages, {
@@ -149,7 +158,7 @@ function Chat({ queryId, success }) {
         // TODO does not select the last message for user 
         // messagebox-user works, but selects the first
         // messagebox-user:last-child returns null
-        const lastUserMessage = document.querySelector(`#chat-${queryId} .messagebox.messagebox-user:last-child`);  
+        const lastUserMessage = document.querySelector(`#chat-${queryId} .messagebox.messagebox-user:last-child`);
 
         if (lastUserMessage) {
             lastUserMessage.scrollIntoView({ behavior: 'smooth' });
@@ -237,6 +246,7 @@ function Chat({ queryId, success }) {
                             )}
                         </div>
                     )}
+                    <div ref={messagesEndRef}></div>
                 </MessageBox>
             ))}
         </div>

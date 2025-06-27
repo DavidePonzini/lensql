@@ -59,6 +59,9 @@ function AssignmentCard({
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="bottom"
                                             data-bs-title={description}
+                                            style={{
+                                                cursor: 'default',
+                                            }}
                                         >
                                             {objective}
                                         </span>

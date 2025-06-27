@@ -30,10 +30,6 @@ def run_query():
 
     def generate_results():
         for query_result in db.users.queries.execute(username=username, query_str=query):
-
-            from dav_tools import messages
-            messages.debug(f'Query result: {query_result}')
-            
             query_id = db.admin.queries.log(
                 batch_id=batch_id,
                 query=query_result.query,

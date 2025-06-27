@@ -9,3 +9,5 @@ bcrypt
 flask-jwt-extended
 gunicorn
 pyarrow
+openai
+pydantic

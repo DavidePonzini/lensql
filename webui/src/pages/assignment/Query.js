@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth, RequestSizeError } from "../../hooks/useAuth";
 
 import "./Query.css";
@@ -30,6 +30,9 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
+    const [showTopBtn, setShowTopBtn] = useState(false);
+
+    const resultEndRef = useRef(null);
 
     const buttonShowSearchPathLocked = false;
     const buttonListTablesLocked = false;
@@ -40,6 +43,18 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
     function displayResult(data) {
         setResult(data);
     }
+
+    // Show a "Scroll to Top" button when the user scrolls down
+    useEffect(() => {
+        const onScroll = () => setShowTopBtn(window.scrollY > 300);
+        window.addEventListener('scroll', onScroll);
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
+    // Scroll to top when the "Scroll to Top" button is clicked
+    const scrollToTop = () =>
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
 
     // Show a confirmation dialog when the user tries to leave the page with unsaved changes
     useEffect(() => {
@@ -56,6 +71,13 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [sqlText]);
+
+    // Scroll to the bottom of the result list when new results are added
+    useEffect(() => {
+        if (resultEndRef.current) {
+            resultEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [result]);
 
 
     async function handleExecute() {
@@ -255,6 +277,9 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
                             disabled={isExecuting || sqlText.trim().length === 0}
                         >
                             Execute
+                            {isExecuting && (
+                                <span className="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+                            )}
                         </ButtonAction>
 
                         <ButtonAction
@@ -382,7 +407,34 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
                         />
                     ))
                 }
+                <div ref={resultEndRef} />
             </div>
+
+            {showTopBtn && (
+                <button
+                    onClick={scrollToTop}
+                    style={{
+                        position: 'fixed',
+                        bottom: '1.5rem',
+                        right: '1.5rem',
+                        zIndex: 1030,
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: 48,
+                        height: 48,
+                        fontSize: '1.25rem',
+                        background: '#0d6efd',
+                        color: '#fff',
+                        boxShadow: '0 2px 6px rgba(0,0,0,.3)',
+                        cursor: 'pointer'
+                    }}
+                    aria-label='Back to top'
+                    title='Back to top'
+                >
+                    ↑
+                </button>
+            )}
+
         </>
     );
 }
