@@ -24,6 +24,30 @@ The error <b>{exception}</b> means that EXPLANATION.
 This usually occurs when REASON.
 '''
 
+def provide_error_example(code: str, exception: str, language='PostgreSQL'):
+    query = SQLCode(code)
+    query = query.strip_comments()
+
+    return f'''
+Hi Lens! Could you please provide a simplified example of a {language} query that would cause the same error as the one below?
+The example should be extremely simplified, leaving out all query parts that do not contribute to generating the error message.
+Remove conditions that are not necessary to reproduce the error.
+You don't need to fix the query—just help me understand what kind of query would lead to this error.
+Remember to use the <pre class="code m"> tag for the example query.
+
+{util.RESPONSE_FORMAT}
+
+-- {language} Query --
+{query}
+
+-- Error --
+{exception}
+
+-- Template answer --
+Let's see a similar query that BRIEF EXPLANATION OF THE ERROR CAUSE.
+<pre class="code m">EXAMPLE QUERY</pre>
+'''
+
 def locate_error_cause(code: str, exception: str, language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
@@ -46,29 +70,6 @@ Let's look at the query and see which part of it is likely to have caused the er
 <pre class="code m">
 WHOLE QUERY, WITH THE PART THAT CAUSES THE ERROR IN BOLD RED
 </pre>
-'''
-
-def provide_error_example(code: str, exception: str, language='PostgreSQL'):
-    query = SQLCode(code)
-    query = query.strip_comments()
-
-    return f'''
-Hi Lens! Could you please provide a simplified example of a {language} query that would cause the same error as the one below?
-The example should be extremely simplified, leaving out all query parts that do not contribute to generating the error message.
-Remove conditions that are not necessary to reproduce the error.
-You don't need to fix the query—just help me understand what kind of query would lead to this error.
-
-{util.RESPONSE_FORMAT}
-
--- {language} Query --
-{query}
-
--- Error --
-{exception}
-
--- Template answer --
-Let's see a similar query that BRIEF EXPLANATION OF THE ERROR CAUSE.
-<pre class="code m">EXAMPLE QUERY</pre>
 '''
 
 def fix_query(code: str, exception: str, language='PostgreSQL'):

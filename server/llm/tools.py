@@ -6,7 +6,7 @@ from server import db
 def get_search_path(username: str) -> str:
     return db.users.queries.metadata.get_search_path(username)
 
-@llm_tool('Returns a list of tables, along with their columns in the current database. Useful for checking if an object actually exists.')
+@llm_tool('Returns a list of tables, along with their columns and their properties, in the current database. Useful for checking what data is actually available.')
 def get_tables(username: str) -> str:
     columns = db.users.queries.metadata.get_columns(username)
     unique = db.users.queries.metadata.get_unique_columns(username)

@@ -5,22 +5,41 @@ class MessageFormat(BaseModel):
     response: str
     motivational_message: str
 
-def format_response(message: MessageFormat) -> str:
-    '''
-    Format the response from the LLM into a string.
-    '''
+    def __str__(self) -> str:
+        introduction = text_to_html(self.introduction)
+        response = text_to_html(self.response, replace_newlines=False)
+        motivational_message = text_to_html(self.motivational_message)
 
-    introduction = text_to_html(message.introduction)
-    response = text_to_html(message.response, replace_newlines=False)
-    motivational_message = text_to_html(message.motivational_message)
+        return f'''
+            <div>{introduction}</div>
+            <br>
+            <div>{response}</div>
+            <br>
+            <i>{motivational_message}</i>
+        '''
+        
 
-    return f'''
-        <div>{introduction}</div>
-        <br>
-        <div>{response}</div>
-        <br>
-        <i>{motivational_message}</i>
-    '''
+class MessageFormatWithCode(MessageFormat):
+    code: str
+
+    def __str__(self) -> str:
+        introduction = text_to_html(self.introduction)
+        response = text_to_html(self.response, replace_newlines=False)
+        motivational_message = text_to_html(self.motivational_message)
+        
+        code = text_to_html(self.code, replace_newlines=False)
+        if code.startswith('<pre class="code m">'):
+            code = code[20:-6]  # Remove the <pre class="code m"> and </pre> tags
+
+        return f'''
+            <div>{introduction}</div>
+            <br>
+            <div>{response}</div>
+            <pre class="code m">{code}</pre>
+            <br>
+            <i>{motivational_message}</i>
+            <br>
+        '''
 
 def text_to_html(text: str, *, replace_newlines: bool = True) -> str:
     '''

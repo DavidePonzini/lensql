@@ -1,46 +1,5 @@
-from typing import Any, Callable#, Dict, List
-# import inspect
-# import typing
+from typing import Any, Callable
 
-# ---------- helpers ---------------------------------------------------------
-
-# def _pytype_to_jsontype(py_type: type) -> str:
-#     '''Very small mapper from Python types → JSON Schema type strings.'''
-#     return {
-#         str:    'string',
-#         int:    'integer',
-#         float:  'number',
-#         bool:   'boolean',
-#         list:   'array',
-#         dict:   'object'
-#     }.get(py_type, 'string')   # sensible fallback
-
-
-# def _infer_properties(fn: Callable) -> tuple[Dict[str, Dict[str, Any]], List[str]]:
-#     '''
-#     Build JSON-Schema properties + required from a function signature.
-#     Anything without a default value is considered *required*.
-#     '''
-#     sig        = inspect.signature(fn)
-#     type_hints = typing.get_type_hints(fn)
-
-#     props: Dict[str, Dict[str, Any]] = {}
-#     required: List[str] = []
-
-#     for name, param in sig.parameters.items():
-#         py_t        = type_hints.get(name, str)
-#         json_t      = _pytype_to_jsontype(py_t)
-#         props[name] = {'type': json_t}
-
-#         if param.default is not inspect._empty:
-#             props[name]['default'] = param.default
-#         else:
-#             required.append(name)
-
-#     return props, required
-
-
-# ---------- the Tool object -------------------------------------------------
 
 class ToolParameter():
     '''
@@ -101,6 +60,7 @@ class Tool:
     def __call__(self, username: str, **kwargs):
         '''Just lets you do tool(**json_args) later on.'''
         return self.function(username=username, **kwargs)
+
 
 def llm_tool(description: str, *, parameters: list[ToolParameter] = [], required: list[str] = []) -> Callable[[Callable], Tool]:
     '''
