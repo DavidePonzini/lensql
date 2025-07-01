@@ -37,7 +37,7 @@ def explain_error_message():
     
     query = db.admin.queries.get(query_id)
     exception = db.admin.queries.get_result(query_id)
-    answer = llm.explain_error_message(query, exception)
+    answer = llm.explain_error_message(username, query, exception)
 
     answer_id = db.admin.messages.log(
         answer=answer,
@@ -58,7 +58,7 @@ def locate_error_cause():
 
     query = db.admin.queries.get(query_id)
     exception = db.admin.queries.get_result(query_id)
-    answer = llm.locate_error_cause(query, exception)
+    answer = llm.locate_error_cause(username, query, exception)
 
     answer_id = db.admin.messages.log(
         answer=answer,
@@ -79,7 +79,7 @@ def provide_error_example():
 
     query = db.admin.queries.get(query_id)
     exception = db.admin.queries.get_result(query_id)
-    answer = llm.provide_error_example(query, exception)
+    answer = llm.provide_error_example(username, query, exception)
     
     answer_id = db.admin.messages.log(
         answer=answer,
@@ -100,7 +100,7 @@ def fix_query():
 
     query = db.admin.queries.get(query_id)
     exception = db.admin.queries.get_result(query_id)
-    answer = llm.fix_query(query, exception)
+    answer = llm.fix_query(username, query, exception)
 
     answer_id = db.admin.messages.log(
         answer=answer,
@@ -120,7 +120,7 @@ def describe_my_query():
     msg_idx = data['msg_idx']
 
     query = db.admin.queries.get(query_id)
-    answer = llm.describe_my_query(query)
+    answer = llm.describe_my_query(username, query)
 
     answer_id = db.admin.messages.log(
         answer=answer,
@@ -140,7 +140,7 @@ def explain_my_query():
     msg_idx = data['msg_idx']
 
     query = db.admin.queries.get(query_id)
-    answer = llm.explain_my_query(query)
+    answer = llm.explain_my_query(username, query)
 
     answer_id = db.admin.messages.log(
         answer=answer,

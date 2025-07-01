@@ -1,6 +1,6 @@
 from . import tools, prompts, format, chatgpt
 
-def explain_error_message(code: str, exception: str) -> str:
+def explain_error_message(username: str, code: str, exception: str) -> str:
     message = chatgpt.Message()
     
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -8,11 +8,11 @@ def explain_error_message(code: str, exception: str) -> str:
     answer = chatgpt.generate_answer(message, json_format=format.MessageFormat, tools=[
         tools.get_search_path,
         tools.get_tables,
-    ])
+    ], username=username)
 
     return format.format_response(answer)
 
-def locate_error_cause(code: str, exception: str) -> str:
+def locate_error_cause(username: str, code: str, exception: str) -> str:
     message = chatgpt.Message()
     
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -20,11 +20,11 @@ def locate_error_cause(code: str, exception: str) -> str:
     answer = chatgpt.generate_answer(message, json_format=format.MessageFormat, tools=[
         tools.get_search_path,
         tools.get_tables,
-    ])
+    ], username=username)
 
     return format.format_response(answer)
 
-def provide_error_example(code: str, exception: str) -> str:
+def provide_error_example(username: str, code: str, exception: str) -> str:
     message = chatgpt.Message()
 
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -32,9 +32,11 @@ def provide_error_example(code: str, exception: str) -> str:
     answer = chatgpt.generate_answer(message, json_format=format.MessageFormat, tools=[
         tools.get_search_path,
         tools.get_tables,
-    ])
+    ], username=username)
 
-def fix_query(code: str, exception: str) -> str:
+    return format.format_response(answer)
+
+def fix_query(username: str, code: str, exception: str) -> str:
     message = chatgpt.Message()
 
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -42,11 +44,11 @@ def fix_query(code: str, exception: str) -> str:
     answer = chatgpt.generate_answer(message, json_format=format.MessageFormat, tools=[
         tools.get_search_path,
         tools.get_tables,
-    ])
+    ], username=username)
 
     return format.format_response(answer)
 
-def describe_my_query(code: str) -> str:
+def describe_my_query(username: str, code: str) -> str:
     message = chatgpt.Message()
     
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -54,11 +56,11 @@ def describe_my_query(code: str) -> str:
     answer = chatgpt.generate_answer(message, json_format=format.MessageFormat, tools=[
         tools.get_search_path,
         tools.get_tables,
-    ])
+    ], username=username)
 
     return format.format_response(answer)
 
-def explain_my_query(code: str) -> str:
+def explain_my_query(username: str, code: str) -> str:
     message = chatgpt.Message()
     
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -66,6 +68,6 @@ def explain_my_query(code: str) -> str:
     answer = chatgpt.generate_answer(message, json_format=format.MessageFormat, tools=[
         tools.get_search_path,
         tools.get_tables,
-    ])
+    ], username=username)
 
     return format.format_response(answer)

@@ -13,7 +13,7 @@ if not api_key:
 
 client = OpenAI(api_key=api_key)
 
-def generate_answer(message: Message, *, json_format: BaseModel, tools: list[Tool] = [], **kwargs) -> BaseModel:
+def generate_answer(message: Message, *, json_format: BaseModel, tools: list[Tool] = [], username: str, **kwargs) -> BaseModel:
     '''
     Generate an answer from the LLM using the provided message and tools.
     '''
@@ -51,7 +51,7 @@ def generate_answer(message: Message, *, json_format: BaseModel, tools: list[Too
             for call in msg.tool_calls:
                 fn   = tool_map[call.function.name]
                 args = json.loads(call.function.arguments) or {}
-                result = fn(**args)
+                result = fn(username=username, **args)
 
                 available_tools.remove(fn)
 
