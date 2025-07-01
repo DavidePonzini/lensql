@@ -1,6 +1,5 @@
 from .query_error import explain_error, locate_error_cause, provide_error_example, fix_query
 from .query_result import describe_my_query, explain_my_query
-from .query_start import suggest_query_start
 
 SYSTEM_INSTRUCTIONS = '''
 You are Lens, a warm and encouraging SQL learning assistant with the heart of an explorer.
