@@ -15,7 +15,7 @@ function Learning() {
         }
 
         fetchProfileData();
-    }, [apiRequest]);   // eslint-disable-line react-hooks/exhaustive-deps
+    }, [apiRequest]);
 
 
     let welcomeMessage = "Here's a look at your SQL progress";
@@ -24,7 +24,7 @@ function Learning() {
     }
 
     return (
-        <>
+        <div className="container-md">
             <h1 className="display-3">Welcome back, {userInfo?.username || 'user'}!</h1>
             <p className="lead">{welcomeMessage}</p>
 
@@ -39,7 +39,7 @@ function Learning() {
             <hr />
             <h2 id="errors">Where things got tricky</h2>
             <ErrorPatterns />
-        </>
+        </div>
     );
 }
 

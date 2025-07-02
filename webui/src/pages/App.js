@@ -10,15 +10,17 @@ import Login from './Login';
 import Home from './Home';
 import Profile from './profile/Profile';
 import Learning from './learning/Learning';
-import AssignmentList from './assignmentList/AssignmentList';
-import ManageAssignments from './manageAssignments/ManageAssignments';
-import Assignment from './assignment/Assignment';
+import ExerciseList from './classes/ExerciseList';
+import ClassList from './classes/ClassList';
+import Exercise from './exercises/Exercise';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import useTooltipObserver from '../hooks/useTooltipObserver';
 import Admin from './admin/Admin';
+import About from './About';
+import Register from './Register';
 
 
 function App() {
@@ -32,34 +34,37 @@ function App() {
                 <Navbar />
 
                 <div className="content">
-                    <div className="container-md">
-                        <Routes>
-                            <Route path="/">
-                                <Route index element={<Home />} />
-                                {isLoggedIn ? (
-                                    <>
-                                        <Route path="profile" element={<Profile />} />
-                                        <Route path="learning" element={<Learning />} />
-                                        <Route path="assignments">
-                                            <Route index element={<AssignmentList />} />
-                                            <Route path="q/:assignmentId" element={<Assignment />} />
+                    <Routes>
+                        <Route path="/">
+                            <Route index element={<Home />} />
+                            <Route path="about" element={<About />} />
 
-                                            {userInfo?.isTeacher && (
-                                                <Route path="manage" element={<ManageAssignments />} />
-                                            )}
+                            {isLoggedIn ? (
+                                <>
+                                    <Route path="profile" element={<Profile />} />
+                                    <Route path="learning" element={<Learning />} />
 
-                                        </Route>
+                                    <Route path="classes">
+                                        <Route index element={<ClassList />} />
+                                        <Route path=":classId" element={<ExerciseList />} />
+                                    </Route>
 
-                                        {userInfo?.isAdmin && (
-                                            <Route path="admin" element={<Admin />} />
-                                        )}
-                                    </>
-                                ) : (
-                                    <Route path="*" element={<Login />} />
-                                )}
-                            </Route>
-                        </Routes>
-                    </div>
+                                    <Route path="exercises/:exerciseId" element={<Exercise />} />
+
+                                    {userInfo?.isAdmin && (
+                                        <Route path="admin" element={<Admin />} />
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <Route path="login" element={<Login />} />
+                                    <Route path="register" element={<Register />} />
+                                </>
+                            )}
+
+                            <Route path="*" element={<Home />} />
+                        </Route>
+                    </Routes>
                 </div>
 
                 <Separator />

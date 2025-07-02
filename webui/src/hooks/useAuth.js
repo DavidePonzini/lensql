@@ -118,7 +118,7 @@ function AuthProvider({ children }) {
         } finally {
             setLoadingUser(false);
         }
-    }, [accessToken]);      // eslint-disable-line react-hooks/exhaustive-deps
+    }, [accessToken, apiRequest]);
 
     // Auto-load user info on login
     useEffect(() => {

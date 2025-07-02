@@ -1,0 +1,92 @@
+import { useState, useEffect, useCallback } from 'react';
+import useAuth from '../../hooks/useAuth';
+
+import ClassCard from './ClassCard';
+import CardList from '../../components/CardList';
+import { Button } from 'react-bootstrap';
+
+function ClassList() {
+    const { apiRequest } = useAuth();
+
+    const [classes, setClasses] = useState([]);
+
+    async function handleJoinClass() {
+        const joinCode = prompt('Enter class join code:');
+        joinCode?.trim().toUpperCase();
+        if (!joinCode) {
+            return;
+        }
+
+        const result = await apiRequest('/api/classes/join', 'POST', {
+            'class_id': joinCode,
+        });
+
+        if (!result.success) {
+            alert(result.message);
+            return;
+        }
+
+        getClasses();
+    }
+
+    async function handleCreateClass() {
+        const className = prompt('Enter class name:');
+        if (!className) {
+            return;
+        }
+
+        const result = await apiRequest('/api/classes/', 'POST', {
+            'title': className,
+        });
+
+        if (!result.success) {
+            alert(result.message);
+            return;
+        }
+
+        getClasses();
+    }
+
+    const getClasses = useCallback(async () => {
+        const response = await apiRequest('/api/classes/', 'GET');
+
+        setClasses(response.data);
+    }, [apiRequest]);
+
+    useEffect(() => {
+        getClasses();
+    }, [getClasses]);
+
+    return (
+        <div className="container-md">
+            <h1>My Classes</h1>
+            <CardList>
+                {classes.length === 0 && <p>Nothing here. Join a class to see exercises.</p>}
+
+                {classes.map((cl) => {
+                    return (
+                        <ClassCard
+                            title={cl.title}
+                            classId={cl.id}
+                            refreshClasses={getClasses}
+                            key={cl.join_code}
+                        />
+                    );
+                })}
+            </CardList>
+
+            <hr />
+            <Button variant="primary" onClick={handleJoinClass} className="me-2 mb-2">
+                <i className="fa fa-plus me-1"></i>
+                Join Class
+            </Button>
+
+            <Button variant="secondary" onClick={handleCreateClass} className="me-2 mb-2">
+                <i className="fa fa-plus me-1"></i>
+                Create Class
+            </Button>
+        </div>
+    );
+}
+
+export default ClassList;

@@ -1,10 +1,12 @@
 import ButtonModal from '../../components/ButtonModal';
 import useAuth from '../../hooks/useAuth';
 import { useState } from 'react';
-import ExerciseData from './ExerciseData';
+import ExerciseUpdate from './ExerciseUpdate';
+import { useParams } from 'react-router-dom';
 
 // Button to add a new exercise + modal to fill in the details
 function AddExercise({ refreshAssignments }) {
+    const { classCode } = useParams();
     const { apiRequest } = useAuth();
     const [exerciseTitle, setExerciseTitle] = useState('');
     const [exerciseRequest, setExerciseRequest] = useState('');
@@ -15,6 +17,7 @@ function AddExercise({ refreshAssignments }) {
         await apiRequest('/api/exercises', 'POST', {
             'title': exerciseTitle,
             'request': exerciseRequest,
+            'class_code': classCode,
             'dataset_name': exerciseDatasetName,
             'solution': exerciseAnswer,
         });
@@ -36,7 +39,7 @@ function AddExercise({ refreshAssignments }) {
                 },
             ]}
         >
-            <ExerciseData
+            <ExerciseUpdate
                 title={exerciseTitle}
                 setTitle={setExerciseTitle}
                 request={exerciseRequest}

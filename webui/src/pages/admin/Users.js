@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import useAuth from '../../hooks/useAuth';
 import Table from 'react-bootstrap/Table';
 import ButtonModal from '../../components/ButtonModal';
@@ -45,16 +45,16 @@ function Users() {
         );
     }
 
-    async function fetchUsers() {
+    const fetchUsers = useCallback(async () => {
         const response = await apiRequest('/api/admin/users', 'GET');
 
         setUsers(response.data);
         setLoading(false);
-    }
+    }, [apiRequest]);
 
     useEffect(() => {
         fetchUsers();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [fetchUsers]);
 
 
     if (loading) {

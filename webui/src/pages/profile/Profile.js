@@ -12,7 +12,7 @@ function Profile() {
         }
 
         fetchProfileData();
-    }, [apiRequest]);   // eslint-disable-line react-hooks/exhaustive-deps
+    }, [apiRequest]);
 
 
     let welcomeMessage = "Here's a look at your SQL progress";
@@ -21,7 +21,7 @@ function Profile() {
     }
 
     return (
-        <>
+        <div className="container-md">
             <h1 className="display-3">Welcome back, {userInfo?.username || 'user'}!</h1>
             <p className="lead">{welcomeMessage}</p>
             <p style={{ color: 'red', fontWeight: 'bold' }}>This section is under developent</p>
@@ -65,7 +65,7 @@ function Profile() {
                     <span className="badge bg-secondary rounded-pill">Locked</span>
                 </li>
             </ul>
-        </>
+        </div>
     );
 }
 

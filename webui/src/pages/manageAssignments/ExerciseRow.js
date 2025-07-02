@@ -4,7 +4,7 @@ import useAuth from '../../hooks/useAuth';
 import { useState } from 'react';
 import AssignExercise from './AssignExercise';
 import ExerciseData from './ExerciseData';
-import SetLearningObjectives from './SetLearningObjectives';
+import SetLearningObjectives from '../classes/SetLearningObjectives';
 
 
 // A single row in the exercise list + buttons

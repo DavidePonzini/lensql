@@ -34,7 +34,7 @@ function ItemAssignmentList({
             setItems(data);
         }
         fetchData();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [fetchItems]);
 
     useEffect(() => {
         const allAssigned = items.length > 0 && items.every((i) => i.isAssigned);
