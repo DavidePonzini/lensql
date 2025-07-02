@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 const AuthContext = createContext();
 
@@ -36,7 +36,7 @@ function AuthProvider({ children }) {
         setUserInfo(null);
     }
 
-    async function refreshAccessToken() {
+    const refreshAccessToken = useCallback(async () => {
         if (!refreshToken) {
             logout();
             throw new Error('No refresh token.');
@@ -56,9 +56,9 @@ function AuthProvider({ children }) {
             logout();
             throw new Error('Refresh token invalid.');
         }
-    }
+    }, [refreshToken]);
 
-    async function apiRequest(endpoint, method = 'GET', body = null, { stream = false } = {}) {
+    const apiRequest = useCallback(async (endpoint, method = 'GET', body = null, { stream = false } = {}) => {
         let token = accessToken;
 
         async function doRequest(currentToken) {
@@ -98,7 +98,7 @@ function AuthProvider({ children }) {
         } else {
             return response.json(); // Standard JSON handling
         }
-    }
+    }, [accessToken, refreshAccessToken, MAX_REQUEST_SIZE]);
 
 
     // Load user info safely and only once if needed
@@ -127,18 +127,18 @@ function AuthProvider({ children }) {
         }
     }, [accessToken, userInfo, loadUserInfo]);
 
+    const value = useMemo(() => ({
+        isLoggedIn: !!accessToken,
+        userInfo,
+        loadingUser,
+        saveTokens,
+        logout,
+        apiRequest,
+        loadUserInfo,
+    }), [accessToken, userInfo, loadingUser, apiRequest, loadUserInfo]);
+
     return (
-        <AuthContext.Provider value={{
-            isLoggedIn: !!accessToken,
-            userInfo,
-            loadingUser,
-            saveTokens,
-            logout,
-            apiRequest,
-            loadUserInfo,
-        }}>
-            {children}
-        </AuthContext.Provider>
+        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
     );
 }
 
