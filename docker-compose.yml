@@ -61,6 +61,14 @@ services:
     volumes:
       - lensql_pgdata_users:/var/lib/postgresql/data
 
+  docs_api:
+    image: docker.swagger.io/swaggerapi/swagger-ui
+    container_name: lensql_docs_api
+    restart: unless-stopped
+    environment:
+      - SWAGGER_JSON=/DOCS/api.yaml
+    volumes:
+      - ./DOCS:/DOCS
 volumes:
   lensql_pgdata:
   lensql_pgdata_users:
