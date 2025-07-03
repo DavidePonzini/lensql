@@ -66,9 +66,10 @@ services:
     container_name: lensql_docs_api
     restart: unless-stopped
     environment:
-      - SWAGGER_JSON=/DOCS/api.yaml
+      - SWAGGER_JSON=/docs/api.yaml
+      - SUPPORTED_SUBMIT_METHODS=[]
     volumes:
-      - ./DOCS:/DOCS
+      - ./docs/swaggerui:/docs
 volumes:
   lensql_pgdata:
   lensql_pgdata_users:

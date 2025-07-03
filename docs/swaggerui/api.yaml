@@ -1,0 +1,516 @@
+openapi: 3.0.4
+info:
+    title: LensQL
+    description: |-
+        LensQL is an interactive AI assistant that helps learners uncover why their SQL queries behave the way they do.
+        Instead of providing answers, LensQL guides students to discover solutions through constructive feedback and minimal examples.
+    contact:
+        email: davide.ponzini@edu.unige.it
+    version: 1.0.0
+
+servers:
+    - url: /api/
+
+paths:
+    /auth/login:
+        post:
+            tags:
+                - auth
+            summary: login with username/password
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
+            responses:
+                "200":
+                    description: Login successful
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    access_token:
+                                        type: string
+                                    refresh_token:
+                                        type: string
+                                    success:
+                                        type: boolean
+    /auth/register:
+        post:
+            tags:
+                - auth
+            summary: register a new account
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
+                                email:
+                                    type: string
+                                school:
+                                    type: string
+            responses:
+                "200":
+                    description: Registration successful
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+    /auth/reset-password:
+        post:
+            tags:
+                - auth
+            summary: set new password for username
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                password:
+                                    type: string
+            responses:
+                "200":
+                    description: Password reset successful
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+    /classes:
+        get:
+            tags:
+                - classes
+            summary: list classes
+            security:
+                - auth: []
+            responses:
+                "200":
+                    description: A list of classes
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        class_id:
+                                            type: string
+                                        title:
+                                            type: string
+        post:
+            tags:
+                - classes
+            summary: create new class
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                title:
+                                    type: string
+            responses:
+                "200":
+                    description: Class created successfully
+            put:
+                tags:
+                    - classes
+                summary: rename class
+                security:
+                    - auth: []
+                requestBody:
+                    required: true
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    class_id:
+                                        type: string
+                                    title:
+                                        type: string
+                responses:
+                    "200":
+                        description: Class renamed successfully
+        delete:
+            tags:
+                - classes
+            summary: delete class, if no students, no exercises and no queries
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                class_id:
+                                    type: string
+            responses:
+                "200":
+                    description: Class deleted successfully
+    /classes/join:
+        post:
+            tags:
+                - classes
+            summary: join a class
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                class_id:
+                                    type: string
+            responses:
+                "200":
+                    description: Successfully joined class
+    /classes/leave:
+        post:
+            tags:
+                - classes
+            summary: leave a class, if not teacher
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                class_id:
+                                    type: string
+            responses:
+                "200":
+                    description: Successfully left class
+    /classes/is-teacher:
+        get:
+            tags:
+                - classes
+            summary: is the user a teacher for this class?
+            security:
+                - auth: []
+            parameters:
+                - in: query
+                  name: class_id
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: Returns whether the user is a teacher for the class
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    is_teacher:
+                                        type: boolean
+    /classes/set-teacher:
+        post:
+            tags:
+                - classes
+            summary: set/unset participant as teacher
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                class_id:
+                                    type: string
+                                username:
+                                    type: string
+                                value:
+                                    type: boolean
+            responses:
+                "200":
+                    description: Teacher status updated successfully
+    /classes/members:
+        get:
+            tags:
+                - classes
+            summary: get participants in this class and their teacher status
+            security:
+                - auth: []
+            parameters:
+                - in: query
+                  name: class_id
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: A list of class members with their teacher status
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        username:
+                                            type: string
+                                        is_teacher:
+                                            type: boolean
+
+    /exercises:
+        get:
+            tags:
+                - exercises
+            summary: list exercises in class
+            security:
+                - auth: []
+            parameters:
+                - in: query
+                  name: class_id
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: A list of exercises in the class
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        exercise_id:
+                                            type: string
+                                        title:
+                                            type: string
+                                        request:
+                                            type: string
+                                        is_ai_generated:
+                                            type: boolean
+        post:
+            tags:
+                - exercises
+            summary: create new exercise in class
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                class_id:
+                                    type: string
+                                title:
+                                    type: string
+                                request:
+                                    type: string
+                                dataset_name:
+                                    type: string
+                                solution:
+                                    type: string
+            responses:
+                "200":
+                    description: Exercise created successfully
+        put:
+            tags:
+                - exercises
+            summary: update exercise in class
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                exercise_id:
+                                    type: string
+                                title:
+                                    type: string
+                                request:
+                                    type: string
+                                dataset_name:
+                                    type: string
+                                solution:
+                                    type: string
+            responses:
+                "200":
+                    description: Exercise updated successfully
+        delete:
+            tags:
+                - exercises
+            summary: delete exercise in class
+            description: exercise can only be deleted if no queries are associated with it and it's not assigned to any student
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                exercise_id:
+                                    type: string
+            responses:
+                "200":
+                    description: Exercise deleted successfully
+    /exercises/get:
+        get:
+            tags:
+                - exercises
+            summary: get exercise data
+            security:
+                - auth: []
+            parameters:
+                - in: query
+                  name: exercise_id
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: Returns the exercise with the given id
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    exercise_id:
+                                        type: string
+                                    title:
+                                        type: string
+                                    request:
+                                        type: string
+                                    dataset_name:
+                                        type: string
+                                    solution:
+                                        type: string
+    /exercises/submit:
+        post:
+            tags:
+                - exercises
+            summary: mark exercise as submitted
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                exercise_id:
+                                    type: string
+            responses:
+                "200":
+                    description: Exercise marked as submitted successfully
+    /exercises/unsubmit:
+        post:
+            tags:
+                - exercises
+            summary: mark exercise as not submitted
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                exercise_id:
+                                    type: string
+            responses:
+                "200":
+                    description: Exercise marked as not submitted successfully
+    /exercises/objectives:
+        get:
+            tags:
+                - exercises
+            summary: list objectives for exercise
+            security:
+                - auth: []
+            parameters:
+                - in: query
+                  name: exercise_id
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: A list of objectives for the exercise
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        objective:
+                                            type: string
+                                        description:
+                                            type: string
+        post:
+            tags:
+                - exercises
+            summary: set/unset objective for exercise
+            security:
+                - auth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                exercise_id:
+                                    type: string
+                                objective:
+                                    type: string
+                                value:
+                                    type: boolean
+            responses:
+                "200":
+                    description: Objective status updated successfully
+
+components:
+    securitySchemes:
+        auth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
