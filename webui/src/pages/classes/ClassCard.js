@@ -4,32 +4,41 @@ import useAuth from '../../hooks/useAuth';
 import ItemAssignmentList from '../../components/ItemAssignmentList';
 import ButtonModal from '../../components/ButtonModal';
 
-function ClassCard({ title, classId, isTeacher = false, refreshClasses }) {
+function ClassCard({ title, classId, isTeacher = false, participants, exercises, queries, refreshClasses }) {
     const { apiRequest } = useAuth();
 
     async function getMembers() {
-        const response = await apiRequest('/api/classes/members', 'GET', {
-            'class_id': classId,
-        });
+        const response = await apiRequest(`/api/classes/members?class_id=${classId}`, 'GET');
 
-        return response.data;
+        return response.members.map(member => ({
+            id: member.username,
+            label: member.username,
+            isAssigned: member.is_teacher,
+        }));
     }
 
     async function handleLeave() {
-        await apiRequest('/api/classes/leave', 'POST', {
+        const result = await apiRequest('/api/classes/leave', 'POST', {
             'class_id': classId,
         });
+
+        if (!result.success) {
+            alert(result.message);
+            return;
+        }
 
         refreshClasses();
     }
 
 
-    async function makeTeacher(username, value) {
+    async function makeTeacher(id, value) {
         await apiRequest('/api/classes/set-teacher', 'POST', {
             'class_id': classId,
-            'username': username,
+            'username': id,
             'value': value,
         });
+
+        refreshClasses();
     }
 
     async function handleEdit() {
@@ -38,7 +47,7 @@ function ClassCard({ title, classId, isTeacher = false, refreshClasses }) {
             return;
         }
 
-        const result = await apiRequest('/api/classes/', 'PUT', {
+        const result = await apiRequest('/api/classes', 'PUT', {
             'title': newTitle,
             'class_id': classId,
         });
@@ -58,9 +67,20 @@ function ClassCard({ title, classId, isTeacher = false, refreshClasses }) {
             </Card.Header>
 
             <Card.Body>
-                <Card.Text>
-                    <strong>Join Code:</strong> {classId}
-                </Card.Text>
+                <strong>Exercises:</strong> {exercises}
+                <br />
+                <strong>Queries executed:</strong> {queries}
+
+                {isTeacher && (
+                    <>
+                        <hr />
+                        <span className="badge bg-success">Teacher</span>
+                        <br />
+                        <strong>Join Code:</strong> {classId}
+                        <br />
+                        <strong>Students:</strong> {participants}
+                    </>
+                )}
             </Card.Body>
 
             <Card.Footer>

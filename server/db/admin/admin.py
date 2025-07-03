@@ -65,8 +65,7 @@ def list_all_users(current_user: str) -> list[dict]:
     query = database.sql.SQL('''
         SELECT
             username,
-            is_admin,
-            is_teacher
+            is_admin
         FROM
             {schema}.users
         WHERE
@@ -83,7 +82,6 @@ def list_all_users(current_user: str) -> list[dict]:
         {
             'username': row[0],
             'is_admin': row[1],
-            'is_teacher': row[2],
         }
         for row in result
     ]

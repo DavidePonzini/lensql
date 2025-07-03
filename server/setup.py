@@ -3,24 +3,15 @@ from server import db
 from dav_tools import messages
 
 if __name__ == '__main__':
-    for user, password, is_teacher, is_admin in [
-        ('lens', 'l', False, True),
-        ('dav', 'd', True, True),
-        ('giovanna', 'g', True, False),
-        ('barbara', 'b', True, False),
-        ('student', 's', False, False),
+    for user, password, is_admin, school in [
+        ('lens', 'l', True, 'DIBRIS'),
+        ('dav', 'd', True, 'DIBRIS'),
+        ('giovanna', 'g', False, 'DIBRIS'),
+        ('barbara', 'b', False, 'DIBRIS'),
+        ('student', 's', False, 'DIBRIS'),
     ]:
-        if db.register_user(user, password, is_teacher=is_teacher, is_admin=is_admin):
+        if db.register_user(user, password, is_admin=is_admin, school=school):
             messages.info(f'User {user} registered successfully')
-
-    for teacher, students in [
-        ('dav', ['student', 'dav']),
-        ('giovanna', ['barbara', 'dav', 'student']),
-        ('barbara', ['giovanna', 'dav', 'student']),
-    ]:
-        for student in students:
-            db.admin.teachers.add_student(teacher, student)
-            messages.info(f'Added teacher {teacher} for student {student}')
 
     for title, request in [
         ('0) Progetto', 'Esegui qui tutte le query relative al tuo progetto finale',),

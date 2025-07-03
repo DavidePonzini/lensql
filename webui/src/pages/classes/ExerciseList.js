@@ -26,9 +26,7 @@ function ExerciseList() {
     }
 
     const getExercises = useCallback(async () => {
-        const response = await apiRequest('/api/exercises/', 'GET', {
-            'class_id': classId,
-        });
+        const response = await apiRequest(`/api/exercises?class_id=${classId}`, 'GET');
 
         const submitted = response.data.filter((exercise) => { return exercise.submission_ts });
         const unsubmitted = response.data.filter((exercise) => { return !exercise.submission_ts });
@@ -42,11 +40,9 @@ function ExerciseList() {
 
     useEffect(() => {
         async function checkIfTeacher() {
-            const response = await apiRequest('/api/classes/is-teacher', 'GET', {
-                'class_code': classId,
-            });
+            const response = await apiRequest(`/api/classes/is-teacher?class_id=${classId}`, 'GET');
 
-            setIsTeacher(response.result);
+            setIsTeacher(response.is_teacher);
         }
 
         checkIfTeacher();

@@ -40,59 +40,6 @@ def set_admin():
         db.admin.admin.set_admin(current_user, username, value),
     )
 
-@bp.route('/set-teacher', methods=['POST'])
-@jwt_required()
-def set_teacher():
-    """Set a user as teacher or not."""
-
-    current_user = get_jwt_identity()
-    data = request.get_json()
-    username = data['username']
-    value = data['value']
-
-    if not db.admin.users.is_admin(current_user):
-        return responses.response(False, message="Access denied: Admin privileges required.")
-
-    return responses.response(
-        db.admin.admin.set_teacher(current_user, username, value),
-    )
-
-@bp.route('/students', methods=['GET'])
-@jwt_required()
-def list_students():
-    """List student status for a given teacher."""
-    username = get_jwt_identity()
-    data = request.args
-    teacher = data.get('teacher')
-
-    if not db.admin.users.is_teacher(username):
-        return responses.response(False, message="Access denied: Teacher privileges required.")
-
-    students = db.admin.teachers.get_students_status(teacher)
-
-    return responses.response(True, data=students)
-
-@bp.route('/assign-student', methods=['POST'])
-@jwt_required()
-def assign_student():
-    """Assign a student to a teacher."""
-    username = get_jwt_identity()
-    data = request.get_json()
-    student = data['student']
-    teacher = data['teacher']
-    value = data['value']
-
-    if not db.admin.users.is_teacher(username):
-        return responses.response(False, message="Access denied: Teacher privileges required.")
-
-    if value:
-        db.admin.teachers.add_student(teacher, student)
-    else:
-        db.admin.teachers.remove_student(teacher, student)
-
-    return responses.response(True)
-
-
 @bp.route('/datasets', methods=['GET'])
 @jwt_required()
 def list_datasets():

@@ -11,32 +11,6 @@ def is_admin(username: str) -> bool:
             {schema}.users
         WHERE
             username = {username}
-            AND NOT is_disabled
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        username=database.sql.Placeholder('username')
-    )
-
-    result = db.execute_and_fetch(query, {
-        'username': username
-    })
-
-    if len(result) == 0:
-        return False
-    
-    return result[0][0]
-
-def is_teacher(username: str) -> bool:
-    '''Check if a user is a teacher'''
-
-    query = database.sql.SQL('''
-        SELECT
-            is_teacher
-        FROM
-            {schema}.users
-        WHERE
-            username = {username}
-            AND NOT is_disabled
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username')
@@ -57,7 +31,6 @@ def get_info(username: str) -> dict:
     return {
         'username': username,
         'is_admin': is_admin(username),
-        'is_teacher': is_teacher(username),
     }
 
 def get_unique_queries_count(username: str) -> int:

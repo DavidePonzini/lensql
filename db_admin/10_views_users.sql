@@ -33,8 +33,7 @@ FROM
     JOIN queries q ON qb.id = q.batch_id
     JOIN users u ON qb.username = u.username
 WHERE
-    NOT u.is_teacher
-    AND NOT u.is_admin 
+    NOT u.is_admin 
 GROUP BY
     DATE(qb.ts)
 ORDER BY

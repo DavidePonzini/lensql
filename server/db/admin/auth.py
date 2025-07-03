@@ -3,6 +3,10 @@ from .connection import db, SCHEMA
 
 import bcrypt
 
+def _hash_password(password: str) -> str:
+    '''Hash a password using bcrypt'''
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
 def user_exists(username: str) -> bool:
     '''Check if a user exists in the database'''
 
@@ -21,29 +25,31 @@ def user_exists(username: str) -> bool:
 
     return len(result) > 0
 
-def register_user(username: str, password: str, *, is_teacher: bool = False, is_admin: bool = False) -> bool:
+def register_user(username: str, password: str, *, school: str, email: str, is_admin: bool = False) -> bool:
     '''Register a new user'''
 
     if user_exists(username):
         return False
 
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    hashed_password = _hash_password(password)
 
     query = database.sql.SQL('''
-        INSERT INTO {schema}.users(username, password_hash, is_teacher, is_admin)
-        VALUES ({username}, {password_hash}, {is_teacher}, {is_admin})
+        INSERT INTO {schema}.users(username, password_hash, email, school, is_admin)
+        VALUES ({username}, {password_hash}, {email}, {school}, {is_admin})
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username'),
         password_hash=database.sql.Placeholder('password_hash'),
-        is_teacher=database.sql.Placeholder('is_teacher'),
+        email=database.sql.Placeholder('email'),
+        school=database.sql.Placeholder('school'),
         is_admin=database.sql.Placeholder('is_admin')
     )
 
     db.execute(query, {
         'username': username,
         'password_hash': hashed_password,
-        'is_teacher': is_teacher,
+        'email': email,
+        'school': school,
         'is_admin': is_admin,
     })
     
@@ -60,7 +66,7 @@ def delete_user(username: str) -> None:
         username=database.sql.Placeholder('username')
     )
 
-    result = db.execute(query, {
+    db.execute(query, {
         'username': username
     })
 
@@ -73,7 +79,6 @@ def can_login(username: str, password: str) -> bool:
             {schema}.users
         WHERE
             username = {username}
-            AND NOT is_disabled
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username')
@@ -89,3 +94,28 @@ def can_login(username: str, password: str) -> bool:
     stored_hash = result[0][0]
     return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
 
+
+def change_password(username: str, old_password: str, new_password: str) -> bool:
+    '''Change the password for a user'''
+
+    if not can_login(username, old_password):
+        return False
+
+    hashed_new_password = _hash_password(new_password)
+
+    query = database.sql.SQL('''
+        UPDATE {schema}.users
+        SET password_hash = {new_password}
+        WHERE username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        new_password=database.sql.Placeholder('new_password'),
+        username=database.sql.Placeholder('username')
+    )
+
+    db.execute(query, {
+        'new_password': hashed_new_password,
+        'username': username
+    })
+
+    return True

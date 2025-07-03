@@ -1,3 +1,8 @@
+/*
+    NOTES:
+    - Prevent deletion of values if they are associated with a query.
+*/
+
 BEGIN;
 
 DO $$
@@ -17,18 +22,28 @@ SET search_path TO lensql;
 CREATE TABLE users (
     username VARCHAR(255) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
-    is_disabled BOOLEAN NOT NULL DEFAULT FALSE,
-    is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
+    email VARCHAR(255) DEFAULT NULL,
+    school VARCHAR(255) NOT NULL,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     experience INTEGER NOT NULL DEFAULT 0,
     coins INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE TABLE teaches (
-    teacher VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
-    student VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
+CREATE SEQUENCE users_drop_seq
+    OWNED BY users.username;
 
-    PRIMARY KEY (teacher, student)
+CREATE TABLE classes (
+    id CHAR(8) PRIMARY KEY DEFAULT UPPER(SUBSTRING(MD5(RANDOM()::TEXT), 1, 8)),
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE class_members (
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,
+    class_id CHAR(8) NOT NULL REFERENCES classes(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- class can only be deleted if no members are present
+    is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
+    joined_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    PRIMARY KEY (username, class_id)
 );
 
 CREATE TABLE datasets (
@@ -48,17 +63,16 @@ CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
-    dataset_name VARCHAR(255) REFERENCES datasets(name) ON UPDATE CASCADE ON DELETE SET NULL DEFAULT NULL,
+    dataset_name VARCHAR(255) REFERENCES datasets(name) ON UPDATE CASCADE ON DELETE RESTRICT DEFAULT NULL,
     solution TEXT DEFAULT NULL,
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE assigned_to (
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
+CREATE TABLE class_exercises (
+    class_id CHAR(8) NOT NULL REFERENCES classes(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of class if exercises are assigned
     exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if assigned to users
-    submission_ts TIMESTAMP DEFAULT NULL,
 
-    PRIMARY KEY (username, exercise_id)
+    PRIMARY KEY (class_id, exercise_id)
 );
 
 CREATE TABLE learning_objectives (
@@ -68,14 +82,14 @@ CREATE TABLE learning_objectives (
 
 CREATE TABLE has_learning_objective (
     exercise_id INTEGER NOT NULL REFERENCES exercises(id),
-    objective VARCHAR(255) NOT NULL REFERENCES learning_objectives(objective) ON UPDATE CASCADE ON DELETE CASCADE,
+    objective VARCHAR(255) NOT NULL REFERENCES learning_objectives(objective) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of objective if it is associated with an exercise
 
     PRIMARY KEY (exercise_id, objective)
 );
 
 CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE SET NULL,
+    username VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if queries exist
     ts TIMESTAMP NOT NULL DEFAULT NOW(),
     exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT   -- prevent deletion of exercise if queries exist
 );
@@ -126,7 +140,7 @@ CREATE TABLE errors (
 
 CREATE TABLE has_error(
     query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
-    error_id INTEGER NOT NULL REFERENCES errors(id) ON DELETE CASCADE,
+    error_id INTEGER NOT NULL REFERENCES errors(id) ON DELETE RESTRICT,  -- prevent deletion of error if it is associated with a query
 
     PRIMARY KEY (query_id, error_id)
 );

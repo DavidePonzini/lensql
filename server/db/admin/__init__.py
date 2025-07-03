@@ -1,1 +1,1 @@
-from . import assignments, auth, dataset, exercises, messages, queries, teachers, users, admin
+from . import auth, classes, dataset, exercises, messages, queries, teachers, users, admin

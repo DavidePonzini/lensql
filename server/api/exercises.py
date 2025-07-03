@@ -18,8 +18,13 @@ class ExerciseAPI(MethodView):
         '''Get a specific exercise by its ID.'''
 
         username = get_jwt_identity()
-        exercise_id = request.args.get('id')
-        result = db.admin.exercises.get(exercise_id, username)
+        class_id = request.args.get('class_id')
+
+        if not db.admin.classes.has_participant(username, class_id):
+            return responses.response(False, message='You are not a participant of this class.')
+        
+        result = db.admin.exercises.get_from_class(class_id)
+        
         return responses.response(True, data=result)
 
     def post(self):

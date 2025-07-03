@@ -35,7 +35,7 @@ function ClassList() {
             return;
         }
 
-        const result = await apiRequest('/api/classes/', 'POST', {
+        const result = await apiRequest('/api/classes', 'POST', {
             'title': className,
         });
 
@@ -48,7 +48,7 @@ function ClassList() {
     }
 
     const getClasses = useCallback(async () => {
-        const response = await apiRequest('/api/classes/', 'GET');
+        const response = await apiRequest('/api/classes', 'GET');
 
         setClasses(response.data);
     }, [apiRequest]);
@@ -67,9 +67,13 @@ function ClassList() {
                     return (
                         <ClassCard
                             title={cl.title}
-                            classId={cl.id}
+                            classId={cl.class_id}
+                            isTeacher={cl.is_teacher}
+                            participants={cl.participants}
+                            exercises={cl.exercises}
+                            queries={cl.queries}
                             refreshClasses={getClasses}
-                            key={cl.join_code}
+                            key={cl.class_id}
                         />
                     );
                 })}

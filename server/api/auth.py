@@ -44,10 +44,24 @@ def register():
     data = request.get_json()
     username = data['username']
     password = data['password']
-    is_teacher = data['is_teacher']
-    is_admin = data['is_admin']
+    email = data['email']
+    school = data['school']
 
-    if not db.register_user(username, password, is_teacher=is_teacher, is_admin=is_admin):
+    if not db.register_user(username, password, email=email, school=school):
         return responses.response(False, message='Registration failed. Please try again.')
     
     return responses.response(True)
+
+@bp.route('/change-password', methods=['POST'])
+@jwt_required()
+def reset_password():
+    '''Reset the password for the current user.'''
+    current_user = get_jwt_identity()
+    data = request.get_json()
+    old_password = data['old_password']
+    new_password = data['new_password']
+
+    if not db.admin.auth.change_password(current_user, old_password, new_password):
+        return responses.response(False, message='Failed to reset password. Please try again.')
+    
+    return responses.response(True, message='Password reset successfully.')

@@ -5,7 +5,6 @@ import os
 
 from server import db
 
-
 jwt = JWTManager()
 
 
@@ -24,10 +23,10 @@ def create_app() -> Flask:
     jwt.init_app(app)
 
     # Register blueprints
-    from . import admin, assignments, auth, datasets, exercises, messages, queries, users
+    from . import admin, auth, datasets, exercises, messages, queries, users, classes
 
     app.register_blueprint(admin.bp, url_prefix='/admin')
-    app.register_blueprint(assignments.bp, url_prefix='/assignments')
+    app.register_blueprint(classes.bp, url_prefix='/classes')
     app.register_blueprint(auth.bp, url_prefix='/auth')
     app.register_blueprint(datasets.bp, url_prefix='/datasets')
     app.register_blueprint(exercises.bp, url_prefix='/exercises')

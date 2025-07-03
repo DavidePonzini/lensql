@@ -2,6 +2,45 @@ from dav_tools import database
 from .connection import db, SCHEMA
 
 
+def get_from_class(class_id: str) -> list[dict]:
+    '''Get all exercises assigned to a class'''
+
+    query = database.sql.SQL(
+    '''
+        SELECT
+            e.id,
+            e.title,
+            e.request,
+            e.is_ai_generated
+        FROM
+            {schema}.exercises e
+            JOIN {schema}.class_exercises ce ON e.id = ce.exercise_id
+        WHERE
+            ce.class_id = {class_id}
+        ORDER BY
+            e.title,
+            e.id
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        class_id=database.sql.Placeholder('class_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'class_id': class_id
+    })
+
+    return [
+        {
+            'exercise_id': row[0],
+            'title': row[1],
+            'request': row[2],
+            'is_ai_generated': row[3]
+        }
+        for row in result
+    ]
+
+
+
 # TODO: show only exercises the user is assigned to
 def list_all(username: str) -> list[dict]:
     '''Get all exercises in the database the user has access to'''
@@ -12,8 +51,6 @@ def list_all(username: str) -> list[dict]:
             e.id,
             e.title,
             e.request,
-            e.dataset_name,
-            e.solution,
             e.is_ai_generated
         FROM
             {schema}.exercises e
@@ -28,11 +65,9 @@ def list_all(username: str) -> list[dict]:
 
     return [
         {
-            'id': row[0],
+            'exercise_id': row[0],
             'title': row[1],
             'request': row[2],
-            'dataset_name': row[3],
-            'solution': row[4],
             'is_ai_generated': row[5]
         }
         for row in result
