@@ -32,12 +32,12 @@ def run_query():
         for query_result in db.users.queries.execute(username=username, query_str=query):
             query_id = db.admin.queries.log(
                 batch_id=batch_id,
-                query=query_result.query,
+                query=query_result.query.query,
                 search_path=db.users.queries.metadata.get_search_path(username),
                 success=query_result.success,
                 result=query_result.result_text,
-                query_type=query_result.query_type,
-                query_goal=query_result.query_goal
+                query_type=query_result.query.query_type,
+                query_goal=query_result.query.query_goal
             )
             query_result.id = query_id
 
@@ -50,8 +50,8 @@ def run_query():
             yield json.dumps({
                 'success': query_result.success,
                 'builtin': False,
-                'query': query_result.query,
-                'type': query_result.query_type,
+                'query': query_result.query.query,
+                'type': query_result.data_type,
                 'data': query_result.result_html,
                 'id': query_id,
                 'notices': query_result.notices,
@@ -72,7 +72,7 @@ def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> i
 
     query_id = db.admin.queries.log(
         batch_id=batch_id,
-        query=result.query,
+        query=result.query.query,
         success=result.success,
         result=result.result_text,
         query_type='BUILTIN',

@@ -7,7 +7,7 @@ from typing import Iterable
 
 from dav_tools import messages
 
-def execute(username: str, query_str: str, *, strip_comments: bool = True) -> Iterable[QueryResult]:
+def execute(username: str, query_str: str, *, strip_comments: bool = True, fast: bool = False) -> Iterable[QueryResult]:
     '''
     Executes the given SQL queries and returns the results.
     The queries will be separated into individual statements.
@@ -39,9 +39,7 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                     yield QueryResultDataset(
                         result=pd.DataFrame(rows, columns=columns),
                         columns=[Column(name=col.name, data_type=col.type_code) for col in cur.description] if cur.description else [],
-                        query=statement.query,
-                        query_type=statement.query_type,
-                        query_goal=statement.query_goal,
+                        query=statement,
                         notices=conn.notices)
                     continue
 
@@ -49,9 +47,7 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                 # No result set, return message status 
                 yield QueryResultMessage(
                     message=f'{cur.statusmessage}',
-                    query=statement.query,
-                    query_type=statement.query_type,
-                    query_goal=statement.query_goal,
+                    query=statement,
                     notices=conn.notices)
 
             conn.update_last_operation_ts()
@@ -64,9 +60,7 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
             
             yield QueryResultError(
                 exception=SQLException(e),
-                query=statement.query,
-                query_type=statement.query_type,
-                query_goal=statement.query_goal,
+                query=statement,
                 notices=conn.notices)
 
 

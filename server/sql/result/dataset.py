@@ -1,6 +1,8 @@
 from .result import QueryResult
 from .util import Column
 
+from ..code import SQLCode
+
 from typing import Self
 import pandas as pd
 
@@ -8,15 +10,12 @@ import pandas as pd
 class QueryResultDataset(QueryResult):
     '''Represents the result of a SQL query that returned a dataset.'''
     def __init__(self, result: pd.DataFrame, *,
-                  query: str,
+                  query: SQLCode,
                   columns: list[Column],
-                  query_type: str, query_goal: str,
                   notices: list = []):
         super().__init__(
             query=query,
             success=True,
-            query_type=query_type,
-            query_goal=query_goal,
             notices=notices,
             data_type='dataset')
         self._result = result

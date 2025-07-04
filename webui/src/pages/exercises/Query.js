@@ -402,7 +402,7 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }
                             query={val.query}
                             key={val.id ? val.id : `i${index}`}
                             success={val.success}
-                            isMessage={val.type === 'message'}
+                            isMessage={val.data_type === 'message'}
                             notices={val.notices}
                         />
                     ))

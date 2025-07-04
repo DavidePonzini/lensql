@@ -41,6 +41,7 @@ function ClassUpdate({ classId, refresh, className }) {
             className={className}
             title="Edit Class"
             buttonText="Edit"
+            size='lg'
             footerButtons={[
                 {
                     text: 'Save',

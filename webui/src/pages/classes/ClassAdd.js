@@ -21,6 +21,7 @@ function ClassAdd({ refresh, className }) {
         <ButtonModal
             className={className}
             title="New Class"
+            size='lg'
             buttonText={
                 <span>
                     <i className="fa fa-plus me-1"></i> New Class

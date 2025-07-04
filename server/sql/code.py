@@ -9,6 +9,7 @@ STRIP_COMMENTS_MAX_LENGTH = 1000
 class SQLCode:
     def __init__(self, query: str):
         self.query = query
+        self._parse_cache = None
         self._query_type_cache = None
 
     def strip_comments(self, *, force: bool = False) -> Self:
@@ -37,10 +38,17 @@ class SQLCode:
         '''Split the SQL query into individual statements'''
         for query in sqlparse.split(self.query, strip_semicolon=False):
             yield SQLCode(query)
+
+    def _parse(self) -> tuple[sqlparse.sql.Statement]:
+        '''Parse the SQL query and return the first statement'''
+        if self._parse_cache is None:
+            self._parse_cache = sqlparse.parse(self.query)
+        
+        return self._parse_cache 
     
     @property
     def first_token(self) -> str:
-        statement = sqlparse.parse(self.query)[0]
+        statement = self._parse()[0]
         first_token = statement.token_first(skip_cm=True)
         
         if first_token:
@@ -80,7 +88,7 @@ class SQLCode:
         }
 
 
-        statements = sqlparse.parse(self.query)
+        statements = self._parse()
         if len(statements) == 0:
             self._query_type_cache = 'EMPTY'
             return self._query_type_cache

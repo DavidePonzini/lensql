@@ -163,8 +163,8 @@ def init_dataset():
             yield json.dumps({
                 'success': query_result.success,
                 'builtin': True,
-                'query': query_result.query,
-                'type': query_result.query_type,
+                'query': query_result.query.query,
+                'type': query_result.data_type,
                 'data': query_result.result_html,
                 'id': None,
             }) + '\n'  # Important: one JSON object per line

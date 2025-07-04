@@ -1,18 +1,16 @@
 from abc import ABC, abstractmethod
 
-from ..query_goal import QueryGoal
+from ..code import SQLCode
 
 class QueryResult(ABC):
     '''Represents the result of a SQL query.'''
     def __init__(self, *,
                  data_type: str,
-                 query: str, success: bool,
-                 query_type: str, query_goal: QueryGoal,
+                 query: SQLCode,
+                 success: bool,
                  notices: list[str]):
         self.query = query
         self.success = success
-        self.query_type = query_type
-        self.query_goal = query_goal
         self.data_type = data_type
         self.notices = notices
         self.id = None

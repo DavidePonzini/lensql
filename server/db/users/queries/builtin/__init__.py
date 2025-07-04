@@ -3,6 +3,8 @@ from ...connection import get_connection as _get_connection
 from server.sql import SQLException, QueryResult, QueryResultDataset, QueryResultError, Column
 from . import solution
 
+from server.sql import SQLCode
+
 import pandas as pd
 
 from dav_tools import messages
@@ -13,6 +15,7 @@ def _execute_builtin(username: str, query: _Queries) -> QueryResult:
 
     try:
         conn = _get_connection(username)
+        
         with conn.cursor() as cur:
             cur.execute(query.value)
             rows = cur.fetchall()
@@ -25,7 +28,7 @@ def _execute_builtin(username: str, query: _Queries) -> QueryResult:
         return QueryResultDataset(
             result=result,
             columns=[Column(name=col.name, data_type=col.type_code) for col in cur.description] if cur.description else [],
-            query=query.name,
+            query=SQLCode(query.name),
             query_type='BUILTIN',
             query_goal='BUILTIN',
             notices=conn.notices)
@@ -37,7 +40,7 @@ def _execute_builtin(username: str, query: _Queries) -> QueryResult:
             messages.error(f"Error rolling back connection for user {username}: {e2}")
         return QueryResultError(
             exception=SQLException(e),
-            query=query.name,
+            query=SQLCode(query.name),
             query_type='BUILTIN',
             query_goal='BUILTIN',
             notices=conn.notices)
