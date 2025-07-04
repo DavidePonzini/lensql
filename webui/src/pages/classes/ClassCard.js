@@ -3,6 +3,8 @@ import { Button, Card } from 'react-bootstrap';
 import useAuth from '../../hooks/useAuth';
 import ItemAssignmentList from '../../components/ItemAssignmentList';
 import ButtonModal from '../../components/ButtonModal';
+import ClassUpdate from './ClassUpdate';
+import ButtonShowDataset from '../../components/ButtonShowDataset';
 
 function ClassCard({ title, classId, isTeacher = false, participants, exercises, queries, refreshClasses }) {
     const { apiRequest, userInfo } = useAuth();
@@ -41,25 +43,6 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
         refreshClasses();
     }
 
-    async function handleEdit() {
-        const newTitle = prompt('Enter new class name:', title);
-        if (!newTitle) {
-            return;
-        }
-
-        const result = await apiRequest('/api/classes', 'PUT', {
-            'title': newTitle,
-            'class_id': classId,
-        });
-
-        if (!result.success) {
-            alert(result.message);
-            return;
-        }
-
-        refreshClasses();
-    }
-
     return (
         <Card className="my-2">
             <Card.Header>
@@ -91,6 +74,12 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                     Open
                 </NavLink>
 
+                <ButtonShowDataset
+                    className="btn btn-secondary me-2"
+                    classId={classId}
+                    title={title}
+                />
+
                 <Button
                     variant="danger"
                     onClick={handleLeave}
@@ -114,14 +103,12 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                             />
                         </ButtonModal>
 
-                        <Button
-                            variant="secondary"
-                            onClick={handleEdit}
-                            className='me-2'
-                        >
-                            <i className="fa fa-edit me-1"></i>
-                            Edit
-                        </Button>
+                        <ClassUpdate
+                            classId={classId}
+                            title={title}
+                            refresh={refreshClasses}
+                            className="btn btn-secondary me-2"
+                        />
                     </>
                 )}
             </Card.Footer>

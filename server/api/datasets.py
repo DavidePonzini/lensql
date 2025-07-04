@@ -7,7 +7,7 @@ from .util import responses
 from server import db
 
 
-bp = Blueprint('dataset', __name__)
+bp = Blueprint('datasets', __name__)
 
 @bp.route('/', methods=['GET'])
 @jwt_required()
@@ -16,20 +16,11 @@ def get_dataset():
     
     username = get_jwt_identity()
     data = request.args
-    dataset_name = data.get('name') or None
+    class_id = data['class_id']
 
-    result = db.admin.dataset.get(dataset_name)
+    if db.admin.classes.has_participant(class_id=class_id, username=username) is False:
+        return responses.response(False, message='You do not have access to this dataset.')
+    
+    result = db.admin.classes.get_dataset(class_id)
 
     return responses.response(True, data=result)
-
-@bp.route('/list', methods=['GET'])
-@jwt_required()
-def list_datasets():
-    '''List all datasets available to the user.'''
-
-    username = get_jwt_identity()
-
-    datasets = db.admin.dataset.list_all(username)
-
-    return responses.response(True, data=datasets)
-

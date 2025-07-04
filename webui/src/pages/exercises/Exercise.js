@@ -11,7 +11,7 @@ function Exercise() {
 
     useEffect(() => {
         async function fetchAssignment() {
-            const data = await apiRequest(`/api/exercises?id=${exerciseId}`, 'GET');
+            const data = await apiRequest(`/api/exercises/get?exercise_id=${exerciseId}`, 'GET');
 
             setExercise(data.data);
         }
@@ -27,6 +27,7 @@ function Exercise() {
         <div className="container-md">
             <Query
                 exerciseId={exerciseId}
+                classId={exercise.class_id}
                 exerciseText={exercise.request}
                 datasetName={exercise.dataset_name}
             />

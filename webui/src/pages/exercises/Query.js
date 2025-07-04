@@ -25,7 +25,7 @@ function ButtonCategory({ text, className, iconClassName }) {
     );
 }
 
-function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
+function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }) {
     const { apiRequest } = useAuth();
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
@@ -46,7 +46,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
 
     // Show a "Scroll to Top" button when the user scrolls down
     useEffect(() => {
-        const onScroll = () => setShowTopBtn(window.scrollY > 300);
+        const onScroll = () => setShowTopBtn(window.scrollY > 60);
         window.addEventListener('scroll', onScroll);
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
@@ -305,7 +305,7 @@ function Query({ exerciseId, exerciseTitle, exerciseText, datasetName }) {
                             variant="info"
                             className="me-1 mb-1"
                             buttonText="Dataset"
-                            datasetName={datasetName}
+                            classId={classId}
                             disabled={isExecuting}
                             footerButtons={[
                                 {

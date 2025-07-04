@@ -162,13 +162,15 @@ paths:
               properties:
                 title:
                   type: string
+                dataset:
+                  type: string
       responses:
         "200":
           description: Class created successfully
     put:
       tags:
         - classes
-      summary: rename class
+      summary: update class title or dataset
       security:
         - auth: []
       requestBody:
@@ -182,9 +184,43 @@ paths:
                   type: string
                 title:
                   type: string
+                dataset:
+                  type: string
       responses:
         "200":
           description: Class renamed successfully
+  /classes/get:
+    get:
+      tags:
+        - classes
+      summary: get class data
+      security:
+        - auth: []
+      parameters:
+        - in: query
+          name: class_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns the class with the given id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      dataset:
+                        type: string
   /classes/join:
     post:
       tags:
@@ -335,6 +371,8 @@ paths:
                           type: string
                         is_ai_generated:
                           type: boolean
+                        is_hidden:
+                          type: boolean
                         submitted:
                           type: boolean
                         learning_objectives:
@@ -365,8 +403,6 @@ paths:
                   type: string
                 request:
                   type: string
-                dataset_name:
-                  type: string
                 solution:
                   type: string
       responses:
@@ -390,8 +426,6 @@ paths:
                 title:
                   type: string
                 request:
-                  type: string
-                dataset_name:
                   type: string
                 solution:
                   type: string
@@ -449,9 +483,9 @@ paths:
                         type: string
                       request:
                         type: string
-                      dataset_name:
-                        type: string
                       solution:
+                        type: string
+                      class_id:
                         type: string
   /exercises/submit:
     post:
@@ -491,6 +525,27 @@ paths:
       responses:
         "200":
           description: Exercise marked as not submitted successfully
+  /exercises/hide:
+    post:
+      tags:
+        - exercises
+      summary: hide exercise from students
+      security:
+        - auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                exercise_id:
+                  type: string
+                value:
+                  type: boolean
+      responses:
+        "200":
+          description: Exercise visibility updated successfully
   /exercises/objectives:
     get:
       tags:
@@ -562,108 +617,16 @@ paths:
         "200":
           description: Dataset initialized successfully
 
-  /admin/users:
+  /exercises/dataset:
     get:
       tags:
-        - admin
-      summary: list all users
-      security:
-        - auth: []
-      responses:
-        "200":
-          description: A list of all users
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    username:
-                      type: string
-                    is_admin:
-                      type: boolean
-  /admin/set-admin:
-    post:
-      tags:
-        - admin
-      summary: set/unset user as admin
-      security:
-        - auth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                value:
-                  type: boolean
-      responses:
-        "200":
-          description: Admin status updated successfully
-  /admin/datasets:
-    get:
-      tags:
-        - admin
-      summary: list all datasets assigned to a user
+        - exercises
+      summary: get a dataset by class id
       security:
         - auth: []
       parameters:
         - in: query
-          name: username
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: A list of datasets assigned to the user
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    is_assigned:
-                      type: boolean
-  /admin/assign-dataset:
-    post:
-      tags:
-        - admin
-      summary: assign/unassign dataset to user
-      security:
-        - auth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                dataset:
-                  type: string
-                value:
-                  type: boolean
-      responses:
-        "200":
-          description: Dataset assignment updated successfully
-  /datasets:
-    get:
-      tags:
-        - datasets
-      summary: get a dataset by id
-      security:
-        - auth: []
-      parameters:
-        - in: query
-          name: name
+          name: class_id
           required: true
           schema:
             type: string
@@ -675,24 +638,41 @@ paths:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
                   data:
                     type: string
-  /datasets/list:
-    get:
+    post:
       tags:
-        - datasets
-      summary: list all datasets available to the user
+        - exercises
+      summary: set a new dataset for a class
       security:
         - auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_id:
+                  type: string
+                dataset:
+                  type: string
       responses:
         "200":
-          description: A list of datasets available to the user
+          description: Dataset set successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
 
 components:
   securitySchemes:

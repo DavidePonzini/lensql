@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import ExerciseCard from './ExerciseCard';
 import CardList from '../../components/CardList';
-import AddExercise from './AddExercise';
+import ExerciseAdd from './ExerciseAdd';
 
 
 function ExerciseList() {
@@ -61,10 +61,11 @@ function ExerciseList() {
                             exerciseId={exercise.exercise_id}
                             isGenerated={exercise.is_ai_generated}
                             isSubmitted={false}
+                            isHidden={exercise.is_hidden}
+                            isTeacher={isTeacher}
                             title={exercise.title}
                             onSubmit={() => handleSubmit(exercise)}
-                            refreshExercises={getExercises}
-                            isTeacher={isTeacher}
+                            refresh={getExercises}
                             learningObjectives={exercise.learning_objectives}
                         >
                             {exercise.request}
@@ -83,12 +84,13 @@ function ExerciseList() {
                             key={exercise.exercise_id}
                             exerciseId={exercise.exercise_id}
                             isGenerated={exercise.is_ai_generated}
-                            learningObjectives={exercise.learning_objectives}
+                            isHidden={exercise.is_hidden}
                             isSubmitted={true}
+                            isTeacher={isTeacher}
+                            learningObjectives={exercise.learning_objectives}
                             title={exercise.title}
                             onUnsubmit={() => handleUnsubmit(exercise)}
-                            refreshExercises={getExercises}
-                            isTeacher={isTeacher}
+                            refresh={getExercises}
                         >
                             {exercise.request}
                         </ExerciseCard>
@@ -100,8 +102,8 @@ function ExerciseList() {
                 <>
                     <hr />
 
-                    <AddExercise
-                        refreshAssignments={getExercises}
+                    <ExerciseAdd
+                        refresh={getExercises}
                         classId={classId}
                     />
                 </>

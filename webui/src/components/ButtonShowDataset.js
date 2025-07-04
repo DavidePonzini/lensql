@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AuthProvider from "../hooks/useAuth";
 import ButtonModal from "./ButtonModal";
 
-function ButtonShowDataset({ datasetName, footerButtons, className = 'btn btn-secondary', buttonText = 'Dataset', disabled = false, variant = 'secondary' }) {
+function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-secondary', buttonText = 'Dataset', disabled = false, variant = 'secondary' }) {
     const { apiRequest } = AuthProvider();
     const [dataset, setDataset] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -10,18 +10,22 @@ function ButtonShowDataset({ datasetName, footerButtons, className = 'btn btn-se
     useEffect(() => {
         async function fetchDataset() {
             setIsLoading(true);
-            try {
-                const response = await apiRequest(`/api/datasets/?name=${datasetName ? datasetName : ''}`, 'GET');
-                setDataset(response.data);
-            } catch (error) {
-                console.error('Error fetching dataset:', error);
-            } finally {
+
+            const response = await apiRequest(`/api/datasets/?class_id=${classId}`, 'GET');
+
+            if (!response.success) {
+                alert(response.message);
                 setIsLoading(false);
+                return;
             }
+
+            
+            setDataset(response.data);
+            setIsLoading(false);
         }
 
         fetchDataset();
-    }, [datasetName, apiRequest]);
+    }, [classId, apiRequest]);
 
     return (
         <ButtonModal

@@ -34,7 +34,8 @@ CREATE SEQUENCE users_drop_seq
 
 CREATE TABLE classes (
     id CHAR(8) PRIMARY KEY DEFAULT UPPER(SUBSTRING(MD5(RANDOM()::TEXT), 1, 8)),
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL,
+    dataset TEXT DEFAULT NULL
 );
 
 CREATE TABLE class_members (
@@ -46,25 +47,12 @@ CREATE TABLE class_members (
     PRIMARY KEY (username, class_id)
 );
 
-CREATE TABLE datasets (
-    name VARCHAR(255) NOT NULL PRIMARY KEY,
-    dataset TEXT NOT NULL DEFAULT '-- No dataset provided',
-    is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-CREATE TABLE has_dataset (
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
-    dataset_name VARCHAR(255) NOT NULL REFERENCES datasets(name) ON UPDATE CASCADE ON DELETE CASCADE,
-
-    PRIMARY KEY (username, dataset_name)
-);
-
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
     class_id CHAR(8) NOT NULL REFERENCES classes(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of class if exercises are assigned
+    is_hidden BOOLEAN NOT NULL DEFAULT TRUE,
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
-    dataset_name VARCHAR(255) REFERENCES datasets(name) ON UPDATE CASCADE ON DELETE RESTRICT DEFAULT NULL,
     solution TEXT DEFAULT NULL,
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );

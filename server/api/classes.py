@@ -26,8 +26,9 @@ class ClassesAPI(MethodView):
         username = get_jwt_identity()
         data = request.get_json()
         title = data['title']
+        dataset = data['dataset']
 
-        class_id = db.admin.classes.create(title)
+        class_id = db.admin.classes.create(title, dataset=dataset)
         db.admin.classes.join(username, class_id)
         db.admin.classes.make_teacher(username, class_id)
 
@@ -39,10 +40,12 @@ class ClassesAPI(MethodView):
         data = request.get_json()
         class_id = data['class_id']
         title = data['title']
+        dataset = data['dataset']
 
         db.admin.classes.update(
             class_id=class_id,
-            title=title
+            title=title,
+            dataset=dataset
         )
 
         return responses.response(True)
@@ -50,6 +53,24 @@ class ClassesAPI(MethodView):
 # Register all methods (GET, POST, PUT, DELETE) on /
 #   Note: trailing slash causes nginx to redirect, leading to CORS error
 bp.add_url_rule('', view_func=ClassesAPI.as_view('classes_api'))
+
+@bp.route('/get', methods=['GET'])
+@jwt_required()
+def get_class():
+    '''Get a class by its ID.'''
+    username = get_jwt_identity()
+    data = request.args
+    class_id = data['class_id']
+
+    if not db.admin.classes.exists(class_id):
+        return responses.response(False, message='Class does not exist.')
+
+    if not db.admin.classes.has_participant(class_id=class_id, username=username):
+        return responses.response(False, message='You do not have access to this class.')
+
+    result = db.admin.classes.get(class_id)
+
+    return responses.response(True, data=result)
 
 @bp.route('/join', methods=['POST'])
 @jwt_required()
@@ -88,7 +109,7 @@ def is_teacher():
     data = request.args
     class_id = data.get('class_id')
 
-    result = db.admin.classes.is_teacher(username, class_id)
+    result = db.admin.classes.has_teacher(username, class_id)
 
     return responses.response(True, is_teacher=result)
 
@@ -102,7 +123,7 @@ def set_teacher():
     username = data['username']
     value = data['value']
 
-    if not db.admin.classes.is_teacher(current_username, class_id):
+    if not db.admin.classes.has_teacher(current_username, class_id):
         return responses.response(False, message='You are not a teacher of this class.')
 
     if current_username == username:
@@ -124,7 +145,7 @@ def get_members():
     data = request.args
     class_id = data.get('class_id')
 
-    if not db.admin.classes.is_teacher(username, class_id):
+    if not db.admin.classes.has_teacher(username, class_id):
         return responses.response(False, message='You are not a teacher of this class.')
     
     members = db.admin.classes.get_members(class_id)

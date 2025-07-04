@@ -13,18 +13,21 @@ function ExerciseCard({
     isGenerated = false,
     isSubmitted,
     isTeacher = false,
+    isHidden = false,
     onSubmit = null,
     onUnsubmit = null,
-    refreshExercises,
+    refresh,
     learningObjectives = []
 }) {
     const { apiRequest } = useAuth();
 
     const [submitted, setSubmitted] = useState(isSubmitted);
+    const [hidden, setHidden] = useState(isHidden);
 
     async function handleSubmit() {
         await apiRequest('/api/exercises/submit', 'POST', {
             'exercise_id': exerciseId,
+            'value': true,
         });
 
         setSubmitted(true);
@@ -33,8 +36,9 @@ function ExerciseCard({
     }
 
     async function handleUnsubmit() {
-        await apiRequest('/api/exercises/unsubmit', 'POST', {
+        await apiRequest('/api/exercises/submit', 'POST', {
             'exercise_id': exerciseId,
+            'value': false,
         });
 
         setSubmitted(false);
@@ -43,22 +47,52 @@ function ExerciseCard({
             onUnsubmit(exerciseId);
     }
 
+    async function handleHide() {
+        await apiRequest('/api/exercises/hide', 'POST', {
+            'exercise_id': exerciseId,
+            'value': true,
+        });
+
+        setHidden(true);
+    }
+
+    async function handleUnhide() {
+        await apiRequest('/api/exercises/hide', 'POST', {
+            'exercise_id': exerciseId,
+            'value': false,
+        });
+
+        setHidden(false);
+    }
+
     async function handleDelete() {
         if (!window.confirm('Are you sure you want to delete this exercise? This action cannot be undone.')) {
             return;
         }
 
-        await apiRequest('/api/exercises', 'DELETE', {
+        const result = await apiRequest('/api/exercises', 'DELETE', {
             'exercise_id': exerciseId,
         });
 
-        refreshExercises();
+        if (!result.success) {
+            alert(result.message);
+            return;
+        }
+
+        refresh();
     }
 
     return (
         <Card className="my-2">
             <Card.Header>
-                <h5 className="card-title">{title}</h5>
+                <h5 className="card-title">
+                    {title}
+                    {hidden && (
+                        <span className="badge bg-secondary ms-2">
+                            Hidden
+                        </span>
+                    )}
+                </h5>
             </Card.Header>
 
             <Card.Body>
@@ -131,20 +165,38 @@ function ExerciseCard({
                         >
                             Archive
                         </Button>
-                        
+
                         {isTeacher && (
                             <>
                                 <ExerciseUpdate
                                     exerciseId={exerciseId}
-                                    refreshExercises={refreshExercises}
+                                    refreshExercises={refresh}
                                     className="btn btn-warning me-1 mb-1"
                                 />
 
                                 <SetLearningObjectives
                                     exerciseId={exerciseId}
-                                    refreshExercises={refreshExercises}
+                                    refreshExercises={refresh}
                                     className="btn btn-secondary me-1 mb-1"
                                 />
+
+                                {hidden ? (
+                                    <Button
+                                        variant="outline-secondary"
+                                        className="me-1 mb-1"
+                                        onClick={handleUnhide}
+                                    >
+                                        <i className="fa fa-eye"></i> Unhide
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="outline-secondary"
+                                        className="me-1 mb-1"
+                                        onClick={handleHide}
+                                    >
+                                        <i className="fa fa-eye-slash"></i> Hide
+                                    </Button>
+                                )}
 
                                 <Button
                                     variant="danger"

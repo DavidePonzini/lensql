@@ -10,7 +10,6 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
 
     const [title, setTitle] = useState('');
     const [request, setRequest] = useState('');
-    const [datasetName, setDatasetName] = useState('');
     const [answer, setAnswer] = useState('');
 
     async function handleEditExercise() {
@@ -18,7 +17,6 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
             'exercise_id': exerciseId,
             'title': title,
             'request': request,
-            'dataset_name': datasetName,
             'solution': answer,
         });
 
@@ -34,7 +32,6 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
 
         setTitle(result.data.title);
         setRequest(result.data.request);
-        setDatasetName(result.data.dataset_name);
         setAnswer(result.data.solution);
     }, [exerciseId, apiRequest]);
 
@@ -61,8 +58,6 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
                 setTitle={setTitle}
                 request={request}
                 setRequest={setRequest}
-                datasetName={datasetName}
-                setDatasetName={setDatasetName}
                 answer={answer}
                 setAnswer={setAnswer}
             />

@@ -24,30 +24,56 @@ def get_class(exercise_id: int) -> str:
 
     return result[0][0]
 
-def get_from_class(username: str, class_id: str) -> list[dict]:
+def get_from_class(username: str, class_id: str, include_hidden: bool = False) -> list[dict]:
     '''Get all exercises assigned to a class'''
 
-    query = database.sql.SQL(
-    '''
-        SELECT
-            e.id,
-            e.title,
-            e.request,
-            e.is_ai_generated,
-            es.username IS NOT NULL AS submitted
-        FROM
-            {schema}.exercises e
-            LEFT JOIN {schema}.exercise_submissions es ON e.id = es.exercise_id AND es.username = {username}
-        WHERE
-            e.class_id = {class_id}
-        ORDER BY
-            e.title,
-            e.id
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        class_id=database.sql.Placeholder('class_id'),
-        username=database.sql.Placeholder('username'),
-    )
+    if include_hidden:
+        query = database.sql.SQL(
+        '''
+            SELECT
+                e.id,
+                e.title,
+                e.request,
+                e.is_ai_generated,
+                e.is_hidden,
+                es.username IS NOT NULL AS submitted
+            FROM
+                {schema}.exercises e
+                LEFT JOIN {schema}.exercise_submissions es ON e.id = es.exercise_id AND es.username = {username}
+            WHERE
+                e.class_id = {class_id}
+            ORDER BY
+                e.title,
+                e.id
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            class_id=database.sql.Placeholder('class_id'),
+            username=database.sql.Placeholder('username'),
+        )
+    else:
+        query = database.sql.SQL(
+        '''
+            SELECT
+                e.id,
+                e.title,
+                e.request,
+                e.is_ai_generated,
+                FALSE AS is_hidden,
+                es.username IS NOT NULL AS submitted
+            FROM
+                {schema}.exercises e
+                LEFT JOIN {schema}.exercise_submissions es ON e.id = es.exercise_id AND es.username = {username}
+            WHERE
+                e.class_id = {class_id}
+                AND e.is_hidden = FALSE
+            ORDER BY
+                e.title,
+                e.id
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            class_id=database.sql.Placeholder('class_id'),
+            username=database.sql.Placeholder('username'),
+        )
 
     result = db.execute_and_fetch(query, {
         'class_id': class_id,
@@ -60,7 +86,8 @@ def get_from_class(username: str, class_id: str) -> list[dict]:
             'title': row[1],
             'request': row[2],
             'is_ai_generated': row[3],
-            'submitted': row[4],
+            'is_hidden': row[4],
+            'submitted': row[5],
             'learning_objectives': get_learning_objectives(row[0]),
         }
         for row in result
@@ -74,8 +101,8 @@ def get_data(exercise_id: int, username: str) -> dict:
         SELECT
             e.title,
             e.request,
-            e.dataset_name,
-            e.solution
+            e.solution,
+            e.class_id
         FROM
             {schema}.exercises e
             JOIN {schema}.classes c ON e.class_id = c.id
@@ -100,41 +127,17 @@ def get_data(exercise_id: int, username: str) -> dict:
     return {
         'title': result[0],
         'request': result[1],
-        'dataset_name': result[2],
-        'solution': result[3]
+        'solution': result[2],
+        'class_id': result[3],
     }
 
-def get_dataset(exercise_id: int) -> str:
-    '''Get the dataset for a given exercise ID'''
-
-    query = database.sql.SQL(
-        '''
-        SELECT dataset
-        FROM {schema}.exercises e
-            JOIN {schema}.datasets d ON e.dataset_name = d.name                     
-        WHERE e.id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
-
-    result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id
-    })
-
-    if len(result) == 0:
-        return '-- No dataset provided'
-
-    return result[0][0]
-
-def create(title: str, *, class_id: str, request: str, dataset_name: str | None = None, solution: str | None = None, is_ai_generated: bool = False) -> int:
+def create(title: str, *, class_id: str, request: str, solution: str | None = None, is_ai_generated: bool = False) -> int:
     '''Create a new exercise'''
 
     result = db.insert(SCHEMA, 'exercises', {
         'title': title,
         'class_id': class_id,
         'request': request,
-        'dataset_name': dataset_name,
         'solution': solution,
         'is_ai_generated': is_ai_generated
     }, ['id'])
@@ -143,28 +146,25 @@ def create(title: str, *, class_id: str, request: str, dataset_name: str | None 
 
     return exercise_id
 
-def update(exercise_id: int, title: str, request: str, dataset_name: str | None, solution: str | None) -> None:
+def update(exercise_id: int, title: str, request: str, solution: str | None) -> None:
     '''Update an existing exercise'''
 
     query = database.sql.SQL('''
         UPDATE {schema}.exercises
         SET title = {title},
             request = {request},
-            dataset_name = {dataset_name},
             solution = {solution}
         WHERE id = {exercise_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         title=database.sql.Placeholder('title'),
         request=database.sql.Placeholder('request'),
-        dataset_name=database.sql.Placeholder('dataset_name'),
         solution=database.sql.Placeholder('solution'),
         exercise_id=database.sql.Placeholder('exercise_id')
     )
     db.execute(query, {
         'title': title,
         'request': request,
-        'dataset_name': dataset_name,
         'solution': solution,
         'exercise_id': exercise_id
     })
@@ -337,5 +337,37 @@ def unsubmit(username: str, exercise_id: int) -> None:
 
     db.execute(query, {
         'username': username,
+        'exercise_id': exercise_id
+    })
+
+def hide(exercise_id: int) -> None:
+    '''Hide an exercise from students'''
+
+    query = database.sql.SQL('''
+        UPDATE {schema}.exercises
+        SET is_hidden = TRUE
+        WHERE id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    db.execute(query, {
+        'exercise_id': exercise_id
+    })
+
+def unhide(exercise_id: int) -> None:
+    '''Unhide an exercise for students'''
+
+    query = database.sql.SQL('''
+        UPDATE {schema}.exercises
+        SET is_hidden = FALSE
+        WHERE id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    db.execute(query, {
         'exercise_id': exercise_id
     })

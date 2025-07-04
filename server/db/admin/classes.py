@@ -21,6 +21,33 @@ def exists(class_id: str) -> bool:
 
     return result[0][0] > 0
 
+def get(class_id: str) -> dict:
+    '''Get a class by its ID'''
+
+    query = database.sql.SQL(
+    '''
+        SELECT
+            name,
+            dataset
+        FROM {schema}.classes
+        WHERE id = {class_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        class_id=database.sql.Placeholder('class_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'class_id': class_id
+    })
+
+    if len(result) == 0:
+        raise ValueError(f'Class with ID {class_id} does not exist')
+    
+    return {
+        'title': result[0][0],
+        'dataset': result[0][1]
+    }
+
 def list_classes(username: str) -> list[dict]:
     '''Get all classes a user belongs to'''
 
@@ -90,32 +117,37 @@ def list_classes(username: str) -> list[dict]:
         'queries': row[5]
     } for row in result]
 
-def create(title: str) -> str:
+def create(title: str, dataset: str) -> str:
     '''Create a new class'''
 
     result = db.insert(SCHEMA, 'classes', {
         'name': title,
+        'dataset': dataset
     }, ['id'])
 
     return result[0][0]
 
-def update(class_id: str, title: str) -> None:
+def update(class_id: str, title: str, dataset: str) -> None:
     '''Update an existing class'''
 
     query = database.sql.SQL(
     '''
         UPDATE {schema}.classes
-        SET name = {title}
+        SET
+            name = {title},
+            dataset = {dataset}
         WHERE id = {class_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         title=database.sql.Placeholder('title'),
-        class_id=database.sql.Placeholder('class_id')
+        class_id=database.sql.Placeholder('class_id'),
+        dataset=database.sql.Placeholder('dataset')
     )
 
     db.execute(query, {
         'title': title,
-        'class_id': class_id
+        'class_id': class_id,
+        'dataset': dataset
     })
 
 def delete(class_id: str) -> None:
@@ -134,7 +166,7 @@ def delete(class_id: str) -> None:
         'class_id': class_id
     })
 
-def is_teacher(username: str, class_id: str) -> bool:
+def has_teacher(username: str, class_id: str) -> bool:
     '''Check if a user is a teacher of a class'''
 
     query = database.sql.SQL(
@@ -173,7 +205,7 @@ def join(username: str, class_id: str) -> None:
 def can_leave(username: str, class_id: str) -> bool:
     '''Check if a user can leave a class. User cannot leave if they are a teacher and the class has at least one exercise, one student or one query assigned to it.'''
 
-    if not is_teacher(username, class_id):
+    if not has_teacher(username, class_id):
         return True
 
     # Check if there are any exercises assigned to the class
@@ -217,7 +249,7 @@ def can_leave(username: str, class_id: str) -> bool:
     '''
         SELECT COUNT(*)
         FROM {schema}.query_batches qb
-        JOIN {schema}.exercises e ON qb.exercise_id = e.exercise_id
+        JOIN {schema}.exercises e ON qb.exercise_id = e.id
         WHERE e.class_id = {class_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
@@ -391,7 +423,27 @@ def get_members(class_id: str) -> list[dict]:
         'is_teacher': row[1]
     } for row in result]
 
+def get_dataset(class_id: int) -> str:
+    '''Get the dataset for a given exercise ID'''
 
+    query = database.sql.SQL(
+        '''
+        SELECT dataset
+        FROM {schema}.classes
+        WHERE id = {class_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        class_id=database.sql.Placeholder('class_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'class_id': class_id
+    })
+
+    if len(result) == 0:
+        return '-- No dataset provided'
+
+    return result[0][0]
 
 
 

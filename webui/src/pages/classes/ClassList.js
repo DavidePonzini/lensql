@@ -4,6 +4,7 @@ import useAuth from '../../hooks/useAuth';
 import ClassCard from './ClassCard';
 import CardList from '../../components/CardList';
 import { Button } from 'react-bootstrap';
+import ClassAdd from './ClassAdd';
 
 function ClassList() {
     const { apiRequest } = useAuth();
@@ -19,24 +20,6 @@ function ClassList() {
 
         const result = await apiRequest('/api/classes/join', 'POST', {
             'class_id': joinCode,
-        });
-
-        if (!result.success) {
-            alert(result.message);
-            return;
-        }
-
-        getClasses();
-    }
-
-    async function handleCreateClass() {
-        const className = prompt('Enter class name:');
-        if (!className) {
-            return;
-        }
-
-        const result = await apiRequest('/api/classes', 'POST', {
-            'title': className,
         });
 
         if (!result.success) {
@@ -85,10 +68,10 @@ function ClassList() {
                 Join Class
             </Button>
 
-            <Button variant="secondary" onClick={handleCreateClass} className="me-2 mb-2">
-                <i className="fa fa-plus me-1"></i>
-                Create Class
-            </Button>
+            <ClassAdd
+                refresh={getClasses}
+                className="btn btn-secondary me-2 mb-2"
+            />
         </div>
     );
 }
