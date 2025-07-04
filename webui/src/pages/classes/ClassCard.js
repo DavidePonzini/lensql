@@ -5,7 +5,7 @@ import ItemAssignmentList from '../../components/ItemAssignmentList';
 import ButtonModal from '../../components/ButtonModal';
 
 function ClassCard({ title, classId, isTeacher = false, participants, exercises, queries, refreshClasses }) {
-    const { apiRequest } = useAuth();
+    const { apiRequest, userInfo } = useAuth();
 
     async function getMembers() {
         const response = await apiRequest(`/api/classes/members?class_id=${classId}`, 'GET');
@@ -110,6 +110,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                                 fetchItems={getMembers}
                                 assignAction={makeTeacher}
                                 title='Participants'
+                                disabledItems={[userInfo?.username]}  // Prevent self from being unassigned
                             />
                         </ButtonModal>
 
@@ -118,7 +119,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                             onClick={handleEdit}
                             className='me-2'
                         >
-                            <i className="fa fa-edit"></i>
+                            <i className="fa fa-edit me-1"></i>
                             Edit
                         </Button>
                     </>

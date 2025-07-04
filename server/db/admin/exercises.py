@@ -2,7 +2,29 @@ from dav_tools import database
 from .connection import db, SCHEMA
 
 
-def get_from_class(class_id: str) -> list[dict]:
+def get_class(exercise_id: int) -> str:
+    '''Get the class ID for a given exercise ID'''
+
+    query = database.sql.SQL(
+        '''
+        SELECT class_id
+        FROM {schema}.exercises
+        WHERE id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'exercise_id': exercise_id
+    })
+
+    if len(result) == 0:
+        return None
+
+    return result[0][0]
+
+def get_from_class(username: str, class_id: str) -> list[dict]:
     '''Get all exercises assigned to a class'''
 
     query = database.sql.SQL(
@@ -11,22 +33,25 @@ def get_from_class(class_id: str) -> list[dict]:
             e.id,
             e.title,
             e.request,
-            e.is_ai_generated
+            e.is_ai_generated,
+            es.username IS NOT NULL AS submitted
         FROM
             {schema}.exercises e
-            JOIN {schema}.class_exercises ce ON e.id = ce.exercise_id
+            LEFT JOIN {schema}.exercise_submissions es ON e.id = es.exercise_id AND es.username = {username}
         WHERE
-            ce.class_id = {class_id}
+            e.class_id = {class_id}
         ORDER BY
             e.title,
             e.id
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
-        class_id=database.sql.Placeholder('class_id')
+        class_id=database.sql.Placeholder('class_id'),
+        username=database.sql.Placeholder('username'),
     )
 
     result = db.execute_and_fetch(query, {
-        'class_id': class_id
+        'class_id': class_id,
+        'username': username,
     })
 
     return [
@@ -34,60 +59,30 @@ def get_from_class(class_id: str) -> list[dict]:
             'exercise_id': row[0],
             'title': row[1],
             'request': row[2],
-            'is_ai_generated': row[3]
+            'is_ai_generated': row[3],
+            'submitted': row[4],
+            'learning_objectives': get_learning_objectives(row[0]),
         }
         for row in result
     ]
 
-
-
-# TODO: show only exercises the user is assigned to
-def list_all(username: str) -> list[dict]:
-    '''Get all exercises in the database the user has access to'''
-
-    query = database.sql.SQL(
-    '''
-        SELECT
-            e.id,
-            e.title,
-            e.request,
-            e.is_ai_generated
-        FROM
-            {schema}.exercises e
-        ORDER BY
-            e.title,
-            e.id
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA)
-    )
-
-    result = db.execute_and_fetch(query)
-
-    return [
-        {
-            'exercise_id': row[0],
-            'title': row[1],
-            'request': row[2],
-            'is_ai_generated': row[5]
-        }
-        for row in result
-    ]
-
-
-def get(exercise_id: int, username: str) -> dict:
+def get_data(exercise_id: int, username: str) -> dict:
     '''Get the exercise for a given ID, if the user is assigned to it'''
 
     query = database.sql.SQL(
     '''
         SELECT
+            e.title,
             e.request,
-            e.dataset_name
+            e.dataset_name,
+            e.solution
         FROM
             {schema}.exercises e
-            JOIN {schema}.assigned_to a ON e.id = a.exercise_id
+            JOIN {schema}.classes c ON e.class_id = c.id
+            JOIN {schema}.class_members cm ON c.id = cm.class_id
         WHERE
             e.id = {exercise_id}
-            AND a.username = {username} 
+            AND cm.username = {username}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         exercise_id=database.sql.Placeholder('exercise_id'),
@@ -103,8 +98,10 @@ def get(exercise_id: int, username: str) -> dict:
     result = result[0]
 
     return {
-        'request': result[0],
-        'dataset_name': result[1]
+        'title': result[0],
+        'request': result[1],
+        'dataset_name': result[2],
+        'solution': result[3]
     }
 
 def get_dataset(exercise_id: int) -> str:
@@ -130,11 +127,12 @@ def get_dataset(exercise_id: int) -> str:
 
     return result[0][0]
 
-def create(title: str, request: str, *, dataset_name: str | None = None, solution: str | None = None, is_ai_generated: bool = False) -> int:
+def create(title: str, *, class_id: str, request: str, dataset_name: str | None = None, solution: str | None = None, is_ai_generated: bool = False) -> int:
     '''Create a new exercise'''
 
     result = db.insert(SCHEMA, 'exercises', {
         'title': title,
+        'class_id': class_id,
         'request': request,
         'dataset_name': dataset_name,
         'solution': solution,
@@ -171,7 +169,7 @@ def update(exercise_id: int, title: str, request: str, dataset_name: str | None,
         'exercise_id': exercise_id
     })
 
-def delete(exercise_id: int) -> None:
+def delete(exercise_id: int) -> bool:
     '''Delete an exercise'''
 
     try:
@@ -185,56 +183,12 @@ def delete(exercise_id: int) -> None:
         db.execute(query, {
             'exercise_id': exercise_id
         })
-    except Exception as e:
-        return 
 
-def assign(teacher: str, exercise_id: int, student: str) -> None:
-    '''Assign an exercise to a student'''
+        return True
+    except Exception:
+        return False
 
-    # TODO: Check if teacher is allowed to assign exercises to the student
-
-
-    # Check if already assigned, skip if exists (optional safeguard)
-    query_check = database.sql.SQL('''
-        SELECT 1 FROM {schema}.assigned_to
-        WHERE username = {student} AND exercise_id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        student=database.sql.Placeholder('student'),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
-    exists = db.execute_and_fetch(query_check, {
-        'student': student,
-        'exercise_id': exercise_id
-    })
-    if exists:
-        return
-
-    db.insert(SCHEMA, 'assigned_to', {
-        'username': student,
-        'exercise_id': exercise_id
-    })
-
-def unassign(teacher: str, exercise_id: int, student: str) -> None:
-    '''Unassign an exercise from a student'''
-
-    # TODO: Check if teacher is allowed to unassign exercises from the student
-
-    query = database.sql.SQL('''
-        DELETE FROM {schema}.assigned_to
-        WHERE username = {student}
-        AND exercise_id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        student=database.sql.Placeholder('student'),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
-    db.execute(query, {
-        'student': student,
-        'exercise_id': exercise_id
-    })
-
-def set_learning_objective(teacher: str, exercise_id: int, objective: str) -> None:
+def set_learning_objective(exercise_id: int, objective: str) -> None:
     '''Set a learning objective for an exercise'''
 
     query = database.sql.SQL('''
@@ -252,7 +206,7 @@ def set_learning_objective(teacher: str, exercise_id: int, objective: str) -> No
         'objective': objective
     })
 
-def unset_learning_objective(teacher: str, exercise_id: int, objective: str) -> None:
+def unset_learning_objective(exercise_id: int, objective: str) -> None:
     '''Unset a learning objective for an exercise'''
 
     query = database.sql.SQL('''
@@ -271,7 +225,7 @@ def unset_learning_objective(teacher: str, exercise_id: int, objective: str) -> 
     })
 
 def list_learning_objectives(exercise_id: int) -> list[str]:
-    '''List learning objectives for an exercise'''
+    '''List all learning objectives status for an exercise'''
 
     query = database.sql.SQL('''
         SELECT
@@ -298,6 +252,36 @@ def list_learning_objectives(exercise_id: int) -> list[str]:
         'is_set': row[2]
     } for row in result]
 
+def get_learning_objectives(exercise_id: int) -> list[str]:
+    '''Get the learning objectives for an exercise'''
+
+    query = database.sql.SQL(
+    '''
+        SELECT
+            hlo.objective,
+            lo.description
+        FROM
+            {schema}.has_learning_objective hlo
+            JOIN {schema}.learning_objectives lo ON hlo.objective = lo.objective
+        WHERE
+            hlo.exercise_id = {exercise_id}
+        ORDER BY
+            hlo.objective
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'exercise_id': exercise_id
+    })
+
+    return [{
+        'objective': row[0],
+        'description': row[1]
+    } for row in result]
+                             
+
 def get_solution(exercise_id: int) -> str | None:
     '''Get the solution for an exercise, if it exists'''
 
@@ -320,4 +304,38 @@ def get_solution(exercise_id: int) -> str | None:
     return result[0][0]
 
 
-                   
+def submit(username: str, exercise_id: int) -> None:
+    '''Submit an exercise for a user'''
+
+    query = database.sql.SQL('''
+        INSERT INTO {schema}.exercise_submissions (username, exercise_id)
+        VALUES ({username}, {exercise_id})
+        ON CONFLICT (username, exercise_id) DO NOTHING
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    db.execute(query, {
+        'username': username,
+        'exercise_id': exercise_id
+    })
+
+def unsubmit(username: str, exercise_id: int) -> None:
+    '''Unsubmit an exercise for a user'''
+
+    query = database.sql.SQL('''
+        DELETE FROM {schema}.exercise_submissions
+        WHERE username = {username}
+        AND exercise_id = {exercise_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        exercise_id=database.sql.Placeholder('exercise_id')
+    )
+
+    db.execute(query, {
+        'username': username,
+        'exercise_id': exercise_id
+    })

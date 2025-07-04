@@ -32,14 +32,18 @@ def list_classes(username: str) -> list[dict]:
             cm.is_teacher,
 
             -- total number of students in the class
-            (SELECT COUNT(*)
-            FROM {schema}.class_members cm2
-            WHERE cm2.class_id = c.id AND cm2.is_teacher = FALSE) AS participants,
+            (
+                SELECT COUNT(*)
+                FROM {schema}.class_members cm2
+                WHERE cm2.class_id = c.id AND cm2.is_teacher = FALSE
+            ) AS participants,
 
             -- total number of exercises in the class
-            (SELECT COUNT(*)
-            FROM {schema}.class_exercises ce2
-            WHERE ce2.class_id = c.id) AS exercises,
+            (
+                SELECT COUNT(*)
+                FROM {schema}.exercises e2
+                WHERE e2.class_id = c.id
+            ) AS exercises,
 
             -- count of queries:
             -- if the user is a teacher → count queries from students only
@@ -60,8 +64,8 @@ def list_classes(username: str) -> list[dict]:
         FROM {schema}.classes c
         JOIN {schema}.class_members cm ON cm.class_id = c.id
 
-        LEFT JOIN {schema}.class_exercises ce ON ce.class_id = c.id
-        LEFT JOIN {schema}.query_batches qb ON qb.exercise_id = ce.exercise_id
+        LEFT JOIN {schema}.exercises e ON e.class_id = c.id
+        LEFT JOIN {schema}.query_batches qb ON qb.exercise_id = e.id
         LEFT JOIN {schema}.queries q ON q.batch_id = qb.id
 
         WHERE cm.username = {username}
@@ -176,7 +180,7 @@ def can_leave(username: str, class_id: str) -> bool:
     query = database.sql.SQL(
     '''
         SELECT COUNT(*)
-        FROM {schema}.class_exercises
+        FROM {schema}.exercises
         WHERE class_id = {class_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
@@ -213,8 +217,8 @@ def can_leave(username: str, class_id: str) -> bool:
     '''
         SELECT COUNT(*)
         FROM {schema}.query_batches qb
-        JOIN {schema}.class_exercises ce ON qb.exercise_id = ce.exercise_id
-        WHERE ce.class_id = {class_id}
+        JOIN {schema}.exercises e ON qb.exercise_id = e.exercise_id
+        WHERE e.class_id = {class_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         class_id=database.sql.Placeholder('class_id')

@@ -28,8 +28,8 @@ function ExerciseList() {
     const getExercises = useCallback(async () => {
         const response = await apiRequest(`/api/exercises?class_id=${classId}`, 'GET');
 
-        const submitted = response.data.filter((exercise) => { return exercise.submission_ts });
-        const unsubmitted = response.data.filter((exercise) => { return !exercise.submission_ts });
+        const submitted = response.data.filter((exercise) => { return exercise.submitted });
+        const unsubmitted = response.data.filter((exercise) => { return !exercise.submitted });
         setUnsubmittedExercises(unsubmitted);
         setSubmittedExercises(submitted);
     }, [classId, apiRequest]);
@@ -57,8 +57,8 @@ function ExerciseList() {
                 {unsubmittedExercises.map((exercise) => {
                     return (
                         <ExerciseCard
-                            key={exercise.id}
-                            exerciseId={exercise.id}
+                            key={exercise.exercise_id}
+                            exerciseId={exercise.exercise_id}
                             isGenerated={exercise.is_ai_generated}
                             isSubmitted={false}
                             title={exercise.title}
@@ -80,8 +80,8 @@ function ExerciseList() {
                 {submittedExercises.map((exercise) => {
                     return (
                         <ExerciseCard
-                            key={exercise.id}
-                            exerciseId={exercise.id}
+                            key={exercise.exercise_id}
+                            exerciseId={exercise.exercise_id}
                             isGenerated={exercise.is_ai_generated}
                             learningObjectives={exercise.learning_objectives}
                             isSubmitted={true}
@@ -100,7 +100,10 @@ function ExerciseList() {
                 <>
                     <hr />
 
-                    <AddExercise refreshAssignments={getExercises} />
+                    <AddExercise
+                        refreshAssignments={getExercises}
+                        classId={classId}
+                    />
                 </>
             )}
         </div>

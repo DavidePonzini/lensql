@@ -4,6 +4,7 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import SetLearningObjectives from './SetLearningObjectives';
 import ExerciseUpdate from './ExerciseUpdate';
+import { NavLink } from 'react-router-dom';
 
 function ExerciseCard({
     children,
@@ -22,7 +23,7 @@ function ExerciseCard({
     const [submitted, setSubmitted] = useState(isSubmitted);
 
     async function handleSubmit() {
-        await apiRequest('/api/assignments/submit', 'POST', {
+        await apiRequest('/api/exercises/submit', 'POST', {
             'exercise_id': exerciseId,
         });
 
@@ -32,7 +33,7 @@ function ExerciseCard({
     }
 
     async function handleUnsubmit() {
-        await apiRequest('/api/assignments/unsubmit', 'POST', {
+        await apiRequest('/api/exercises/unsubmit', 'POST', {
             'exercise_id': exerciseId,
         });
 
@@ -47,7 +48,7 @@ function ExerciseCard({
             return;
         }
 
-        await apiRequest('/api/exercises/', 'DELETE', {
+        await apiRequest('/api/exercises', 'DELETE', {
             'exercise_id': exerciseId,
         });
 
@@ -106,45 +107,54 @@ function ExerciseCard({
             </Card.Body>
 
             <Card.Footer>
-                {!submitted && (
-                    <a
-                        href={`/assignments/q/${exerciseId}`}
-                        className="btn btn-primary"
-                    >
-                        Open
-                    </a>
-                )}
-
-                {submitted && onUnsubmit && (
+                {submitted ? (
                     <Button
                         variant="outline-danger"
-                        className="ms-2"
+                        className="me-1 mb-1"
                         onClick={handleUnsubmit}
                     >
                         Unarchive
                     </Button>
-                )}
-                {!submitted && onSubmit && (
-                    <Button
-                        variant="success"
-                        className="ms-2"
-                        onClick={handleSubmit}
-                    >
-                        Archive
-                    </Button>
-                )}
-                {isTeacher && (
+                ) : (
                     <>
-                        <ExerciseUpdate exerciseId={exerciseId} refreshExercises={refreshExercises} />
-                        <SetLearningObjectives exerciseId={exerciseId} refreshExercises={refreshExercises} />
+                        <NavLink
+                            to={`/exercises/${exerciseId}`}
+                            className="btn btn-primary me-1 mb-1"
+                        >
+                            Open
+                        </NavLink>
 
                         <Button
-                            variant="danger"
-                            className="ms-2"
-                            onClick={handleDelete}
+                            variant="success"
+                            className="me-1 mb-1"
+                            onClick={handleSubmit}
                         >
-                            <i className="fa fa-trash"></i> Delete
+                            Archive
                         </Button>
+                        
+                        {isTeacher && (
+                            <>
+                                <ExerciseUpdate
+                                    exerciseId={exerciseId}
+                                    refreshExercises={refreshExercises}
+                                    className="btn btn-warning me-1 mb-1"
+                                />
+
+                                <SetLearningObjectives
+                                    exerciseId={exerciseId}
+                                    refreshExercises={refreshExercises}
+                                    className="btn btn-secondary me-1 mb-1"
+                                />
+
+                                <Button
+                                    variant="danger"
+                                    className="me-1 mb-1"
+                                    onClick={handleDelete}
+                                >
+                                    <i className="fa fa-trash"></i> Delete
+                                </Button>
+                            </>
+                        )}
                     </>
                 )}
             </Card.Footer>

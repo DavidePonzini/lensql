@@ -61,6 +61,7 @@ CREATE TABLE has_dataset (
 
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
+    class_id CHAR(8) NOT NULL REFERENCES classes(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of class if exercises are assigned
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
     dataset_name VARCHAR(255) REFERENCES datasets(name) ON UPDATE CASCADE ON DELETE RESTRICT DEFAULT NULL,
@@ -68,11 +69,12 @@ CREATE TABLE exercises (
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE class_exercises (
-    class_id CHAR(8) NOT NULL REFERENCES classes(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of class if exercises are assigned
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if assigned to users
+CREATE TABLE exercise_submissions (
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if submissions exist
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if submissions exist
+    submission_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
-    PRIMARY KEY (class_id, exercise_id)
+    PRIMARY KEY (exercise_id, username)
 );
 
 CREATE TABLE learning_objectives (

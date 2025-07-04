@@ -23,7 +23,7 @@ class ExerciseAPI(MethodView):
         if not db.admin.classes.has_participant(username, class_id):
             return responses.response(False, message='You are not a participant of this class.')
         
-        result = db.admin.exercises.get_from_class(class_id)
+        result = db.admin.exercises.get_from_class(username=username, class_id=class_id)
         
         return responses.response(True, data=result)
 
@@ -32,17 +32,20 @@ class ExerciseAPI(MethodView):
 
         data = request.get_json()
         title = data['title']
+        class_id = data['class_id']
         request_text = data['request']
         dataset_name = data['dataset_name'] or None
         solution = data['solution']
 
         db.admin.exercises.create(
             title=title,
+            class_id=class_id,
             request=request_text,
             dataset_name=dataset_name,
             solution=solution,
             is_ai_generated=False
         )
+
         return responses.response(True)
 
     def put(self):
@@ -76,80 +79,47 @@ class ExerciseAPI(MethodView):
 #   Note: trailing slash causes nginx to redirect, leading to CORS error
 bp.add_url_rule('', view_func=ExerciseAPI.as_view('exercise_api'))
 
-@bp.route('/list', methods=['GET'])
-@jwt_required()
-def get_all_exercises():
-    '''Get a list of all exercises.'''
+class ObjectivesAPI(MethodView):
+    decorators = [jwt_required()]
 
-    username = get_jwt_identity()
+    def get(self):
+        '''List learning objectives for an exercise.'''
 
-    exercises = db.admin.exercises.list_all(username)
-    return responses.response(True, data=exercises)
+        exercise_id = request.args.get('exercise_id')
 
-@bp.route('/assign', methods=['POST'])
-@jwt_required()
-def assign():
-    '''Assign or unassign an exercise to a student.'''
+        objectives = db.admin.exercises.list_learning_objectives(exercise_id)
 
-    username = get_jwt_identity()
-    data = request.get_json()
-    exercise_id = data['exercise_id']
-    student_id = data['student_id']
-    value = data['value']
+        return responses.response(True, data=objectives)
+    
+    def post(self):
+        '''Set or unset a learning objective for an exercise.'''
 
-    if value:
-        db.admin.exercises.assign(
-            teacher=username,
-            exercise_id=exercise_id,
-            student=student_id
-        )
-    else:
-        db.admin.exercises.unassign(
-            teacher=username,
-            exercise_id=exercise_id,
-            student=student_id
-        )
+        username = get_jwt_identity()
+        data = request.get_json()
+        exercise_id = data['exercise_id']
+        objective = data['objective']
+        value = data['value']
 
-    return responses.response(True)
+        class_id = db.admin.exercises.get_class(exercise_id)
+        if not db.admin.classes.is_teacher(username, class_id):
+            return responses.response(False, message='You are not authorized to set learning objectives for this exercise.')
 
-@bp.route('/objective', methods=['POST'])
-@jwt_required()
-def set_learning_objective():
-    '''Set learning objective for an exercise.'''
+        if value:
+            db.admin.exercises.set_learning_objective(
+                exercise_id=exercise_id,
+                objective=objective
+            )
+        else:
+            db.admin.exercises.unset_learning_objective(
+                exercise_id=exercise_id,
+                objective=objective
+            )
 
-    username = get_jwt_identity()
-    data = request.get_json()
-    exercise_id = data['exercise_id']
-    objective = data['objective']
-    value = data['value']
+        return responses.response(True)
 
-    if value:
-        db.admin.exercises.set_learning_objective(
-            teacher=username,
-            exercise_id=exercise_id,
-            objective=objective
-        )
-    else:
-        db.admin.exercises.unset_learning_objective(
-            teacher=username,
-            exercise_id=exercise_id,
-            objective=objective
-        )
+# Register all methods (GET, POST) on /learning-objectives
+bp.add_url_rule('/objectives', view_func=ObjectivesAPI.as_view('objectives_api'))
 
-    return responses.response(True)
-
-
-@bp.route('/list-objectives', methods=['GET'])
-@jwt_required()
-def list_learning_objectives():
-    '''List learning objectives for an exercise.'''
-
-    username = get_jwt_identity()
-    exercise_id = request.args.get('exercise_id')
-
-    objectives = db.admin.exercises.list_learning_objectives(exercise_id)
-
-    return responses.response(True, data=objectives)
 
 @bp.route('/init-dataset', methods=['POST'])
 @jwt_required()
@@ -174,3 +144,46 @@ def init_dataset():
             }) + '\n'  # Important: one JSON object per line
 
     return responses.streaming_response(generate_results())
+
+@bp.route('/get', methods=['GET'])
+@jwt_required()
+def get_exercise():
+    '''Get a specific exercise by its ID.'''
+
+    username = get_jwt_identity()
+    exercise_id = request.args.get('exercise_id')
+
+    result = db.admin.exercises.get_data(exercise_id=exercise_id, username=username)
+
+    if not result:
+        return responses.response(False, message='Exercise not found.')
+
+    return responses.response(True, data=result)
+
+@bp.route('/submit', methods=['POST'])
+@jwt_required()
+def submit_exercise():
+    '''Submit an exercise.'''
+
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+
+    if not db.admin.exercises.submit(username=username, exercise_id=exercise_id):
+        return responses.response(False, message='Failed to submit exercise.')
+
+    return responses.response(True)
+
+@bp.route('/unsubmit', methods=['POST'])
+@jwt_required()
+def unsubmit_exercise():
+    '''Unsubmit an exercise.'''
+
+    username = get_jwt_identity()
+    data = request.get_json()
+    exercise_id = data['exercise_id']
+
+    if not db.admin.exercises.unsubmit(username=username, exercise_id=exercise_id):
+        return responses.response(False, message='Failed to unsubmit exercise.')
+
+    return responses.response(True)

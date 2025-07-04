@@ -316,18 +316,36 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    exercise_id:
-                      type: string
-                    title:
-                      type: string
-                    request:
-                      type: string
-                    is_ai_generated:
-                      type: boolean
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        exercise_id:
+                          type: string
+                        title:
+                          type: string
+                        request:
+                          type: string
+                        is_ai_generated:
+                          type: boolean
+                        submitted:
+                          type: boolean
+                        learning_objectives:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              objective:
+                                type: string
+                              description:
+                                type: string
     post:
       tags:
         - exercises
@@ -420,16 +438,21 @@ paths:
               schema:
                 type: object
                 properties:
-                  exercise_id:
+                  success:
+                    type: boolean
+                  message:
                     type: string
-                  title:
-                    type: string
-                  request:
-                    type: string
-                  dataset_name:
-                    type: string
-                  solution:
-                    type: string
+                  data:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      request:
+                        type: string
+                      dataset_name:
+                        type: string
+                      solution:
+                        type: string
   /exercises/submit:
     post:
       tags:
@@ -517,6 +540,27 @@ paths:
       responses:
         "200":
           description: Objective status updated successfully
+  /exercises/init-dataset:
+    post:
+      tags:
+        - exercises
+      summary: initialize dataset for exercise
+      security:
+        - auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                exercise_id:
+                  type: string
+                dataset_name:
+                  type: string
+      responses:
+        "200":
+          description: Dataset initialized successfully
 
   /admin/users:
     get:

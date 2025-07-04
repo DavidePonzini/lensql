@@ -4,6 +4,7 @@ function ItemAssignmentList({
     fetchItems,             // async () => [{ id, label, isAssigned }]
     assignAction,           // async (id: string, value: boolean) => void
     title = 'Assign to',    // UI label above the list
+    disabledItems = [],     // List of items that should be disabled
 }) {
     const [items, setItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
@@ -19,12 +20,16 @@ function ItemAssignmentList({
     async function handleSelectAll(value) {
         setSelectAll(value);
 
-        // Update UI optimistically
-        setItems((prev) => prev.map((item) => ({ ...item, isAssigned: value })));
+        // Update UI optimistically, skipping the disabled items
+        setItems((prev) =>
+            prev.map((item) => (disabledItems.includes(item.id) ? item : { ...item, isAssigned: value }))
+        );
         
-        // Send requests for all entities
+        // Send requests for all entities, skipping the disabled ones
         await Promise.all(
-            items.map((item) => assignAction(item.id, value))
+            items
+                .filter((item) => !disabledItems.includes(item.id))
+                .map((item) => assignAction(item.id, value))
         );
     }
 
@@ -67,6 +72,7 @@ function ItemAssignmentList({
                         type="checkbox"
                         checked={item.isAssigned}
                         id={`item-${item.id}`}
+                        disabled={disabledItems.includes(item.id)}
                         onChange={(e) => handleAssign(item.id, e.target.checked)}
                     />
                     <label className="form-check-label" htmlFor={`item-${item.id}`}>

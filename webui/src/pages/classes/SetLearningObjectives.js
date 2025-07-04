@@ -4,7 +4,7 @@ import ItemAssignmentList from '../../components/ItemAssignmentList';
 import ButtonModal from '../../components/ButtonModal';
 
 
-function SetLearningObjectives({ exerciseId, refreshExercises }) {
+function SetLearningObjectives({ exerciseId, refreshExercises, className }) {
     const { apiRequest } = useAuth();
 
     async function fetchObjectives() {
@@ -33,7 +33,7 @@ function SetLearningObjectives({ exerciseId, refreshExercises }) {
 
     return (
         <ButtonModal
-            className="btn btn-primary ms-2"
+            className={className}
             title="Set Objectives"
             buttonText="Objectives"
         >
