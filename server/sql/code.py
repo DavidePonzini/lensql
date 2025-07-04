@@ -7,10 +7,11 @@ STRIP_COMMENTS_MAX_LENGTH = 1000
 
 
 class SQLCode:
-    def __init__(self, query: str):
+    def __init__(self, query: str, builtin: bool = False):
         self.query = query
         self._parse_cache = None
         self._query_type_cache = None
+        self.builtin = builtin
 
     def strip_comments(self, *, force: bool = False) -> Self:
         '''
@@ -63,6 +64,9 @@ class SQLCode:
     @property
     def query_type(self) -> str:
         '''Get the type of the SQL query (e.g., SELECT, INSERT, UPDATE, DELETE)'''
+
+        if self.builtin:
+            return 'BUILTIN'
 
         # Use cache to avoid re-parsing the query
         if self._query_type_cache is not None:
@@ -134,6 +138,9 @@ class SQLCode:
     @property
     def query_goal(self) -> str | None:
         '''Get the goal of the SQL query'''
+
+        if self.builtin:
+            return QueryGoal.BUILTIN
 
         # Only consider SELECT queries
         if self.query_type != 'SELECT':

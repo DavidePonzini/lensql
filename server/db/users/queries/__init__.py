@@ -7,7 +7,7 @@ from typing import Iterable
 
 from dav_tools import messages
 
-def execute(username: str, query_str: str, *, strip_comments: bool = True, fast: bool = False) -> Iterable[QueryResult]:
+def execute(username: str, query_str: str, *, strip_comments: bool = True) -> Iterable[QueryResult]:
     '''
     Executes the given SQL queries and returns the results.
     The queries will be separated into individual statements.
