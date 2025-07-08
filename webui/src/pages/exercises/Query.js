@@ -93,7 +93,6 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }
         }
 
         scheduledScrollRef.current = setTimeout(scroll, SCROLL_GRACE_PERIOD);
-        console.log('new scroll')
     }, [result]);
 
     async function handleExecute() {
