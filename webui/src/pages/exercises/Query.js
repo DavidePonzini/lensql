@@ -26,12 +26,15 @@ function ButtonCategory({ text, className, iconClassName }) {
 }
 
 function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }) {
+    const SCROLL_GRACE_PERIOD = 500; // milliseconds
+
     const { apiRequest } = useAuth();
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
     const [showTopBtn, setShowTopBtn] = useState(false);
 
+    const scheduledScrollRef = useRef(null);
     const resultEndRef = useRef(null);
 
     const buttonShowSearchPathLocked = false;
@@ -46,19 +49,23 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }
 
     // Show a "Scroll to Top" button when the user scrolls down
     useEffect(() => {
-        const onScroll = () => setShowTopBtn(window.scrollY > 60);
+        function onScroll() {
+            setShowTopBtn(window.scrollY > 60);
+        } 
+
         window.addEventListener('scroll', onScroll);
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
     // Scroll to top when the "Scroll to Top" button is clicked
-    const scrollToTop = () =>
+    function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
 
     // Show a confirmation dialog when the user tries to leave the page with unsaved changes
     useEffect(() => {
-        const handleBeforeUnload = (e) => {
+        function handleBeforeUnload(e) {
             if (sqlText.length > 0) {
                 e.preventDefault();
                 e.returnValue = ''; // Required for Chrome to show the confirmation dialog
@@ -74,11 +81,20 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }
 
     // Scroll to the bottom of the result list when new results are added
     useEffect(() => {
-        if (resultEndRef.current) {
-            resultEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        function scroll() {
+            scheduledScrollRef.current = null;
+            if (resultEndRef.current) {
+                resultEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
         }
-    }, [result]);
 
+        if (scheduledScrollRef.current) {
+            clearTimeout(scheduledScrollRef.current);
+        }
+
+        scheduledScrollRef.current = setTimeout(scroll, SCROLL_GRACE_PERIOD);
+        console.log('new scroll')
+    }, [result]);
 
     async function handleExecute() {
         if (!sqlText.trim()) return;

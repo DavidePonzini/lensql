@@ -25,14 +25,6 @@ function Chat({ queryId, success }) {
     const buttonErrorLocateLocked = false;
     const buttonErrorFixLocked = false;
 
-    // Scroll to the bottom of the message list when new messages are added
-    useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [messages]);
-
-
     function addMessage(text, isFromAssistant, isThinking = false, messageId = null) {
         setMessages((prevMessages) => [...prevMessages, {
             text,
