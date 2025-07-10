@@ -58,10 +58,9 @@ def reset_password():
     '''Reset the password for the current user.'''
     current_user = get_jwt_identity()
     data = request.get_json()
-    old_password = data['old_password']
     new_password = data['new_password']
 
-    if not db.admin.auth.change_password(current_user, old_password, new_password):
+    if not db.admin.auth.change_password(current_user, new_password):
         return responses.response(False, message='Failed to reset password. Please try again.')
     
     return responses.response(True, message='Password reset successfully.')

@@ -95,10 +95,10 @@ def can_login(username: str, password: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
 
 
-def change_password(username: str, old_password: str, new_password: str) -> bool:
+def change_password(username: str, new_password: str) -> bool:
     '''Change the password for a user'''
 
-    if not can_login(username, old_password):
+    if not user_exists(username):
         return False
 
     hashed_new_password = _hash_password(new_password)
