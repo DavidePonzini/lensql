@@ -33,7 +33,7 @@ function ClassAdd({ refresh, className }) {
                     variant: 'primary',
                     onClick: handleAdd,
                     autoClose: true,
-                    disabled: !title || !dataset,
+                    disabled: !title,
                 },
             ]}
         >
