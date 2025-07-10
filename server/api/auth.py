@@ -35,17 +35,16 @@ def refresh():
     return responses.response(True, access_token=access_token)
 
 @bp.route('/register', methods=['POST'])
-@jwt_required()
 def register():
     '''Register a new user and return JWT tokens.'''
-    if not db.admin.users.is_admin(get_jwt_identity()):
-        return responses.response(False, message='Only admins can register new users.')
-
     data = request.get_json()
     username = data['username']
     password = data['password']
     email = data['email']
     school = data['school']
+
+    if db.admin.auth.user_exists(username):
+        return responses.response(False, message='Username already exists. Please choose a different username.')
 
     if not db.register_user(username, password, email=email, school=school):
         return responses.response(False, message='Registration failed. Please try again.')

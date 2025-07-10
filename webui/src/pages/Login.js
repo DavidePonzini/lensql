@@ -9,9 +9,43 @@ function Login() {
     const { saveTokens } = useAuth();
 
     const [usernameInput, setUsernameInput] = useState('');
+    const [usernameError, setUsernameError] = useState('');
+    const [isUsernameValid, setIsUsernameValid] = useState(false);
+
     const [passwordInput, setPasswordInput] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
+    const [isPasswordValid, setIsPasswordValid] = useState(false);
+
     const [error, setError] = useState('');
+
+    function checkUsername(username) {
+        setUsernameInput(username);
+
+        if (!username) {
+            setIsUsernameValid(false);
+            setUsernameError('Please enter a username.');
+            return;
+        }
+
+        setIsUsernameValid(true);
+        setUsernameError('');
+        return true;
+    }
+
+    function checkPassword(password) {
+        setPasswordInput(password);
+
+        if (!password) {
+            setIsPasswordValid(false);
+            setPasswordError('Please enter a password.');
+            return;
+        }
+
+        setIsPasswordValid(true);
+        setPasswordError('');
+        return true;
+    }
 
     async function handleLogin(event) {
         event.preventDefault();
@@ -83,14 +117,17 @@ function Login() {
                                     <input
                                         type="text"
                                         id="login-username"
-                                        className="form-control form-control-lg"
+                                        className={`form-control form-control-lg ${usernameError ? 'is-invalid' : ''}`}
                                         placeholder="Username"
                                         value={usernameInput}
-                                        onInput={(e) => {
-                                            setUsernameInput(e.target.value);
-                                        }}
+                                        onInput={(e) => checkUsername(e.target.value)}
                                         autoFocus={true}
                                     />
+                                    {usernameError && (
+                                        <div className="invalid-feedback">
+                                            {usernameError}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="form-outline mb-4">
@@ -102,12 +139,15 @@ function Login() {
                                         <input
                                             type={showPassword ? 'text' : 'password'}
                                             id="login-password"
-                                            className="form-control form-control-lg pe-5"
+                                            className={`form-control form-control-lg pe-5 ${passwordError ? 'is-invalid' : ''}`}
                                             placeholder="Password"
                                             value={passwordInput}
-                                            onChange={(e) => setPasswordInput(e.target.value)}
+                                            onInput={(e) => checkPassword(e.target.value)}
                                         />
-                                        <div className="input-group-text" style={{ cursor: 'pointer' }}>
+                                        <div
+                                            className="input-group-text"
+                                            style={{ cursor: 'pointer' }}
+                                        >
                                             <i
                                                 className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
                                                 onClick={() => setShowPassword(!showPassword)}
@@ -115,6 +155,11 @@ function Login() {
                                                 style={{ width: '1.5rem' }}
                                             ></i>
                                         </div>
+                                        {passwordError && (
+                                            <div className="invalid-feedback">
+                                                {passwordError}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -122,6 +167,7 @@ function Login() {
                                     <button
                                         className="btn btn-primary btn-lg btn-block w-100"
                                         onClick={handleLogin}
+                                        disabled={!isUsernameValid || !isPasswordValid}
                                     >
                                         Login
                                     </button>
