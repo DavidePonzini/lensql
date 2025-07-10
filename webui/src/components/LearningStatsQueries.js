@@ -1,17 +1,19 @@
 import { useState } from "react";
-import useAuth from "../../hooks/useAuth";
-import ObservedOnce from "../../components/ObservedOnce";
+import useAuth from "../hooks/useAuth";
+import ObservedOnce from "./ObservedOnce";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, PieChart, Pie, Cell } from 'recharts';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-function Queries() {
+function Queries({ classId = null, exerciseId = null }) {
     const { apiRequest } = useAuth();
     const [data, setData] = useState(null);
 
     async function fetchData() {
-        const response = await apiRequest('/api/users/stats/queries', 'GET');
+        const response = await apiRequest(
+            `/api/users/stats/queries?class_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
+             'GET');
         setData(response.data)
     }
 

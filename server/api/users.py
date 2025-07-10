@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server import db
@@ -21,6 +21,8 @@ def get_user_info():
 @jwt_required()
 def get_query_stats():
     username = get_jwt_identity()
+    class_id = request.args.get('class_id', None)
+    exercise_id = request.args.get('exercise_id', None)
 
     result = db.admin.users.get_query_stats(username)
     if result is None:
@@ -40,6 +42,8 @@ def get_unique_queries_count():
 @jwt_required()
 def get_message_stats():
     username = get_jwt_identity()
+    class_id = request.args.get('class_id', None)
+    exercise_id = request.args.get('exercise_id', None)
 
     result = db.admin.users.get_message_stats(username)
     if result is None:

@@ -2,9 +2,11 @@ import { useState } from 'react';
 import useAuth from '../../hooks/useAuth';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
+import ButtonModal from '../../components/ButtonModal';
 import SetLearningObjectives from './SetLearningObjectives';
 import ExerciseUpdate from './ExerciseUpdate';
 import { NavLink } from 'react-router-dom';
+import LearningStatsAll from '../../components/LearningStatsAll';
 
 function ExerciseCard({
     children,
@@ -109,7 +111,7 @@ function ExerciseCard({
                                     {learningObjectives.map(({ objective, description }, index) => (
                                         <span
                                             key={index}
-                                            className="badge bg-secondary me-1"
+                                            className="badge bg-secondary me-2"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="bottom"
                                             data-bs-title={description}
@@ -144,7 +146,7 @@ function ExerciseCard({
                 {submitted ? (
                     <Button
                         variant="outline-danger"
-                        className="me-1 mb-1"
+                        className="me-2 mb-1"
                         onClick={handleUnsubmit}
                     >
                         Unarchive
@@ -153,14 +155,14 @@ function ExerciseCard({
                     <>
                         <NavLink
                             to={`/exercises/${exerciseId}`}
-                            className="btn btn-primary me-1 mb-1"
+                            className="btn btn-primary me-2 mb-1"
                         >
                             Open
                         </NavLink>
 
                         <Button
-                            variant="success"
-                            className="me-1 mb-1"
+                            variant="outline-success"
+                            className="me-2 mb-1"
                             onClick={handleSubmit}
                         >
                             Archive
@@ -168,30 +170,44 @@ function ExerciseCard({
 
                         {isTeacher && (
                             <>
+                                <div className='vr me-2 mb-1' style={{
+                                    verticalAlign: 'middle',
+                                    height: '2.5rem',
+                                }} />
+
+                                <ButtonModal
+                                    className="btn btn-info me-2 mb-1"
+                                    title="Learning Analytics"
+                                    fullscreen={true}
+                                    buttonText="Learning Analytics"
+                                >
+                                    <LearningStatsAll exerciseId={exerciseId} />
+                                </ButtonModal>
+
                                 <ExerciseUpdate
                                     exerciseId={exerciseId}
                                     refreshExercises={refresh}
-                                    className="btn btn-warning me-1 mb-1"
+                                    className="btn btn-warning me-2 mb-1"
                                 />
 
                                 <SetLearningObjectives
                                     exerciseId={exerciseId}
                                     refreshExercises={refresh}
-                                    className="btn btn-secondary me-1 mb-1"
+                                    className="btn btn-warning me-2 mb-1"
                                 />
 
                                 {hidden ? (
                                     <Button
-                                        variant="outline-secondary"
-                                        className="me-1 mb-1"
+                                        variant="secondary"
+                                        className="me-2 mb-1"
                                         onClick={handleUnhide}
                                     >
-                                        <i className="fa fa-eye"></i> Unhide
+                                        <i className="fa fa-eye"></i> Make Visible
                                     </Button>
                                 ) : (
                                     <Button
                                         variant="outline-secondary"
-                                        className="me-1 mb-1"
+                                        className="me-2 mb-1"
                                         onClick={handleHide}
                                     >
                                         <i className="fa fa-eye-slash"></i> Hide
@@ -200,7 +216,7 @@ function ExerciseCard({
 
                                 <Button
                                     variant="danger"
-                                    className="me-1 mb-1"
+                                    className="me-2 mb-1"
                                     onClick={handleDelete}
                                 >
                                     <i className="fa fa-trash"></i> Delete

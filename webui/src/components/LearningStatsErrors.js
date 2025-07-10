@@ -1,16 +1,18 @@
 import { useState } from "react";
-import useAuth from "../../hooks/useAuth";
-import ObservedOnce from "../../components/ObservedOnce";
+import useAuth from "../hooks/useAuth";
+import ObservedOnce from "./ObservedOnce";
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-function Errors() {
+function Errors({ classId = null, exerciseId = null }) {
     const { apiRequest } = useAuth();
     const [data, setData] = useState(null);
 
     async function fetchData() {
-        const response = await apiRequest('/api/users/stats/errors', 'GET');
+        const response = await apiRequest(
+            `/api/users/stats/errors?class_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
+            'GET');
         setData(response.data)
     }
 

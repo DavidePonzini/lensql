@@ -35,7 +35,7 @@ function SetLearningObjectives({ exerciseId, refreshExercises, className }) {
         <ButtonModal
             className={className}
             title="Set Objectives"
-            buttonText="Objectives"
+            buttonText="Set Objectives"
         >
             <ItemAssignmentList
                 fetchItems={fetchObjectives}

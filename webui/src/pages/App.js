@@ -9,7 +9,7 @@ import Separator from "../components/Separator";
 import Login from './Login';
 import Home from './Home';
 import Profile from './profile/Profile';
-import Learning from './learning/Learning';
+import Learning from './profile/Learning';
 import ExerciseList from './classes/ExerciseList';
 import ClassList from './classes/ClassList';
 import Exercise from './exercises/Exercise';

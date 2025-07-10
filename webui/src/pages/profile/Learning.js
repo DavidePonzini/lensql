@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import QueryOverview from "./Queries";
-import MessagesOverview from "./Messages";
-import ErrorPatterns from "./Errors";
+import LearningStatsQueries from "../../components/LearningStatsQueries";
+import LearningStatsMessages from "../../components/LearningStatsMessages";
+import LearningStatsErrors from "../../components/LearningStatsErrors";
 
 function Learning() {
     const { apiRequest, userInfo } = useAuth();
@@ -30,15 +30,15 @@ function Learning() {
 
             <hr />
             <h2 id="queries">Let's look at your queries</h2>
-            <QueryOverview />
+            <LearningStatsQueries />
 
             <hr />
             <h2 id="messages">Turning Questions Into Progress</h2>
-            <MessagesOverview />
+            <LearningStatsMessages />
 
             <hr />
             <h2 id="errors">Where things got tricky</h2>
-            <ErrorPatterns />
+            <LearningStatsErrors />
         </div>
     );
 }

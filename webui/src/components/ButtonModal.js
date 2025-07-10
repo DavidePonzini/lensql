@@ -9,6 +9,7 @@ function ButtonModal({
     children,
     footerButtons, // Array of buttons to render in the footer
     size = "md",
+    fullscreen = false,
     disabled = false,
 }) {
     const [showModal, setShowModal] = useState(false);
@@ -22,7 +23,7 @@ function ButtonModal({
                 {buttonText}
             </Button>
 
-            <Modal show={showModal} onHide={(handleClose)} centered size={size}>
+            <Modal show={showModal} onHide={(handleClose)} centered size={size} fullscreen={fullscreen}>
                 <Modal.Header closeButton>
                     <Modal.Title>{title}</Modal.Title>
                 </Modal.Header>

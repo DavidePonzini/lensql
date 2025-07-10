@@ -5,6 +5,7 @@ import ItemAssignmentList from '../../components/ItemAssignmentList';
 import ButtonModal from '../../components/ButtonModal';
 import ClassUpdate from './ClassUpdate';
 import ButtonShowDataset from '../../components/ButtonShowDataset';
+import LearningStatsAll from '../../components/LearningStatsAll';
 
 function ClassCard({ title, classId, isTeacher = false, participants, exercises, queries, refreshClasses }) {
     const { apiRequest, userInfo } = useAuth();
@@ -90,10 +91,32 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
 
                 {isTeacher && (
                     <>
+                        <div className='vr me-2 mb-1' style={{
+                            verticalAlign: 'middle',
+                            height: '2.5rem',
+                        }} />
+
+
                         <ButtonModal
-                            className="btn btn-primary me-2"
+                            className="btn btn-info me-2"
+                            title="Learning Analytics"
+                            buttonText="Learning Analytics"
+                            fullscreen={true}
+                        >
+                            <LearningStatsAll classId={classId} />
+                        </ButtonModal>
+
+                        <ClassUpdate
+                            classId={classId}
+                            title={title}
+                            refresh={refreshClasses}
+                            className="btn btn-warning me-2"
+                        />
+
+                        <ButtonModal
+                            className="btn btn-warning me-2"
                             title="Set Teachers"
-                            buttonText="Teachers"
+                            buttonText="Set Teachers"
                         >
                             <ItemAssignmentList
                                 fetchItems={getMembers}
@@ -102,13 +125,6 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                                 disabledItems={[userInfo?.username]}  // Prevent self from being unassigned
                             />
                         </ButtonModal>
-
-                        <ClassUpdate
-                            classId={classId}
-                            title={title}
-                            refresh={refreshClasses}
-                            className="btn btn-secondary me-2"
-                        />
                     </>
                 )}
             </Card.Footer>
