@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
+import LevelTitle from "./LevelTitle";
 
 function Profile() {
     const { apiRequest, userInfo } = useAuth();
@@ -30,15 +31,15 @@ function Profile() {
 
             <p>
                 <i className="fa fa-shield me-1" />
-                Current Level: 3 <i>(Apprentice)</i>
+                Current Level: <LevelTitle level={userInfo?.level || 0} />
             </p>
             <p>
                 <i className="fa fa-trophy me-1" />
-                EXP: 3453/5000
+                EXP: {userInfo?.xp || 0}/{userInfo?.xpToNextLevel || 0}
             </p>
             <p>
                 <i className="fa fa-coins me-1" />
-                LensCoins: 58
+                LensCoins: {userInfo?.coins || 0}
             </p>
 
             <hr />

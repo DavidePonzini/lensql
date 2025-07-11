@@ -1,5 +1,6 @@
 from dav_tools import database
 from .connection import db, SCHEMA
+from server import gamification
 
 def is_admin(username: str) -> bool:
     '''Check if a user is an admin'''
@@ -28,9 +29,42 @@ def is_admin(username: str) -> bool:
 def get_info(username: str) -> dict:
     '''Get general information about a user'''
 
+    query = database.sql.SQL(
+        '''
+        SELECT
+            u.username,
+            u.is_admin,
+            u.experience,
+            u.coins
+        FROM
+            {schema}.users u
+        WHERE
+            u.username = {username}
+        '''
+    ).format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    if len(result) == 0:
+        return {}
+    
+    username, is_admin, experience, coins = result[0]
+
+    level = gamification.get_level(experience)
+    xp_to_next_level = gamification.get_experience_for_next_level(level)
+
     return {
         'username': username,
-        'is_admin': is_admin(username),
+        'is_admin': is_admin,
+        'coins': coins,
+        'xp': experience,
+        'xp_to_next_level': xp_to_next_level,
+        'level': level,
     }
 
 def get_unique_queries_count(username: str) -> int:
@@ -135,3 +169,46 @@ def get_error_stats(username: str) -> dict:
 
     # TODO
     return {}
+
+def add_coins(username: str, amount: int) -> None:
+    '''Add coins to a user's account'''
+
+    query = database.sql.SQL('''
+        UPDATE
+            {schema}.users
+        SET
+            coins = coins + {amount}
+        WHERE
+            username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        amount=database.sql.Placeholder('amount'),
+        username=database.sql.Placeholder('username')
+    )
+
+    db.execute(query, {
+        'amount': amount,
+        'username': username
+    })
+
+def add_experience(username: str, amount: int) -> None:
+    '''Add experience to a user's account'''
+
+    query = database.sql.SQL('''
+        UPDATE
+            {schema}.users
+        SET
+            experience = experience + {amount}
+        WHERE
+            username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        amount=database.sql.Placeholder('amount'),
+        username=database.sql.Placeholder('username')
+    )
+
+    db.execute(query, {
+        'amount': amount,
+        'username': username
+    })
+

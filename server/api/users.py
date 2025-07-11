@@ -24,6 +24,29 @@ def get_query_stats():
     class_id = request.args.get('class_id', None)
     exercise_id = request.args.get('exercise_id', None)
 
+    
+    # if class_id is not None:
+    #     if not db.admin.classes.has_participant(username=username, class_id=class_id):
+    #         return responses.response(False, message="User is not a participant in the specified class.")
+
+    #     if db.admin.classes.has_teacher(username=username, class_id=class_id):
+    #         result = db.admin.classes.get_query_stats(class_id, username)
+    #     if exercise_id is None:
+    #         # Query stats for a class
+    #         pass
+    #     else:
+    #         if db.admin.exercises.get_class(exercise_id) != class_id:
+    #             return responses.response(False, message="Exercise does not belong to the specified class.")
+    #         # Query stats for a specific class and exercise
+    #         pass
+
+    # if class_id is not None and exercise_id is None:    # Query stats for a class
+    #     pass
+    # elif class_id is None and exercise_id is not None:  # Query stats for an exercise
+    #     pass
+    # elif class_id is not None and exercise_id is not None:  # Query stats for a specific class and exercise
+    #     pass
+
     result = db.admin.users.get_query_stats(username)
     if result is None:
         return responses.response(False)

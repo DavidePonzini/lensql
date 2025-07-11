@@ -14,7 +14,10 @@ def log_batch(username: str, exercise_id: int) -> int:
     batch_id = result[0][0]
     return batch_id
 
-def log(batch_id: int, query: str, *,
+def log(*,
+        username: str,
+        batch_id: int,
+        query: str,
         search_path: str | None = None,
         success: bool,
         result: str,
@@ -34,7 +37,46 @@ def log(batch_id: int, query: str, *,
 
     query_id = result[0][0]
 
+    # Log in unique queries table
+    if query_type != 'BUILTIN':
+        statement = database.sql.SQL(
+            '''
+            INSERT INTO {schema}.user_unique_queries (username, query_hash)
+            VALUES ({username}, MD5({query}))
+            ON CONFLICT (username, query_hash) DO NOTHING
+            '''
+        ).format(
+            schema=database.sql.Identifier(SCHEMA),
+            username=database.sql.Placeholder('username'),
+            query=database.sql.Placeholder('query')
+        )
+        db.execute(statement, {
+            'username': username,
+            'query': query
+        })
+
     return query_id
+
+def is_new_query(username: str, query: str) -> bool:
+    '''Check if a query is new for the user.'''
+
+    statement = database.sql.SQL('''
+        SELECT COUNT(*)
+        FROM {schema}.user_unique_queries
+        WHERE username = {username}
+        AND query_hash = MD5({query})
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        query=database.sql.Placeholder('query')
+    )
+
+    result = db.execute_and_fetch(statement, {
+        'username': username,
+        'query': query
+    })
+
+    return result[0][0] == 0
 
 def log_context(query_id: int, columns: list[dict], unique_columns: list[dict]) -> None:
     '''Log context for a query.'''

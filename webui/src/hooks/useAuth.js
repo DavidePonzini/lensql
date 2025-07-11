@@ -103,14 +103,21 @@ function AuthProvider({ children }) {
 
     // Load user info safely and only once if needed
     const loadUserInfo = useCallback(async () => {
-        if (!accessToken) return;
+        if (!accessToken)
+            return;
+        
         setLoadingUser(true);
+        
         try {
             const response = await apiRequest('/api/users/info');
+
             setUserInfo({
                 username: response.username,
-                isTeacher: response.is_teacher,
                 isAdmin: response.is_admin,
+                coins: response.coins,
+                xp: response.xp,
+                xpToNextLevel: response.xp_to_next_level,
+                level: response.level,
             });
         } catch (err) {
             console.error('Failed to load user info.', err);

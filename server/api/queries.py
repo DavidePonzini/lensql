@@ -4,7 +4,7 @@ from flask import Blueprint, request
 import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from server import db
+from server import db, gamification
 from server.sql.result import QueryResult, QueryResultDataset
 from .util import responses
 
@@ -28,9 +28,15 @@ def run_query():
         exercise_id=exercise_id if exercise_id > 0 else None
     )
 
+    if db.admin.queries.is_new_query(username, query):
+        db.admin.users.add_experience(username, gamification.Experience.QUERY_RUN_UNIQUE.value)
+    else:
+        db.admin.users.add_experience(username, gamification.Experience.QUERY_RUN.value)
+
     def generate_results():
         for query_result in db.users.queries.execute(username=username, query_str=query):
             query_id = db.admin.queries.log(
+                username=username,
                 batch_id=batch_id,
                 query=query_result.query.query,
                 search_path=db.users.queries.metadata.get_search_path(username),
@@ -71,6 +77,7 @@ def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> i
     )
 
     query_id = db.admin.queries.log(
+        username=username,
         batch_id=batch_id,
         query=result.query.query,
         success=result.success,
@@ -151,7 +158,12 @@ def view_expected_result():
 
     solution = db.admin.exercises.get_solution(exercise_id)
     
-    result = db.users.queries.builtin.solution.check(username, query_user=query, query_solution=solution)
+    correct, result = db.users.queries.builtin.solution.check(username, query_user=query, query_solution=solution)
     result.id = log_builtin_query(username, exercise_id, result)
+
+    if correct:
+        db.admin.exercises.mark_as_solved(exercise_id, username)
+        db.admin.users.add_experience(username, gamification.Experience.EXERCISE_SOLVED.value)
+        db.admin.users.add_coins(username, gamification.Coins.EXERCISE_SOLVED.value)
 
     return responses.response_query(result, is_builtin=True)

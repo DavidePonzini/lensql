@@ -5,7 +5,7 @@ import ButtonAction from "../../components/ButtonAction";
 
 
 function Chat({ queryId, success }) {
-    const { apiRequest } = useAuth();
+    const { apiRequest, loadUserInfo } = useAuth();
 
     const [messages, setMessages] = useState([
         {
@@ -15,6 +15,7 @@ function Chat({ queryId, success }) {
             messageId: null,
         }
     ]);
+
     const [isThinking, setIsThinking] = useState(false);
     const messagesEndRef = useRef(null);
 
@@ -36,6 +37,8 @@ function Chat({ queryId, success }) {
 
     function addFollowupPrompt() {
         addMessage('Would you like to ask something else?', true);
+
+        loadUserInfo(); // Refresh user info after a message has been fully processed
     }
 
     function removeLastMessage() {

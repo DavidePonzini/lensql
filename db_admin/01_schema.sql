@@ -29,8 +29,12 @@ CREATE TABLE users (
     coins INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE SEQUENCE users_drop_seq
-    OWNED BY users.username;
+CREATE TABLE user_unique_queries (
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if unique queries exist
+    query_hash TEXT NOT NULL,
+
+    PRIMARY KEY (username, query_hash)
+);
 
 CREATE TABLE classes (
     id CHAR(8) PRIMARY KEY DEFAULT UPPER(SUBSTRING(MD5(RANDOM()::TEXT), 1, 8)),
@@ -61,6 +65,15 @@ CREATE TABLE exercise_submissions (
     exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if submissions exist
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if submissions exist
     submission_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    PRIMARY KEY (exercise_id, username)
+);
+
+CREATE TABLE exercise_solutions (
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if solutions exist
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if solutions exist
+    solution TEXT NOT NULL,
+    solution_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (exercise_id, username)
 );

@@ -24,6 +24,27 @@ def get_class(exercise_id: int) -> str:
 
     return result[0][0]
 
+def mark_as_solved(exercise_id: int, username: str, solution: str) -> None:
+    '''Mark an exercise as solved for a user'''
+
+    query = database.sql.SQL(
+    '''
+        INSERT INTO {schema}.exercises_solved (exercise_id, username, solution)
+        VALUES ({exercise_id}, {username}, {solution})
+        ON CONFLICT (exercise_id, username) DO NOTHING
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id'),
+        username=database.sql.Placeholder('username'),
+        solution=database.sql.Placeholder('solution')
+    )
+
+    db.execute(query, {
+        'exercise_id': exercise_id,
+        'username': username,
+        'solution': solution,
+    })
+
 def get_from_class(username: str, class_id: str, include_hidden: bool = False) -> list[dict]:
     '''Get all exercises assigned to a class'''
 

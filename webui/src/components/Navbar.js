@@ -8,24 +8,18 @@ import './Navbar.css';
 function GamificationStats({ userInfo }) {
     return (
         <>
-            {userInfo?.level && (
-                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Level">
-                    <i className="fa fa-trophy text-primary" />
-                    {userInfo.level}
-                </span>
-            )}
-            {userInfo?.xp && userInfo?.xpToNextLevel && (
-                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Experience points">
-                    <i className="fa fa-star text-info" />
-                    {userInfo.xp}/{userInfo.xpToNextLevel}
-                </span>
-            )}
-            {userInfo?.coins && (
-                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="LensCoins">
-                    <i className="fa fa-coins text-warning" />
-                    {userInfo.coins}
-                </span>
-            )}
+            <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Level">
+                <i className="fa fa-trophy text-primary me-1" />
+                {userInfo?.level || 0}
+            </span>
+            <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Experience points">
+                <i className="fa fa-star text-info me-1" />
+                {userInfo?.xp || 0}/{userInfo?.xpToNextLevel || 0}
+            </span>
+            <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="LensCoins">
+                <i className="fa fa-coins text-warning me-1" />
+                {userInfo?.coins || 0}
+            </span>
         </>
     );
 }
@@ -33,14 +27,6 @@ function GamificationStats({ userInfo }) {
 function Navbar() {
     const { isLoggedIn, logout, userInfo, loadingUser } = useAuth();
     const [isDropdownOpen, setDropdownOpen] = useState(false);
-
-    // TODO placeholder data for testing
-    if (userInfo) {
-        userInfo.coins = 75;
-        userInfo.xp = 1500;
-        userInfo.xpToNextLevel = 2000;
-        userInfo.level = 5;
-    }
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">

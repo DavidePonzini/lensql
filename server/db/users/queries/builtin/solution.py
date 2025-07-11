@@ -35,9 +35,7 @@ def _execute(username: str, query: str) -> QueryResultDataset | None:
             return QueryResultDataset(
                 result=pd.DataFrame(rows, columns=columns),
                 columns=[Column(name=col.name, data_type=col.type_code) for col in cur.description] if cur.description else [],
-                query=statement.query,
-                query_type='SELECT',
-                query_goal='',
+                query=statement,
                 notices=conn.notices)
 
     except Exception as e:
@@ -50,7 +48,7 @@ def _execute(username: str, query: str) -> QueryResultDataset | None:
 
 
 
-def check(username: str, query_user: str, query_solution: str) -> QueryResult:
+def check(username: str, query_user: str, query_solution: str) -> tuple[bool, QueryResult]:
     '''
     Checks the user's solution against the exercise solution.
     If multiple queries are present, only the first one is checked.
@@ -61,35 +59,28 @@ def check(username: str, query_user: str, query_solution: str) -> QueryResult:
         solution (str): The SQL solution for the exercise.
 
     Returns:
-        QueryResult: The result of the comparison between the user's query and the exercise solution.
+        tuple: A tuple containing a boolean indicating if the solution is correct and a QueryResult object.
+        If the solution is correct, the QueryResult object contains a success message.
+        If the solution is incorrect, the QueryResult object contains the comparison of results.
         If the exercise has no solution, a message indicating that is returned.
     '''
 
     if not query_solution:
-        return QueryResultMessage(
+        return False, QueryResultMessage(
             message=f'No solution found for this exercise.',
-            query=NAME,
-            query_type='BUILTIN',
-            query_goal='BUILTIN',
-            notices=[])
+            query=SQLCode(NAME, builtin=True))
     
     result_user = _execute(username, query_user)
     if result_user is None:
-        return QueryResultMessage(
+        return False, QueryResultMessage(
             message=f'<i class="fa fa-exclamation-triangle text-danger me-1"></i>User query is not supported. Please ensure it is a valid SQL SELECT query.',
-            query=NAME,
-            query_type='BUILTIN',
-            query_goal='BUILTIN',
-            notices=[])
+            query=SQLCode(NAME, builtin=True))
 
     result_solution = _execute(username, query_solution)
     if result_solution is None:
-        return QueryResultMessage(
+        return False, QueryResultMessage(
             message=f'Teacher-provided solution is not supported',
-            query=NAME,
-            query_type='BUILTIN',
-            query_goal='BUILTIN',
-            notices=[])
+            query=SQLCode(NAME, builtin=True))
 
     # ensure both results have the same columns
     if not result_user.compare_column_names(result_solution):
@@ -98,12 +89,9 @@ def check(username: str, query_user: str, query_solution: str) -> QueryResult:
         message += f'Expected: <code>{"</code>, <code>".join([col.name for col in result_solution.columns])}</code><br/>'
         message += f'Your query: <code>{"</code>, <code>".join([col.name for col in result_user.columns])}</code><br/>'
 
-        return QueryResultMessage(
+        return False, QueryResultMessage(
             message=message,
-            query=NAME,
-            query_type='BUILTIN',
-            query_goal='BUILTIN',
-            notices=[])
+            query=SQLCode(NAME, builtin=True))
     
     # check for wrong data types
     wrong_types = result_user.compare_column_types(result_solution)
@@ -114,26 +102,20 @@ def check(username: str, query_user: str, query_solution: str) -> QueryResult:
         message += f'Expected: <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_solution.columns])}</code><br/>'
         message += f'Your query: <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_user.columns])}</code><br/>'
 
-        return QueryResultMessage(
+        return False, QueryResultMessage(
             message=message,
-            query=NAME,
-            query_type='BUILTIN',
-            query_goal='BUILTIN')
+            query=SQLCode(NAME, builtin=True))
 
     
     has_same_result, comparison = result_user.compare_results(result_solution)
 
     if has_same_result:
-        return QueryResultMessage(
-            message=f'<i class="fa fa-check text-success me-1" ></i>Solution is correct.',
-            query=NAME,
-            query_type='BUILTIN',
-            query_goal='BUILTIN')
+        return True, QueryResultMessage(
+            message=f'<i class="fa fa-check text-success me-1"></i>Solution is correct.',
+            query=SQLCode(NAME, builtin=True))
     else:
-        return QueryResultDataset(
+        return False, QueryResultDataset(
             result=comparison,
-            query=NAME,
-            columns=result_user.columns,
-            query_type='BUILTIN',
-            query_goal='BUILTIN')
+            query=SQLCode(NAME, builtin=True),
+            columns=result_user.columns)
 

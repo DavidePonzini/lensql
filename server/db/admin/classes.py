@@ -120,9 +120,10 @@ def list_classes(username: str) -> list[dict]:
 def create(title: str, dataset: str) -> str:
     '''Create a new class'''
 
+
     result = db.insert(SCHEMA, 'classes', {
         'name': title,
-        'dataset': dataset
+        'dataset': dataset.strip() or None
     }, ['id'])
 
     return result[0][0]
@@ -147,7 +148,7 @@ def update(class_id: str, title: str, dataset: str) -> None:
     db.execute(query, {
         'title': title,
         'class_id': class_id,
-        'dataset': dataset
+        'dataset': dataset.strip() or None
     })
 
 def delete(class_id: str) -> None:

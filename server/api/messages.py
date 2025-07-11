@@ -3,7 +3,7 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from server import db, llm
+from server import db, llm, gamification
 from .util import responses
 
 bp = Blueprint('message', __name__)
@@ -23,6 +23,8 @@ def feedback():
         feedback=feedback,
         username=username,
     )
+
+    db.admin.users.add_coins(username, gamification.Coins.HELP_FEEDBACK.value)
 
     return responses.response(True)
 
@@ -46,6 +48,8 @@ def explain_error_message():
         msg_idx=msg_idx
     )
 
+    db.admin.users.add_coins(username, gamification.Coins.HELP_ERROR_EXPLAIN.value)
+
     return responses.response(answer=answer, id=answer_id)
 
 @bp.route('/error/locate', methods=['POST'])
@@ -66,6 +70,8 @@ def locate_error_cause():
         query_id=query_id,
         msg_idx=msg_idx
     )
+
+    db.admin.users.add_coins(username, gamification.Coins.HELP_ERROR_LOCATE.value)
 
     return responses.response(answer=answer, id=answer_id)
 
@@ -88,6 +94,8 @@ def provide_error_example():
         msg_idx=msg_idx
     )
 
+    db.admin.users.add_coins(username, gamification.Coins.HELP_ERROR_EXAMPLE.value)
+
     return responses.response(answer=answer, id=answer_id)
 
 @bp.route('/error/fix', methods=['POST'])
@@ -109,6 +117,8 @@ def fix_query():
         msg_idx=msg_idx
     )
 
+    db.admin.users.add_coins(username, gamification.Coins.HELP_ERROR_FIX.value)
+
     return responses.response(answer=answer, id=answer_id)
 
 @bp.route('/success/describe', methods=['POST'])
@@ -129,6 +139,8 @@ def describe_my_query():
         msg_idx=msg_idx
     )
 
+    db.admin.users.add_coins(username, gamification.Coins.HELP_SUCCESS_DESCRIBE.value)
+
     return responses.response(answer=answer, id=answer_id)
 
 @bp.route('/success/explain', methods=['POST'])
@@ -148,5 +160,7 @@ def explain_my_query():
         query_id=query_id,
         msg_idx=msg_idx
     )
+
+    db.admin.users.add_coins(username, gamification.Coins.HELP_SUCCESS_EXPLAIN.value)
 
     return responses.response(answer=answer, id=answer_id)

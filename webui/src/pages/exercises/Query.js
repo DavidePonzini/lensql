@@ -28,7 +28,7 @@ function ButtonCategory({ text, className, iconClassName }) {
 function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }) {
     const SCROLL_GRACE_PERIOD = 500; // milliseconds
 
-    const { apiRequest } = useAuth();
+    const { apiRequest, loadUserInfo } = useAuth();
     const [sqlText, setSqlText] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
@@ -45,6 +45,8 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }
 
     function displayResult(data) {
         setResult(data);
+
+        loadUserInfo(); // Refresh user info after displaying result
     }
 
     // Show a "Scroll to Top" button when the user scrolls down
@@ -150,6 +152,7 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }
             }
         } finally {
             setIsExecuting(false);
+            loadUserInfo(); // Refresh user info after all queries have been executed
         }
     }
 
