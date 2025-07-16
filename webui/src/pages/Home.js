@@ -1,8 +1,9 @@
 import AppName from '../components/AppName';
-
 import { NavLink } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 function Home() {
+    const { isLoggedIn } = useAuth();
 
     return (
         <div>
@@ -18,7 +19,7 @@ function Home() {
                         Your personal AI companion for mastering query logic, not just syntax.
                     </p>
                     <div>
-                        <NavLink to='/register' className='btn btn-primary btn-lg me-2'>Get Started</NavLink>
+                        <NavLink to={isLoggedIn ? '/classes' : '/register'} className='btn btn-primary btn-lg me-2'>Get Started</NavLink>
                         <NavLink to='/about' className='btn btn-outline-secondary btn-lg'>Learn More</NavLink>
                     </div>
                 </div>

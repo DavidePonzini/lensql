@@ -392,3 +392,12 @@ def unhide(exercise_id: int) -> None:
     db.execute(query, {
         'exercise_id': exercise_id
     })
+
+def log_solution_attempt(exercise_id: int, username: str, solution: str) -> None:
+    '''Log a solution attempt for an exercise'''
+
+    db.insert(SCHEMA, 'exercise_solutions', {
+        'exercise_id': exercise_id,
+        'username': username,
+        'solution': solution,
+    })

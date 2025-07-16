@@ -148,9 +148,9 @@ def list_constraints():
 
     return responses.response_query(result, is_builtin=True)
 
-@bp.route('/builtin/view-expected-result', methods=['POST'])
+@bp.route('/check-solution', methods=['POST'])
 @jwt_required()
-def view_expected_result():
+def check_solution():
     username = get_jwt_identity()
     data = request.get_json()
     query = data['query']
@@ -159,10 +159,11 @@ def view_expected_result():
     solution = db.admin.exercises.get_solution(exercise_id)
     
     correct, result = db.users.queries.builtin.solution.check(username, query_user=query, query_solution=solution)
-    result.id = log_builtin_query(username, exercise_id, result)
+
+    db.admin.exercises.log_solution_attempt(exercise_id, username, query)
 
     if correct:
-        db.admin.exercises.mark_as_solved(exercise_id, username)
+        db.admin.exercises.mark_as_solved(exercise_id, username, solution=query)
         db.admin.users.add_experience(username, gamification.Experience.EXERCISE_SOLVED.value)
         db.admin.users.add_coins(username, gamification.Coins.EXERCISE_SOLVED.value)
 

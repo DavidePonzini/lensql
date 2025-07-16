@@ -102,7 +102,12 @@ function Login() {
                                     <i className="fas fa-search fa-2x me-3" style={{ color: 'var(--logo-color)' }} />
                                     <span className="h1 fw-bold mb-0">LensQL</span>
                                 </div>
-                                <h5 className="fw-normal mb-3 pb-3" style={{ letterSpacing: 1 }}>Sign into your account</h5>
+                                <h5 className="fw-normal mb-1" style={{ letterSpacing: 1 }}>Sign into your account</h5>
+
+                                <NavLink to="/login" className="text-muted mb-4 d-block">
+                                    Don't have an account? Register here
+                                </NavLink>
+
 
                                 {error && (
                                     <div className="alert alert-danger" role="alert">

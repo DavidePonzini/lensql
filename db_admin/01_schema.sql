@@ -69,10 +69,19 @@ CREATE TABLE exercise_submissions (
     PRIMARY KEY (exercise_id, username)
 );
 
+-- solutions attempted by students
 CREATE TABLE exercise_solutions (
+    id SERIAL PRIMARY KEY,
     exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if solutions exist
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if solutions exist
     solution TEXT NOT NULL,
+    solution_ts TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- solved status for archiving exercises
+CREATE TABLE exercise_solved (
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if solved status exists
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if solved status exists
     solution_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (exercise_id, username)
