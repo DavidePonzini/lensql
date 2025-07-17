@@ -1,26 +1,36 @@
 services:
-  nginx:
-    build: ./nginx
-    image: davideponzini/lensql:nginx
-    container_name: lensql_nginx
+  nginx_prod:
+    build: .
+    container_name: lensql_nginx_prod
     restart: unless-stopped
     ports:
       - "3001:80"
+    profiles:
+      - prod
+
+  nginx_dev:
+    build: ./nginx
+    container_name: lensql_nginx_dev
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    profiles:
+      - dev
     depends_on:
       - webui
       - server
 
   webui:
     build: ./webui
-    image: davideponzini/lensql:webui
     container_name: lensql_webui
     restart: unless-stopped
     ports:
       - "3000:3000"
+    profiles:
+      - dev
 
   server:
     build: ./server
-    image: davideponzini/lensql:server
     container_name: lensql_server
     restart: unless-stopped
     depends_on:
@@ -42,7 +52,6 @@ services:
 
   db_admin:
     build: ./db_admin
-    image: davideponzini/lensql:db_admin
     container_name: lensql_db_admin
     restart: unless-stopped
     environment:

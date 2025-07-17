@@ -9,18 +9,15 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-DEV_DOCKER_COMPOSE_FILE = docker-compose.yml
-PROD_DOCKER_COMPOSE_FILE = docker-compose.prod.yml
-
 .PHONY: $(VENV)_upgrade start deploy setup psql psql_users active_users dump clean
 
 start:
-	docker compose -f $(DEV_DOCKER_COMPOSE_FILE) down
-	docker compose -f $(DEV_DOCKER_COMPOSE_FILE) up --build
+	docker compose --profile dev down
+	docker compose --profile dev up --build
 
 deploy:
-	docker compose -f $(PROD_DOCKER_COMPOSE_FILE) down
-	docker compose -f $(PROD_DOCKER_COMPOSE_FILE) up -d --build
+	docker compose --profile prod down
+	docker compose --profile prod up -d --build
 
 setup:
 	docker exec lensql_server python /app/server/setup.py
