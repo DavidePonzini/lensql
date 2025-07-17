@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import bg from '../res/database.jpg';
 
@@ -170,9 +170,9 @@ function Register() {
                                 </div>
                                 <h5 className="fw-normal mb-1" style={{ letterSpacing: 1 }}>Register a new account</h5>
 
-                                <NavLink to="/login" className="text-muted mb-4 d-block">
+                                <Link to="/login" className="text-muted mb-4 d-block">
                                     Already have an account? Log in here
-                                </NavLink>
+                                </Link>
 
                                 {error && (
                                     <div className="alert alert-danger" role="alert">
@@ -184,7 +184,7 @@ function Register() {
                                     <div className="alert alert-success" role="alert">
                                         Registration successful! You can now log in with your new account.
                                         <br />
-                                        <NavLink to="/login" className="alert-link">Go to Login</NavLink>
+                                        <Link to="/login" className="alert-link">Go to Login</Link>
                                     </div>
                                 )}
 
@@ -303,3 +303,4 @@ function Register() {
 }
 
 export default Register;
+

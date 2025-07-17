@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import bg from '../res/database.jpg';
 
@@ -104,9 +104,9 @@ function Login() {
                                 </div>
                                 <h5 className="fw-normal mb-1" style={{ letterSpacing: 1 }}>Sign into your account</h5>
 
-                                <NavLink to="/login" className="text-muted mb-4 d-block">
+                                <Link to="/register" className="text-muted mb-4 d-block">
                                     Don't have an account? Register here
-                                </NavLink>
+                                </Link>
 
 
                                 {error && (
@@ -187,3 +187,4 @@ function Login() {
 }
 
 export default Login;
+
