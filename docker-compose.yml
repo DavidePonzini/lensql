@@ -79,6 +79,9 @@ services:
       - SUPPORTED_SUBMIT_METHODS=[]
     volumes:
       - ./docs/swaggerui:/docs
+    profiles:
+      - dev
+
 volumes:
   lensql_pgdata:
   lensql_pgdata_users:
