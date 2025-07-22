@@ -21,11 +21,8 @@ def get_user_info():
 @jwt_required()
 def get_query_stats():
     username = get_jwt_identity()
-    class_id = request.args.get('class_id', None)
+    class_id = request.args.get('class_id', None) or None   # required for empty string handling
     exercise_id = request.args.get('exercise_id', None, type=int)
-
-    from dav_tools import messages
-    messages.debug(f'Query stats for user "{username}", class_id: "{class_id}", exercise_id: "{exercise_id}"', request.args)
 
     # if we have an exercise, then we have a class
     #   (ignore class ID passed as argument, just to be safe)
@@ -65,11 +62,8 @@ def get_unique_queries_count():
 @jwt_required()
 def get_message_stats():
     username = get_jwt_identity()
-    class_id = request.args.get('class_id', None)
+    class_id = request.args.get('class_id', None) or None   # required for empty string handling
     exercise_id = request.args.get('exercise_id', None, type=int)
-
-    from dav_tools import messages
-    messages.debug(f'Message stats for user "{username}", class_id: "{class_id}", exercise_id: "{exercise_id}"', request.args)
 
     # if we have an exercise, then we have a class
     #   (ignore class ID passed as argument, just to be safe)

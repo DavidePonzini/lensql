@@ -265,9 +265,6 @@ def get_message_stats(username: str, *, class_id: str | None = None, exercise_id
 
     result = db.execute_and_fetch(query, params)
 
-    from dav_tools import messages
-    messages.debug(result)
-
     if len(result) == 0:
         return {
             'messages': 0,
