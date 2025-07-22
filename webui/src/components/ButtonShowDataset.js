@@ -11,7 +11,7 @@ function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-second
         async function fetchDataset() {
             setIsLoading(true);
 
-            const response = await apiRequest(`/api/datasets/?class_id=${classId}`, 'GET');
+            const response = await apiRequest(`/api/datasets/${classId}`, 'GET');
 
             if (!response.success) {
                 alert(response.message);

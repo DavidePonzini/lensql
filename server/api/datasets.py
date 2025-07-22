@@ -9,14 +9,12 @@ from server import db
 
 bp = Blueprint('datasets', __name__)
 
-@bp.route('/', methods=['GET'])
+@bp.route('/<class_id>', methods=['GET'])
 @jwt_required()
-def get_dataset():
+def get_dataset(class_id):
     '''Get a dataset by ID.'''
     
     username = get_jwt_identity()
-    data = request.args
-    class_id = data['class_id']
 
     if db.admin.classes.has_participant(class_id=class_id, username=username) is False:
         return responses.response(False, message='You do not have access to this dataset.')

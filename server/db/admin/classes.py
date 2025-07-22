@@ -45,7 +45,7 @@ def get(class_id: str) -> dict:
     
     return {
         'title': result[0][0],
-        'dataset': result[0][1]
+        'dataset': result[0][1] or '-- No dataset provided'
     }
 
 def list_classes(username: str) -> list[dict]:
@@ -444,7 +444,7 @@ def get_dataset(class_id: int) -> str:
     if len(result) == 0:
         return '-- No dataset provided'
 
-    return result[0][0]
+    return result[0][0] or '-- No dataset provided'
 
 
 
