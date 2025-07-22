@@ -70,24 +70,6 @@ CREATE TABLE exercise_submissions (
     PRIMARY KEY (exercise_id, username)
 );
 
--- solutions attempted by students
-CREATE TABLE exercise_solutions (
-    id SERIAL PRIMARY KEY,
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if solutions exist
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if solutions exist
-    solution TEXT NOT NULL,
-    solution_ts TIMESTAMP NOT NULL DEFAULT NOW()
-);
-
--- solved status for archiving exercises
-CREATE TABLE exercise_solved (
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if solved status exists
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if solved status exists
-    solution_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-
-    PRIMARY KEY (exercise_id, username)
-);
-
 CREATE TABLE learning_objectives (
     objective VARCHAR(255) NOT NULL PRIMARY KEY,
     description TEXT NOT NULL
@@ -112,11 +94,20 @@ CREATE TABLE queries (
     batch_id INTEGER NOT NULL REFERENCES query_batches(id) ON DELETE CASCADE,
     query TEXT NOT NULL,
     search_path TEXT DEFAULT NULL,
-    success BOOLEAN NOT NULL,
+    success BOOLEAN,        -- supports NULL for queries that are not executed (e.g. when checking solutions in particular cases)
     result TEXT DEFAULT NULL,
     query_type VARCHAR(50) NOT NULL,
     query_goal VARCHAR(255) DEFAULT NULL,
     ts TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- solutions attempted by students
+CREATE TABLE exercise_solutions (
+    id INTEGER NOT NULL REFERENCES queries(id) PRIMARY KEY,
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if solutions exist
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if solutions exist
+    is_correct BOOLEAN NOT NULL,
+    solution_ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE query_context_columns (

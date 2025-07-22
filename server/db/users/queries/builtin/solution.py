@@ -7,17 +7,35 @@ from dav_tools import messages
 NAME = 'CHECK_SOLUTION'
 
 
-def _execute(username: str, query: str) -> QueryResultDataset | None:
+class CheckSolutionResult:
+    def __init__(self, correct: bool, execution_success: bool | None, result: QueryResult):
+        self.correct = correct
+        self.execution_success = execution_success
+        self.result = result
+
+    def __repr__(self):
+        return f'CheckSolutionResult(correct={self.correct}, execution_success={self.execution_success}'
+
+
+def _execute(username: str, query: str) -> tuple[QueryResultDataset | None, bool]:
+    '''
+        Execute the first statement of the query and return the result.
+
+        Returns:
+            QueryResultDataset: The result of the query execution.
+            bool: True if the query was executed successfully, False otherwise. None if the query was not executed (e.g. not a SELECT query).
+    '''
+
     statements = SQLCode(query).split()
 
     # Only execute the first statement
     statement = util.next_statement(statements)
     if statement is None:
-        return None
-    
+        return None, None
+
     # Only SELECT queries are supported
     if statement.query_type != 'SELECT':
-        return None
+        return None, None
     try:
         conn = get_connection(username)
         
@@ -27,7 +45,7 @@ def _execute(username: str, query: str) -> QueryResultDataset | None:
 
             # If the query doesn't have a result set, we don't need it   
             if not cur.description:
-                return None
+                return None, True
 
             rows = cur.fetchall()
             columns = [desc[0] for desc in cur.description]
@@ -36,7 +54,7 @@ def _execute(username: str, query: str) -> QueryResultDataset | None:
                 result=pd.DataFrame(rows, columns=columns),
                 columns=[Column(name=col.name, data_type=col.type_code) for col in cur.description] if cur.description else [],
                 query=statement,
-                notices=conn.notices)
+                notices=conn.notices), True
 
     except Exception as e:
         try:
@@ -44,11 +62,9 @@ def _execute(username: str, query: str) -> QueryResultDataset | None:
             conn.update_last_operation_ts()
         except Exception as e:
             messages.error(f"Error rolling back connection for user {username}: {e}")
-        return None
+        return None, False
 
-
-
-def check(username: str, query_user: str, query_solution: str) -> tuple[bool, QueryResult]:
+def check(username: str, query_user: str, query_solution: str) -> CheckSolutionResult:
     '''
     Checks the user's solution against the exercise solution.
     If multiple queries are present, only the first one is checked.
@@ -66,21 +82,25 @@ def check(username: str, query_user: str, query_solution: str) -> tuple[bool, Qu
     '''
 
     if not query_solution:
-        return False, QueryResultMessage(
+        return CheckSolutionResult(False, None, QueryResultMessage(
             message=f'No solution found for this exercise.',
-            query=SQLCode(NAME, builtin=True))
-    
-    result_user = _execute(username, query_user)
-    if result_user is None:
-        return False, QueryResultMessage(
-            message=f'<i class="fa fa-exclamation-triangle text-danger me-1"></i>User query is not supported. Please ensure it is a valid SQL SELECT query.',
-            query=SQLCode(NAME, builtin=True))
+            query=SQLCode(NAME, builtin=True)),
+        )
 
-    result_solution = _execute(username, query_solution)
+    result_user, execution_success = _execute(username, query_user)
+    if result_user is None:
+        return CheckSolutionResult(False, execution_success, QueryResultMessage(
+            message=f'<i class="fa fa-exclamation-triangle text-danger me-1"></i>User query is not supported. Please ensure it is a valid SQL SELECT query.',
+            query=SQLCode(NAME, builtin=True)),
+        )
+
+
+    result_solution, _ = _execute(username, query_solution)
     if result_solution is None:
-        return False, QueryResultMessage(
+        return CheckSolutionResult(False, execution_success, QueryResultMessage(
             message=f'Teacher-provided solution is not supported',
-            query=SQLCode(NAME, builtin=True))
+            query=SQLCode(NAME, builtin=True)),
+        )
 
     # ensure both results have the same columns
     if not result_user.compare_column_names(result_solution):
@@ -89,10 +109,11 @@ def check(username: str, query_user: str, query_solution: str) -> tuple[bool, Qu
         message += f'Expected: <code>{"</code>, <code>".join([col.name for col in result_solution.columns])}</code><br/>'
         message += f'Your query: <code>{"</code>, <code>".join([col.name for col in result_user.columns])}</code><br/>'
 
-        return False, QueryResultMessage(
+        return CheckSolutionResult(False, execution_success, QueryResultMessage(
             message=message,
             query=SQLCode(NAME, builtin=True))
-    
+        )
+
     # check for wrong data types
     wrong_types = result_user.compare_column_types(result_solution)
 
@@ -102,20 +123,21 @@ def check(username: str, query_user: str, query_solution: str) -> tuple[bool, Qu
         message += f'Expected: <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_solution.columns])}</code><br/>'
         message += f'Your query: <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_user.columns])}</code><br/>'
 
-        return False, QueryResultMessage(
+        return CheckSolutionResult(False, execution_success, QueryResultMessage(
             message=message,
             query=SQLCode(NAME, builtin=True))
-
-    
+        )
     has_same_result, comparison = result_user.compare_results(result_solution)
 
     if has_same_result:
-        return True, QueryResultMessage(
+        return CheckSolutionResult(True, execution_success, QueryResultMessage(
             message=f'<i class="fa fa-check text-success me-1"></i>Solution is correct.',
             query=SQLCode(NAME, builtin=True))
+        )
     else:
-        return False, QueryResultDataset(
+        return CheckSolutionResult(False, execution_success, QueryResultDataset(
             result=comparison,
             query=SQLCode(NAME, builtin=True),
             columns=result_user.columns)
+        )
 

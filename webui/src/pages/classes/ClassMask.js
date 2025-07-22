@@ -7,7 +7,7 @@ function ClassMask({ title, setTitle, dataset, setDataset }) {
                 <input type="text" className="form-control" defaultValue={title} onInput={(e) => setTitle(e.target.value)} />
             </div>
             <div className="mb-3">
-                <label className="form-label">Dataset</label>
+                <label className="form-label">Dataset (Optional)</label>
                 <textarea className="form-control monospace" rows="10" defaultValue={dataset} onInput={(e) => setDataset(e.target.value)}></textarea>
                 <div>
                     <b>Tips</b>

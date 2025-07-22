@@ -158,13 +158,35 @@ def check_solution():
 
     solution = db.admin.exercises.get_solution(exercise_id)
     
-    correct, result = db.users.queries.builtin.solution.check(username, query_user=query, query_solution=solution)
+    check = db.users.queries.builtin.solution.check(username, query_user=query, query_solution=solution)
+    
+    batch_id = db.admin.queries.log_batch(
+        username=username,
+        exercise_id=exercise_id if exercise_id > 0 else None
+    )
 
-    db.admin.exercises.log_solution_attempt(exercise_id, username, query)
+    query_id = db.admin.queries.log(
+        username=username,
+        batch_id=batch_id,
+        query=query,
+        success=check.execution_success,
+        result=check.result.result_text,
+        query_type='CHECK_SOLUTION',
+        query_goal='CHECK_SOLUTION'
+    )
 
-    if correct:
-        db.admin.exercises.mark_as_solved(exercise_id, username, solution=query)
+    db.admin.queries.log_context(
+        query_id=query_id,
+        columns=db.users.queries.metadata.get_columns(username),
+        unique_columns=db.users.queries.metadata.get_unique_columns(username)
+    )
+
+    already_solved = db.admin.exercises.is_solved(exercise_id, username)
+
+    db.admin.exercises.log_solution_attempt(query_id=query_id, username=username, exercise_id=exercise_id, is_correct=check.correct)
+
+    if check.correct and not already_solved:
         db.admin.users.add_experience(username, gamification.Experience.EXERCISE_SOLVED.value)
         db.admin.users.add_coins(username, gamification.Coins.EXERCISE_SOLVED.value)
 
-    return responses.response_query(result, is_builtin=True)
+    return responses.response_query(check.result, is_builtin=True)

@@ -159,7 +159,7 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, datasetName }
     async function handleCheckResult() {
         setIsExecuting(true);
 
-        const data = await apiRequest('/api/queries/builtin/view-expected-result', 'POST', {
+        const data = await apiRequest('/api/queries/check-solution', 'POST', {
             'query': sqlText,
             'exercise_id': exerciseId,
         });

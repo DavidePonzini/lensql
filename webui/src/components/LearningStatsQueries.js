@@ -13,7 +13,7 @@ function Queries({ classId = null, exerciseId = null }) {
     async function fetchData() {
         const response = await apiRequest(
             `/api/users/stats/queries?class_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
-             'GET');
+            'GET');
         setData(response.data)
     }
 
@@ -57,131 +57,139 @@ function Queries({ classId = null, exerciseId = null }) {
 
     return (
         <ObservedOnce onFirstVisible={fetchData}>
-            <Row className="mb-4">
-                <Col xs={4}>
-                    <Card style={{ height: '100%' }}>
-                        <Card.Header>
-                            <Card.Title>Your SQL Journey</Card.Title>
-                        </Card.Header>
-                        <Card.Body>
-                            <div>
-                                <strong>Distinct queries tried:</strong> {queriesUnique}
-                                <br />
-                                <strong>Total queries executed:</strong> {queriesTotal}
-                            </div>
-                            <div className="mt-2 text-muted" style={{ fontSize: '0.9rem' }}>
-                                Every attempt helps — even retries are part of the learning curve.
-                            </div>
-                        </Card.Body>
-                    </Card>
-                </Col>
-
-                <Col>
-                    <Card style={{ height: '100%' }}>
-                        <Card.Header>
-                            <Card.Title>How often things worked</Card.Title>
-                        </Card.Header>
-                        <Card.Body>
-                            <Row>
-                                <Col>
-                                    <div style={{
-                                        textAlign: 'center',
-                                        fontSize: '1.2rem',
-                                        fontWeight: 'bold'
-                                    }}>
-                                        SELECT Queries
+            {queriesTotal === 0 ? (
+                <p className="text-muted" style={{ fontSize: '1.2rem' }}>
+                    You haven't run any queries yet. When you do, we'll show you how many queries you tried, how often they worked, and what types of queries you used.
+                </p>
+            ) : (
+                <>
+                    <Row className="mb-4">
+                        <Col xs={4}>
+                            <Card style={{ height: '100%' }}>
+                                <Card.Header>
+                                    <Card.Title>Your SQL Journey</Card.Title>
+                                </Card.Header>
+                                <Card.Body>
+                                    <div>
+                                        <strong>Distinct queries tried:</strong> {queriesUnique}
+                                        <br />
+                                        <strong>Total queries executed:</strong> {queriesTotal}
                                     </div>
-                                    <ResponsiveContainer width="100%" height={100}>
-                                        <PieChart>
-                                            <Pie
-                                                data={querySuccessDataSelect}
-                                                dataKey="value"
-                                                innerRadius={25}
-                                                outerRadius={50}
-                                                startAngle={90}
-                                                endAngle={-270}
-                                            >
-                                                <Cell fill="#198754" /> {/* Green for success */}
-                                                <Cell fill="#dc3545" /> {/* Red for failure */}
-                                            </Pie>
-                                            <Tooltip formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]} />
-                                            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
-                                                {queriesTotalSelect === 0 ?
-                                                    0 :
-                                                    (queriesSuccessSelect / queriesTotalSelect * 100).toFixed(0)
-                                                }%
-                                            </text>
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </Col>
-                                <Col>
-                                    <div style={{
-                                        textAlign: 'center',
-                                        fontSize: '1.2rem',
-                                        fontWeight: 'bold'
-                                    }}>
-                                        All Queries
+                                    <div className="mt-2 text-muted" style={{ fontSize: '0.9rem' }}>
+                                        Every attempt helps — even retries are part of the learning curve.
                                     </div>
-                                    <ResponsiveContainer width="100%" height={100}>
-                                        <PieChart>
-                                            <Pie
-                                                data={querySuccessDataAll}
-                                                dataKey="value"
-                                                innerRadius={25}
-                                                outerRadius={50}
-                                                startAngle={90}
-                                                endAngle={-270}
-                                            >
-                                                <Cell fill="#198754" /> {/* Green for success */}
-                                                <Cell fill="#dc3545" /> {/* Red for failure */}
-                                            </Pie>
-                                            <Tooltip formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]} />
-                                            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
-                                                {queriesTotalSelect === 0 ?
-                                                    0 :
-                                                    (queriesSuccess / queriesTotal * 100).toFixed(0)
-                                                }%
-                                            </text>
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+                                </Card.Body>
+                            </Card>
+                        </Col>
 
-            <Row className="mb-4">
-                <Col>
-                    <Card>
-                        <Card.Header>
-                            <Card.Title>What kind of queries are you running?</Card.Title>
-                            <Card.Subtitle className="text-muted">
-                                Here's the mix of SQL commands you've used, and how they turned out.
-                            </Card.Subtitle>
-                        </Card.Header>
-                        <Card.Body>
-                            {queriesTotal === 0 ? (
-                                <div className="text-center text-muted" style={{ fontSize: '1.2rem' }}>
-                                    No queries run yet. Start exploring SQL!
-                                </div>
-                            ) : (
-                                <ResponsiveContainer width="100%" height={40 * queryTypesData?.length || 1}>
-                                    <BarChart layout="vertical" data={queryTypesData} margin={{ left: 40, right: 60 }}>
-                                        <XAxis type="number" hide />
-                                        <YAxis dataKey="type" type="category" />
-                                        <Tooltip formatter={queryTypesTootlipFormatter} />
-                                        <Bar dataKey="success" stackId="a" fill="#198754" />
-                                        <Bar dataKey="fail" stackId="a" fill="#dc3545">
-                                            <LabelList dataKey="total" position="right" fill="#000" />
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            )}
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+                        <Col>
+                            <Card style={{ height: '100%' }}>
+                                <Card.Header>
+                                    <Card.Title>How often things worked</Card.Title>
+                                </Card.Header>
+                                <Card.Body>
+                                    <Row>
+                                        <Col>
+                                            <div style={{
+                                                textAlign: 'center',
+                                                fontSize: '1.2rem',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                SELECT Queries
+                                            </div>
+                                            <ResponsiveContainer width="100%" height={100}>
+                                                <PieChart>
+                                                    <Pie
+                                                        data={querySuccessDataSelect}
+                                                        dataKey="value"
+                                                        innerRadius={25}
+                                                        outerRadius={50}
+                                                        startAngle={90}
+                                                        endAngle={-270}
+                                                    >
+                                                        <Cell fill="#198754" /> {/* Green for success */}
+                                                        <Cell fill="#dc3545" /> {/* Red for failure */}
+                                                    </Pie>
+                                                    <Tooltip formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]} />
+                                                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
+                                                        {queriesTotalSelect === 0 ?
+                                                            0 :
+                                                            (queriesSuccessSelect / queriesTotalSelect * 100).toFixed(0)
+                                                        }%
+                                                    </text>
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </Col>
+                                        <Col>
+                                            <div style={{
+                                                textAlign: 'center',
+                                                fontSize: '1.2rem',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                All Queries
+                                            </div>
+                                            <ResponsiveContainer width="100%" height={100}>
+                                                <PieChart>
+                                                    <Pie
+                                                        data={querySuccessDataAll}
+                                                        dataKey="value"
+                                                        innerRadius={25}
+                                                        outerRadius={50}
+                                                        startAngle={90}
+                                                        endAngle={-270}
+                                                    >
+                                                        <Cell fill="#198754" /> {/* Green for success */}
+                                                        <Cell fill="#dc3545" /> {/* Red for failure */}
+                                                    </Pie>
+                                                    <Tooltip formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]} />
+                                                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
+                                                        {queriesTotalSelect === 0 ?
+                                                            0 :
+                                                            (queriesSuccess / queriesTotal * 100).toFixed(0)
+                                                        }%
+                                                    </text>
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </Col>
+                                    </Row>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    <Row className="mb-4">
+                        <Col>
+                            <Card>
+                                <Card.Header>
+                                    <Card.Title>What kind of queries are you running?</Card.Title>
+                                    <Card.Subtitle className="text-muted">
+                                        Here's the mix of SQL commands you've used, and how they turned out.
+                                    </Card.Subtitle>
+                                </Card.Header>
+                                <Card.Body>
+                                    {queriesTotal === 0 ? (
+                                        <div className="text-center text-muted" style={{ fontSize: '1.2rem' }}>
+                                            No queries run yet. Start exploring SQL!
+                                        </div>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height={40 * queryTypesData?.length || 1}>
+                                            <BarChart layout="vertical" data={queryTypesData} margin={{ left: 40, right: 60 }}>
+                                                <XAxis type="number" hide />
+                                                <YAxis dataKey="type" type="category" />
+                                                <Tooltip formatter={queryTypesTootlipFormatter} />
+                                                <Bar dataKey="success" stackId="a" fill="#198754" />
+                                                <Bar dataKey="fail" stackId="a" fill="#dc3545">
+                                                    <LabelList dataKey="total" position="right" fill="#000" />
+                                                </Bar>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
+                </>
+            )}
         </ObservedOnce>
     );
 }

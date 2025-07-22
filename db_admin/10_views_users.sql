@@ -39,4 +39,5 @@ GROUP BY
 ORDER BY
     day DESC;
 
+
 COMMIT;

@@ -24,26 +24,30 @@ def get_class(exercise_id: int) -> str:
 
     return result[0][0]
 
-def mark_as_solved(exercise_id: int, username: str, solution: str) -> None:
-    '''Mark an exercise as solved for a user'''
+def is_solved(exercise_id: int, username: str) -> bool:
+    '''Check if an exercise has been solved by a user'''
 
-    query = database.sql.SQL(
-    '''
-        INSERT INTO {schema}.exercises_solved (exercise_id, username, solution)
-        VALUES ({exercise_id}, {username}, {solution})
-        ON CONFLICT (exercise_id, username) DO NOTHING
+    query = database.sql.SQL('''
+        SELECT EXISTS (
+            SELECT 1
+            FROM {schema}.exercise_solutions
+            WHERE
+                exercise_id = {exercise_id}
+                AND username = {username}
+                AND is_correct = TRUE
+        )
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         exercise_id=database.sql.Placeholder('exercise_id'),
-        username=database.sql.Placeholder('username'),
-        solution=database.sql.Placeholder('solution')
+        username=database.sql.Placeholder('username')
     )
 
-    db.execute(query, {
+    result = db.execute_and_fetch(query, {
         'exercise_id': exercise_id,
-        'username': username,
-        'solution': solution,
+        'username': username
     })
+
+    return result[0][0] if result else False
 
 def get_from_class(username: str, class_id: str, include_hidden: bool = False) -> list[dict]:
     '''Get all exercises assigned to a class'''
@@ -393,11 +397,12 @@ def unhide(exercise_id: int) -> None:
         'exercise_id': exercise_id
     })
 
-def log_solution_attempt(exercise_id: int, username: str, solution: str) -> None:
+def log_solution_attempt(query_id: int, username: str, exercise_id: int, is_correct: bool) -> None:
     '''Log a solution attempt for an exercise'''
 
     db.insert(SCHEMA, 'exercise_solutions', {
+        'id': query_id,
         'exercise_id': exercise_id,
         'username': username,
-        'solution': solution,
+        'is_correct': is_correct,
     })

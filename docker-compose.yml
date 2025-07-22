@@ -7,6 +7,8 @@ services:
       - "3001:80"
     profiles:
       - prod
+    depends_on:
+      - server
 
   nginx_dev:
     build: ./nginx

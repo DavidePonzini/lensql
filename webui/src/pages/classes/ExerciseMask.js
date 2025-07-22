@@ -11,7 +11,7 @@ function ExerciseMask({ title, setTitle, request, setRequest, answer, setAnswer 
                 <textarea className="form-control" rows="3" defaultValue={request} onInput={(e) => setRequest(e.target.value)}></textarea>
             </div>
             <div className="mb-3">
-                <label className="form-label">Answer</label>
+                <label className="form-label">Answer (Optional)</label>
                 <textarea className="form-control" rows="3" defaultValue={answer} onInput={(e) => setAnswer(e.target.value)}></textarea>
             </div>
         </>
