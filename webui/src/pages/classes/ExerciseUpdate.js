@@ -28,7 +28,7 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
             return;
         }
 
-        const result = await apiRequest(`/api/exercises/get?exercise_id=${exerciseId}`, 'GET');
+        const result = await apiRequest(`/api/exercises/get/${exerciseId}`, 'GET');
 
         setTitle(result.data.title);
         setRequest(result.data.request);

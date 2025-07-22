@@ -54,13 +54,11 @@ class ClassesAPI(MethodView):
 #   Note: trailing slash causes nginx to redirect, leading to CORS error
 bp.add_url_rule('', view_func=ClassesAPI.as_view('classes_api'))
 
-@bp.route('/get', methods=['GET'])
+@bp.route('/get/<class_id>', methods=['GET'])
 @jwt_required()
-def get_class():
+def get_class(class_id):
     '''Get a class by its ID.'''
     username = get_jwt_identity()
-    data = request.args
-    class_id = data['class_id']
 
     if not db.admin.classes.exists(class_id):
         return responses.response(False, message='Class does not exist.')
@@ -101,13 +99,11 @@ def leave_class():
         return responses.response(False, message='You cannot leave this class, as you are a teacher and it has data associated with it.')
 
 
-@bp.route('/is-teacher', methods=['GET'])
+@bp.route('/is-teacher/<class_id>', methods=['GET'])
 @jwt_required()
-def is_teacher():
+def is_teacher(class_id):
     '''Check if the user is a teacher of a class.'''
     username = get_jwt_identity()
-    data = request.args
-    class_id = data.get('class_id')
 
     result = db.admin.classes.has_teacher(username, class_id)
 
@@ -137,13 +133,11 @@ def set_teacher():
     return responses.response(True)
 
 
-@bp.route('/members', methods=['GET'])
+@bp.route('/members/<class_id>', methods=['GET'])
 @jwt_required()
-def get_members():
+def get_members(class_id):
     '''Get the members of a class.'''
     username = get_jwt_identity()
-    data = request.args
-    class_id = data.get('class_id')
 
     if not db.admin.classes.has_teacher(username, class_id):
         return responses.response(False, message='You are not a teacher of this class.')

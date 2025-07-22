@@ -11,7 +11,7 @@ function Exercise() {
 
     useEffect(() => {
         async function fetchAssignment() {
-            const data = await apiRequest(`/api/exercises/get?exercise_id=${exerciseId}`, 'GET');
+            const data = await apiRequest(`/api/exercises/get/${exerciseId}`, 'GET');
 
             setExercise(data.data);
         }

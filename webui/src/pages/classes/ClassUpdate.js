@@ -26,7 +26,7 @@ function ClassUpdate({ classId, refresh, className }) {
                 return;
             }
     
-            const result = await apiRequest(`/api/classes/get?class_id=${classId}`, 'GET');
+            const result = await apiRequest(`/api/classes/get/${classId}`, 'GET');
     
             setTitle(result.data.title);
             setDataset(result.data.dataset);

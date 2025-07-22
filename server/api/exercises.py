@@ -171,13 +171,12 @@ def init_dataset():
 
     return responses.streaming_response(generate_results())
 
-@bp.route('/get', methods=['GET'])
+@bp.route('/get/<exercise_id>', methods=['GET'])
 @jwt_required()
-def get_exercise():
+def get_exercise(exercise_id):
     '''Get a specific exercise by its ID.'''
 
     username = get_jwt_identity()
-    exercise_id = request.args.get('exercise_id')
 
     result = db.admin.exercises.get_data(exercise_id=exercise_id, username=username)
 

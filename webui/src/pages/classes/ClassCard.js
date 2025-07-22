@@ -11,7 +11,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
     const { apiRequest, userInfo } = useAuth();
 
     async function getMembers() {
-        const response = await apiRequest(`/api/classes/members?class_id=${classId}`, 'GET');
+        const response = await apiRequest(`/api/classes/members/${classId}`, 'GET');
 
         return response.members.map(member => ({
             id: member.username,

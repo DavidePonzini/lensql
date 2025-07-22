@@ -62,14 +62,18 @@ def list_classes(username: str) -> list[dict]:
             (
                 SELECT COUNT(*)
                 FROM {schema}.class_members cm2
-                WHERE cm2.class_id = c.id AND cm2.is_teacher = FALSE
+                WHERE
+                    cm2.class_id = c.id
+                    AND cm2.is_teacher = FALSE
             ) AS participants,
 
             -- total number of exercises in the class
             (
                 SELECT COUNT(*)
                 FROM {schema}.exercises e2
-                WHERE e2.class_id = c.id
+                WHERE
+                    e2.class_id = c.id
+                    AND (cm.is_teacher OR NOT e2.is_hidden)
             ) AS exercises,
 
             -- count of queries:
