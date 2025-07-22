@@ -44,7 +44,6 @@ function ExerciseCard({
         });
 
         setSubmitted(false);
-
         if (onUnsubmit)
             onUnsubmit(exerciseId);
     }

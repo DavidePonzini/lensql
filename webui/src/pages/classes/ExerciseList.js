@@ -16,13 +16,13 @@ function ExerciseList() {
     const [submittedExercises, setSubmittedExercises] = useState([]);
 
     function handleSubmit(exercise) {
-        setUnsubmittedExercises((prevExercises) => prevExercises.filter((e) => e.id !== exercise.id));
-        setSubmittedExercises((prevExercises) => [...prevExercises, exercise]);
+        setUnsubmittedExercises((prev) => prev.filter((e) => e.exercise_id !== exercise.exercise_id));
+        setSubmittedExercises((prev) => [...prev, exercise]);
     }
 
     function handleUnsubmit(exercise) {
-        setSubmittedExercises((prevExercises) => prevExercises.filter((e) => e.id !== exercise.id));
-        setUnsubmittedExercises((prevExercises) => [...prevExercises, exercise]);
+        setSubmittedExercises((prev) => prev.filter((e) => e.exercise_id !== exercise.exercise_id));
+        setUnsubmittedExercises((prev) => [...prev, exercise]);
     }
 
     const getExercises = useCallback(async () => {
