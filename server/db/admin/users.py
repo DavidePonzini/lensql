@@ -55,16 +55,15 @@ def get_info(username: str) -> dict:
     
     username, is_admin, experience, coins = result[0]
 
-    level = gamification.get_level(experience)
-    xp_to_next_level = gamification.get_experience_for_next_level(level)
+    xp = gamification.xp_to_level(experience)
 
     return {
         'username': username,
         'is_admin': is_admin,
         'coins': coins,
-        'xp': experience,
-        'xp_to_next_level': xp_to_next_level,
-        'level': level,
+        'xp': xp['current'],
+        'xp_to_next_level': xp['next'],
+        'level': xp['level'],
     }
 
 def get_unique_queries_count(username: str) -> int:

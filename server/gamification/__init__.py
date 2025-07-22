@@ -21,30 +21,28 @@ class Experience(Enum):
     QUERY_RUN_UNIQUE = 10
 
 # Experience grows quadratically with level
-# Level 0: 0 XP
-# Level 1: 100 XP
-# Level 2: 400 XP
-# Level 3: 900 XP
-# Level 4: 1600 XP
-# Level 5: 2500 XP
+# Level 0:    0 XP  |   0
+# Level 1:  100 XP  | 100
+# Level 2:  400 XP  | 500
+# Level 3:  900 XP  | 1400
+# Level 4: 1600 XP  | 3000
+# Level 5: 2500 XP  | 5500
 # ...
-def get_level(experience: int) -> int:
-    '''Calculate the level based on experience points'''
-    level = 0
-    base = 100
-    total_xp = 0
+def xp_to_level(total_xp):
+    def cumulative_xp(level):
+        return 100 * level * (level + 1) * (2 * level + 1) // 6
 
-    while True:
-        xp_for_next = base * (level + 1) ** 2
-        if experience < total_xp + xp_for_next:
-            break
-        total_xp += xp_for_next
+    # Find level by incrementing until XP would exceed total_xp
+    level = 0
+    while cumulative_xp(level + 1) <= total_xp:
         level += 1
 
-    return level
+    xp_for_current_level = cumulative_xp(level)
+    xp_for_next_level = cumulative_xp(level + 1)
+    current_level_xp = total_xp - xp_for_current_level
 
-
-def get_experience_for_next_level(level: int) -> int:
-    '''Calculate the experience points needed for the next level'''
-    base = 100
-    return base * (level + 1) ** 2
+    return {
+        'level': level,
+        'current': current_level_xp,
+        'next': xp_for_next_level - xp_for_current_level
+    }

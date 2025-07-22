@@ -25,6 +25,7 @@ function Profile() {
         <div className="container-md">
             <h1 className="display-3">Welcome back, {userInfo?.username || 'user'}!</h1>
             <p className="lead">{welcomeMessage}</p>
+            
             <p style={{ color: 'red', fontWeight: 'bold' }}>This section is under developent</p>
 
             <hr />
@@ -42,7 +43,7 @@ function Profile() {
                 LensCoins: {userInfo?.coins || 0}
             </p>
 
-            <hr />
+            {/* <hr />
             <h2>Achievements</h2>
             <ul className="list-group mb-3">
                 <li className="list-group-item d-flex justify-content-between align-items-center">
@@ -65,7 +66,7 @@ function Profile() {
                     Daily Challenger
                     <span className="badge bg-secondary rounded-pill">Locked</span>
                 </li>
-            </ul>
+            </ul> */}
         </div>
     );
 }
