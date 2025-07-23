@@ -4,7 +4,7 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME}_nginx_prod
     restart: unless-stopped
     ports:
-      - "3001:80"
+      - "${PORT:-3001}:80"
     profiles:
       - prod
     depends_on:
@@ -15,7 +15,7 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME}_nginx_dev
     restart: unless-stopped
     ports:
-      - "3001:80"
+      - "${PORT:-3001}:80"
     profiles:
       - dev
     depends_on:
