@@ -1,7 +1,7 @@
 services:
   nginx_prod:
     build: .
-    container_name: lensql_nginx_prod
+    container_name: ${COMPOSE_PROJECT_NAME}_nginx_prod
     restart: unless-stopped
     ports:
       - "3001:80"
@@ -12,7 +12,7 @@ services:
 
   nginx_dev:
     build: ./nginx
-    container_name: lensql_nginx_dev
+    container_name: ${COMPOSE_PROJECT_NAME}_nginx_dev
     restart: unless-stopped
     ports:
       - "3001:80"
@@ -24,7 +24,7 @@ services:
 
   webui:
     build: ./webui
-    container_name: lensql_webui
+    container_name: ${COMPOSE_PROJECT_NAME}_webui
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -33,7 +33,7 @@ services:
 
   server:
     build: ./server
-    container_name: lensql_server
+    container_name: ${COMPOSE_PROJECT_NAME}_server
     restart: unless-stopped
     depends_on:
       - db_admin
@@ -54,27 +54,27 @@ services:
 
   db_admin:
     build: ./db_admin
-    container_name: lensql_db_admin
+    container_name: ${COMPOSE_PROJECT_NAME}_db_admin
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
     volumes:
-      - lensql_pgdata:/var/lib/postgresql/data
+      - pgdata_admin:/var/lib/postgresql/data
 
   db_users:
     image: postgres:latest
     command: -c 'max_connections=500'
-    container_name: lensql_db_users
+    container_name: ${COMPOSE_PROJECT_NAME}_db_users
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - lensql_pgdata_users:/var/lib/postgresql/data
+      - pgdata_users:/var/lib/postgresql/data
 
   docs_api:
     image: docker.swagger.io/swaggerapi/swagger-ui
-    container_name: lensql_docs_api
+    container_name: ${COMPOSE_PROJECT_NAME}_docs_api
     restart: unless-stopped
     environment:
       - SWAGGER_JSON=/docs/api.yaml
@@ -85,5 +85,7 @@ services:
       - dev
 
 volumes:
-  lensql_pgdata:
-  lensql_pgdata_users:
+  pgdata_admin:
+    name: ${COMPOSE_PROJECT_NAME}_pgdata_admin
+  pgdata_users:
+    name: ${COMPOSE_PROJECT_NAME}_pgdata_users
