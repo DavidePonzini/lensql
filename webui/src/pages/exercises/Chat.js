@@ -3,6 +3,8 @@ import useAuth from "../../hooks/useAuth";
 import MessageBox from "./MessageBox";
 import ButtonAction from "../../components/ButtonAction";
 
+import { Coins } from "../../constants/Gamification";
+
 
 function Chat({ queryId, success }) {
     const { apiRequest, loadUserInfo } = useAuth();
@@ -180,7 +182,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleDescribeQuery}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={1}
+                                        cost={Coins.HELP_SUCCESS_DESCRIBE}
                                         locked={buttonSuccessDescribeLocked}
                                     >
                                         Describe query
@@ -190,7 +192,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleExplainQuery}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={3}
+                                        cost={Coins.HELP_SUCCESS_EXPLAIN}
                                         locked={buttonSuccessExplainLocked}
                                     >
                                         Explain query
@@ -202,7 +204,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleExplainError}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={3}
+                                        cost={Coins.HELP_ERROR_EXPLAIN}
                                         locked={buttonErrorExplainLocked}
                                     >
                                         Explain error
@@ -212,7 +214,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleShowExample}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={3}
+                                        cost={Coins.HELP_ERROR_EXAMPLE}
                                         locked={buttonErrorExampleLocked}
                                     >
                                         Show example
@@ -222,7 +224,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleWhereToLook}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={5}
+                                        cost={Coins.HELP_ERROR_LOCATE}
                                         locked={buttonErrorLocateLocked}
                                     >
                                         Where to look
@@ -232,7 +234,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleSuggestFix}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={20}
+                                        cost={Coins.HELP_ERROR_FIX}
                                         locked={buttonErrorFixLocked}
                                     >
                                         Suggest fix

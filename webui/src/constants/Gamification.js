@@ -1,0 +1,19 @@
+export const Coins = {
+    EXERCISE_SOLVED: 100,
+
+    HELP_SUCCESS_EXPLAIN: -1,
+    HELP_SUCCESS_DESCRIBE: -3,
+
+    HELP_ERROR_EXPLAIN: -3,
+    HELP_ERROR_EXAMPLE: -3,
+    HELP_ERROR_LOCATE: -5,
+    HELP_ERROR_FIX: -20,
+
+    HELP_FEEDBACK: 5,
+};
+
+export const Experience = {
+    EXERCISE_SOLVED: 1000,
+    QUERY_RUN: 1,
+    QUERY_RUN_UNIQUE: 10,
+};
