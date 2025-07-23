@@ -21,6 +21,10 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
     }
 
     async function handleLeave() {
+        if (!window.confirm('Are you sure you want to leave this class?')) {
+            return;
+        }
+
         const result = await apiRequest('/api/classes/leave', 'POST', {
             'class_id': classId,
         });
