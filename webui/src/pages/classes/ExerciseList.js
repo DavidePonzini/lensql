@@ -61,6 +61,7 @@ function ExerciseList() {
                             exerciseId={exercise.exercise_id}
                             isGenerated={exercise.is_ai_generated}
                             isSubmitted={false}
+                            isSolved={exercise.is_solved}
                             isHidden={exercise.is_hidden}
                             isTeacher={isTeacher}
                             title={exercise.title}
@@ -85,6 +86,7 @@ function ExerciseList() {
                             exerciseId={exercise.exercise_id}
                             isGenerated={exercise.is_ai_generated}
                             isHidden={exercise.is_hidden}
+                            isSolved={exercise.is_solved}
                             isSubmitted={true}
                             isTeacher={isTeacher}
                             learningObjectives={exercise.learning_objectives}

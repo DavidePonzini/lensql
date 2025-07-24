@@ -61,7 +61,15 @@ def get_from_class(username: str, class_id: str, include_hidden: bool = False) -
                 e.request,
                 e.is_ai_generated,
                 e.is_hidden,
-                es.username IS NOT NULL AS submitted
+                es.username IS NOT NULL AS submitted,
+                (SELECT EXISTS (
+                    SELECT 1
+                    FROM {schema}.exercise_solutions
+                    WHERE
+                        exercise_id = e.id
+                        AND username = {username}
+                        AND is_correct = TRUE
+                )) AS is_solved
             FROM
                 {schema}.exercises e
                 LEFT JOIN {schema}.exercise_submissions es ON e.id = es.exercise_id AND es.username = {username}
@@ -84,7 +92,15 @@ def get_from_class(username: str, class_id: str, include_hidden: bool = False) -
                 e.request,
                 e.is_ai_generated,
                 FALSE AS is_hidden,
-                es.username IS NOT NULL AS submitted
+                es.username IS NOT NULL AS submitted,
+                (SELECT EXISTS (
+                    SELECT 1
+                    FROM {schema}.exercise_solutions
+                    WHERE
+                        exercise_id = e.id
+                        AND username = {username}
+                        AND is_correct = TRUE
+                )) AS is_solved
             FROM
                 {schema}.exercises e
                 LEFT JOIN {schema}.exercise_submissions es ON e.id = es.exercise_id AND es.username = {username}
@@ -113,6 +129,7 @@ def get_from_class(username: str, class_id: str, include_hidden: bool = False) -
             'is_ai_generated': row[3],
             'is_hidden': row[4],
             'submitted': row[5],
+            'is_solved': row[6],
             'learning_objectives': get_learning_objectives(row[0]),
         }
         for row in result

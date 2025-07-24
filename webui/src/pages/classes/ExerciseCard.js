@@ -13,7 +13,8 @@ function ExerciseCard({
     title,
     exerciseId,
     isGenerated = false,
-    isSubmitted,
+    isSubmitted = false,
+    isSolved = false,
     isTeacher = false,
     isHidden = false,
     onSubmit = null,
@@ -91,6 +92,11 @@ function ExerciseCard({
                     {hidden && (
                         <span className="badge bg-secondary ms-2">
                             Hidden
+                        </span>
+                    )}
+                    {isSolved && (
+                        <span className="badge bg-success ms-2">
+                            Solved
                         </span>
                     )}
                 </h5>
