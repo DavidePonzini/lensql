@@ -1,10 +1,10 @@
-export const Coins = {
+const Coins = {
     EXERCISE_SOLVED: 100,
 
-    HELP_SUCCESS_EXPLAIN: -1,
-    HELP_SUCCESS_DESCRIBE: -3,
+    HELP_SUCCESS_DESCRIBE: -1,
+    HELP_SUCCESS_EXPLAIN: -3,
 
-    HELP_ERROR_EXPLAIN: -3,
+    HELP_ERROR_EXPLAIN: -1,
     HELP_ERROR_EXAMPLE: -3,
     HELP_ERROR_LOCATE: -5,
     HELP_ERROR_FIX: -20,
@@ -12,8 +12,35 @@ export const Coins = {
     HELP_FEEDBACK: 5,
 };
 
-export const Experience = {
+const Experience = {
     EXERCISE_SOLVED: 1000,
     QUERY_RUN: 1,
     QUERY_RUN_UNIQUE: 10,
+    ASK_HELP: 1,
 };
+
+function cumulativeXp(level) {
+    return Math.floor(100 * level * (level + 1) * (2 * level + 1) / 6);
+}
+
+function getXpStats(totalXp) {
+    if (totalXp < 0) totalXp = 0;
+
+    let level = 0;
+    while (cumulativeXp(level + 1) <= totalXp) {
+        level++;
+    }
+
+    const xpForCurrentLevel = cumulativeXp(level);
+    const xpForNextLevel = cumulativeXp(level + 1);
+    const current = totalXp - xpForCurrentLevel;
+    const next = xpForNextLevel - xpForCurrentLevel;
+
+    return {
+        level,
+        current,
+        next
+    };
+}
+
+export { Experience, Coins, getXpStats}

@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import useAuth from '../../hooks/useAuth';
+import BubbleStatsChange from '../../components/BubbleStatsChange';
+import { Coins } from '../../constants/Gamification';
 
 import './Message.css';
 
 function Message({ children, text, messageId = null }) {
-    const { apiRequest } = useAuth();
+    const { apiRequest, incrementStats } = useAuth();
 
     const [feedback, setFeedback] = useState(null);
+    const [coinsChange, setCoinsChange] = useState(0);
 
     async function handleSendFeedback(positive) {
         // This message doesn't support feedback
@@ -25,7 +28,11 @@ function Message({ children, text, messageId = null }) {
             'feedback': positive
         });
 
+        sessionStorage.setItem('hasProvidedFeedback', 'true');
         setFeedback(positive);
+
+        incrementStats(Coins.HELP_FEEDBACK, 0);
+        setCoinsChange(Coins.HELP_FEEDBACK);
     }
 
     return (
@@ -35,6 +42,22 @@ function Message({ children, text, messageId = null }) {
             {
                 messageId && (
                     <div className="message-feedback">
+                        <BubbleStatsChange
+                            coinsChange={coinsChange}
+                            setCoinsChange={setCoinsChange}
+                            isAlert={false}
+                            changeReason='Provided feedback'
+                        />
+
+                        {
+                            !sessionStorage.getItem('hasProvidedFeedback') && (
+                                <span className="text-muted">
+                                    You can earn {Coins.HELP_FEEDBACK} LensCoins by providing feedback on this message
+                                    <i className="fa fa-arrow-right mx-1" />
+                                </span>
+                            )
+                        }
+
                         <span
                             className={`feedback feedback-up ${feedback !== null ? 'disabled' : ''} ${feedback === true ? 'selected' : ''}`}
                             data-bs-toggle="tooltip"

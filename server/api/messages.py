@@ -9,6 +9,9 @@ from .util import responses
 bp = Blueprint('message', __name__)
 
 
+NOT_ENOUGH_COINS_MESSAGE = "You don't have enough coins to use this feature. You can earn coins by providing feedback on Lens's answers."
+
+
 @bp.route('/feedback', methods=['POST'])
 @jwt_required()
 def feedback():
@@ -36,6 +39,10 @@ def explain_error_message():
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
+
+    coins = db.admin.users.get_coins(username)
+    if coins < abs(gamification.Coins.HELP_ERROR_EXPLAIN.value):
+        return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
     
     query = db.admin.queries.get(query_id)
     exception = db.admin.queries.get_result(query_id)
@@ -60,6 +67,10 @@ def locate_error_cause():
     query_id = data['query_id']
     msg_idx = data['msg_idx']
 
+    coins = db.admin.users.get_coins(username)
+    if coins < abs(gamification.Coins.HELP_ERROR_LOCATE.value):
+        return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
+
     query = db.admin.queries.get(query_id)
     exception = db.admin.queries.get_result(query_id)
     answer = llm.locate_error_cause(username, query, exception)
@@ -72,6 +83,7 @@ def locate_error_cause():
     )
 
     db.admin.users.add_coins(username, gamification.Coins.HELP_ERROR_LOCATE.value)
+    db.admin.users.add_experience(username, gamification.Experience.ASK_HELP.value)
 
     return responses.response(answer=answer, id=answer_id)
 
@@ -82,6 +94,10 @@ def provide_error_example():
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
+
+    coins = db.admin.users.get_coins(username)
+    if coins < abs(gamification.Coins.HELP_ERROR_EXAMPLE.value):
+        return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
     query = db.admin.queries.get(query_id)
     exception = db.admin.queries.get_result(query_id)
@@ -95,6 +111,7 @@ def provide_error_example():
     )
 
     db.admin.users.add_coins(username, gamification.Coins.HELP_ERROR_EXAMPLE.value)
+    db.admin.users.add_experience(username, gamification.Experience.ASK_HELP.value)
 
     return responses.response(answer=answer, id=answer_id)
 
@@ -105,6 +122,10 @@ def fix_query():
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
+
+    coins = db.admin.users.get_coins(username)
+    if coins < abs(gamification.Coins.HELP_ERROR_FIX.value):
+        return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
     query = db.admin.queries.get(query_id)
     exception = db.admin.queries.get_result(query_id)
@@ -118,6 +139,7 @@ def fix_query():
     )
 
     db.admin.users.add_coins(username, gamification.Coins.HELP_ERROR_FIX.value)
+    db.admin.users.add_experience(username, gamification.Experience.ASK_HELP.value)
 
     return responses.response(answer=answer, id=answer_id)
 
@@ -128,6 +150,10 @@ def describe_my_query():
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
+
+    coins = db.admin.users.get_coins(username)
+    if coins < abs(gamification.Coins.HELP_SUCCESS_DESCRIBE.value):
+        return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
     query = db.admin.queries.get(query_id)
     answer = llm.describe_my_query(username, query)
@@ -140,6 +166,7 @@ def describe_my_query():
     )
 
     db.admin.users.add_coins(username, gamification.Coins.HELP_SUCCESS_DESCRIBE.value)
+    db.admin.users.add_experience(username, gamification.Experience.ASK_HELP.value)
 
     return responses.response(answer=answer, id=answer_id)
 
@@ -150,6 +177,10 @@ def explain_my_query():
     data = request.get_json()
     query_id = data['query_id']
     msg_idx = data['msg_idx']
+
+    coins = db.admin.users.get_coins(username)
+    if coins < abs(gamification.Coins.HELP_SUCCESS_EXPLAIN.value):
+        return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
     query = db.admin.queries.get(query_id)
     answer = llm.explain_my_query(username, query)
@@ -162,5 +193,6 @@ def explain_my_query():
     )
 
     db.admin.users.add_coins(username, gamification.Coins.HELP_SUCCESS_EXPLAIN.value)
+    db.admin.users.add_experience(username, gamification.Experience.ASK_HELP.value)
 
     return responses.response(answer=answer, id=answer_id)

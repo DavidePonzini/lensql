@@ -3,22 +3,21 @@ from enum import Enum
 class Coins(Enum):
     EXERCISE_SOLVED = 100
 
-    HELP_SUCCESS_EXPLAIN = -1
-    HELP_SUCCESS_DESCRIBE = -3
-    HELP_ERROR_EXPLAIN = -3
+    HELP_SUCCESS_DESCRIBE = -1
+    HELP_SUCCESS_EXPLAIN = -3
+    HELP_ERROR_EXPLAIN = -1
     HELP_ERROR_EXAMPLE = -3
     HELP_ERROR_LOCATE = -5
     HELP_ERROR_FIX = -20
 
     HELP_FEEDBACK = 5
 
-# maybe implement it as a function?
-# exp = exercises solved * 1000 + queries run * 1 + unique queries run * 10
-# this way it can be retroactively calculated
 class Experience(Enum):
     EXERCISE_SOLVED = 1000
+    EXERCISE_SOLUTION_CHECKED = 1
     QUERY_RUN = 1
     QUERY_RUN_UNIQUE = 10
+    ASK_HELP = 1
 
 # Experience grows quadratically with level
 # Level 0:    0 XP  |   0

@@ -26,6 +26,30 @@ def is_admin(username: str) -> bool:
     
     return result[0][0]
 
+def get_coins(username: str) -> int:
+    '''Get the amount of coins a user has'''
+
+    query = database.sql.SQL('''
+        SELECT
+            coins
+        FROM
+            {schema}.users
+        WHERE
+            username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    if len(result) == 0:
+        return 0
+    
+    return result[0][0]
+
 def get_info(username: str) -> dict:
     '''Get general information about a user'''
 
@@ -53,17 +77,13 @@ def get_info(username: str) -> dict:
     if len(result) == 0:
         return {}
     
-    username, is_admin, experience, coins = result[0]
-
-    xp = gamification.xp_to_level(experience)
+    result = result[0]
 
     return {
-        'username': username,
-        'is_admin': is_admin,
-        'coins': coins,
-        'xp': xp['current'],
-        'xp_to_next_level': xp['next'],
-        'level': xp['level'],
+        'username': result[0],
+        'is_admin': result[1],
+        'xp': result[2],
+        'coins': result[3],
     }
 
 def get_unique_queries_count(username: str) -> int:
@@ -292,6 +312,9 @@ def get_error_stats(username: str) -> dict:
 def add_coins(username: str, amount: int) -> None:
     '''Add coins to a user's account'''
 
+    if amount == 0:
+        return
+
     query = database.sql.SQL('''
         UPDATE
             {schema}.users
@@ -312,6 +335,9 @@ def add_coins(username: str, amount: int) -> None:
 
 def add_experience(username: str, amount: int) -> None:
     '''Add experience to a user's account'''
+
+    if amount == 0:
+        return
 
     query = database.sql.SQL('''
         UPDATE

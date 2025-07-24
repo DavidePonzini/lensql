@@ -8,13 +8,11 @@ function Profile() {
         { label: 'Solving exercises', value: `+${Experience.EXERCISE_SOLVED} XP` },
         { label: 'Running queries', value: `+${Experience.QUERY_RUN} XP each` },
         { label: 'Trying new, unique queries', value: `+${Experience.QUERY_RUN_UNIQUE} XP each` },
+        { label: 'Interacting with Lens', value: `+${Experience.ASK_HELP} XP` },
     ];
 
     const coinActions = [
-        {
-            label: 'Ask Lens for help',
-            value: `from ${Math.max(...Object.values(Coins).filter(v => v < 0))} to ${Math.min(...Object.values(Coins).filter(v => v < 0))} coins`
-        },
+        { label: 'Ask Lens for help', value: `from ${Math.max(...Object.values(Coins).filter(v => v < 0))} to ${Math.min(...Object.values(Coins).filter(v => v < 0))} coins` },
         { label: 'Give feedback on Lens’ help', value: `+${Coins.HELP_FEEDBACK} coins` },
     ];
 

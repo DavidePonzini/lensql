@@ -2,12 +2,13 @@ import { useState, useRef } from "react";
 import useAuth from "../../hooks/useAuth";
 import MessageBox from "./MessageBox";
 import ButtonAction from "../../components/ButtonAction";
+import BubbleStatsChange from "../../components/BubbleStatsChange";
 
-import { Coins } from "../../constants/Gamification";
+import { Coins, Experience } from "../../constants/Gamification";
 
 
 function Chat({ queryId, success }) {
-    const { apiRequest, loadUserInfo } = useAuth();
+    const { apiRequest, incrementStats } = useAuth();
 
     const [messages, setMessages] = useState([
         {
@@ -17,6 +18,8 @@ function Chat({ queryId, success }) {
             messageId: null,
         }
     ]);
+    const [coinsChange, setCoinsChange] = useState(0);
+    const [expChange, setExpChange] = useState(0);
 
     const [isThinking, setIsThinking] = useState(false);
     const messagesEndRef = useRef(null);
@@ -39,8 +42,6 @@ function Chat({ queryId, success }) {
 
     function addFollowupPrompt() {
         addMessage('Would you like to ask something else?', true);
-
-        loadUserInfo(); // Refresh user info after a message has been fully processed
     }
 
     function removeLastMessage() {
@@ -65,6 +66,10 @@ function Chat({ queryId, success }) {
         addMessage("Describe what my query does", false);
         startThinking();
 
+        incrementStats(Coins.HELP_SUCCESS_DESCRIBE, Experience.HELP_ERROR_FIX);
+        setCoinsChange(Coins.HELP_SUCCESS_DESCRIBE);
+        setExpChange(Experience.HELP_ERROR_FIX);
+
         const data = await apiRequest('/api/messages/success/describe', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
@@ -79,6 +84,10 @@ function Chat({ queryId, success }) {
     async function handleExplainQuery() {
         addMessage("Explain what each clause in my query is doing", false);
         startThinking();
+
+        incrementStats(Coins.HELP_SUCCESS_EXPLAIN, Experience.HELP_ERROR_FIX);
+        setCoinsChange(Coins.HELP_SUCCESS_EXPLAIN);
+        setExpChange(Experience.HELP_ERROR_FIX);
 
         const data = await apiRequest('/api/messages/success/explain', 'POST', {
             'query_id': queryId,
@@ -95,6 +104,10 @@ function Chat({ queryId, success }) {
         addMessage("Explain what this error means", false);
         startThinking();
 
+        incrementStats(Coins.HELP_ERROR_EXPLAIN, Experience.HELP_ERROR_FIX);
+        setCoinsChange(Coins.HELP_ERROR_EXPLAIN);
+        setExpChange(Experience.HELP_ERROR_FIX);
+
         const data = await apiRequest('/api/messages/error/explain', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
@@ -109,6 +122,10 @@ function Chat({ queryId, success }) {
     async function handleShowExample() {
         addMessage("Show a simplified example that can cause this problem", false);
         startThinking();
+
+        incrementStats(Coins.HELP_ERROR_EXAMPLE, Experience.HELP_ERROR_FIX);
+        setCoinsChange(Coins.HELP_ERROR_EXAMPLE);
+        setExpChange(Experience.HELP_ERROR_FIX);
 
         const data = await apiRequest('/api/messages/error/example', 'POST', {
             'query_id': queryId,
@@ -125,6 +142,10 @@ function Chat({ queryId, success }) {
         addMessage("Show me which query part is causing this error", false);
         startThinking();
 
+        incrementStats(Coins.HELP_ERROR_LOCATE, Experience.HELP_ERROR_FIX);
+        setCoinsChange(Coins.HELP_ERROR_LOCATE);
+        setExpChange(Experience.HELP_ERROR_FIX);
+
         const data = await apiRequest('/api/messages/error/locate', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
@@ -140,6 +161,10 @@ function Chat({ queryId, success }) {
         addMessage("Suggest a fix for this error", false);
         startThinking();
 
+        incrementStats(Coins.HELP_ERROR_FIX, Experience.HELP_ERROR_FIX);
+        setCoinsChange(Coins.HELP_ERROR_FIX);
+        setExpChange(Experience.HELP_ERROR_FIX);
+
         const data = await apiRequest('/api/messages/error/fix', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
@@ -152,13 +177,8 @@ function Chat({ queryId, success }) {
     }
 
     function focusOnLastUserMessage() {
-        // TODO does not select the last message for user 
-        // messagebox-user works, but selects the first
-        // messagebox-user:last-child returns null
-        const lastUserMessage = document.querySelector(`#chat-${queryId} .messagebox.messagebox-user:last-child`);
-
-        if (lastUserMessage) {
-            lastUserMessage.scrollIntoView({ behavior: 'smooth' });
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }
 
@@ -182,7 +202,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleDescribeQuery}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={Coins.HELP_SUCCESS_DESCRIBE}
+                                        cost={-Coins.HELP_SUCCESS_DESCRIBE}
                                         locked={buttonSuccessDescribeLocked}
                                     >
                                         Describe query
@@ -192,7 +212,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleExplainQuery}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={Coins.HELP_SUCCESS_EXPLAIN}
+                                        cost={-Coins.HELP_SUCCESS_EXPLAIN}
                                         locked={buttonSuccessExplainLocked}
                                     >
                                         Explain query
@@ -204,7 +224,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleExplainError}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={Coins.HELP_ERROR_EXPLAIN}
+                                        cost={-Coins.HELP_ERROR_EXPLAIN}
                                         locked={buttonErrorExplainLocked}
                                     >
                                         Explain error
@@ -214,7 +234,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleShowExample}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={Coins.HELP_ERROR_EXAMPLE}
+                                        cost={-Coins.HELP_ERROR_EXAMPLE}
                                         locked={buttonErrorExampleLocked}
                                     >
                                         Show example
@@ -224,7 +244,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleWhereToLook}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={Coins.HELP_ERROR_LOCATE}
+                                        cost={-Coins.HELP_ERROR_LOCATE}
                                         locked={buttonErrorLocateLocked}
                                     >
                                         Where to look
@@ -234,7 +254,7 @@ function Chat({ queryId, success }) {
                                         onClick={handleSuggestFix}
                                         className="me-2 mb-1"
                                         variant="primary"
-                                        cost={Coins.HELP_ERROR_FIX}
+                                        cost={-Coins.HELP_ERROR_FIX}
                                         locked={buttonErrorFixLocked}
                                     >
                                         Suggest fix
@@ -243,9 +263,22 @@ function Chat({ queryId, success }) {
                             )}
                         </div>
                     )}
-                    <div ref={messagesEndRef}></div>
                 </MessageBox>
             ))}
+
+            <div ref={messagesEndRef} style={{
+                marginLeft: '70px',
+                marginTop: '.5rem',
+            }}>
+                <BubbleStatsChange
+                    expChange={expChange}
+                    setExpChange={setExpChange}
+                    coinsChange={coinsChange}
+                    setCoinsChange={setCoinsChange}
+                    changeReason='Interacted with Lens'
+                    style={{ padding: '6px' }}
+                />
+            </div>
         </div>
     );
 }

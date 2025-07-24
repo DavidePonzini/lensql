@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { getXpStats } from '../constants/Gamification';
 
 const AuthContext = createContext();
 
@@ -17,7 +18,6 @@ function AuthProvider({ children }) {
     const [accessToken, setAccessToken] = useState(sessionStorage.getItem('access_token'));
     const [refreshToken, setRefreshToken] = useState(sessionStorage.getItem('refresh_token'));
     const [userInfo, setUserInfo] = useState(null);
-    const [loadingUser, setLoadingUser] = useState(false);
 
     // Tokens management
     function saveTokens(access, refresh) {
@@ -105,25 +105,24 @@ function AuthProvider({ children }) {
     const loadUserInfo = useCallback(async () => {
         if (!accessToken)
             return;
-        
-        setLoadingUser(true);
-        
+
         try {
             const response = await apiRequest('/api/users/info');
+
+            const xp = getXpStats(response.xp);
 
             setUserInfo({
                 username: response.username,
                 isAdmin: response.is_admin,
                 coins: response.coins,
-                xp: response.xp,
-                xpToNextLevel: response.xp_to_next_level,
-                level: response.level,
+                xpTotal: response.xp,
+                xp: xp.current,
+                xpToNextLevel: xp.next,
+                level: xp.level,
             });
         } catch (err) {
             console.error('Failed to load user info.', err);
             logout();
-        } finally {
-            setLoadingUser(false);
         }
     }, [accessToken, apiRequest]);
 
@@ -134,15 +133,39 @@ function AuthProvider({ children }) {
         }
     }, [accessToken, userInfo, loadUserInfo]);
 
+    const incrementStats = useCallback((coins, experience) => {
+        setUserInfo(prev => {
+            if (!prev) return null; // No user info available
+
+            if (!coins)
+                coins = 0;
+
+            if (!experience)
+                experience = 0;
+
+            const xpTotal = prev.xpTotal + experience;
+            const xp = getXpStats(xpTotal);
+
+            return {
+                ...prev,
+                coins: prev.coins + coins,
+                xpTotal,
+                xp: xp.current,
+                xpToNextLevel: xp.next,
+                level: xp.level,
+            };
+        });
+    }, []);
+
     const value = useMemo(() => ({
         isLoggedIn: !!accessToken,
         userInfo,
-        loadingUser,
         saveTokens,
         logout,
         apiRequest,
         loadUserInfo,
-    }), [accessToken, userInfo, loadingUser, apiRequest, loadUserInfo]);
+        incrementStats
+    }), [accessToken, userInfo, apiRequest, loadUserInfo, incrementStats]);
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

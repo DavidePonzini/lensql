@@ -10,7 +10,7 @@ def response(success: bool = True, **kwargs) -> _Response:
         **kwargs
     })
 
-def response_query(*results: _QueryResult, is_builtin: bool = False) -> _Response:
+def response_query(*results: _QueryResult, is_builtin: bool = False, **kwargs) -> _Response:
     return _jsonify([
         {
             'success': query.success,
@@ -19,6 +19,7 @@ def response_query(*results: _QueryResult, is_builtin: bool = False) -> _Respons
             'type': query.data_type,
             'data': query.result_html,
             'id': query.id,
+            **kwargs
         }
         for query in results
     ])

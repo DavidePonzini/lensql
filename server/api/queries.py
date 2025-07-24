@@ -29,11 +29,20 @@ def run_query():
     )
 
     if db.admin.queries.is_new_query(username, query):
-        db.admin.users.add_experience(username, gamification.Experience.QUERY_RUN_UNIQUE.value)
+        exp_change = gamification.Experience.QUERY_RUN_UNIQUE.value
+        exp_change_reason = 'New query executed'
     else:
-        db.admin.users.add_experience(username, gamification.Experience.QUERY_RUN.value)
+        exp_change = gamification.Experience.QUERY_RUN.value
+        exp_change_reason = 'Query executed'
+
+    db.admin.users.add_experience(username, exp_change)
 
     def generate_results():
+        yield json.dumps({
+            'exp_change': exp_change,
+            'exp_change_reason': exp_change_reason,
+        }) + '\n'  # Important: one JSON object per line
+
         for query_result in db.users.queries.execute(username=username, query_str=query):
             query_id = db.admin.queries.log(
                 username=username,
@@ -182,11 +191,29 @@ def check_solution():
     )
 
     already_solved = db.admin.exercises.is_solved(exercise_id, username)
-
     db.admin.exercises.log_solution_attempt(query_id=query_id, username=username, exercise_id=exercise_id, is_correct=check.correct)
 
-    if check.correct and not already_solved:
-        db.admin.users.add_experience(username, gamification.Experience.EXERCISE_SOLVED.value)
-        db.admin.users.add_coins(username, gamification.Coins.EXERCISE_SOLVED.value)
+    if check.correct:
+        if not already_solved:
+            exp_change = gamification.Experience.EXERCISE_SOLVED.value
+            coins_change = gamification.Coins.EXERCISE_SOLVED.value
+            change_reason = 'Exercise solved for the first time'
+        else:
+            exp_change = gamification.Experience.EXERCISE_SOLUTION_CHECKED.value
+            coins_change = 0
+            change_reason = 'Exercise solution checked'
+    else:
+        exp_change = 0
+        coins_change = 0
+        change_reason = 'Exercise solution check failed'
 
-    return responses.response_query(check.result, is_builtin=True)
+    db.admin.users.add_experience(username, exp_change)
+    db.admin.users.add_coins(username, coins_change)
+
+    return responses.response_query(
+        check.result,
+        is_builtin=True,
+        exp_change=exp_change,
+        coins_change=coins_change,
+        change_reason=change_reason,
+    )
