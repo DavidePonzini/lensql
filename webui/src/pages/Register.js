@@ -243,7 +243,7 @@ function Register() {
 
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="login-email">
-                                        Email
+                                        Email (Optional)
                                     </label>
                                     <input
                                         type="email"
