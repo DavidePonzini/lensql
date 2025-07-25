@@ -19,6 +19,26 @@ const Experience = {
     ASK_HELP: 1,
 };
 
+const levelTitles = [
+    'Curious Beginner',
+    'Logical Thinker',
+    'Query Novice',
+    'Pattern Seeker',
+    'Relational Explorer',
+    'Intentional Analyst',
+    'Data Interpreter',
+    'Insight Builder',
+    'Structured Thinker',
+    'Query Architect'
+];
+
+function getLevelTitle(level) {
+    return level >= 0 && level < levelTitles.length
+        ? levelTitles[level]
+        : `Level ${level}`;
+}
+
+
 function cumulativeXp(level) {
     return Math.floor(100 * level * (level + 1) * (2 * level + 1) / 6);
 }
@@ -43,4 +63,4 @@ function getXpStats(totalXp) {
     };
 }
 
-export { Experience, Coins, getXpStats}
+export { Experience, Coins, getXpStats, getLevelTitle }
