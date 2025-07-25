@@ -1,7 +1,7 @@
 from enum import Enum
 
 class Coins(Enum):
-    EXERCISE_SOLVED = 100
+    EXERCISE_SOLVED = 100           # solve an exercise for the first time
 
     HELP_SUCCESS_DESCRIBE = -1
     HELP_SUCCESS_EXPLAIN = -3
@@ -10,14 +10,14 @@ class Coins(Enum):
     HELP_ERROR_LOCATE = -5
     HELP_ERROR_FIX = -20
 
-    HELP_FEEDBACK = 5
+    HELP_FEEDBACK = 5               # provide feedback on the help system
 
 class Experience(Enum):
-    EXERCISE_SOLVED = 1000
-    EXERCISE_SOLUTION_CHECKED = 1
-    QUERY_RUN = 1
-    QUERY_RUN_UNIQUE = 10
-    ASK_HELP = 1
+    EXERCISE_SOLVED = 1000          # solve an exercise for the first time
+    EXERCISE_SOLUTION_CHECKED = 1   # solve an exercise that you have already solved
+    QUERY_RUN = 1                   # run a query that you have already run
+    QUERY_RUN_UNIQUE = 10           # run a query for the first time
+    ASK_HELP = 1                    # interact with the help system
 
 # Experience grows quadratically with level
 # Level 0:    0 XP  |   0

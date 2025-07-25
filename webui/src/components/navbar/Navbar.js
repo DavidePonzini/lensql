@@ -59,7 +59,7 @@ function Navbar() {
 
                                 <li className="nav-item">
                                     <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/classes" end>
-                                        <i className="fa-solid fa-tasks"></i> Exercises
+                                        <i className="fa-solid fa-tasks"></i> Courses
                                     </NavLink>
                                 </li>
                             </>

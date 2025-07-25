@@ -42,9 +42,9 @@ function ClassList() {
 
     return (
         <div className="container-md">
-            <h1>My Classes</h1>
+            <h1>My Courses</h1>
             <CardList>
-                {classes.length === 0 && <p>Nothing here. Join a class to see exercises.</p>}
+                {classes.length === 0 && <p>Nothing here. Join a course to see exercises.</p>}
 
                 {classes.map((cl) => {
                     return (
@@ -65,7 +65,7 @@ function ClassList() {
             <hr />
             <Button variant="primary" onClick={handleJoinClass} className="me-2 mb-2">
                 <i className="fa fa-plus me-1"></i>
-                Join Class
+                Join Course
             </Button>
 
             <ClassAdd

@@ -24,7 +24,7 @@ function Home() {
                     </p>
                     <div className="mt-4">
                         <Link to={isLoggedIn ? "/classes" : "/register"} className="btn btn-primary me-3">
-                            Create or Join a Class
+                            Create or Join a Course
                         </Link>
                         <Link to="/about" className="btn btn-outline-success">
                             How LensQL Works
@@ -182,7 +182,7 @@ function Home() {
                                 <div className="col-md-6 mb-4">
                                     <h5 className="text-primary">For Teachers</h5>
                                     <ul className="list-unstyled fs-5">
-                                        <li>📊 Class-wide misconceptions</li>
+                                        <li>📊 Course-wide misconceptions</li>
                                         <li>📈 Exercise effectiveness metrics</li>
                                         <li>🧑‍🏫 Student clustering by learning behavior</li>
                                         <li>🔍 Drill-down into individual learning trajectories</li>

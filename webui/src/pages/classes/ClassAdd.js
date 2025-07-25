@@ -20,11 +20,11 @@ function ClassAdd({ refresh, className }) {
     return (
         <ButtonModal
             className={className}
-            title="New Class"
+            title="New Course"
             size='lg'
             buttonText={
                 <span>
-                    <i className="fa fa-plus me-1"></i> New Class
+                    <i className="fa fa-plus me-1"></i> New Course
                 </span>
             }
             footerButtons={[

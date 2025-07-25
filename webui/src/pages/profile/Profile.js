@@ -1,32 +1,45 @@
-import { useEffect, useState } from 'react';
 import useAuth from '../../hooks/useAuth';
 import LevelTitle from './LevelTitle';
 import { Coins, Experience } from '../../constants/Gamification';
 
 function Profile() {
     const expActions = [
-        { label: 'Solving exercises', value: `+${Experience.EXERCISE_SOLVED} XP` },
-        { label: 'Running queries', value: `+${Experience.QUERY_RUN} XP each` },
-        { label: 'Trying new, unique queries', value: `+${Experience.QUERY_RUN_UNIQUE} XP each` },
-        { label: 'Interacting with Lens', value: `+${Experience.ASK_HELP} XP` },
+        {
+            label: 'Solving exercises',
+            value: `+${Experience.EXERCISE_SOLVED} XP`,
+            className: 'text-success'
+        },
+        {
+            label: 'Running queries',
+            value: `+${Experience.QUERY_RUN} XP each`,
+            className: 'text-success'
+        },
+        {
+            label: 'Trying new, unique queries',
+            value: `+${Experience.QUERY_RUN_UNIQUE} XP each`,
+            className: 'text-success'
+        },
+        {
+            label: 'Interacting with Lens',
+            value: `+${Experience.ASK_HELP} XP`,
+            className: 'text-success'
+        }
     ];
 
     const coinActions = [
-        { label: 'Ask Lens for help', value: `from ${Math.max(...Object.values(Coins).filter(v => v < 0))} to ${Math.min(...Object.values(Coins).filter(v => v < 0))} coins` },
-        { label: 'Give feedback on Lens’ help', value: `+${Coins.HELP_FEEDBACK} coins` },
+        {
+            label: 'Ask Lens for help',
+            value: `from ${Math.max(...Object.values(Coins).filter(v => v < 0))} to ${Math.min(...Object.values(Coins).filter(v => v < 0))} coins`,
+            className: 'text-danger'
+        },
+        {
+            label: 'Give feedback on Lens’ help',
+            value: `+${Coins.HELP_FEEDBACK} coins`,
+            className: 'text-success'
+        },
     ];
 
-    const { apiRequest, userInfo } = useAuth();
-    const [queriesCount, setQueriesCount] = useState(0);
-
-    useEffect(() => {
-        async function fetchProfileData() {
-            const response = await apiRequest('/api/users/stats/unique_queries', 'GET');
-            setQueriesCount(response.data);
-        }
-
-        fetchProfileData();
-    }, [apiRequest]);
+    const { userInfo } = useAuth();
 
     const username = userInfo?.username || 'user';
     const xp = userInfo?.xp || 0;
@@ -34,19 +47,10 @@ function Profile() {
     const coins = userInfo?.coins || 0;
     const level = userInfo?.level || 0;
 
-    const welcomeMessage =
-        queriesCount > 100
-            ? "Here's a look at your SQL progress — keep going strong!"
-            : "Here's a look at your SQL progress";
-
     return (
         <div className="container-md">
             <h1 className="display-3 mb-3">Welcome back, {username}!</h1>
-            <p className="lead">{welcomeMessage}</p>
-
-            <div className="alert alert-warning mt-4" role="alert">
-                🚧 This section is under development.
-            </div>
+            <p className="lead">Here's a look at your progress</p>
 
             <hr className="my-4" />
 
@@ -60,7 +64,7 @@ function Profile() {
                 <small className="text-muted">Earn more EXP by:</small>
                 <ul className="mt-2">
                     {expActions.map((a, i) => (
-                        <li key={i}>{a.label}: <strong>{a.value}</strong></li>
+                        <li key={i}>{a.label}: <strong className={a.className}>{a.value}</strong></li>
                     ))}
                 </ul>
             </section>
@@ -71,7 +75,7 @@ function Profile() {
                 <small className="text-muted">Use LensCoins to interact with Lens:</small>
                 <ul className="mt-2">
                     {coinActions.map((a, i) => (
-                        <li key={i}>{a.label}: <strong>{a.value} coins</strong></li>
+                        <li key={i}>{a.label}: <strong className={a.className}>{a.value} coins</strong></li>
                     ))}
                 </ul>
             </section>

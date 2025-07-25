@@ -39,7 +39,7 @@ function ClassUpdate({ classId, refresh, className }) {
     return (
         <ButtonModal
             className={className}
-            title="Edit Class"
+            title="Edit Course"
             buttonText="Edit"
             size='lg'
             footerButtons={[
