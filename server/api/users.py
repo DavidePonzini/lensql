@@ -55,7 +55,7 @@ def get_query_stats():
 def get_unique_queries_count():
     username = get_jwt_identity()
 
-    count = db.admin.users.get_unique_queries_count(username)
+    count = db.admin.users.count_unique_queries(username)
     return responses.response(True, data=count)
 
 @bp.route('/stats/messages', methods=['GET'])

@@ -11,9 +11,9 @@ function ButtonAction({ onClick, disabled = false, locked = false, variant, clas
         >
             {locked && <i className="fa-solid fa-lock me-1" />}
             {children}
-            {cost && cost > 0 && (
+            {cost !== null && (
                 <span className="ms-2">
-                    <i className="fa-solid fa-coins" /> {cost}
+                    <i className="fa-solid fa-coins" /> {cost > 0 ? cost : 'Free'}
                 </span>
             )}
         </Button>

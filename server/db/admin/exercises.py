@@ -24,6 +24,69 @@ def get_class(exercise_id: int) -> str:
 
     return result[0][0]
 
+def count_own_exercises_with_at_least_one_own_query(username: str) -> int:
+    '''Get the count of exercises created by a user that have at least one execution'''
+
+    query = database.sql.SQL('''
+        SELECT COUNT(*)
+        FROM {schema}.exercises e
+        WHERE e.created_by = {username}
+        AND EXISTS (
+            SELECT 1
+            FROM {schema}.query_batches qb
+            WHERE qb.exercise_id = e.id
+            AND qb.username = {username}
+        )
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return result[0][0] if result else 0
+
+def count_created_by(username: str) -> int:
+    '''Get the number of exercises created by a user'''
+
+    query = database.sql.SQL('''
+        SELECT COUNT(*)
+        FROM {schema}.exercises
+        WHERE created_by = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return result[0][0] if result else 0
+
+def count_attempts(exercise_id: int, username: str) -> int:
+    '''Get the number of solution attempts for an exercise by a user'''
+
+    query = database.sql.SQL('''
+        SELECT COUNT(*)
+        FROM {schema}.exercise_solutions
+        WHERE exercise_id = {exercise_id}
+        AND username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id'),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'exercise_id': exercise_id,
+        'username': username
+    })
+
+    return result[0][0] if result else 0
+
 def is_solved(exercise_id: int, username: str) -> bool:
     '''Check if an exercise has been solved by a user'''
 
@@ -173,7 +236,7 @@ def get_data(exercise_id: int, username: str) -> dict:
         'class_id': result[3],
     }
 
-def create(title: str, *, class_id: str, request: str, solution: str | None = None, is_ai_generated: bool = False) -> int:
+def create(username: str, title: str, *, class_id: str, request: str, solution: str | None = None, is_ai_generated: bool = False) -> int:
     '''Create a new exercise'''
 
     result = db.insert(SCHEMA, 'exercises', {
@@ -181,6 +244,7 @@ def create(title: str, *, class_id: str, request: str, solution: str | None = No
         'class_id': class_id,
         'request': request,
         'solution': solution,
+        'created_by': username,
         'is_ai_generated': is_ai_generated
     }, ['id'])
 

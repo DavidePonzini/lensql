@@ -4,7 +4,7 @@ from flask import Blueprint, request
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from server import db
+from server import db, gamification
 from .util import responses
 
 bp = Blueprint('classes', __name__)
@@ -83,7 +83,13 @@ def join_class():
     
     db.admin.classes.join(username, class_id)
 
-    return responses.response(True)
+    badges = []
+
+    joined_classes = db.admin.users.count_all_classes_joined(username)
+    if joined_classes in gamification.rewards.Badges.JOIN_COURSE:
+        badges.append(gamification.rewards.Badges.JOIN_COURSE[joined_classes])
+
+    return responses.response(True, badges=badges)
 
 @bp.route('/leave', methods=['POST'])
 @jwt_required()

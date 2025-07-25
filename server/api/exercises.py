@@ -34,6 +34,7 @@ class ExerciseAPI(MethodView):
     def post(self):
         '''Add a new exercise.'''
 
+        username = get_jwt_identity()
         data = request.get_json()
         title = data['title']
         class_id = data['class_id']
@@ -41,6 +42,7 @@ class ExerciseAPI(MethodView):
         solution = data['solution']
 
         db.admin.exercises.create(
+            username=username,
             title=title,
             class_id=class_id,
             request=request_text,

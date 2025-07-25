@@ -26,6 +26,92 @@ def is_admin(username: str) -> bool:
     
     return result[0][0]
 
+def count_days_active(username: str) -> int:
+    '''Get the amount of days a user has been active in LensQL'''
+
+    query = database.sql.SQL('''
+        SELECT
+            COUNT(DISTINCT DATE(ts))
+        FROM
+            {schema}.query_batches
+        WHERE
+            username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return result[0][0] if result else 0
+
+def count_all_classes_joined(username: str) -> int:
+    '''Get the amount of classes a user has joined'''
+
+    query = database.sql.SQL('''
+        SELECT
+            COUNT(*)
+        FROM
+            {schema}.classes_participants
+        WHERE
+            username = {username}
+            AND is_teacher = FALSE
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return result[0][0] if result else 0
+
+def count_help_usage(username: str) -> int:
+    '''Get the amount of help messages used by a user'''
+
+    query = database.sql.SQL('''
+        SELECT
+            COUNT(*)
+        FROM
+            {schema}.messages
+        WHERE
+            username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return result[0][0] if result else 0
+
+def count_feedbacks(username: str) -> int:
+    '''Get the amount of feedbacks provided by a user'''
+
+    query = database.sql.SQL('''
+        SELECT
+            COUNT(*)
+        FROM
+            {schema}.feedbacks
+        WHERE
+            username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return result[0][0] if result else 0
+
+
 def get_coins(username: str) -> int:
     '''Get the amount of coins a user has'''
 
@@ -86,7 +172,29 @@ def get_info(username: str) -> dict:
         'coins': result[3],
     }
 
-def get_unique_queries_count(username: str) -> int:
+def count_exercises_solved(username: str) -> int:
+    '''Get the amount of exercises solved by the user'''
+
+    query = database.sql.SQL('''
+        SELECT
+            COUNT(DISTINCT exercise_id)
+        FROM
+            {schema}.exercise_solutions
+        WHERE
+            username = {username}
+            AND is_correct = TRUE
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'username': username
+    })
+
+    return result[0][0] if result else 0
+
+def count_unique_queries(username: str) -> int:
     '''Get the amount of unique queries run by the user'''
 
     query = database.sql.SQL('''
@@ -309,51 +417,34 @@ def get_error_stats(username: str) -> dict:
     # TODO
     return {}
 
-def add_coins(username: str, amount: int) -> None:
-    '''Add coins to a user's account'''
+def add_rewards(username: str, *rewards: gamification.Reward) -> None:
+    '''Add rewards to a user'''
 
-    if amount == 0:
+    reward = gamification.Reward('')
+    for r in rewards:
+        reward += r
+
+    if reward.is_empty():
         return
 
     query = database.sql.SQL('''
         UPDATE
             {schema}.users
         SET
-            coins = coins + {amount}
+            coins = coins + {coins},
+            experience = experience + {experience}
         WHERE
             username = {username}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
-        amount=database.sql.Placeholder('amount'),
+        coins=database.sql.Placeholder('coins'),
+        experience=database.sql.Placeholder('experience'),
         username=database.sql.Placeholder('username')
     )
 
     db.execute(query, {
-        'amount': amount,
-        'username': username
-    })
-
-def add_experience(username: str, amount: int) -> None:
-    '''Add experience to a user's account'''
-
-    if amount == 0:
-        return
-
-    query = database.sql.SQL('''
-        UPDATE
-            {schema}.users
-        SET
-            experience = experience + {amount}
-        WHERE
-            username = {username}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        amount=database.sql.Placeholder('amount'),
-        username=database.sql.Placeholder('username')
-    )
-
-    db.execute(query, {
-        'amount': amount,
+        'coins': reward.coins,
+        'experience': reward.experience,
         'username': username
     })
 

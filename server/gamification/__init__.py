@@ -1,47 +1,5 @@
-from enum import Enum
+from . import rewards
 
-class Coins(Enum):
-    EXERCISE_SOLVED = 100           # solve an exercise for the first time
+from .reward import Reward
+from .experience import XP
 
-    HELP_SUCCESS_DESCRIBE = -1
-    HELP_SUCCESS_EXPLAIN = -3
-    HELP_ERROR_EXPLAIN = -1
-    HELP_ERROR_EXAMPLE = -3
-    HELP_ERROR_LOCATE = -5
-    HELP_ERROR_FIX = -20
-
-    HELP_FEEDBACK = 5               # provide feedback on the help system
-
-class Experience(Enum):
-    EXERCISE_SOLVED = 1000          # solve an exercise for the first time
-    EXERCISE_SOLUTION_CHECKED = 1   # solve an exercise that you have already solved
-    QUERY_RUN = 1                   # run a query that you have already run
-    QUERY_RUN_UNIQUE = 10           # run a query for the first time
-    ASK_HELP = 1                    # interact with the help system
-
-# Experience grows quadratically with level
-# Level 0:    0 XP  |   0
-# Level 1:  100 XP  | 100
-# Level 2:  400 XP  | 500
-# Level 3:  900 XP  | 1400
-# Level 4: 1600 XP  | 3000
-# Level 5: 2500 XP  | 5500
-# ...
-def xp_to_level(total_xp):
-    def cumulative_xp(level):
-        return 100 * level * (level + 1) * (2 * level + 1) // 6
-
-    # Find level by incrementing until XP would exceed total_xp
-    level = 0
-    while cumulative_xp(level + 1) <= total_xp:
-        level += 1
-
-    xp_for_current_level = cumulative_xp(level)
-    xp_for_next_level = cumulative_xp(level + 1)
-    current_level_xp = total_xp - xp_for_current_level
-
-    return {
-        'level': level,
-        'current': current_level_xp,
-        'next': xp_for_next_level - xp_for_current_level
-    }

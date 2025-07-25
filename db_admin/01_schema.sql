@@ -46,6 +46,7 @@ CREATE TABLE classes (
 CREATE TABLE class_members (
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,
     class_id CHAR(8) NOT NULL REFERENCES classes(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- class can only be deleted if no members are present
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
     joined_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
@@ -59,6 +60,8 @@ CREATE TABLE exercises (
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
     solution TEXT DEFAULT NULL,
+    created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if exercises are assigned
+    created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
 );
 

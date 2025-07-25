@@ -202,10 +202,23 @@ def has_teacher(username: str, class_id: str) -> bool:
 def join(username: str, class_id: str) -> None:
     '''Join a class as a student'''
 
-    db.insert(SCHEMA, 'class_members', {
+    query = database.sql.SQL(
+    '''
+        INSERT INTO {schema}.class_members (username, class_id, is_teacher)
+            VALUES ({username}, {class_id}, FALSE)
+        ON CONFLICT (username, class_id) DO UPDATE
+            SET is_active = TRUE
+            WHERE class_members.username = {username} AND class_members.class_id = {class_id}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        class_id=database.sql.Placeholder('class_id')
+    )
+
+    db.execute(query, {
         'username': username,
-        'class_id': class_id,
-        })
+        'class_id': class_id
+    })
 
 def can_leave(username: str, class_id: str) -> bool:
     '''Check if a user can leave a class. User cannot leave if they are a teacher and the class has at least one exercise, one student or one query assigned to it.'''
@@ -236,7 +249,10 @@ def can_leave(username: str, class_id: str) -> bool:
     '''
         SELECT COUNT(*)
         FROM {schema}.class_members
-        WHERE class_id = {class_id} AND is_teacher = FALSE
+        WHERE
+            class_id = {class_id}
+            AND is_teacher = FALSE
+            AND is_active = TRUE
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         class_id=database.sql.Placeholder('class_id')
@@ -278,7 +294,8 @@ def leave(username: str, class_id: str) -> bool:
 
     query = database.sql.SQL(
     '''
-        DELETE FROM {schema}.class_members
+        UPDATE {schema}.class_members
+        SET is_active = FALSE
         WHERE
             username = {username}
             AND class_id = {class_id}
@@ -321,13 +338,7 @@ def list_exercises(username: str, class_id: str) -> list[dict]:
         username=database.sql.Placeholder('username'),
         class_id=database.sql.Placeholder('class_id')
     )
-
-def list_all_exercises(username: str) -> list[dict]:
-    '''Get all exercises assigned to a user'''
-
-def get_students(username: str, class_id: str) -> list[dict]:
-    '''Get all students in a class in which the user is a teacher'''
-
+    
 def has_participant(username: str, class_id: str) -> bool:
     '''Check if a user is a participant of a class'''
 
@@ -449,58 +460,6 @@ def get_dataset(class_id: int) -> str:
         return '-- No dataset provided'
 
     return result[0][0] or '-- No dataset provided'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # query = database.sql.SQL(
-    # '''
-    #     SELECT
-    #         e.id,
-    #         e.title,
-    #         e.request,
-    #         a.submission_ts,
-    #         e.is_ai_generated
-    #     FROM
-    #         {schema}.assigned_to a
-    #         JOIN {schema}.exercises e ON a.exercise_id = e.id
-    #     WHERE
-    #         username = {username}
-    #     ORDER BY
-    #         CASE WHEN a.submission_ts IS NULL THEN 0 ELSE 1 END,
-    #         e.title,
-    #         e.id
-    # ''').format(
-    #     schema=database.sql.Identifier(SCHEMA),
-    #     username=database.sql.Placeholder('username')
-    # )
-
-    # result = db.execute_and_fetch(query, {
-    #     'username': username
-    # })
-
-    # return [
-    #     {
-    #         'id': row[0],
-    #         'title': row[1],
-    #         'request': row[2],
-    #         'submission_ts': row[3],
-    #         'is_ai_generated': row[4],
-    #         'learning_objectives': get_learning_objectives(row[0])
-    #     }
-    #     for row in result
-    # ]
 
 def submit(username: str, exercise_id: int) -> None:
     '''Submit an assignment'''

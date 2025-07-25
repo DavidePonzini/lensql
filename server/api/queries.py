@@ -28,19 +28,35 @@ def run_query():
         exercise_id=exercise_id if exercise_id > 0 else None
     )
 
-    if db.admin.queries.is_new_query(username, query):
-        exp_change = gamification.Experience.QUERY_RUN_UNIQUE.value
-        exp_change_reason = 'New query executed'
-    else:
-        exp_change = gamification.Experience.QUERY_RUN.value
-        exp_change_reason = 'Query executed'
+    rewards = []
+    badges = []
 
-    db.admin.users.add_experience(username, exp_change)
+    # Gamification: query execution
+    if db.admin.queries.is_new_query(username, query):
+        rewards.append(gamification.rewards.Actions.Query.UNIQUE_RUN)
+    
+        unique_queries_count = db.admin.users.count_unique_queries(username)
+        if unique_queries_count in gamification.rewards.Badges.QUERIES_UNIQUE:
+            badges.append(gamification.rewards.Badges.QUERIES_UNIQUE[unique_queries_count])
+    else:
+        rewards.append(gamification.rewards.Actions.Query.RUN)
+
+    # Gamification: query execution in own exercise
+    own_exercises_with_at_least_one_own_query = db.admin.exercises.count_own_exercises_with_at_least_one_own_query(username)
+    if own_exercises_with_at_least_one_own_query in gamification.rewards.Badges.CREATE_EXERCISES:
+        badges.append(gamification.rewards.Badges.CREATE_EXERCISES[own_exercises_with_at_least_one_own_query])
+
+    # Gamification: daily usage
+    days_active = db.admin.users.count_days_active(username)
+    if days_active in gamification.rewards.Badges.DAILY_USAGE:
+        badges.append(gamification.rewards.Badges.DAILY_USAGE[days_active])
+
+    db.admin.users.add_rewards(username, *rewards, *badges)
 
     def generate_results():
         yield json.dumps({
-            'exp_change': exp_change,
-            'exp_change_reason': exp_change_reason,
+            'rewards': rewards,
+            'badges': badges,
         }) + '\n'  # Important: one JSON object per line
 
         for query_result in db.users.queries.execute(username=username, query_str=query):
@@ -191,29 +207,32 @@ def check_solution():
     )
 
     already_solved = db.admin.exercises.is_solved(exercise_id, username)
+    attempts = db.admin.exercises.count_attempts(exercise_id, username)
+    
     db.admin.exercises.log_solution_attempt(query_id=query_id, username=username, exercise_id=exercise_id, is_correct=check.correct)
+
+    rewards = []
+    badges = []
+
+    # cost for checking the solution
+    rewards.append(gamification.rewards.Actions.Exercise.check_solution_cost(attempts))
 
     if check.correct:
         if not already_solved:
-            exp_change = gamification.Experience.EXERCISE_SOLVED.value
-            coins_change = gamification.Coins.EXERCISE_SOLVED.value
-            change_reason = 'Exercise solved for the first time'
-        else:
-            exp_change = gamification.Experience.EXERCISE_SOLUTION_CHECKED.value
-            coins_change = 0
-            change_reason = 'Exercise solution checked'
-    else:
-        exp_change = 0
-        coins_change = 0
-        change_reason = 'Exercise solution check failed'
+            rewards.append(gamification.rewards.Actions.Exercise.SOLVED)
 
-    db.admin.users.add_experience(username, exp_change)
-    db.admin.users.add_coins(username, coins_change)
+            # Gamification: check Exercise Solved badge
+            solved_count = db.admin.users.count_exercises_solved(username)
+            if solved_count in gamification.rewards.Badges.EXERCISE_SOLUTIONS:
+                badges.append(gamification.rewards.Badges.EXERCISE_SOLUTIONS[solved_count])
+        else:
+            rewards.append(gamification.rewards.Actions.Exercise.REPEATED)
+
+    db.admin.users.add_rewards(username, *rewards, *badges)
 
     return responses.response_query(
         check.result,
         is_builtin=True,
-        exp_change=exp_change,
-        coins_change=coins_change,
-        change_reason=change_reason,
+        rewards=rewards,
+        badges=badges,
     )

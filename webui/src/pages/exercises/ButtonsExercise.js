@@ -111,6 +111,7 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
                     className="me-1 mb-1"
                     onClick={handleCheckResult}
                     disabled={isExecuting || sqlText.trim().length === 0}
+                    cost={0}
                 >
                     Check Result
                 </ButtonAction>
