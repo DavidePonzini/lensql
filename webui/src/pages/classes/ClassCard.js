@@ -107,7 +107,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                             buttonText="Learning Analytics"
                             fullscreen={true}
                         >
-                            <LearningStatsAll classId={classId} />
+                            <LearningStatsAll classId={classId} isTeacher={isTeacher} />
                         </ButtonModal>
 
                         <ClassUpdate

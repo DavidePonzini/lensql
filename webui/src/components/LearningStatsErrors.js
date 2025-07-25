@@ -5,7 +5,7 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-function Errors({ classId = null, exerciseId = null }) {
+function Errors({ classId = null, exerciseId = null, isTeacher = false }) {
     const { apiRequest } = useAuth();
     const [data, setData] = useState(null);
 
@@ -22,7 +22,10 @@ function Errors({ classId = null, exerciseId = null }) {
         <ObservedOnce onFirstVisible={fetchData}>
             {true ? (
                 <p className="text-muted" style={{ fontSize: '1.2rem' }}>
-                    You haven't encountered any errors yet. When you do, we'll show you the types of errors you faced and how they changed over time.
+                    {isTeacher ?
+                        "Your students haven't encountered any errors yet. When they do, we'll show you the types of errors they faced and how they changed over time."
+                        : "You haven't encountered any errors yet. When you do, we'll show you the types of errors you faced and how they changed over time."
+                    }
                 </p>
             ) : (
                 <>
@@ -32,11 +35,17 @@ function Errors({ classId = null, exerciseId = null }) {
                                 <Card.Header>
                                     <Card.Title>What kind of issues came up?</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        Your errors fall into a few key patterns — here's the overview.
+                                        {isTeacher ?
+                                            "Your students' errors fall into a few key patterns — here's the overview."
+                                            : "Your errors fall into a few key patterns — here's the overview."
+                                        }
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
-                                    Under development! This section will categorize your errors into Syntactic, Semantic, Logical Errors, and Complications.
+                                    {isTeacher ?
+                                        "Under development! This section will categorize your students' errors into Syntactic, Semantic, Logical Errors, and Complications."
+                                        : "Under development! This section will categorize your errors into Syntactic, Semantic, Logical Errors, and Complications."
+                                    }
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -46,11 +55,17 @@ function Errors({ classId = null, exerciseId = null }) {
                                 <Card.Header>
                                     <Card.Title>Most common mistakes</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        Here are the most frequent error patterns detected in your queries.
+                                        {isTeacher ?
+                                            "Here are the most frequent error patterns detected in your students' queries."
+                                            : "Here are the most frequent error patterns detected in your queries."
+                                        }
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
-                                    Under development! This section will show the most common error patterns in your queries.
+                                    {isTeacher ?
+                                        "Under development! This section will show the most common error patterns in your students' queries."
+                                        : "Under development! This section will show the most common error patterns in your queries."
+                                    }
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -59,13 +74,19 @@ function Errors({ classId = null, exerciseId = null }) {
                         <Col>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>How your errors changed over time</Card.Title>
+                                    <Card.Title>{isTeacher? "How your students' errors changed over time" : "How your errors changed over time"}</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        See whether you're making fewer mistakes as you progress.
+                                        {isTeacher ?
+                                            "See whether your students are making fewer mistakes as they progress."
+                                            : "See whether you're making fewer mistakes as you progress."
+                                        }
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
-                                    Under development! This section will show a timeline of your errors, helping you track your progress.
+                                    {isTeacher ?
+                                        "Under development! This section will show a timeline of your students' errors, helping you track their progress."
+                                        : "Under development! This section will show a timeline of your errors, helping you track your progress."
+                                    }
                                 </Card.Body>
                             </Card>
                         </Col>

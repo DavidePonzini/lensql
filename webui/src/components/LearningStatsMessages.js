@@ -6,7 +6,7 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-function Messages({ classId = null, exerciseId = null }) {
+function Messages({ classId = null, exerciseId = null, isTeacher = false }) {
     const { apiRequest } = useAuth();
     const [data, setData] = useState(null);
 
@@ -44,7 +44,10 @@ function Messages({ classId = null, exerciseId = null }) {
         <ObservedOnce onFirstVisible={fetchData}>
             {messagesTotal === 0 ? (
                 <p className="text-muted" style={{ fontSize: '1.2rem' }}>
-                    You haven't asked for help yet. When you do, we'll show you how often you asked for explanations and how well you understood the replies.
+                    {isTeacher ?
+                        "Your students haven't asked for help yet. When they do, we'll show you how often they asked for explanations and how well they understood the replies."
+                        : "You haven't asked for help yet. When you do, we'll show you how often you asked for explanations and how well you understood the replies."
+                    }
                 </p>
             ) : (
                 <>
@@ -53,22 +56,25 @@ function Messages({ classId = null, exerciseId = null }) {
                         <Col xs={6}>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>You asked, we explained</Card.Title>
+                                    <Card.Title>{isTeacher ? "Your students asked, we explained" : "You asked, we explained"}</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        Got stuck or curious? Here's when you asked for explanations or guidance on your queries.
+                                        {isTeacher ?
+                                            "Got stuck or curious? Here's when your students asked for explanations or guidance on their queries."
+                                            : "Got stuck or curious? Here's when you asked for explanations or guidance on your queries."
+                                        }
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
                                     <Row>
                                         <Col>
-                                            <strong>When you asked for help:</strong>
+                                            <strong>{isTeacher ? "When your students asked for help:" : "When you asked for help:"}</strong>
                                             <ul style={{ paddingLeft: '1.2em', marginBottom: '0.5rem' }}>
                                                 <li>Total requests: {messagesTotal}</li>
                                                 <li>On SELECT queries: {messagesSelect}</li>
                                             </ul>
                                         </Col>
                                         <Col>
-                                            <strong>What you were looking for:</strong>
+                                            <strong>{isTeacher ? "What your students were looking for:" : "What you were looking for:"}</strong>
                                             <div style={{ width: '100%', height: '90px', overflow: 'hidden' }}>
                                                 <ResponsiveContainer width="100%" height={140}>
                                                     <PieChart>
@@ -109,10 +115,13 @@ function Messages({ classId = null, exerciseId = null }) {
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
                                     <Card.Title>
-                                        You rated the replies
+                                        {isTeacher ? "Your students rated the replies" : "You rated the replies"}
                                     </Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        You gave a thumbs-up or down on the explanations — that helps us improve.
+                                        {isTeacher ?
+                                            "Your students gave a thumbs-up or down on the explanations — that helps us improve."
+                                            : "You gave a thumbs-up or down on the explanations — that helps us improve."
+                                        }
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>

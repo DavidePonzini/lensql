@@ -186,7 +186,7 @@ function ExerciseCard({
                                     fullscreen={true}
                                     buttonText="Learning Analytics"
                                 >
-                                    <LearningStatsAll exerciseId={exerciseId} />
+                                    <LearningStatsAll exerciseId={exerciseId} isTeacher={isTeacher} />
                                 </ButtonModal>
 
                                 <ExerciseUpdate

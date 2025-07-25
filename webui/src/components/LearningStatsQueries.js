@@ -6,7 +6,7 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-function Queries({ classId = null, exerciseId = null }) {
+function Queries({ classId = null, exerciseId = null, isTeacher = false }) {
     const { apiRequest } = useAuth();
     const [data, setData] = useState(null);
 
@@ -59,7 +59,10 @@ function Queries({ classId = null, exerciseId = null }) {
         <ObservedOnce onFirstVisible={fetchData}>
             {queriesTotal === 0 ? (
                 <p className="text-muted" style={{ fontSize: '1.2rem' }}>
-                    You haven't run any queries yet. When you do, we'll show you how many queries you tried, how often they worked, and what types of queries you used.
+                    {isTeacher ?
+                        "You students haven't run any queries yet. When they do, we'll show you how many queries they tried, how often they worked, and what types of queries they used."
+                        : "You haven't run any queries yet. When you do, we'll show you how many queries you tried, how often they worked, and what types of queries you used."
+                    }
                 </p>
             ) : (
                 <>
@@ -67,7 +70,7 @@ function Queries({ classId = null, exerciseId = null }) {
                         <Col xs={4}>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>Your SQL Journey</Card.Title>
+                                    <Card.Title>{isTeacher ? "Your Students' SQL Journey" : "Your SQL Journey"}</Card.Title>
                                 </Card.Header>
                                 <Card.Body>
                                     <div>
@@ -161,15 +164,21 @@ function Queries({ classId = null, exerciseId = null }) {
                         <Col>
                             <Card>
                                 <Card.Header>
-                                    <Card.Title>What kind of queries are you running?</Card.Title>
+                                    <Card.Title>{isTeacher ? "What kind of queries are your students running?" : "What kind of queries are you running?"}</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        Here's the mix of SQL commands you've used, and how they turned out.
+                                        {isTeacher ?
+                                            "Here's the mix of SQL commands your students have used, and how they turned out."
+                                            : "Here's the mix of SQL commands you've used, and how they turned out."
+                                        }
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
                                     {queriesTotal === 0 ? (
                                         <div className="text-center text-muted" style={{ fontSize: '1.2rem' }}>
-                                            No queries run yet. Start exploring SQL!
+                                            {isTeacher ?
+                                                "No queries run yet. Wait for your students to start exploring SQL!"
+                                                : "No queries run yet. Start exploring SQL!"
+                                            }
                                         </div>
                                     ) : (
                                         <ResponsiveContainer width="100%" height={40 * queryTypesData?.length || 1}>
