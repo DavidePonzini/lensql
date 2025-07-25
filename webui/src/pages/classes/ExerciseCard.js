@@ -108,7 +108,7 @@ function ExerciseCard({
                 </Card.Text>
 
                 <div className='row my-2'>
-                    {learningObjectives.length > 0 && (
+                    {isTeacher && learningObjectives.length > 0 && (
                         <>
                             <div className='col'>
                                 <b>Learning Objectives:</b>
