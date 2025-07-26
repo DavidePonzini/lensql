@@ -98,7 +98,7 @@ def add_badge(username: str, badge: str, rank: int = 1) -> None:
     query = database.sql.SQL('''
         INSERT INTO {schema}.badges (username, badge, rank)
         VALUES ({username}, {badge}, {rank})
-        ON CONFLICT (username, badge) DO NOTHING
+        ON CONFLICT (username, badge, rank) DO NOTHING
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username'),
