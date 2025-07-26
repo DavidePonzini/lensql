@@ -87,6 +87,27 @@ def count_attempts(exercise_id: int, username: str) -> int:
 
     return result[0][0] if result else 0
 
+def count_query_batches(exercise_id: int, username: str) -> int:
+    '''Get the number of query batches for an exercise by a user'''
+
+    query = database.sql.SQL('''
+        SELECT COUNT(*)
+        FROM {schema}.query_batches
+        WHERE exercise_id = {exercise_id}
+        AND username = {username}
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        exercise_id=database.sql.Placeholder('exercise_id'),
+        username=database.sql.Placeholder('username')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'exercise_id': exercise_id,
+        'username': username
+    })
+
+    return result[0][0] if result else 0
+
 def is_solved(exercise_id: int, username: str) -> bool:
     '''Check if an exercise has been solved by a user'''
 
@@ -234,6 +255,7 @@ def get_data(exercise_id: int, username: str) -> dict:
         'request': result[1],
         'solution': result[2],
         'class_id': result[3],
+        'attempts': count_attempts(exercise_id, username),
     }
 
 def create(username: str, title: str, *, class_id: str, request: str, solution: str | None = None, is_ai_generated: bool = False) -> int:
@@ -245,7 +267,7 @@ def create(username: str, title: str, *, class_id: str, request: str, solution: 
         'request': request,
         'solution': solution,
         'created_by': username,
-        'is_ai_generated': is_ai_generated
+        'is_ai_generated': is_ai_generated,
     }, ['id'])
 
     exercise_id = result[0][0]

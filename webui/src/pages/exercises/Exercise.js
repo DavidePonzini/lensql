@@ -29,7 +29,8 @@ function Exercise() {
                 exerciseId={exerciseId}
                 classId={exercise.class_id}
                 exerciseText={exercise.request}
-                datasetName={exercise.dataset_name}
+                attempts={exercise.attempts}
+                hasSolution={!!exercise.solution}
             />
         </div>
     );

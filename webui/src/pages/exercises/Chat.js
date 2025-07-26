@@ -3,12 +3,13 @@ import useAuth from "../../hooks/useAuth";
 import MessageBox from "./MessageBox";
 import ButtonAction from "../../components/ButtonAction";
 import BubbleStatsChange from "../../components/BubbleStatsChange";
+import { setBadges } from "../../components/BadgeNotifier";
 
-import { Coins, Experience } from "../../constants/Gamification";
+import { Coins } from "../../constants/Gamification";
 
 
 function Chat({ queryId, success }) {
-    const { apiRequest, incrementStats } = useAuth();
+    const { apiRequest } = useAuth();
 
     const [messages, setMessages] = useState([
         {
@@ -18,8 +19,7 @@ function Chat({ queryId, success }) {
             messageId: null,
         }
     ]);
-    const [coinsChange, setCoinsChange] = useState(0);
-    const [expChange, setExpChange] = useState(0);
+    const [rewards, setRewards] = useState([]);
 
     const [isThinking, setIsThinking] = useState(false);
     const messagesEndRef = useRef(null);
@@ -66,28 +66,24 @@ function Chat({ queryId, success }) {
         addMessage("Describe what my query does", false);
         startThinking();
 
-        incrementStats(Coins.HELP_SUCCESS_DESCRIBE, Experience.HELP_ERROR_FIX);
-        setCoinsChange(Coins.HELP_SUCCESS_DESCRIBE);
-        setExpChange(Experience.HELP_ERROR_FIX);
-
         const data = await apiRequest('/api/messages/success/describe', 'POST', {
             'query_id': queryId,
             'msg_idx': getLastMessageIdx(),
         });
 
+        console.log("Describe query response:", data);
+
         stopThinking();
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
         addFollowupPrompt();
+        setRewards(data.rewards || []);
+        setBadges(data.badges || []);
     }
 
     async function handleExplainQuery() {
         addMessage("Explain what each clause in my query is doing", false);
         startThinking();
-
-        incrementStats(Coins.HELP_SUCCESS_EXPLAIN, Experience.HELP_ERROR_FIX);
-        setCoinsChange(Coins.HELP_SUCCESS_EXPLAIN);
-        setExpChange(Experience.HELP_ERROR_FIX);
 
         const data = await apiRequest('/api/messages/success/explain', 'POST', {
             'query_id': queryId,
@@ -98,15 +94,13 @@ function Chat({ queryId, success }) {
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
         addFollowupPrompt();
+        setRewards(data.rewards || []);
+        setBadges(data.badges || []);
     }
 
     async function handleExplainError() {
         addMessage("Explain what this error means", false);
         startThinking();
-
-        incrementStats(Coins.HELP_ERROR_EXPLAIN, Experience.HELP_ERROR_FIX);
-        setCoinsChange(Coins.HELP_ERROR_EXPLAIN);
-        setExpChange(Experience.HELP_ERROR_FIX);
 
         const data = await apiRequest('/api/messages/error/explain', 'POST', {
             'query_id': queryId,
@@ -117,15 +111,13 @@ function Chat({ queryId, success }) {
         focusOnLastUserMessage();
         addMessage(data.answer, true, false, data.id);
         addFollowupPrompt();
+        setRewards(data.rewards || []);
+        setBadges(data.badges || []);
     }
 
     async function handleShowExample() {
         addMessage("Show a simplified example that can cause this problem", false);
         startThinking();
-
-        incrementStats(Coins.HELP_ERROR_EXAMPLE, Experience.HELP_ERROR_FIX);
-        setCoinsChange(Coins.HELP_ERROR_EXAMPLE);
-        setExpChange(Experience.HELP_ERROR_FIX);
 
         const data = await apiRequest('/api/messages/error/example', 'POST', {
             'query_id': queryId,
@@ -136,15 +128,13 @@ function Chat({ queryId, success }) {
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
         addFollowupPrompt();
+        setRewards(data.rewards || []);
+        setBadges(data.badges || []);
     }
 
     async function handleWhereToLook() {
         addMessage("Show me which query part is causing this error", false);
         startThinking();
-
-        incrementStats(Coins.HELP_ERROR_LOCATE, Experience.HELP_ERROR_FIX);
-        setCoinsChange(Coins.HELP_ERROR_LOCATE);
-        setExpChange(Experience.HELP_ERROR_FIX);
 
         const data = await apiRequest('/api/messages/error/locate', 'POST', {
             'query_id': queryId,
@@ -155,15 +145,13 @@ function Chat({ queryId, success }) {
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
         addFollowupPrompt();
+        setRewards(data.rewards || []);
+        setBadges(data.badges || []);
     }
 
     async function handleSuggestFix() {
         addMessage("Suggest a fix for this error", false);
         startThinking();
-
-        incrementStats(Coins.HELP_ERROR_FIX, Experience.HELP_ERROR_FIX);
-        setCoinsChange(Coins.HELP_ERROR_FIX);
-        setExpChange(Experience.HELP_ERROR_FIX);
 
         const data = await apiRequest('/api/messages/error/fix', 'POST', {
             'query_id': queryId,
@@ -174,6 +162,8 @@ function Chat({ queryId, success }) {
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
         addFollowupPrompt();
+        setRewards(data.rewards || []);
+        setBadges(data.badges || []);
     }
 
     function focusOnLastUserMessage() {
@@ -271,11 +261,8 @@ function Chat({ queryId, success }) {
                 marginTop: '.5rem',
             }}>
                 <BubbleStatsChange
-                    expChange={expChange}
-                    setExpChange={setExpChange}
-                    coinsChange={coinsChange}
-                    setCoinsChange={setCoinsChange}
-                    changeReason='Interacted with Lens'
+                    rewards={rewards}
+                    setRewards={setRewards}
                     style={{ padding: '6px' }}
                 />
             </div>

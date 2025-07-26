@@ -1,4 +1,15 @@
 const Coins = {
+    MAX_CHECK_SOLUTION_COST: 5,
+
+    checkSolutionCost: (attempts) => {
+        if (attempts === 0)
+            return 'Free';
+
+        const cost = Math.min(attempts, Coins.MAX_CHECK_SOLUTION_COST);
+
+        return cost;
+    },
+
     EXERCISE_SOLVED: 100,
 
     HELP_SUCCESS_DESCRIBE: -1,

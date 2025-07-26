@@ -1,8 +1,8 @@
-import useAuth from "../../hooks/useAuth";
+import useUserInfo from "../../hooks/useUserInfo";
 import LearningStatsAll from "../../components/LearningStatsAll";
 
 function Learning() {
-    const { userInfo } = useAuth();
+    const { userInfo } = useUserInfo();
 
     return (
         <div className="container-md">

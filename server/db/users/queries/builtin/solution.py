@@ -8,7 +8,7 @@ NAME = 'CHECK_SOLUTION'
 
 
 class CheckSolutionResult:
-    def __init__(self, correct: bool, execution_success: bool | None, result: QueryResult):
+    def __init__(self, correct: bool | None, execution_success: bool | None, result: QueryResult):
         self.correct = correct
         self.execution_success = execution_success
         self.result = result
@@ -82,7 +82,7 @@ def check(username: str, query_user: str, query_solution: str) -> CheckSolutionR
     '''
 
     if not query_solution:
-        return CheckSolutionResult(False, None, QueryResultMessage(
+        return CheckSolutionResult(None, None, QueryResultMessage(
             message=f'No solution found for this exercise.',
             query=SQLCode(NAME, builtin=True)),
         )
@@ -97,7 +97,7 @@ def check(username: str, query_user: str, query_solution: str) -> CheckSolutionR
 
     result_solution, _ = _execute(username, query_solution)
     if result_solution is None:
-        return CheckSolutionResult(False, execution_success, QueryResultMessage(
+        return CheckSolutionResult(None, execution_success, QueryResultMessage(
             message=f'Teacher-provided solution is not supported',
             query=SQLCode(NAME, builtin=True)),
         )

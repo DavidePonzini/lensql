@@ -5,7 +5,8 @@ import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server import db, gamification
-from server.sql.result import QueryResult, QueryResultDataset
+from server.sql.code import SQLCode
+from server.sql.result import QueryResultMessage, QueryResult
 from .util import responses
 
 bp = Blueprint('query', __name__)
@@ -23,13 +24,15 @@ def run_query():
     query = data['query']
     exercise_id = int(data['exercise_id'])
 
-    batch_id = db.admin.queries.log_batch(
-        username=username,
-        exercise_id=exercise_id if exercise_id > 0 else None
-    )
-
     rewards = []
     badges = []
+
+    # Gamification: query execution in own exercise, if this is the first query for this exercise
+    # At this point, the batch has not been logged yet
+    if db.admin.exercises.count_query_batches(exercise_id, username) == 0:
+        own_exercises_with_at_least_one_own_query = db.admin.exercises.count_own_exercises_with_at_least_one_own_query(username)
+        if own_exercises_with_at_least_one_own_query in gamification.rewards.Badges.CREATE_EXERCISES:
+            badges.append(gamification.rewards.Badges.CREATE_EXERCISES[own_exercises_with_at_least_one_own_query])
 
     # Gamification: query execution
     if db.admin.queries.is_new_query(username, query):
@@ -41,22 +44,23 @@ def run_query():
     else:
         rewards.append(gamification.rewards.Actions.Query.RUN)
 
-    # Gamification: query execution in own exercise
-    own_exercises_with_at_least_one_own_query = db.admin.exercises.count_own_exercises_with_at_least_one_own_query(username)
-    if own_exercises_with_at_least_one_own_query in gamification.rewards.Badges.CREATE_EXERCISES:
-        badges.append(gamification.rewards.Badges.CREATE_EXERCISES[own_exercises_with_at_least_one_own_query])
+    # -------------------------- From here on, the batch is logged -------------------
+    batch_id = db.admin.queries.log_batch(
+        username=username,
+        exercise_id=exercise_id if exercise_id > 0 else None
+    )
 
     # Gamification: daily usage
     days_active = db.admin.users.count_days_active(username)
     if days_active in gamification.rewards.Badges.DAILY_USAGE:
         badges.append(gamification.rewards.Badges.DAILY_USAGE[days_active])
 
-    db.admin.users.add_rewards(username, *rewards, *badges)
+    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
     def generate_results():
         yield json.dumps({
-            'rewards': rewards,
-            'badges': badges,
+            'rewards': [reward.to_dict() for reward in rewards],
+            'badges': [badge.to_dict() for badge in badges],
         }) + '\n'  # Important: one JSON object per line
 
         for query_result in db.users.queries.execute(username=username, query_str=query):
@@ -181,6 +185,17 @@ def check_solution():
     query = data['query']
     exercise_id = int(data['exercise_id'])
 
+    coins = db.admin.users.get_coins(username)
+    attempts = db.admin.exercises.count_attempts(exercise_id, username)
+    cost = gamification.rewards.Actions.Exercise.check_solution_cost(attempts)  # value is negative
+
+    if coins + cost.coins < 0:
+        return responses.response_query(
+            QueryResultMessage(gamification.NOT_ENOUGH_COINS_MESSAGE, query=SQLCode(db.users.queries.builtin.solution.NAME, builtin=True)),
+            is_builtin=True,
+            attempts=attempts,
+        )
+
     solution = db.admin.exercises.get_solution(exercise_id)
     
     check = db.users.queries.builtin.solution.check(username, query_user=query, query_solution=solution)
@@ -207,7 +222,6 @@ def check_solution():
     )
 
     already_solved = db.admin.exercises.is_solved(exercise_id, username)
-    attempts = db.admin.exercises.count_attempts(exercise_id, username)
     
     db.admin.exercises.log_solution_attempt(query_id=query_id, username=username, exercise_id=exercise_id, is_correct=check.correct)
 
@@ -228,11 +242,12 @@ def check_solution():
         else:
             rewards.append(gamification.rewards.Actions.Exercise.REPEATED)
 
-    db.admin.users.add_rewards(username, *rewards, *badges)
+    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
     return responses.response_query(
         check.result,
         is_builtin=True,
         rewards=rewards,
         badges=badges,
+        attempts=attempts + 1,
     )

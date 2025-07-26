@@ -4,11 +4,11 @@ import { useAuth, RequestSizeError } from '../../hooks/useAuth';
 import ButtonCategory from './ButtonCategory';
 import ButtonAction from '../../components/ButtonAction';
 import BubbleStatsChange from '../../components/BubbleStatsChange';
+import { setBadges } from '../../components/BadgeNotifier';
 
 function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result, setResult }) {
-    const { apiRequest, incrementStats } = useAuth();
-    const [expChange, setExpChange] = useState(0);
-    const [changeReason, setChangeReason] = useState('');
+    const { apiRequest } = useAuth();
+    const [rewards, setRewards] = useState([]);
 
     async function handleExecute() {
         if (!sqlText.trim()) return;
@@ -47,9 +47,12 @@ function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result
                             const parsed = JSON.parse(line);
 
                             if (firstLine) {
-                                incrementStats(0, parsed.exp_change || 0);
-                                setExpChange(parsed.exp_change);
-                                setChangeReason(parsed.exp_change_reason);
+                                const rewards = parsed.rewards || [];
+                                const badges = parsed.badges || [];
+
+                                setRewards(rewards);
+                                setBadges(badges);
+
                                 firstLine = false;
                             } else {
                                 setResult(prev => [...prev, parsed]);
@@ -118,9 +121,8 @@ function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result
                 </ButtonAction>
 
                 <BubbleStatsChange
-                    expChange={expChange}
-                    setExpChange={setExpChange}
-                    changeReason={changeReason}
+                    rewards={rewards}
+                    setRewards={setRewards}
                     style={{ padding: '.4rem', marginBottom: '.25rem', verticalAlign: 'middle' }}
                 />
             </div>

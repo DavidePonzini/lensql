@@ -76,9 +76,11 @@ def count_help_usage(username: str) -> int:
         SELECT
             COUNT(*)
         FROM
-            {schema}.messages
+            {schema}.messages m
+            JOIN {schema}.queries q ON q.id = m.query_id
+            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
         WHERE
-            username = {username}
+            qb.username = {username}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username')
@@ -90,6 +92,24 @@ def count_help_usage(username: str) -> int:
 
     return result[0][0] if result else 0
 
+def add_badge(username: str, badge: str) -> None:
+    '''Add a badge to a user'''
+
+    query = database.sql.SQL('''
+        INSERT INTO {schema}.badges (username, badge)
+        VALUES ({username}, {badge})
+        ON CONFLICT (username, badge) DO NOTHING
+    ''').format(
+        schema=database.sql.Identifier(SCHEMA),
+        username=database.sql.Placeholder('username'),
+        badge=database.sql.Placeholder('badge')
+    )
+
+    db.execute(query, {
+        'username': username,
+        'badge': badge
+    })
+
 def count_feedbacks(username: str) -> int:
     '''Get the amount of feedbacks provided by a user'''
 
@@ -97,9 +117,12 @@ def count_feedbacks(username: str) -> int:
         SELECT
             COUNT(*)
         FROM
-            {schema}.feedbacks
+            {schema}.messages m
+            JOIN {schema}.queries q ON q.id = m.query_id
+            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
         WHERE
             username = {username}
+            AND m.feedback IS NOT NULL
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username')
@@ -417,11 +440,14 @@ def get_error_stats(username: str) -> dict:
     # TODO
     return {}
 
-def add_rewards(username: str, *rewards: gamification.Reward) -> None:
+def add_rewards(username: str, *, rewards: list[gamification.Reward], badges: list[gamification.Reward]) -> None:
     '''Add rewards to a user'''
 
+    for badge in badges:
+        add_badge(username, badge.reason)
+
     reward = gamification.Reward('')
-    for r in rewards:
+    for r in rewards + badges:
         reward += r
 
     if reward.is_empty():

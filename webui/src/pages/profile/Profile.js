@@ -1,4 +1,4 @@
-import useAuth from '../../hooks/useAuth';
+import useUserInfo from '../../hooks/useUserInfo';
 import LevelTitle from './LevelTitle';
 import { Coins, Experience } from '../../constants/Gamification';
 
@@ -28,6 +28,11 @@ function Profile() {
 
     const coinActions = [
         {
+            label: 'Check if a solution is correct',
+            value: `from 0 to ${Coins.MAX_CHECK_SOLUTION_COST} coins`,
+            className: 'text-danger'
+        },
+        {
             label: 'Ask Lens for help',
             value: `from ${Math.max(...Object.values(Coins).filter(v => v < 0))} to ${Math.min(...Object.values(Coins).filter(v => v < 0))} coins`,
             className: 'text-danger'
@@ -39,7 +44,7 @@ function Profile() {
         },
     ];
 
-    const { userInfo } = useAuth();
+    const { userInfo } = useUserInfo();
 
     const username = userInfo?.username || 'user';
     const xp = userInfo?.xp || 0;

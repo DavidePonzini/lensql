@@ -1,16 +1,24 @@
 from typing import Iterable as _Iterable
 from flask import jsonify as _jsonify, Response as _Response
 
+from server import gamification
 from server.sql import QueryResult as _QueryResult
 
 
-def response(success: bool = True, **kwargs) -> _Response:
+def response(success: bool = True, rewards: list[gamification.Reward] = [], badges: list[gamification.Reward] = [], **kwargs) -> _Response:
     return _jsonify({
         'success': success,
+        'rewards': [reward.to_dict() for reward in rewards],
+        'badges': [badge.to_dict() for badge in badges],
         **kwargs
     })
 
-def response_query(*results: _QueryResult, is_builtin: bool = False, **kwargs) -> _Response:
+def response_query(
+        *results: _QueryResult,
+        is_builtin: bool = False,
+        rewards: list[gamification.Reward] = [],
+        badges: list[gamification.Reward] = [],
+        **kwargs) -> _Response:
     return _jsonify([
         {
             'success': query.success,
@@ -19,6 +27,8 @@ def response_query(*results: _QueryResult, is_builtin: bool = False, **kwargs) -
             'type': query.data_type,
             'data': query.result_html,
             'id': query.id,
+            'rewards': [reward.to_dict() for reward in rewards],
+            'badges': [badge.to_dict() for badge in badges],
             **kwargs
         }
         for query in results

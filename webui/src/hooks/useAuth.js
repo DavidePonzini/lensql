@@ -1,5 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { getXpStats } from '../constants/Gamification';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 const AuthContext = createContext();
 
@@ -11,30 +10,18 @@ class RequestSizeError extends Error {
     }
 }
 
-
 function AuthProvider({ children }) {
-    const MAX_REQUEST_SIZE = 1024 * 1024 * 20; // 20 MB
+    const MAX_REQUEST_SIZE = 1024 * 1024 * 20;
 
     const [accessToken, setAccessToken] = useState(sessionStorage.getItem('access_token'));
     const [refreshToken, setRefreshToken] = useState(sessionStorage.getItem('refresh_token'));
-    const [userInfo, setUserInfo] = useState(null);
 
-    // Tokens management
-    function saveTokens(access, refresh) {
-        sessionStorage.setItem('access_token', access);
-        sessionStorage.setItem('refresh_token', refresh);
-        setAccessToken(access);
-        setRefreshToken(refresh);
-        setUserInfo(null); // Reset user info on new token
-    }
-
-    function logout() {
+    const logout = useCallback(() => {
         sessionStorage.removeItem('access_token');
         sessionStorage.removeItem('refresh_token');
         setAccessToken(null);
         setRefreshToken(null);
-        setUserInfo(null);
-    }
+    }, []);
 
     const refreshAccessToken = useCallback(async () => {
         if (!refreshToken) {
@@ -44,7 +31,10 @@ function AuthProvider({ children }) {
 
         const response = await fetch('/api/auth/refresh', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + refreshToken, 'Content-Type': 'application/json' },
+            headers: {
+                'Authorization': 'Bearer ' + refreshToken,
+                'Content-Type': 'application/json'
+            }
         });
 
         const data = await response.json();
@@ -56,7 +46,7 @@ function AuthProvider({ children }) {
             logout();
             throw new Error('Refresh token invalid.');
         }
-    }, [refreshToken]);
+    }, [refreshToken, logout]);
 
     const apiRequest = useCallback(async (endpoint, method = 'GET', body = null, { stream = false } = {}) => {
         let token = accessToken;
@@ -90,82 +80,23 @@ function AuthProvider({ children }) {
             throw error;
         }
 
-        if (stream) {
-            if (!response.body) {
-                throw new Error('No response body (streaming not supported)');
-            }
-            return response.body; // Return ReadableStream for caller to handle
-        } else {
-            return response.json(); // Standard JSON handling
-        }
+        return stream ? response.body : response.json();
     }, [accessToken, refreshAccessToken, MAX_REQUEST_SIZE]);
 
-
-    // Load user info safely and only once if needed
-    const loadUserInfo = useCallback(async () => {
-        if (!accessToken)
-            return;
-
-        try {
-            const response = await apiRequest('/api/users/info');
-
-            const xp = getXpStats(response.xp);
-
-            setUserInfo({
-                username: response.username,
-                isAdmin: response.is_admin,
-                coins: response.coins,
-                xpTotal: response.xp,
-                xp: xp.current,
-                xpToNextLevel: xp.next,
-                level: xp.level,
-            });
-        } catch (err) {
-            console.error('Failed to load user info.', err);
-            logout();
-        }
-    }, [accessToken, apiRequest]);
-
-    // Auto-load user info on login
-    useEffect(() => {
-        if (accessToken && !userInfo) {
-            loadUserInfo();
-        }
-    }, [accessToken, userInfo, loadUserInfo]);
-
-    const incrementStats = useCallback((coins, experience) => {
-        setUserInfo(prev => {
-            if (!prev) return null; // No user info available
-
-            if (!coins)
-                coins = 0;
-
-            if (!experience)
-                experience = 0;
-
-            const xpTotal = prev.xpTotal + experience;
-            const xp = getXpStats(xpTotal);
-
-            return {
-                ...prev,
-                coins: prev.coins + coins,
-                xpTotal,
-                xp: xp.current,
-                xpToNextLevel: xp.next,
-                level: xp.level,
-            };
-        });
+    const saveTokens = useCallback((access, refresh) => {
+        sessionStorage.setItem('access_token', access);
+        sessionStorage.setItem('refresh_token', refresh);
+        setAccessToken(access);
+        setRefreshToken(refresh);
     }, []);
 
     const value = useMemo(() => ({
         isLoggedIn: !!accessToken,
-        userInfo,
         saveTokens,
         logout,
         apiRequest,
-        loadUserInfo,
-        incrementStats
-    }), [accessToken, userInfo, apiRequest, loadUserInfo, incrementStats]);
+        accessToken,
+    }), [accessToken, apiRequest, logout, saveTokens]);
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

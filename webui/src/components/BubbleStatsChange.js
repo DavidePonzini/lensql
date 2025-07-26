@@ -1,46 +1,61 @@
 import BubbleMessage from "./BubbleMessage";
+import useUserInfo from "../hooks/useUserInfo";
 
-function BubbleStatsChange({
-    coinsChange = 0, setCoinsChange = (val) => { },
-    expChange = 0, setExpChange = (val) => { },
-    isAlert = true,
-    changeReason = '',
-    style = {}
-}) {
+function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {} }) {
+    const { incrementStats } = useUserInfo();
+
     const duration = 2000;
+
+    const reward = rewards[0] || null;
+
+    if (!reward) {
+        return null;
+    }
 
     return (
         <>
             <BubbleMessage
                 className={isAlert ? "alert alert-warning" : "text text-warning"}
-                visible={coinsChange !== 0}
-                onHide={() => setCoinsChange(0)}
+                visible={reward.coins > 0}
+                onHide={() => {
+                    console.log('Incrementing coins:', reward.coins);
+                    incrementStats(reward.coins, 0);
+                    reward.coins = 0;
+
+                    if (reward.experience === 0)
+                        setRewards(prev => prev.slice(1));
+                }}
                 style={style}
                 duration={duration}
             >
-                {changeReason ? (
-                    <>
-                        <strong>{changeReason}:</strong>&nbsp;
-                    </>
-                ) : null}
+                {
+                    reward.reason ? (
+                        <>
+                            <strong>{reward.reason}:</strong> &nbsp;
+                        </>
+                    ) : null}
 
-                {coinsChange >= 0 ? '+' : '-'}{Math.abs(coinsChange)} {Math.abs(coinsChange) === 1 ? 'LensCoin' : 'LensCoins'} <i className="fa fa-coins" />
-            </BubbleMessage>
+                {reward.coins >= 0 ? '+' : '-'} {Math.abs(reward.coins)} {Math.abs(reward.coins) === 1 ? 'LensCoin' : 'LensCoins'} <i className="fa fa-coins" />
+            </BubbleMessage >
 
             <BubbleMessage
                 className={isAlert ? "alert alert-primary" : "text text-primary"}
-                visible={coinsChange === 0 && expChange !== 0}
-                onHide={() => setExpChange(0)}
+                visible={reward.coins === 0 && reward.experience !== 0}
+                onHide={() => {
+                    console.log('Incrementing exp:', reward.experience);
+                    incrementStats(0, reward.experience);
+                    setRewards(prev => prev.slice(1));
+                }}
                 style={style}
                 duration={duration}
             >
-                {changeReason ? (
+                {reward.reason ? (
                     <>
-                        <strong>{changeReason}:</strong>&nbsp;
+                        <strong>{reward.reason}:</strong>&nbsp;
                     </>
                 ) : null}
-                
-                {expChange >= 0 ? '+' : '-'}{Math.abs(expChange)} EXP <i className="fa fa-diamond" />
+
+                {reward.experience >= 0 ? '+' : '-'}{Math.abs(reward.experience)} EXP <i className="fa fa-diamond" />
             </BubbleMessage>
         </>
     );

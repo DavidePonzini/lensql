@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import { useAuth } from '../hooks/useAuth';
+import useAuth from '../hooks/useAuth';
+import useUserInfo from '../hooks/useUserInfo';
 
 import Navbar from "../components/navbar/Navbar";
 import Footer from "../components/Footer";
@@ -18,13 +19,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import useTooltipObserver from '../hooks/useTooltipObserver';
+import BadgeNotifier from '../components/BadgeNotifier';
 import Admin from './admin/Admin';
 import About from './About';
 import Register from './Register';
 
 
 function App() {
-    const { isLoggedIn, userInfo } = useAuth();
+    const { isLoggedIn } = useAuth();
+    const { userInfo } = useUserInfo();
 
     useTooltipObserver();
 
@@ -70,6 +73,8 @@ function App() {
                 <Separator />
                 <Footer />
             </Router>
+
+            <BadgeNotifier />
         </>
     )
 }

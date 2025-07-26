@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import AppName from '../AppName';
 import useAuth from '../../hooks/useAuth';
+import useUserInfo from '../../hooks/useUserInfo';
 
 import './Navbar.css';
 
@@ -9,7 +10,8 @@ import GamificationStats from './GamificationStats';
 
 
 function Navbar() {
-    const { isLoggedIn, logout, userInfo, loadingUser } = useAuth();
+    const { isLoggedIn, logout } = useAuth();
+    const { userInfo, loadingUserInfo } = useUserInfo();
     const [isDropdownOpen, setDropdownOpen] = useState(false);
 
     return (
@@ -79,7 +81,7 @@ function Navbar() {
                             <>
                                 <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Your username">
                                     <i className="fa-solid fa-user" />
-                                    <span>{loadingUser ? 'Loading...' : userInfo?.username || 'Unknown'}</span>
+                                    <span>{loadingUserInfo ? 'Loading...' : userInfo?.username || 'Unknown'}</span>
                                 </span>
 
                                 {userInfo?.isAdmin && (

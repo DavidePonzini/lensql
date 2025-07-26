@@ -2,14 +2,15 @@ import { useState } from 'react';
 import useAuth from '../../hooks/useAuth';
 import BubbleStatsChange from '../../components/BubbleStatsChange';
 import { Coins } from '../../constants/Gamification';
+import { setBadges } from '../../components/BadgeNotifier';
 
 import './Message.css';
 
 function Message({ children, text, messageId = null }) {
-    const { apiRequest, incrementStats } = useAuth();
+    const { apiRequest } = useAuth();
 
     const [feedback, setFeedback] = useState(null);
-    const [coinsChange, setCoinsChange] = useState(0);
+    const [rewards, setRewards] = useState([]);
 
     async function handleSendFeedback(positive) {
         // This message doesn't support feedback
@@ -23,7 +24,7 @@ function Message({ children, text, messageId = null }) {
             return;
         }
 
-        await apiRequest('/api/messages/feedback', 'POST', {
+        const result = await apiRequest('/api/messages/feedback', 'POST', {
             'message_id': messageId,
             'feedback': positive
         });
@@ -31,8 +32,8 @@ function Message({ children, text, messageId = null }) {
         sessionStorage.setItem('hasProvidedFeedback', 'true');
         setFeedback(positive);
 
-        incrementStats(Coins.HELP_FEEDBACK, 0);
-        setCoinsChange(Coins.HELP_FEEDBACK);
+        setRewards(result.rewards || []);
+        setBadges(result.badges || []);
     }
 
     return (
@@ -43,10 +44,9 @@ function Message({ children, text, messageId = null }) {
                 messageId && (
                     <div className="message-feedback">
                         <BubbleStatsChange
-                            coinsChange={coinsChange}
-                            setCoinsChange={setCoinsChange}
+                            rewards={rewards}
+                            setRewards={setRewards}
                             isAlert={false}
-                            changeReason='Provided feedback'
                         />
 
                         {

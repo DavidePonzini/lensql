@@ -1,3 +1,5 @@
+import json
+
 class Reward:
     def __init__(self, reason: str, *, experience: int = 0, coins: int = 0):
         self.reason = reason
@@ -21,3 +23,13 @@ class Reward:
 
     def __repr__(self):
         return f"Reward(reason={self.reason}, experience={self.experience}, coins={self.coins})"
+    
+    def to_dict(self):
+        return {
+            'reason': self.reason,
+            'experience': self.experience,
+            'coins': self.coins
+        }
+    
+    def to_json(self):
+        return json.dumps(self.to_dict())

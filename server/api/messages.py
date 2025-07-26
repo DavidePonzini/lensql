@@ -5,16 +5,14 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server import db, llm, gamification
 from .util import responses
+from server.gamification import NOT_ENOUGH_COINS_MESSAGE
 
 bp = Blueprint('message', __name__)
-
-
-NOT_ENOUGH_COINS_MESSAGE = "You don't have enough coins to use this feature. You can earn coins by providing feedback on Lens's answers."
 
 def _check_coins(username: str, cost: gamification.Reward) -> bool:
     '''Check if the user has enough coins to perform an action.'''
     coins = db.admin.users.get_coins(username)
-    return coins >= abs(cost)
+    return coins >= abs(cost.coins)
 
 def _get_usage_badges(username: str) -> list[gamification.Reward]:
     '''Check if the user has earned any badges related to message usage.'''
@@ -52,7 +50,7 @@ def feedback():
     if feedback_count in gamification.rewards.Badges.FEEDBACK:
         badges.append(gamification.rewards.Badges.FEEDBACK[feedback_count])
 
-    db.admin.users.add_rewards(username, *rewards, *badges)
+    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
     return responses.response(True, rewards=rewards, badges=badges)
 
@@ -84,7 +82,7 @@ def explain_error_message():
     rewards = [cost]
     badges = _get_usage_badges(username)
 
-    db.admin.users.add_rewards(username, *rewards, *badges)
+    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
     return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
 
@@ -115,7 +113,7 @@ def locate_error_cause():
     rewards = [cost]
     badges = _get_usage_badges(username)
 
-    db.admin.users.add_rewards(username, *rewards, *badges)
+    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
     return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
 
@@ -146,7 +144,7 @@ def provide_error_example():
     rewards = [cost]
     badges = _get_usage_badges(username)
 
-    db.admin.users.add_rewards(username, *rewards, *badges)
+    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
     return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
 
@@ -177,7 +175,7 @@ def fix_query():
     rewards = [cost]
     badges = _get_usage_badges(username)
 
-    db.admin.users.add_rewards(username, *rewards, *badges)
+    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
     return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
 
@@ -207,7 +205,7 @@ def describe_my_query():
     rewards = [cost]
     badges = _get_usage_badges(username)
 
-    db.admin.users.add_rewards(username, *rewards, *badges)
+    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
     return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
 
@@ -237,6 +235,6 @@ def explain_my_query():
     rewards = [cost]
     badges = _get_usage_badges(username)
 
-    db.admin.users.add_rewards(username, *rewards, *badges)
+    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
     return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)

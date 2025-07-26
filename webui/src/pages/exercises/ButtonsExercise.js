@@ -5,12 +5,14 @@ import ButtonAction from "../../components/ButtonAction";
 import ButtonShowDataset from "../../components/ButtonShowDataset";
 import ButtonCategory from "./ButtonCategory";
 import BubbleStatsChange from '../../components/BubbleStatsChange';
+import { setBadges } from '../../components/BadgeNotifier';
+import { Coins } from '../../constants/Gamification';
 
-function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecuting, setResult }) {
-    const { apiRequest, incrementStats } = useAuth();
-    const [expChange, setExpChange] = useState(0);
-    const [coinsChange, setCoinsChange] = useState(0);
-    const [changeReason, setChangeReason] = useState('');
+
+function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecuting, setResult, attempts: initialAttempts, hasSolution }) {
+    const { apiRequest } = useAuth();
+    const [rewards, setRewards] = useState([]);
+    const [attempts, setAttempts] = useState(initialAttempts);
 
     async function handleCreateDataset() {
         setIsExecuting(true);
@@ -70,12 +72,12 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
             'query': sqlText,
             'exercise_id': exerciseId,
         });
+
         setIsExecuting(false);
 
-        incrementStats(data[0].coins_change, data[0].exp_change);
-        setChangeReason(data[0].change_reason);
-        setExpChange(data[0].exp_change);
-        setCoinsChange(data[0].coins_change);
+        setAttempts(data[0].attempts);
+        setRewards(data[0].rewards || []);
+        setBadges(data[0].badges || []);
 
         setResult(data);
     }
@@ -110,18 +112,22 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
                     variant="warning"
                     className="me-1 mb-1"
                     onClick={handleCheckResult}
-                    disabled={isExecuting || sqlText.trim().length === 0}
-                    cost={0}
+                    disabled={isExecuting || sqlText.trim().length === 0 || !hasSolution}
+                    cost={hasSolution ? Coins.checkSolutionCost(attempts) : null}
                 >
                     Check Result
+                    <span className="text-muted ms-2">
+                        (
+                        {hasSolution ?
+                            attempts === 1 ? `${attempts} attempt` : `${attempts} attempts`
+                            : 'No solution available'}
+                        )
+                    </span>
                 </ButtonAction>
 
                 <BubbleStatsChange
-                    expChange={expChange}
-                    setExpChange={setExpChange}
-                    coinsChange={coinsChange}
-                    setCoinsChange={setCoinsChange}
-                    changeReason={changeReason}
+                    rewards={rewards}
+                    setRewards={setRewards}
                     style={{ padding: '.4rem', marginBottom: '.25rem', verticalAlign: 'middle' }}
                 />
             </div>

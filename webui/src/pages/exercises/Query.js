@@ -8,7 +8,7 @@ import ButtonsQuery from "./ButtonsQuery";
 import ButtonsDatabase from "./ButtonsDatabase";
 import ButtonsExercise from "./ButtonsExercise";
 
-function Query({ exerciseId, classId, exerciseTitle, exerciseText }) {
+function Query({ exerciseId, classId, exerciseTitle, exerciseText, attempts, hasSolution }) {
     const SCROLL_GRACE_PERIOD = 500; // milliseconds
 
     const [sqlText, setSqlText] = useState('');
@@ -91,6 +91,8 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText }) {
                         exerciseId={exerciseId}
                         classId={classId}
                         sqlText={sqlText}
+                        attempts={attempts}
+                        hasSolution={hasSolution}
                         isExecuting={isExecuting}
                         setIsExecuting={setIsExecuting}
                         setResult={setResult}

@@ -3,10 +3,10 @@ from .reward import Reward
 class Actions:
     class Query:
         '''Run a query for the first time'''
-        UNIQUE_RUN = Reward('New query executed', experience=10, coins=5)
+        UNIQUE_RUN = Reward('New query executed', experience=25)
 
         '''Run a query that has been run before'''
-        RUN = Reward('Query executed', experience=5, coins=2)
+        RUN = Reward('Query executed', experience=5)
 
     class Exercise:
         '''Find the correct solution for the first time'''
@@ -50,7 +50,7 @@ class Badges:
 
     '''Run unique queries'''
     QUERIES_UNIQUE = {
-        1: Reward('Ran your first query', coins=10),
+        1: Reward('Ran your first query', coins=5),
         10: Reward('Ran 10 different queries', coins=10),
         50: Reward('Ran 50 different queries', coins=25),
         100: Reward('Ran 100 different queries', coins=50),
@@ -82,7 +82,7 @@ class Badges:
     DAILY_USAGE = {
         5: Reward('Run a query in 5 different days', coins=25),
         14: Reward('Run a query in 14 different days', coins=50),
-        30: Reward('Run a query in 30 different days', coins=50),
+        30: Reward('Run a query in 30 different days', coins=75),
     }
 
     # TODO
