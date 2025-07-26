@@ -1,9 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { getXpStats } from '../constants/Gamification';
-import { useAuth } from './useAuth';
+import useAuth from './useAuth';
 
-function useUserInfo() {
-    const { apiRequest, logout, accessToken } = useAuth();
+const UserInfoContext = createContext();
+
+function UserInfoProvider({ children }) {
+    const { apiRequest, accessToken, logout } = useAuth();
+
     const [userInfo, setUserInfo] = useState(null);
 
     const loadUserInfo = useCallback(async () => {
@@ -11,8 +14,8 @@ function useUserInfo() {
 
         try {
             const data = await apiRequest('/api/users/info');
-
             const xp = getXpStats(data.xp);
+
             setUserInfo({
                 username: data.username,
                 isAdmin: data.is_admin,
@@ -28,12 +31,6 @@ function useUserInfo() {
         }
     }, [accessToken, apiRequest, logout]);
 
-    useEffect(() => {
-        if (accessToken && !userInfo) {
-            loadUserInfo();
-        }
-    }, [accessToken, userInfo, loadUserInfo]);
-
     const incrementStats = useCallback((coins = 0, experience = 0) => {
         setUserInfo(prev => {
             if (!prev) return null;
@@ -41,7 +38,7 @@ function useUserInfo() {
             const xpTotal = prev.xpTotal + experience;
             const xp = getXpStats(xpTotal);
 
-            const newStats = {
+            return {
                 ...prev,
                 coins: prev.coins + coins,
                 xpTotal,
@@ -49,14 +46,29 @@ function useUserInfo() {
                 xpToNextLevel: xp.next,
                 level: xp.level,
             };
-
-            console.log('Incremented stats:', newStats);
-
-            return newStats;
         });
     }, []);
 
-    return { userInfo, loadUserInfo, incrementStats };
+    useEffect(() => {
+        if (accessToken && !userInfo) {
+            loadUserInfo();
+        }
+    }, [accessToken, userInfo, loadUserInfo]);
+
+    const value = useMemo(() => ({
+        userInfo,
+        loadUserInfo,
+        incrementStats,
+    }), [userInfo, loadUserInfo, incrementStats]);
+
+    return (
+        <UserInfoContext.Provider value={value}>{children}</UserInfoContext.Provider>
+    );
 }
 
+function useUserInfo() {
+    return useContext(UserInfoContext);
+}
+
+export { UserInfoProvider, useUserInfo };
 export default useUserInfo;

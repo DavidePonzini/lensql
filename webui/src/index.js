@@ -5,6 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import App from './pages/App';
 
 import { AuthProvider } from './hooks/useAuth';
+import { UserInfoProvider } from './hooks/useUserInfo';
 
 // Boostrap CSS and JS
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -24,9 +25,15 @@ import './index.css';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
+
         <AuthProvider>
-            <App />
+            <UserInfoProvider>
+    
+                <App />
+    
+            </UserInfoProvider>
         </AuthProvider>
+    
     </React.StrictMode>
 );
 

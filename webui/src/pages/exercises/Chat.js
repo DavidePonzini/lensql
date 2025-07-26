@@ -182,6 +182,7 @@ function Chat({ queryId, success }) {
                     text={message.text}
                     messageId={message.messageId}
                     key={index}
+                    ref={index === messages.length - 1 ? messagesEndRef : null}
                 >
                     {/* Buttons -- shown only on last message when not thinking */}
                     {!isThinking && index === messages.length - 1 && (
@@ -256,7 +257,7 @@ function Chat({ queryId, success }) {
                 </MessageBox>
             ))}
 
-            <div ref={messagesEndRef} style={{
+            <div style={{
                 marginLeft: '70px',
                 marginTop: '.5rem',
             }}>

@@ -1,11 +1,15 @@
+import { forwardRef } from 'react';
 import Message from './Message';
 
 import './MessageBox.css';
 
-function MessageBox({ children, text, assistant = false, thinking = false, messageId = null }) {
+const MessageBox = forwardRef(({ children, text, assistant = false, thinking = false, messageId = null }, ref) => {
 
     return (
-        <div className={`messagebox ${assistant ? 'messagebox-assistant' : 'messagebox-user'} ${thinking ? 'thinking' : ''}`}>
+        <div
+            className={`messagebox ${assistant ? 'messagebox-assistant' : 'messagebox-user'} ${thinking ? 'thinking' : ''}`}
+            ref={ref}
+        >
             {assistant && (
                 <div className="icon">
                     <i className="fas fa-search" />
@@ -27,6 +31,6 @@ function MessageBox({ children, text, assistant = false, thinking = false, messa
             )}
         </div>
     );
-}
+});
 
 export default MessageBox;
