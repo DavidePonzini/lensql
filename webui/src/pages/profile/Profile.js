@@ -1,48 +1,9 @@
 import useUserInfo from '../../hooks/useUserInfo';
 import LevelTitle from './LevelTitle';
-import { Coins, Experience } from '../../constants/Gamification';
+import { expActions, coinActions } from '../../constants/Gamification';
+import AlertUnderDevelopment from '../../components/AlertUnderDevelopment';
 
 function Profile() {
-    const expActions = [
-        {
-            label: 'Solving exercises',
-            value: `+${Experience.EXERCISE_SOLVED} XP`,
-            className: 'text-success'
-        },
-        {
-            label: 'Running queries',
-            value: `+${Experience.QUERY_RUN} XP each`,
-            className: 'text-success'
-        },
-        {
-            label: 'Trying new, unique queries',
-            value: `+${Experience.QUERY_RUN_UNIQUE} XP each`,
-            className: 'text-success'
-        },
-        {
-            label: 'Interacting with Lens',
-            value: `+${Experience.ASK_HELP} XP`,
-            className: 'text-success'
-        }
-    ];
-
-    const coinActions = [
-        {
-            label: 'Check if a solution is correct',
-            value: `from 0 to ${Coins.MAX_CHECK_SOLUTION_COST} coins`,
-            className: 'text-danger'
-        },
-        {
-            label: 'Ask Lens for help',
-            value: `from ${Math.max(...Object.values(Coins).filter(v => v < 0))} to ${Math.min(...Object.values(Coins).filter(v => v < 0))} coins`,
-            className: 'text-danger'
-        },
-        {
-            label: 'Give feedback on Lens’ help',
-            value: `+${Coins.HELP_FEEDBACK} coins`,
-            className: 'text-success'
-        },
-    ];
 
     const { userInfo } = useUserInfo();
 
@@ -66,10 +27,10 @@ function Profile() {
                     <i className="fa fa-diamond me-2" />
                     EXP: <strong>{xp}</strong> / {xpToNext}
                 </p>
-                <small className="text-muted">Earn more EXP by:</small>
+                <small className="text-muted">Earn more EXP by learning SQL:</small>
                 <ul className="mt-2">
                     {expActions.map((a, i) => (
-                        <li key={i}>{a.label}: <strong className={a.className}>{a.value}</strong></li>
+                        <li key={i}>{a.label}: <strong className={a.positive ? 'text-success' : 'text-danger'}>{a.value}</strong></li>
                     ))}
                 </ul>
             </section>
@@ -80,9 +41,18 @@ function Profile() {
                 <small className="text-muted">Use LensCoins to interact with Lens:</small>
                 <ul className="mt-2">
                     {coinActions.map((a, i) => (
-                        <li key={i}>{a.label}: <strong className={a.className}>{a.value} coins</strong></li>
+                        <li key={i}>{a.label}: <strong className={a.positive ? 'text-success' : 'text-danger'}>{a.value}</strong></li>
                     ))}
                 </ul>
+            </section>
+
+            <hr className="my-4" />
+
+            <section>
+                <h5><i className="fa fa-trophy me-2" />Achievements</h5>
+                <p>You've earned the following achievements:</p>
+
+                <AlertUnderDevelopment />
             </section>
         </div>
     );

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import Parallax from '../components/Parallax';
+import AlertUnderDevelopment from '../components/AlertUnderDevelopment';
 
 import bg from '../res/database.jpg';
 
@@ -203,6 +204,7 @@ function Home() {
                             </p>
 
                             {/* Replace src with actual GIF path or embedded player */}
+                            <AlertUnderDevelopment />
                             <div className="border rounded shadow-sm p-3 bg-white">
                                 <img
                                     src="/demo/lensql-demo.gif"

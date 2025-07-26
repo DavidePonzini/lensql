@@ -92,22 +92,24 @@ def count_help_usage(username: str) -> int:
 
     return result[0][0] if result else 0
 
-def add_badge(username: str, badge: str) -> None:
+def add_badge(username: str, badge: str, rank: int = 1) -> None:
     '''Add a badge to a user'''
 
     query = database.sql.SQL('''
-        INSERT INTO {schema}.badges (username, badge)
-        VALUES ({username}, {badge})
+        INSERT INTO {schema}.badges (username, badge, rank)
+        VALUES ({username}, {badge}, {rank})
         ON CONFLICT (username, badge) DO NOTHING
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username'),
-        badge=database.sql.Placeholder('badge')
+        badge=database.sql.Placeholder('badge'),
+        rank=database.sql.Placeholder('rank')
     )
 
     db.execute(query, {
         'username': username,
-        'badge': badge
+        'badge': badge,
+        'rank': rank
     })
 
 def count_feedbacks(username: str) -> int:
