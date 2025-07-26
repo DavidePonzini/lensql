@@ -36,7 +36,7 @@ active_users:
 
 dump:
 	docker exec -t $(COMPOSE_PROJECT_NAME)_db_admin pg_dump -U postgres -n lensql > dump_admin_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
-	docker exec -t $(COMPOSE_PROJECT_NAME)_db_admin pg_dumpall -U postgres > dump_users_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
+	docker exec -t $(COMPOSE_PROJECT_NAME)_db_users pg_dumpall -U postgres > dump_users_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
 
 $(VENV):
 	python -m venv $(VENV)
