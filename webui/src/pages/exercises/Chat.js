@@ -71,8 +71,6 @@ function Chat({ queryId, success }) {
             'msg_idx': getLastMessageIdx(),
         });
 
-        console.log("Describe query response:", data);
-
         stopThinking();
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
@@ -182,7 +180,6 @@ function Chat({ queryId, success }) {
                     text={message.text}
                     messageId={message.messageId}
                     key={index}
-                    ref={index === messages.length - 1 ? messagesEndRef : null}
                 >
                     {/* Buttons -- shown only on last message when not thinking */}
                     {!isThinking && index === messages.length - 1 && (
@@ -257,10 +254,12 @@ function Chat({ queryId, success }) {
                 </MessageBox>
             ))}
 
-            <div style={{
-                marginLeft: '70px',
-                marginTop: '.5rem',
-            }}>
+            <div
+                ref={messagesEndRef}
+                style={{
+                    marginLeft: '70px',
+                    marginTop: '.5rem',
+                }}>
                 <BubbleStatsChange
                     rewards={rewards}
                     setRewards={setRewards}

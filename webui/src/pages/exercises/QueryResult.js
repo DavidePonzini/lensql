@@ -1,10 +1,14 @@
+import { forwardRef } from 'react';
 import Chat from './Chat';
 
 import './QueryResult.css';
 
-function QueryResult({ result, isBuiltin, queryId, query, success, isMessage, notices }) {
+const QueryResult = forwardRef(({ result, isBuiltin, queryId, query, success, isMessage, notices }, ref) => {
     return (
-        <div className={`query-result alert ${success ? isBuiltin ? 'alert-secondary' : 'alert-primary' : 'alert-danger'}`}>
+        <div
+            className={`query-result alert ${success ? isBuiltin ? 'alert-secondary' : 'alert-primary' : 'alert-danger'}`}
+            ref={ref}
+        >
             <div className="query-result-title">
                 {isBuiltin ? (
                     <span>
@@ -17,7 +21,7 @@ function QueryResult({ result, isBuiltin, queryId, query, success, isMessage, no
                         <b>User query</b>
                     </span>
                 )}
-                <pre style={{maxHeight: '500px', overflow: 'auto'}}>{query}</pre>
+                <pre style={{ maxHeight: '500px', overflow: 'auto' }}>{query}</pre>
             </div>
             <hr />
 
@@ -62,6 +66,6 @@ function QueryResult({ result, isBuiltin, queryId, query, success, isMessage, no
             }
         </div >
     );
-}
+});
 
 export default QueryResult;

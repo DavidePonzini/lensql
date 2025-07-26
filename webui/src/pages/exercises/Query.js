@@ -121,10 +121,10 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, attempts, has
                             success={val.success}
                             isMessage={val.data_type === 'message'}
                             notices={val.notices}
+                            ref={index === result.length - 1 ? resultEndRef : null}
                         />
                     ))
                 }
-                <div ref={resultEndRef} />
             </div>
 
             {showTopBtn && (
