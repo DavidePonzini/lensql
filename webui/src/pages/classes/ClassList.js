@@ -44,7 +44,14 @@ function ClassList() {
         <div className="container-md">
             <h1>My Courses</h1>
             <CardList>
-                {classes.length === 0 && <p>Nothing here. Join a course to see exercises.</p>}
+                {classes.length === 0 && (
+                    <>
+                        <p>Nothing here. Join a course to see exercises.</p>
+                        <p>
+                            If you want to run a query which hasn't been assigned to you by the teacher, please create a new course.
+                        </p>
+                    </>
+                )}
 
                 {classes.map((cl) => {
                     return (
