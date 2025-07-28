@@ -1,7 +1,7 @@
 FROM node:slim AS build
 WORKDIR /app
 COPY webui/package.json webui/package-lock.json ./
-RUN npm install && npm cache clean --force
+RUN npm install --legacy-peer-deps && npm cache clean --force
 COPY webui ./
 RUN ["npm", "run", "build"] 
 

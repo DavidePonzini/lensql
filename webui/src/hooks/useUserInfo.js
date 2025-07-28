@@ -49,6 +49,11 @@ function UserInfoProvider({ children }) {
         });
     }, []);
 
+    const logoutUser = useCallback(() => {
+        setUserInfo(null);
+        logout();
+    }, [logout]);
+
     useEffect(() => {
         if (accessToken && !userInfo) {
             loadUserInfo();
@@ -59,7 +64,8 @@ function UserInfoProvider({ children }) {
         userInfo,
         loadUserInfo,
         incrementStats,
-    }), [userInfo, loadUserInfo, incrementStats]);
+        logout: logoutUser,
+    }), [userInfo, loadUserInfo, incrementStats, logoutUser]);
 
     return (
         <UserInfoContext.Provider value={value}>{children}</UserInfoContext.Provider>

@@ -15,9 +15,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Includes Popper.js automa
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-// Common CSS
-import './styles/_colors.css';
-import './styles/_common.css';
+// Translations
+import './i18n';
 
 import './index.css';
 

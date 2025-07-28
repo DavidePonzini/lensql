@@ -3,7 +3,7 @@ FROM node:slim
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install && npm cache clean --force
+RUN npm install --legacy-peer-deps && npm cache clean --force
 
 COPY . .
 

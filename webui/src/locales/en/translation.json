@@ -1,0 +1,22 @@
+{
+    "nav": {
+        "home": "Home",
+        "profile": "Profile",
+        "view_profile": "View Profile",
+        "learning": "Learning Insights",
+        "courses": "Courses",
+        "admin": "Admin",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "loading": "Loading...",
+        "unknown": "Unknown",
+        "username_tooltip": "Your username",
+        "admin_tooltip": "Admin"
+    },
+    "language": {
+        "label": "Language",
+        "en": "EN",
+        "it": "IT"
+    }
+}
