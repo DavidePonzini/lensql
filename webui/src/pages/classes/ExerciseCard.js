@@ -7,6 +7,7 @@ import SetLearningObjectives from './SetLearningObjectives';
 import ExerciseUpdate from './ExerciseUpdate';
 import { NavLink } from 'react-router-dom';
 import LearningStatsAll from '../../components/LearningStatsAll';
+import { useTranslation } from 'react-i18next';
 
 function ExerciseCard({
     children,
@@ -23,6 +24,7 @@ function ExerciseCard({
     learningObjectives = []
 }) {
     const { apiRequest } = useAuth();
+    const { t } = useTranslation();
 
     const [submitted, setSubmitted] = useState(isSubmitted);
     const [hidden, setHidden] = useState(isHidden);
@@ -34,8 +36,7 @@ function ExerciseCard({
         });
 
         setSubmitted(true);
-        if (onSubmit)
-            onSubmit(exerciseId);
+        if (onSubmit) onSubmit(exerciseId);
     }
 
     async function handleUnsubmit() {
@@ -45,8 +46,7 @@ function ExerciseCard({
         });
 
         setSubmitted(false);
-        if (onUnsubmit)
-            onUnsubmit(exerciseId);
+        if (onUnsubmit) onUnsubmit(exerciseId);
     }
 
     async function handleHide() {
@@ -68,7 +68,7 @@ function ExerciseCard({
     }
 
     async function handleDelete() {
-        if (!window.confirm('Are you sure you want to delete this exercise? This action cannot be undone.')) {
+        if (!window.confirm(t('exercise.delete_confirm'))) {
             return;
         }
 
@@ -89,42 +89,30 @@ function ExerciseCard({
             <Card.Header>
                 <h5 className="card-title">
                     {title}
-                    {hidden && (
-                        <span className="badge bg-secondary ms-2">
-                            Hidden
-                        </span>
-                    )}
-                    {isSolved && (
-                        <span className="badge bg-success ms-2">
-                            Solved
-                        </span>
-                    )}
+                    {hidden && <span className="badge bg-secondary ms-2">{t('exercise.hidden')}</span>}
+                    {isSolved && <span className="badge bg-success ms-2">{t('exercise.solved')}</span>}
                 </h5>
             </Card.Header>
 
             <Card.Body>
-                <Card.Text>
-                    {children}
-                </Card.Text>
+                <Card.Text>{children}</Card.Text>
 
                 <div className='row my-2'>
                     {isTeacher && learningObjectives.length > 0 && (
                         <>
                             <div className='col'>
-                                <b>Learning Objectives:</b>
+                                <b>{t('exercise.objectives')}:</b>
                                 <div>
-                                    {learningObjectives.map(({ objective, description }, index) => (
+                                    {learningObjectives.map((o, index) => (
                                         <span
                                             key={index}
                                             className="badge bg-secondary me-2"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="bottom"
-                                            data-bs-title={description}
-                                            style={{
-                                                cursor: 'default',
-                                            }}
+                                            data-bs-title={t(`learning_objectives.objectives.${o}.description`, o)}
+                                            style={{ cursor: 'default' }}
                                         >
-                                            {objective}
+                                            {t(`learning_objectives.objectives.${o}.label`, o)}
                                         </span>
                                     ))}
                                 </div>
@@ -134,13 +122,12 @@ function ExerciseCard({
                                 <div className='vr'></div>
                             </div>
                         </>
-
                     )}
 
                     <div className='col'>
                         {isGenerated && (
                             <span className="badge bg-info mx-1 my-2">
-                                AI Generated
+                                {t('exercise.generated')}
                             </span>
                         )}
                     </div>
@@ -154,7 +141,7 @@ function ExerciseCard({
                         className="me-2 mb-1"
                         onClick={handleUnsubmit}
                     >
-                        Unarchive
+                        {t('exercise.unarchive')}
                     </Button>
                 ) : (
                     <>
@@ -162,7 +149,7 @@ function ExerciseCard({
                             to={`/exercises/${exerciseId}`}
                             className="btn btn-primary me-2 mb-1"
                         >
-                            Open
+                            {t('exercise.open')}
                         </NavLink>
 
                         <Button
@@ -170,21 +157,18 @@ function ExerciseCard({
                             className="me-2 mb-1"
                             onClick={handleSubmit}
                         >
-                            Archive
+                            {t('exercise.archive')}
                         </Button>
 
                         {isTeacher && (
                             <>
-                                <div className='vr me-2 mb-1' style={{
-                                    verticalAlign: 'middle',
-                                    height: '2.5rem',
-                                }} />
+                                <div className='vr me-2 mb-1' style={{ verticalAlign: 'middle', height: '2.5rem' }} />
 
                                 <ButtonModal
                                     className="btn btn-info me-2 mb-1"
-                                    title="Learning Analytics"
-                                    fullscreen={true}
-                                    buttonText="Learning Analytics"
+                                    title={t('exercise.analytics')}
+                                    fullscreen
+                                    buttonText={t('exercise.analytics')}
                                 >
                                     <LearningStatsAll exerciseId={exerciseId} isTeacher={isTeacher} />
                                 </ButtonModal>
@@ -207,7 +191,7 @@ function ExerciseCard({
                                         className="me-2 mb-1"
                                         onClick={handleUnhide}
                                     >
-                                        <i className="fa fa-eye"></i> Make Visible
+                                        <i className="fa fa-eye"></i> {t('exercise.show')}
                                     </Button>
                                 ) : (
                                     <Button
@@ -215,7 +199,7 @@ function ExerciseCard({
                                         className="me-2 mb-1"
                                         onClick={handleHide}
                                     >
-                                        <i className="fa fa-eye-slash"></i> Hide
+                                        <i className="fa fa-eye-slash"></i> {t('exercise.hide')}
                                     </Button>
                                 )}
 
@@ -224,7 +208,7 @@ function ExerciseCard({
                                     className="me-2 mb-1"
                                     onClick={handleDelete}
                                 >
-                                    <i className="fa fa-trash"></i> Delete
+                                    <i className="fa fa-trash"></i> {t('exercise.delete')}
                                 </Button>
                             </>
                         )}

@@ -1,14 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import BubbleMessage from "./BubbleMessage";
 import useUserInfo from "../hooks/useUserInfo";
 
 function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {}, duration = 2000 }) {
     const { incrementStats } = useUserInfo();
+    const { t } = useTranslation();
 
     const reward = rewards[0] || null;
 
-    if (!reward) {
-        return null;
-    }
+    if (!reward) return null;
+
+    const coinLabel = Math.abs(reward.coins) === 1
+        ? t('reward.coin_singular')
+        : t('reward.coin_plural');
 
     return (
         <>
@@ -25,15 +29,13 @@ function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {}, du
                 style={style}
                 duration={duration}
             >
-                {
-                    reward.reason ? (
-                        <>
-                            <strong>{reward.reason}:</strong> &nbsp;
-                        </>
-                    ) : null}
-
-                {reward.coins >= 0 ? '+' : '-'} {Math.abs(reward.coins)} {Math.abs(reward.coins) === 1 ? 'LensCoin' : 'LensCoins'} <i className="fa fa-coins" />
-            </BubbleMessage >
+                {reward.reason ? (
+                    <>
+                        <strong>{reward.reason}:&nbsp;</strong>
+                    </>
+                ) : null}
+                {reward.coins >= 0 ? '+' : '-'}{Math.abs(reward.coins)} {coinLabel} <i className="fa fa-coins" />
+            </BubbleMessage>
 
             <BubbleMessage
                 className={isAlert ? "alert alert-primary" : "text text-primary"}
@@ -47,11 +49,10 @@ function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {}, du
             >
                 {reward.reason ? (
                     <>
-                        <strong>{reward.reason}:</strong>&nbsp;
+                        <strong>{reward.reason}:&nbsp;</strong>
                     </>
                 ) : null}
-
-                {reward.experience >= 0 ? '+' : '-'}{Math.abs(reward.experience)} EXP <i className="fa fa-diamond" />
+                {reward.experience >= 0 ? '+' : '-'}{t('reward.exp', { count: Math.abs(reward.experience) })} <i className="fa fa-diamond" />
             </BubbleMessage>
         </>
     );

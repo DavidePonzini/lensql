@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import useAuth from "../hooks/useAuth";
 import ObservedOnce from "./ObservedOnce";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, PieChart, Pie, Cell } from 'recharts';
@@ -6,63 +7,53 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-function Queries({ classId = null, exerciseId = null, isTeacher = false }) {
+function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = false }) {
     const { apiRequest } = useAuth();
+    const { t } = useTranslation();
     const [data, setData] = useState(null);
 
     async function fetchData() {
         const response = await apiRequest(
             `/api/users/stats/queries?class_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
             'GET');
-        setData(response.data)
+        setData(response.data);
     }
 
-    // Total queries box
     const queriesTotal = data?.queries || 0;
     const queriesUnique = data?.queries_d || 0;
-
-    // Success rate box
     const queriesSuccess = data?.queries_success || 0;
+
     const querySuccessDataAll = [
-        { name: 'Successful', value: queriesSuccess },
-        { name: 'Failed', value: queriesTotal - queriesSuccess },
+        { name: t('learningStatsQueries.success'), value: queriesSuccess },
+        { name: t('learningStatsQueries.fail'), value: queriesTotal - queriesSuccess },
     ];
 
     const queriesTotalSelect = data?.queries_select || 0;
     const queriesSuccessSelect = data?.queries_success_select || 0;
     const querySuccessDataSelect = [
-        { name: 'Successful', value: queriesSuccessSelect },
-        { name: 'Failed', value: queriesTotalSelect - queriesSuccessSelect },
+        { name: t('learningStatsQueries.success'), value: queriesSuccessSelect },
+        { name: t('learningStatsQueries.fail'), value: queriesTotalSelect - queriesSuccessSelect },
     ];
 
-    // Query type breakdown box
     const queryTypesData = data?.query_types.map(({ type, count, success }) => ({
         type,
         success,
         fail: count - success,
         total: count,
     }));
+
     const queryTypesTootlipFormatter = (value, name) => {
-        if (name === 'success') {
-            if (value === 1)
-                return [`${value} query`, 'Successful'];
-            return [`${value} queries`, 'Successful'];
-        } else if (name === 'fail') {
-            if (value === 1)
-                return [`${value} query`, 'Failed'];
-            return [`${value} queries`, 'Failed'];
-        }
-        return [value, name];
-    }
+        const label = t(`learningStatsQueries.${name}`) || name;
+        return [value === 1 ? `${value} query` : `${value} queries`, label];
+    };
+
+    const role = isTeacher ? 'teacher' : 'student';
 
     return (
         <ObservedOnce onFirstVisible={fetchData}>
             {queriesTotal === 0 ? (
                 <p className="text-muted" style={{ fontSize: '1.2rem' }}>
-                    {isTeacher ?
-                        "You students haven't run any queries yet. When they do, we'll show you how many queries they tried, how often they worked, and what types of queries they used."
-                        : "You haven't run any queries yet. When you do, we'll show you how many queries you tried, how often they worked, and what types of queries you used."
-                    }
+                    {t(`learningStatsQueries.empty.${role}`)}
                 </p>
             ) : (
                 <>
@@ -70,16 +61,15 @@ function Queries({ classId = null, exerciseId = null, isTeacher = false }) {
                         <Col xs={4}>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>{isTeacher ? "Your Students' SQL Journey" : "Your SQL Journey"}</Card.Title>
+                                    <Card.Title>{t(`learningStatsQueries.title.${role}`)}</Card.Title>
                                 </Card.Header>
                                 <Card.Body>
                                     <div>
-                                        <strong>Distinct queries tried:</strong> {queriesUnique}
-                                        <br />
-                                        <strong>Total queries executed:</strong> {queriesTotal}
+                                        <strong>{t('learningStatsQueries.stats.distinct')}:</strong> {queriesUnique}<br />
+                                        <strong>{t('learningStatsQueries.stats.total')}:</strong> {queriesTotal}
                                     </div>
                                     <div className="mt-2 text-muted" style={{ fontSize: '0.9rem' }}>
-                                        Every attempt helps — even retries are part of the learning curve.
+                                        {t('learningStatsQueries.stats.note')}
                                     </div>
                                 </Card.Body>
                             </Card>
@@ -88,17 +78,13 @@ function Queries({ classId = null, exerciseId = null, isTeacher = false }) {
                         <Col>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>How often things worked</Card.Title>
+                                    <Card.Title>{t('learningStatsQueries.success_title')}</Card.Title>
                                 </Card.Header>
                                 <Card.Body>
                                     <Row>
                                         <Col>
-                                            <div style={{
-                                                textAlign: 'center',
-                                                fontSize: '1.2rem',
-                                                fontWeight: 'bold'
-                                            }}>
-                                                SELECT Queries
+                                            <div className="text-center fw-bold" style={{ fontSize: '1.2rem' }}>
+                                                {t('learningStatsQueries.select_label')}
                                             </div>
                                             <ResponsiveContainer width="100%" height={100}>
                                                 <PieChart>
@@ -110,8 +96,8 @@ function Queries({ classId = null, exerciseId = null, isTeacher = false }) {
                                                         startAngle={90}
                                                         endAngle={-270}
                                                     >
-                                                        <Cell fill="#198754" /> {/* Green for success */}
-                                                        <Cell fill="#dc3545" /> {/* Red for failure */}
+                                                        <Cell fill="#198754" />
+                                                        <Cell fill="#dc3545" />
                                                     </Pie>
                                                     <Tooltip formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]} />
                                                     <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
@@ -124,12 +110,8 @@ function Queries({ classId = null, exerciseId = null, isTeacher = false }) {
                                             </ResponsiveContainer>
                                         </Col>
                                         <Col>
-                                            <div style={{
-                                                textAlign: 'center',
-                                                fontSize: '1.2rem',
-                                                fontWeight: 'bold'
-                                            }}>
-                                                All Queries
+                                            <div className="text-center fw-bold" style={{ fontSize: '1.2rem' }}>
+                                                {t('learningStatsQueries.all_label')}
                                             </div>
                                             <ResponsiveContainer width="100%" height={100}>
                                                 <PieChart>
@@ -141,12 +123,12 @@ function Queries({ classId = null, exerciseId = null, isTeacher = false }) {
                                                         startAngle={90}
                                                         endAngle={-270}
                                                     >
-                                                        <Cell fill="#198754" /> {/* Green for success */}
-                                                        <Cell fill="#dc3545" /> {/* Red for failure */}
+                                                        <Cell fill="#198754" />
+                                                        <Cell fill="#dc3545" />
                                                     </Pie>
                                                     <Tooltip formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]} />
                                                     <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
-                                                        {queriesTotalSelect === 0 ?
+                                                        {queriesTotal === 0 ?
                                                             0 :
                                                             (queriesSuccess / queriesTotal * 100).toFixed(0)
                                                         }%
@@ -164,21 +146,15 @@ function Queries({ classId = null, exerciseId = null, isTeacher = false }) {
                         <Col>
                             <Card>
                                 <Card.Header>
-                                    <Card.Title>{isTeacher ? "What kind of queries are your students running?" : "What kind of queries are you running?"}</Card.Title>
+                                    <Card.Title>{t(`learningStatsQueries.chart_title.${role}`)}</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        {isTeacher ?
-                                            "Here's the mix of SQL commands your students have used, and how they turned out."
-                                            : "Here's the mix of SQL commands you've used, and how they turned out."
-                                        }
+                                        {t(`learningStatsQueries.chart_subtitle.${role}`)}
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
                                     {queriesTotal === 0 ? (
                                         <div className="text-center text-muted" style={{ fontSize: '1.2rem' }}>
-                                            {isTeacher ?
-                                                "No queries run yet. Wait for your students to start exploring SQL!"
-                                                : "No queries run yet. Start exploring SQL!"
-                                            }
+                                            {t(`learningStatsQueries.chart_empty.${role}`)}
                                         </div>
                                     ) : (
                                         <ResponsiveContainer width="100%" height={40 * queryTypesData?.length || 1}>
@@ -203,4 +179,4 @@ function Queries({ classId = null, exerciseId = null, isTeacher = false }) {
     );
 }
 
-export default Queries;
+export default LearningStatsQueries;

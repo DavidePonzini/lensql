@@ -18,5 +18,507 @@
         "label": "Lingua",
         "en": "EN",
         "it": "IT"
+    },
+    "gamificationStats": {
+        "level": "Livello",
+        "xp": "Punti esperienza",
+        "coins": "LensCoins"
+    },
+    "alert": {
+        "under_development": "🚧 Questa sezione è in fase di sviluppo."
+    },
+    "badge": {
+        "title": "🏆 Obiettivo Raggiunto!",
+        "exp": "{{count}} EXP",
+        "coins": "{{count}} LensCoins"
+    },
+    "reward": {
+        "coin_singular": "LensCoin",
+        "coin_plural": "LensCoins",
+        "exp": "{{count}} EXP"
+    },
+    "button": {
+        "locked_tooltip": "Questa azione è bloccata",
+        "free": "Gratis"
+    },
+    "modal": {
+        "close": "Chiudi"
+    },
+    "dataset": {
+        "title": "Dataset",
+        "loading": "Caricamento..."
+    },
+    "footer": {
+        "developed_by": "Sviluppato da Davide Ponzini.",
+        "license": "Licenza Pubblica Generale GNU",
+        "contact": "Contatta",
+        "social": {
+            "website": "Sito Web",
+            "github": "GitHub",
+            "email": "Email"
+        }
+    },
+    "assignment": {
+        "title": "Assegna a",
+        "select_all": "Seleziona tutti"
+    },
+    "learning": {
+        "queries_teacher": "Esploriamo le query dei tuoi studenti",
+        "queries_student": "Esploriamo le tue query",
+        "messages": "Trasformare le domande in progresso",
+        "errors": "Dove le cose si sono complicate"
+    },
+    "learningStatsErrors": {
+        "empty": {
+            "student": "Non hai ancora commesso errori. Quando lo farai, ti mostreremo i tipi di errori e come sono cambiati nel tempo.",
+            "teacher": "I tuoi studenti non hanno ancora commesso errori. Quando lo faranno, ti mostreremo i tipi di errori e come sono cambiati nel tempo."
+        },
+        "kind_title": "Che tipo di problemi sono emersi?",
+        "kind_subtitle": {
+            "student": "I tuoi errori rientrano in alcune categorie principali — ecco una panoramica.",
+            "teacher": "Gli errori dei tuoi studenti rientrano in alcune categorie principali — ecco una panoramica."
+        },
+        "kind_body": {
+            "student": "In fase di sviluppo! Questa sezione classificherà i tuoi errori in sintattici, semantici, logici e complicazioni.",
+            "teacher": "In fase di sviluppo! Questa sezione classificherà gli errori dei tuoi studenti in sintattici, semantici, logici e complicazioni."
+        },
+        "common_title": "Errori più comuni",
+        "common_subtitle": {
+            "student": "Ecco i pattern di errore più frequenti rilevati nelle tue query.",
+            "teacher": "Ecco i pattern di errore più frequenti rilevati nelle query dei tuoi studenti."
+        },
+        "common_body": {
+            "student": "In fase di sviluppo! Questa sezione mostrerà i pattern di errore più frequenti nelle tue query.",
+            "teacher": "In fase di sviluppo! Questa sezione mostrerà i pattern di errore più frequenti nelle query dei tuoi studenti."
+        },
+        "timeline_title": {
+            "student": "Come sono cambiati i tuoi errori nel tempo",
+            "teacher": "Come sono cambiati gli errori dei tuoi studenti nel tempo"
+        },
+        "timeline_subtitle": {
+            "student": "Guarda se stai commettendo meno errori man mano che progredisci.",
+            "teacher": "Guarda se i tuoi studenti stanno commettendo meno errori man mano che progrediscono."
+        },
+        "timeline_body": {
+            "student": "In fase di sviluppo! Questa sezione mostrerà una linea temporale degli errori, aiutandoti a monitorare i tuoi progressi.",
+            "teacher": "In fase di sviluppo! Questa sezione mostrerà una linea temporale degli errori degli studenti, aiutandoti a monitorare i loro progressi."
+        }
+    },
+    "learningStatsMessages": {
+        "empty": {
+            "student": "Non hai ancora chiesto aiuto. Quando lo farai, ti mostreremo quante volte hai chiesto spiegazioni e quanto hai compreso le risposte.",
+            "teacher": "I tuoi studenti non hanno ancora chiesto aiuto. Quando lo faranno, ti mostreremo quante volte hanno chiesto spiegazioni e quanto hanno compreso le risposte."
+        },
+        "title_help": {
+            "student": "Tu hai chiesto, Lens ha spiegato",
+            "teacher": "I tuoi studenti hanno chiesto, Lens ha spiegato"
+        },
+        "subtitle_help": {
+            "student": "Bloccato o curioso? Ecco quando hai chiesto spiegazioni o chiarimenti sulle query.",
+            "teacher": "Bloccati o curiosi? Ecco quando i tuoi studenti hanno chiesto spiegazioni o chiarimenti sulle loro query."
+        },
+        "list_title": {
+            "student": "Quando hai chiesto aiuto:",
+            "teacher": "Quando i tuoi studenti hanno chiesto aiuto:"
+        },
+        "list_labels": {
+            "total": "Richieste totali",
+            "select": "Sulle query SELECT"
+        },
+        "chart_title": {
+            "student": "Cosa stavi cercando:",
+            "teacher": "Cosa stavano cercando i tuoi studenti:"
+        },
+        "understanding_results": "Comprendere risultati",
+        "understanding_errors": "Comprendere errori",
+        "title_feedback": {
+            "student": "Hai valutato le risposte",
+            "teacher": "I tuoi studenti hanno valutato le risposte"
+        },
+        "subtitle_feedback": {
+            "student": "Hai dato un voto positivo o negativo alle spiegazioni — questo ci aiuta a migliorare.",
+            "teacher": "I tuoi studenti hanno dato un voto positivo o negativo alle spiegazioni — questo ci aiuta a migliorare."
+        },
+        "feedback_given": "Feedback fornito",
+        "feedback_not_given": "Nessun feedback"
+    },
+    "learningStatsQueries": {
+        "empty": {
+            "student": "Non hai ancora eseguito query. Quando lo farai, ti mostreremo quante query hai provato, quante hanno funzionato e quali tipi hai usato.",
+            "teacher": "I tuoi studenti non hanno ancora eseguito query. Quando lo faranno, ti mostreremo quante ne hanno provate, quante hanno funzionato e quali tipi hanno usato."
+        },
+        "title": {
+            "student": "Il tuo percorso SQL",
+            "teacher": "Il percorso SQL dei tuoi studenti"
+        },
+        "stats": {
+            "distinct": "Query distinte provate",
+            "total": "Query totali eseguite",
+            "note": "Ogni tentativo conta — anche i ripetuti fanno parte dell’apprendimento."
+        },
+        "success_title": "Quanto spesso ha funzionato",
+        "select_label": "Query SELECT",
+        "all_label": "Tutte le query",
+        "chart_title": {
+            "student": "Che tipo di query stai eseguendo?",
+            "teacher": "Che tipo di query stanno eseguendo i tuoi studenti?"
+        },
+        "chart_subtitle": {
+            "student": "Ecco i vari comandi SQL che hai usato e come sono andati.",
+            "teacher": "Ecco i vari comandi SQL che i tuoi studenti hanno usato e come sono andati."
+        },
+        "chart_empty": {
+            "student": "Nessuna query eseguita. Inizia a esplorare SQL!",
+            "teacher": "Nessuna query eseguita. Aspetta che i tuoi studenti inizino a esplorare SQL!"
+        },
+        "success": "Corrette",
+        "fail": "Errate"
+    },
+    "admin": {
+        "title": "Pagina di amministrazione",
+        "empty": "Nessun contenuto disponibile"
+    },
+    "class": {
+        "new": "Nuovo Corso",
+        "save": "Salva"
+    },
+    "class_card": {
+        "exercises": "Esercizi",
+        "queries": "Query eseguite",
+        "badge_teacher": "Docente",
+        "join_code": "Codice di iscrizione",
+        "students": "Studenti",
+        "open": "Apri",
+        "leave": "Lascia",
+        "confirm_leave": "Sei sicuro di voler lasciare questa classe?",
+        "learning_analytics": "Statistiche di Apprendimento",
+        "set_teachers": "Imposta Docenti",
+        "participants": "Partecipanti"
+    },
+    "class_list": {
+        "title": "I miei corsi",
+        "empty_1": "Nessun corso trovato. Unisciti a un corso per vedere gli esercizi.",
+        "empty_2": "Se vuoi eseguire una query non assegnata da un docente, crea un nuovo corso.",
+        "join": "Unisciti a un corso",
+        "join_prompt": "Inserisci il codice del corso:"
+    },
+    "class_mask": {
+        "title_label": "Titolo",
+        "dataset_label": "Dataset (Opzionale)",
+        "tips_title": "Suggerimenti",
+        "tips": [
+            "Includi l'intero script in un blocco <code>BEGIN; ... COMMIT;</code>",
+            "Inizia lo script con <code>DROP SCHEMA IF EXISTS schema_name CASCADE;</code>",
+            "Usa un <code>search_path</code> unico per ogni dataset",
+            "Raggruppa le inserzioni in un unico comando <code>INSERT INTO</code> per ogni tabella per migliorare le prestazioni"
+        ]
+    },
+    "class_update": {
+        "modal_title": "Modifica Corso",
+        "button_text": "Modifica",
+        "save": "Salva"
+    },
+    "exercise_add": {
+        "title": "Aggiungi Esercizio",
+        "button_text": "Nuovo Esercizio",
+        "save": "Salva"
+    },
+    "exercise": {
+        "hidden": "Nascosto",
+        "solved": "Risolto",
+        "generated": "Generato dall'IA",
+        "objectives": "Obiettivi di Apprendimento",
+        "archive": "Archivia",
+        "unarchive": "Annulla Archiviazione",
+        "open": "Apri",
+        "analytics": "Statistiche di Apprendimento",
+        "edit": "Modifica",
+        "objectives_set": "Imposta Obiettivi",
+        "hide": "Nascondi",
+        "show": "Rendi Visibile",
+        "delete": "Elimina",
+        "delete_confirm": "Sei sicuro di voler eliminare questo esercizio? Questa azione non può essere annullata."
+    },
+    "exercise_list": {
+        "title": "Esercizi",
+        "none": "Nessun esercizio",
+        "archived": "Archiviati",
+        "archived_none": "Nessun esercizio archiviato"
+    },
+    "exercise_mask": {
+        "title": "Titolo",
+        "request": "Richiesta",
+        "answer_optional": "Risposta (facoltativa)"
+    },
+    "exercise_update": {
+        "title": "Modifica esercizio",
+        "button": "Modifica",
+        "save": "Salva"
+    },
+    "learning_objectives": {
+        "title": "Imposta obiettivi",
+        "button": "Imposta obiettivi",
+        "list_title": "Imposta obiettivi di apprendimento",
+        "objectives": {
+            "Simple Select": {
+                "label": "SELECT semplice",
+                "description": "Scrivi un'istruzione SELECT semplice per recuperare dati da una sola tabella."
+            },
+            "Single condition": {
+                "label": "Condizione singola",
+                "description": "Scrivi query che filtrano i risultati in base a una sola condizione."
+            },
+            "Distinct": {
+                "label": "DISTINCT",
+                "description": "Usa la parola chiave DISTINCT per eliminare righe duplicate dai risultati."
+            },
+            "Aggregate functions": {
+                "label": "Funzioni di aggregazione",
+                "description": "Usa funzioni come COUNT, SUM, AVG, MIN e MAX per riassumere i dati."
+            },
+            "Subquery in SELECT": {
+                "label": "Subquery in SELECT",
+                "description": "Scrivi query che includono sottoquery nella clausola SELECT."
+            },
+            "Case statements": {
+                "label": "Istruzioni CASE",
+                "description": "Usa le istruzioni CASE per creare logica condizionale nelle query."
+            },
+            "String functions": {
+                "label": "Funzioni stringa",
+                "description": "Applica funzioni stringa per manipolare i dati testuali nelle query."
+            },
+            "Date functions": {
+                "label": "Funzioni di data",
+                "description": "Usa funzioni di data per manipolare e formattare dati temporali."
+            },
+            "Numeric functions": {
+                "label": "Funzioni numeriche",
+                "description": "Applica funzioni numeriche per effettuare calcoli su dati numerici."
+            },
+            "Window functions": {
+                "label": "Funzioni finestra",
+                "description": "Usa le funzioni finestra per calcolare risultati su insiemi di righe correlate."
+            },
+            "Simple join": {
+                "label": "JOIN semplice",
+                "description": "Scrivi query che utilizzano un join tra due tabelle per ottenere dati correlati."
+            },
+            "Self join": {
+                "label": "SELF JOIN",
+                "description": "Scrivi query che utilizzano un self-join per confrontare righe nella stessa tabella."
+            },
+            "Left join": {
+                "label": "LEFT JOIN",
+                "description": "Scrivi query che usano LEFT JOIN per ottenere tutte le righe da una tabella e quelle corrispondenti da un'altra."
+            },
+            "Right join": {
+                "label": "RIGHT JOIN",
+                "description": "Scrivi query che usano RIGHT JOIN per ottenere tutte le righe da una tabella e quelle corrispondenti da un'altra."
+            },
+            "Full outer join": {
+                "label": "FULL OUTER JOIN",
+                "description": "Usa FULL OUTER JOIN per ottenere tutte le righe dove c'è una corrispondenza in almeno una tabella."
+            },
+            "Subquery in FROM": {
+                "label": "Subquery in FROM",
+                "description": "Usa sottoquery nella clausola FROM per creare tabelle derivate."
+            },
+            "Multiple conditions": {
+                "label": "Condizioni multiple",
+                "description": "Usa operatori logici per filtrare i risultati in base a più condizioni."
+            },
+            "Subquery in WHERE": {
+                "label": "Subquery in WHERE",
+                "description": "Usa sottoquery nella clausola WHERE per filtrare i risultati in base a dati correlati."
+            },
+            "Correlated subqueries": {
+                "label": "Sottoquery correlate",
+                "description": "Scrivi sottoquery che fanno riferimento a colonne della query esterna."
+            },
+            "Group by": {
+                "label": "GROUP BY",
+                "description": "Raggruppa i risultati usando GROUP BY per aggregare i dati."
+            },
+            "Group by with conditions": {
+                "label": "Clausola HAVING",
+                "description": "Usa la clausola HAVING per filtrare i risultati aggregati."
+            },
+            "Order by": {
+                "label": "ORDER BY",
+                "description": "Ordina i risultati delle query usando ORDER BY."
+            },
+            "Limit and offset": {
+                "label": "LIMIT e OFFSET",
+                "description": "Usa LIMIT e OFFSET per controllare il numero di righe restituite da una query."
+            },
+            "Union": {
+                "label": "UNION",
+                "description": "Combina i risultati di più query usando l'operatore UNION."
+            },
+            "Intersect": {
+                "label": "INTERSECT",
+                "description": "Recupera risultati comuni a più query usando INTERSECT."
+            },
+            "Except": {
+                "label": "EXCEPT",
+                "description": "Usa EXCEPT per trovare righe in una query che non sono presenti in un'altra."
+            }
+        }
+    },
+    "profile": {
+        "learning": {
+            "title": "Bentornato, {{username}}!",
+            "subtitle": "Ecco una panoramica dei tuoi progressi in SQL"
+        },
+        "home": {
+            "welcome": "Bentornato, {{username}}!",
+            "progress": "Ecco una panoramica dei tuoi progressi",
+            "level": {
+                "title": "Livello Attuale",
+                "exp": "EXP: {{xp}} / {{xpToNext}}",
+                "tip": "Ottieni più EXP studiando SQL:"
+            },
+            "coins": {
+                "title": "LensCoins",
+                "available": "{{coins}} monete disponibili",
+                "tip": "Usa i LensCoins per interagire con Lens:"
+            },
+            "achievements": {
+                "title": "Obiettivi",
+                "text": "Hai ottenuto i seguenti obiettivi:"
+            }
+        }
+    },
+    "about": {
+        "title": "Informazioni su LensQL",
+        "p1": "LensQL è una piattaforma interattiva che aiuta gli studenti a imparare SQL attraverso esercitazioni guidate, feedback personalizzati e un percorso di apprendimento gamificato. Progettata per studenti e insegnanti, favorisce una comprensione più profonda dei database relazionali, concentrandosi sul ragionamento dietro le query, non solo sulla loro correttezza.",
+        "p2": "Anziché fornire soluzioni immediate, LensQL incoraggia l’esplorazione attiva. L’assistente AI, Lens, aiuta gli studenti a riflettere sugli errori, affinare la logica e migliorare le competenze con ogni tentativo. Gli insegnanti, nel frattempo, ottengono una panoramica su come apprendono gli studenti, dove incontrano difficoltà e come supportarli al meglio.",
+        "p3": "Che tu stia eseguendo la tua prima query o perfezionando join complessi, LensQL trasforma ogni errore in un’opportunità di apprendimento.",
+        "moreTitle": "🔍 Vuoi saperne di più?",
+        "moreIntro": "LensQL è sviluppato come parte di una ricerca in corso presso l’Università di Genova. Se sei curioso di approfondire gli aspetti accademici o tecnici, ecco alcune pubblicazioni che ne esplorano i fondamenti:",
+        "paper1": "Analyzing Common Student Errors in SQL Query Formulation to Enhance Learning Support",
+        "paper1Desc": "Uno studio su larga scala sugli errori SQL degli studenti e le differenze nei diversi contesti educativi.",
+        "paper2": "Enhancing SQL Learning through Generative AI and Student Error Analysis",
+        "paper2Desc": "Un framework per feedback AI-driven, tracciamento degli errori e generazione personalizzata di esercizi nell'insegnamento di SQL.",
+        "cta": "Prova LensQL"
+    },
+    "login": {
+        "title": "Accedi al tuo account",
+        "subtitle": "Non hai un account? Registrati qui",
+        "username": "Nome utente",
+        "usernamePlaceholder": "Nome utente",
+        "usernameRequired": "Inserisci un nome utente.",
+        "password": "Password",
+        "passwordPlaceholder": "Password",
+        "passwordRequired": "Inserisci una password.",
+        "show": "Mostra password",
+        "hide": "Nascondi password",
+        "submit": "Accedi",
+        "errorEmptyFields": "Compila entrambi i campi.",
+        "errorServer": "Impossibile connettersi al server.",
+        "errorLoginFailed": "Accesso non riuscito"
+    },
+    "register": {
+        "title": "Registrati con un nuovo account",
+        "subtitle": "Hai già un account? Accedi qui",
+        "success": "Registrazione completata! Ora puoi accedere con il tuo nuovo account.",
+        "gotoLogin": "Vai al Login",
+        "submit": "Registrati",
+        "username": "Nome utente",
+        "usernamePlaceholder": "Nome utente",
+        "usernameRequired": "Inserisci un nome utente.",
+        "password": "Password",
+        "passwordPlaceholder": "Password",
+        "passwordRequired": "Inserisci una password.",
+        "passwordLength": "La password deve contenere almeno 8 caratteri.",
+        "passwordUpper": "La password deve contenere almeno una lettera maiuscola.",
+        "passwordLower": "La password deve contenere almeno una lettera minuscola.",
+        "passwordDigit": "La password deve contenere almeno un numero.",
+        "passwordSpecial": "La password deve contenere almeno un carattere speciale.",
+        "show": "Mostra password",
+        "hide": "Nascondi password",
+        "email": "Email (opzionale)",
+        "emailPlaceholder": "Email",
+        "emailRequired": "Inserisci un indirizzo email.",
+        "emailInvalid": "Inserisci un indirizzo email valido.",
+        "school": "Scuola",
+        "schoolPlaceholder": "Scuola",
+        "schoolRequired": "Inserisci la tua scuola.",
+        "errorServer": "Impossibile connettersi al server.",
+        "errorGeneric": "Registrazione fallita"
+    },
+    "gamification": {
+        "actions": {
+            "solve_exercises": "Risolvi esercizi",
+            "run_queries": "Esegui query",
+            "try_unique_queries": "Prova nuove query uniche",
+            "interact_with_lens": "Interagisci con Lens",
+            "feedback_on_lens": "Dai un feedback sull’aiuto di Lens",
+            "achievements": "Sblocca obiettivi",
+            "check_solution": "Controlla se la soluzione è corretta",
+            "ask_lens": "Chiedi aiuto a Lens"
+        },
+        "badges": {
+            "create_exercises": {
+                "1": "Hai creato il tuo primo esercizio ed eseguito una query",
+                "5": "Hai creato 5 esercizi ed eseguito una query in ognuno",
+                "10": "Hai creato 10 esercizi ed eseguito una query in ognuno"
+            },
+            "feedback": {
+                "1": "Hai lasciato il tuo primo feedback",
+                "10": "Hai lasciato 10 feedback",
+                "50": "Hai lasciato 50 feedback"
+            },
+            "queries_unique": {
+                "1": "Hai eseguito la tua prima query",
+                "10": "Hai eseguito 10 query diverse",
+                "50": "Hai eseguito 50 query diverse",
+                "100": "Hai eseguito 100 query diverse",
+                "500": "Hai eseguito 500 query diverse",
+                "1000": "Hai eseguito 1000 query diverse",
+                "2500": "Hai eseguito 2500 query diverse",
+                "5000": "Hai eseguito 5000 query diverse",
+                "10000": "Hai eseguito 10000 query diverse"
+            },
+            "exercise_solutions": {
+                "1": "Hai risolto il tuo primo esercizio",
+                "5": "Hai risolto 5 esercizi",
+                "10": "Hai risolto 10 esercizi"
+            },
+            "help_usage": {
+                "1": "Hai interagito con Lens per la prima volta",
+                "10": "Hai interagito con Lens 10 volte",
+                "50": "Hai interagito con Lens 50 volte",
+                "100": "Hai interagito con Lens 100 volte",
+                "500": "Hai interagito con Lens 500 volte",
+                "1000": "Hai interagito con Lens 1000 volte"
+            },
+            "daily_usage": {
+                "5": "Hai eseguito una query in 5 giorni diversi",
+                "14": "Hai eseguito una query in 14 giorni diversi",
+                "30": "Hai eseguito una query in 30 giorni diversi"
+            },
+            "level_up": {
+                "3": "Hai raggiunto il livello 3",
+                "5": "Hai raggiunto il livello 5",
+                "10": "Hai raggiunto il livello 10"
+            },
+            "join_course": {
+                "1": "Ti sei unito al tuo primo corso"
+            }
+        },
+        "levels": {
+            "0": "Principiante curioso",
+            "1": "Pensatore logico",
+            "2": "Apprendista delle query",
+            "3": "Cercatore di pattern",
+            "4": "Esploratore relazionale",
+            "5": "Analista intenzionale",
+            "6": "Interprete dei dati",
+            "7": "Costruttore di intuizioni",
+            "8": "Pensatore strutturato",
+            "9": "Architetto delle query"
+        }
     }
 }

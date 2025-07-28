@@ -2,10 +2,12 @@ import ButtonModal from '../../components/ButtonModal';
 import useAuth from '../../hooks/useAuth';
 import { useState } from 'react';
 import ExerciseMask from './ExerciseMask';
+import { useTranslation } from 'react-i18next';
 
-// Button to add a new exercise + modal to fill in the details
 function ExerciseAdd({ refresh, classId }) {
     const { apiRequest } = useAuth();
+    const { t } = useTranslation();
+
     const [exerciseTitle, setExerciseTitle] = useState('');
     const [exerciseRequest, setExerciseRequest] = useState('');
     const [exerciseAnswer, setExerciseAnswer] = useState('');
@@ -20,14 +22,15 @@ function ExerciseAdd({ refresh, classId }) {
 
         refresh();
     }
+
     return (
         <ButtonModal
             className="btn btn-success"
-            title="Add Exercise"
-            buttonText="Add New Exercise"
+            title={t('exercise_add.title')}
+            buttonText={t('exercise_add.button_text')}
             footerButtons={[
                 {
-                    text: 'Save',
+                    text: t('exercise_add.save'),
                     variant: 'primary',
                     onClick: handleAddExercise,
                     autoClose: true,

@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import useAuth from '../../hooks/useAuth';
 import BubbleStatsChange from '../../components/BubbleStatsChange';
-import { Coins } from '../../constants/Gamification';
 import { setBadges } from '../../components/BadgeNotifier';
+import useGamificationData from '../../hooks/useGamificationData';
 
 import './Message.css';
 
 function Message({ children, text, messageId = null }) {
     const { apiRequest } = useAuth();
+    const { Coins } = useGamificationData();
 
     const [feedback, setFeedback] = useState(null);
     const [rewards, setRewards] = useState([]);

@@ -1,7 +1,11 @@
+import { useTranslation } from 'react-i18next';
+
 function AlertUnderDevelopment() {
+    const { t } = useTranslation();
+
     return (
         <div className="alert alert-warning mt-4" role="alert">
-            🚧 This section is under development.
+            {t('alert.under_development')}
         </div>
     );
 }

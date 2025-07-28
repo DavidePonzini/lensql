@@ -316,40 +316,40 @@ def delete(exercise_id: int) -> bool:
     except Exception:
         return False
 
-def set_learning_objective(exercise_id: int, objective: str) -> None:
+def set_learning_objective(exercise_id: int, objective_id: str) -> None:
     '''Set a learning objective for an exercise'''
 
     query = database.sql.SQL('''
-        INSERT INTO {schema}.has_learning_objective (exercise_id, objective)
-        VALUES ({exercise_id}, {objective})
-        ON CONFLICT (exercise_id, objective) DO NOTHING
+        INSERT INTO {schema}.has_learning_objective (exercise_id, objective_id)
+        VALUES ({exercise_id}, {objective_id})
+        ON CONFLICT (exercise_id, objective_id) DO NOTHING
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         exercise_id=database.sql.Placeholder('exercise_id'),
-        objective=database.sql.Placeholder('objective')
+        objective_id=database.sql.Placeholder('objective_id')
     )
 
     db.execute(query, {
         'exercise_id': exercise_id,
-        'objective': objective
+        'objective_id': objective_id
     })
 
-def unset_learning_objective(exercise_id: int, objective: str) -> None:
+def unset_learning_objective(exercise_id: int, objective_id: str) -> None:
     '''Unset a learning objective for an exercise'''
 
     query = database.sql.SQL('''
         DELETE FROM {schema}.has_learning_objective
         WHERE exercise_id = {exercise_id}
-        AND objective = {objective}
+        AND objective_id = {objective_id}
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         exercise_id=database.sql.Placeholder('exercise_id'),
-        objective=database.sql.Placeholder('objective')
+        objective_id=database.sql.Placeholder('objective_id')
     )
 
     db.execute(query, {
         'exercise_id': exercise_id,
-        'objective': objective
+        'objective_id': objective_id
     })
 
 def list_learning_objectives(exercise_id: int) -> list[str]:
@@ -357,14 +357,13 @@ def list_learning_objectives(exercise_id: int) -> list[str]:
 
     query = database.sql.SQL('''
         SELECT
-            lo.objective AS objective,
-            lo.description AS description,
-            (hlo.objective IS NOT NULL) AS is_set
+            lo.id,
+            (hlo.objective_id IS NOT NULL) AS is_set
         FROM
             {schema}.learning_objectives lo
-            LEFT JOIN {schema}.has_learning_objective hlo ON lo.objective = hlo.objective AND hlo.exercise_id = {exercise_id}
+            LEFT JOIN {schema}.has_learning_objective hlo ON lo.id = hlo.objective_id AND hlo.exercise_id = {exercise_id}
         ORDER BY
-            lo.objective
+            lo.id
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         exercise_id=database.sql.Placeholder('exercise_id')
@@ -375,9 +374,8 @@ def list_learning_objectives(exercise_id: int) -> list[str]:
     })
 
     return [{
-        'objective': row[0],
-        'description': row[1],
-        'is_set': row[2]
+        'objective_id': row[0],
+        'is_set': row[1]
     } for row in result]
 
 def get_learning_objectives(exercise_id: int) -> list[str]:
@@ -386,15 +384,14 @@ def get_learning_objectives(exercise_id: int) -> list[str]:
     query = database.sql.SQL(
     '''
         SELECT
-            hlo.objective,
-            lo.description
+            hlo.objective_id
         FROM
             {schema}.has_learning_objective hlo
-            JOIN {schema}.learning_objectives lo ON hlo.objective = lo.objective
+            JOIN {schema}.learning_objectives lo ON hlo.objective_id = lo.id
         WHERE
             hlo.exercise_id = {exercise_id}
         ORDER BY
-            hlo.objective
+            hlo.objective_id
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         exercise_id=database.sql.Placeholder('exercise_id')
@@ -404,10 +401,7 @@ def get_learning_objectives(exercise_id: int) -> list[str]:
         'exercise_id': exercise_id
     })
 
-    return [{
-        'objective': row[0],
-        'description': row[1]
-    } for row in result]
+    return [row[0] for row in result]
                              
 
 def get_solution(exercise_id: int) -> str | None:

@@ -84,15 +84,14 @@ CREATE TABLE exercise_submissions (
 );
 
 CREATE TABLE learning_objectives (
-    objective VARCHAR(255) NOT NULL PRIMARY KEY,
-    description TEXT NOT NULL
+    id VARCHAR(255) NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE has_learning_objective (
     exercise_id INTEGER NOT NULL REFERENCES exercises(id),
-    objective VARCHAR(255) NOT NULL REFERENCES learning_objectives(objective) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of objective if it is associated with an exercise
+    objective_id VARCHAR(255) NOT NULL REFERENCES learning_objectives(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of objective if it is associated with an exercise
 
-    PRIMARY KEY (exercise_id, objective)
+    PRIMARY KEY (exercise_id, objective_id)
 );
 
 CREATE TABLE query_batches (

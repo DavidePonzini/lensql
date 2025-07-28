@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import bg from '../res/database.jpg';
 
 function Register() {
+    const { t } = useTranslation();
+    
     const [usernameInput, setUsernameInput] = useState('');
     const [usernameError, setUsernameError] = useState('');
     const [isUsernameValid, setIsUsernameValid] = useState(false);
@@ -26,13 +29,11 @@ function Register() {
 
     function checkUsername(username) {
         setUsernameInput(username);
-
         if (!username) {
             setIsUsernameValid(false);
-            setUsernameError('Please enter a username.');
+            setUsernameError(t('register.usernameRequired'));
             return false;
         }
-
         setIsUsernameValid(true);
         setUsernameError('');
         return true;
@@ -41,76 +42,48 @@ function Register() {
     function checkPassword(password) {
         setPasswordInput(password);
 
-        if (!password) {
-            setIsPasswordValid(false);
-            setPasswordError('Please enter a password.');
-            return false;
-        }
-
-        if (password.length < 8) {
-            setIsPasswordValid(false);
-            setPasswordError('Password must be at least 8 characters long.');
-            return false;
-        }
-
-        if (!/[A-Z]/.test(password)) {
-            setIsPasswordValid(false);
-            setPasswordError('Password must contain at least one uppercase letter.');
-            return false;
-        }
-
-        if (!/[a-z]/.test(password)) {
-            setIsPasswordValid(false);
-            setPasswordError('Password must contain at least one lowercase letter.');
-            return false;
-        }
-
-        if (!/[0-9]/.test(password)) {
-            setIsPasswordValid(false);
-            setPasswordError('Password must contain at least one number.');
-            return false;
-        }
-
-        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-            setIsPasswordValid(false);
-            setPasswordError('Password must contain at least one special character.');
-            return false;
-        }
+        if (!password) return invalidate(t('register.passwordRequired'));
+        if (password.length < 8) return invalidate(t('register.passwordLength'));
+        if (!/[A-Z]/.test(password)) return invalidate(t('register.passwordUpper'));
+        if (!/[a-z]/.test(password)) return invalidate(t('register.passwordLower'));
+        if (!/[0-9]/.test(password)) return invalidate(t('register.passwordDigit'));
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return invalidate(t('register.passwordSpecial'));
 
         setIsPasswordValid(true);
         setPasswordError('');
         return true;
+
+        function invalidate(msg) {
+            setIsPasswordValid(false);
+            setPasswordError(msg);
+            return false;
+        }
     }
 
     function checkEmail(email) {
         setEmailInput(email);
-
-        if (!email) {
-            setIsEmailValid(false);
-            setEmailError('Please enter an email address.');
-            return false;
-        }
-
+        if (!email) return valid(); // Optional
         if (!email.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
             setIsEmailValid(false);
-            setEmailError('Please enter a valid email address.');
+            setEmailError(t('register.emailInvalid'));
             return false;
         }
+        return valid();
 
-        setIsEmailValid(true);
-        setEmailError('');
-        return true;
+        function valid() {
+            setIsEmailValid(true);
+            setEmailError('');
+            return true;
+        }
     }
 
     function checkSchool(school) {
         setSchoolInput(school);
-
         if (!school) {
             setIsSchoolValid(false);
-            setSchoolError('Please enter your school.');
+            setSchoolError(t('register.schoolRequired'));
             return false;
         }
-
         setIsSchoolValid(true);
         setSchoolError('');
         return true;
@@ -122,9 +95,7 @@ function Register() {
         try {
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     username: usernameInput,
                     password: passwordInput,
@@ -134,21 +105,19 @@ function Register() {
             });
 
             const data = await response.json();
-            console.log(data);
-
             if (data.success) {
                 setError('');
                 setSuccess(true);
             } else {
-                setError(data.message || 'Registration failed');
+                setError(data.message || t('register.errorGeneric'));
             }
-        } catch (error) {
-            setError('Could not connect to the server.');
+        } catch {
+            setError(t('register.errorServer'));
         }
     }
 
     return (
-        <div className='container-md'>
+        <div className="container-md">
             <section>
                 <div className="row g-0">
                     <div className="col-md-6 col-lg-5 d-none d-md-block" style={{
@@ -168,10 +137,11 @@ function Register() {
                                     <i className="fas fa-search fa-2x me-3" style={{ color: 'var(--logo-color)' }} />
                                     <span className="h1 fw-bold mb-0">LensQL</span>
                                 </div>
-                                <h5 className="fw-normal mb-1" style={{ letterSpacing: 1 }}>Register a new account</h5>
+
+                                <h5 className="fw-normal mb-1">{t('register.title')}</h5>
 
                                 <Link to="/login" className="text-muted mb-4 d-block">
-                                    Already have an account? Log in here
+                                    {t('register.subtitle')}
                                 </Link>
 
                                 {error && (
@@ -182,115 +152,96 @@ function Register() {
 
                                 {success && (
                                     <div className="alert alert-success" role="alert">
-                                        Registration successful! You can now log in with your new account.
+                                        {t('register.success')}
                                         <br />
-                                        <Link to="/login" className="alert-link">Go to Login</Link>
+                                        <Link to="/login" className="alert-link">{t('register.gotoLogin')}</Link>
                                     </div>
                                 )}
 
+                                {/* Username */}
                                 <div className="form-outline mb-4">
-                                    <label className="form-label" htmlFor="login-username">
-                                        Username
+                                    <label className="form-label" htmlFor="register-username">
+                                        {t('register.username')}
                                     </label>
                                     <input
                                         type="text"
-                                        id="login-username"
+                                        id="register-username"
                                         className={`form-control form-control-lg ${usernameError ? 'is-invalid' : ''}`}
-                                        placeholder="Username"
+                                        placeholder={t('register.usernamePlaceholder')}
                                         value={usernameInput}
                                         onInput={(e) => checkUsername(e.target.value)}
-                                        autoFocus={true}
+                                        autoFocus
                                     />
-                                    {usernameError && (
-                                        <div className="invalid-feedback">
-                                            {usernameError}
-                                        </div>
-                                    )}
+                                    {usernameError && <div className="invalid-feedback">{usernameError}</div>}
                                 </div>
 
+                                {/* Password */}
                                 <div className="form-outline mb-4">
-                                    <label className="form-label" htmlFor="login-password">
-                                        Password
+                                    <label className="form-label" htmlFor="register-password">
+                                        {t('register.password')}
                                     </label>
-
                                     <div className="input-group">
                                         <input
                                             type={showPassword ? 'text' : 'password'}
-                                            id="login-password"
+                                            id="register-password"
                                             className={`form-control form-control-lg pe-5 ${passwordError ? 'is-invalid' : ''}`}
-                                            placeholder="Password"
+                                            placeholder={t('register.passwordPlaceholder')}
                                             value={passwordInput}
                                             onInput={(e) => checkPassword(e.target.value)}
                                         />
-                                        <div
-                                            className='input-group-text'
-                                            style={{ cursor: 'pointer' }}
-                                        >
+                                        <div className="input-group-text" style={{ cursor: 'pointer' }}>
                                             <i
                                                 className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                                                style={{ width: '1.5rem' }}
-                                            ></i>
+                                                aria-label={showPassword ? t('register.hide') : t('register.show')}
+                                            />
                                         </div>
-                                        {passwordError && (
-                                            <div className="invalid-feedback">
-                                                {passwordError}
-                                            </div>
-                                        )}
+                                        {passwordError && <div className="invalid-feedback">{passwordError}</div>}
                                     </div>
                                 </div>
 
+                                {/* Email */}
                                 <div className="form-outline mb-4">
-                                    <label className="form-label" htmlFor="login-email">
-                                        Email (Optional)
+                                    <label className="form-label" htmlFor="register-email">
+                                        {t('register.email')}
                                     </label>
                                     <input
                                         type="email"
-                                        id="login-email"
+                                        id="register-email"
                                         className={`form-control form-control-lg ${emailError ? 'is-invalid' : ''}`}
-                                        placeholder="Email"
+                                        placeholder={t('register.emailPlaceholder')}
                                         value={emailInput}
                                         onInput={(e) => checkEmail(e.target.value)}
                                     />
-                                    {emailError && (
-                                        <div className="invalid-feedback">
-                                            {emailError}
-                                        </div>
-                                    )}
+                                    {emailError && <div className="invalid-feedback">{emailError}</div>}
                                 </div>
 
+                                {/* School */}
                                 <div className="form-outline mb-4">
-                                    <label className="form-label" htmlFor="login-school">
-                                        School
+                                    <label className="form-label" htmlFor="register-school">
+                                        {t('register.school')}
                                     </label>
                                     <input
                                         type="text"
-                                        id="login-school"
+                                        id="register-school"
                                         className={`form-control form-control-lg ${schoolError ? 'is-invalid' : ''}`}
-                                        placeholder="School"
+                                        placeholder={t('register.schoolPlaceholder')}
                                         value={schoolInput}
                                         onInput={(e) => checkSchool(e.target.value)}
                                     />
-                                    {schoolError && (
-                                        <div className="invalid-feedback">
-                                            {schoolError}
-                                        </div>
-                                    )}
+                                    {schoolError && <div className="invalid-feedback">{schoolError}</div>}
                                 </div>
 
+                                {/* Submit */}
                                 <div className="pt-1 mb-4">
                                     <button
                                         className="btn btn-primary btn-lg btn-block w-100"
-                                        onClick={handleRegister}
+                                        type="submit"
                                         disabled={
-                                            !isUsernameValid ||
-                                            !isPasswordValid ||
-                                            !isEmailValid ||
-                                            !isSchoolValid
+                                            !isUsernameValid || !isPasswordValid || !isEmailValid || !isSchoolValid
                                         }
                                     >
-                                        Register
+                                        {t('register.submit')}
                                     </button>
                                 </div>
                             </form>
@@ -303,4 +254,3 @@ function Register() {
 }
 
 export default Register;
-

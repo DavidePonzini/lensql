@@ -4,12 +4,12 @@ import MessageBox from "./MessageBox";
 import ButtonAction from "../../components/ButtonAction";
 import BubbleStatsChange from "../../components/BubbleStatsChange";
 import { setBadges } from "../../components/BadgeNotifier";
-
-import { Coins } from "../../constants/Gamification";
+import useGamificationData from "../../hooks/useGamificationData";
 
 
 function Chat({ queryId, success }) {
     const { apiRequest } = useAuth();
+    const { Coins } = useGamificationData();
 
     const [messages, setMessages] = useState([
         {

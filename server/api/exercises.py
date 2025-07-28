@@ -103,7 +103,7 @@ class ObjectivesAPI(MethodView):
         username = get_jwt_identity()
         data = request.get_json()
         exercise_id = data['exercise_id']
-        objective = data['objective']
+        objective_id = data['objective_id']
         value = data['value']
 
         class_id = db.admin.exercises.get_class(exercise_id)
@@ -113,12 +113,12 @@ class ObjectivesAPI(MethodView):
         if value:
             db.admin.exercises.set_learning_objective(
                 exercise_id=exercise_id,
-                objective=objective
+                objective_id=objective_id
             )
         else:
             db.admin.exercises.unset_learning_objective(
                 exercise_id=exercise_id,
-                objective=objective
+                objective_id=objective_id
             )
 
         return responses.response(True)

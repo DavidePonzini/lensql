@@ -6,11 +6,12 @@ import ButtonShowDataset from "../../components/ButtonShowDataset";
 import ButtonCategory from "./ButtonCategory";
 import BubbleStatsChange from '../../components/BubbleStatsChange';
 import { setBadges } from '../../components/BadgeNotifier';
-import { Coins } from '../../constants/Gamification';
-
+import useGamificationData from '../../hooks/useGamificationData';
 
 function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecuting, setResult, attempts: initialAttempts, hasSolution }) {
     const { apiRequest } = useAuth();
+    const { Coins } = useGamificationData();
+    
     const [rewards, setRewards] = useState([]);
     const [attempts, setAttempts] = useState(initialAttempts);
 

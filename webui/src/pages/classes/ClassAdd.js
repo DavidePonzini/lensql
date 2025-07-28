@@ -1,11 +1,12 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ButtonModal from '../../components/ButtonModal';
 import useAuth from '../../hooks/useAuth';
-import { useState } from 'react';
 import ClassMask from './ClassMask';
 
-// Button to add a new exercise + modal to fill in the details
 function ClassAdd({ refresh, className }) {
     const { apiRequest } = useAuth();
+    const { t } = useTranslation();
     const [title, setTitle] = useState('');
     const [dataset, setDataset] = useState('');
 
@@ -17,19 +18,20 @@ function ClassAdd({ refresh, className }) {
 
         refresh();
     }
+
     return (
         <ButtonModal
             className={className}
-            title="New Course"
+            title={t('class.new')}
             size='lg'
             buttonText={
                 <span>
-                    <i className="fa fa-plus me-1"></i> New Course
+                    <i className="fa fa-plus me-1"></i> {t('class.new')}
                 </span>
             }
             footerButtons={[
                 {
-                    text: 'Save',
+                    text: t('class.save'),
                     variant: 'primary',
                     onClick: handleAdd,
                     autoClose: true,

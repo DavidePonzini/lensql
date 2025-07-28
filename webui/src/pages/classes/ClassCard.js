@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import useAuth from '../../hooks/useAuth';
 import ItemAssignmentList from '../../components/ItemAssignmentList';
 import ButtonModal from '../../components/ButtonModal';
@@ -9,10 +10,10 @@ import LearningStatsAll from '../../components/LearningStatsAll';
 
 function ClassCard({ title, classId, isTeacher = false, participants, exercises, queries, refreshClasses }) {
     const { apiRequest, userInfo } = useAuth();
+    const { t } = useTranslation();
 
     async function getMembers() {
         const response = await apiRequest(`/api/classes/members/${classId}`, 'GET');
-
         return response.members.map(member => ({
             id: member.username,
             label: member.username,
@@ -21,7 +22,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
     }
 
     async function handleLeave() {
-        if (!window.confirm('Are you sure you want to leave this class?')) {
+        if (!window.confirm(t('class_card.confirm_leave'))) {
             return;
         }
 
@@ -36,7 +37,6 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
 
         refreshClasses();
     }
-
 
     async function makeTeacher(id, value) {
         await apiRequest('/api/classes/set-teacher', 'POST', {
@@ -55,18 +55,18 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
             </Card.Header>
 
             <Card.Body>
-                <strong>Exercises:</strong> {exercises}
+                <strong>{t('class_card.exercises')}:</strong> {exercises}
                 <br />
-                <strong>Queries executed:</strong> {queries}
+                <strong>{t('class_card.queries')}:</strong> {queries}
 
                 {isTeacher && (
                     <>
                         <hr />
-                        <span className="badge bg-success">Teacher</span>
+                        <span className="badge bg-success">{t('class_card.badge_teacher')}</span>
                         <br />
-                        <strong>Join Code:</strong> {classId}
+                        <strong>{t('class_card.join_code')}:</strong> {classId}
                         <br />
-                        <strong>Students:</strong> {participants}
+                        <strong>{t('class_card.students')}:</strong> {participants}
                     </>
                 )}
             </Card.Body>
@@ -76,7 +76,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                     to={classId}
                     className="btn btn-primary me-2"
                 >
-                    Open
+                    {t('class_card.open')}
                 </NavLink>
 
                 <ButtonShowDataset
@@ -90,21 +90,17 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                     onClick={handleLeave}
                     className='me-2'
                 >
-                    Leave
+                    {t('class_card.leave')}
                 </Button>
 
                 {isTeacher && (
                     <>
-                        <div className='vr me-2 mb-1' style={{
-                            verticalAlign: 'middle',
-                            height: '2.5rem',
-                        }} />
-
+                        <div className='vr me-2 mb-1' style={{ verticalAlign: 'middle', height: '2.5rem' }} />
 
                         <ButtonModal
                             className="btn btn-info me-2"
-                            title="Learning Analytics"
-                            buttonText="Learning Analytics"
+                            title={t('class_card.learning_analytics')}
+                            buttonText={t('class_card.learning_analytics')}
                             fullscreen={true}
                         >
                             <LearningStatsAll classId={classId} isTeacher={isTeacher} />
@@ -119,14 +115,14 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
 
                         <ButtonModal
                             className="btn btn-warning me-2"
-                            title="Set Teachers"
-                            buttonText="Set Teachers"
+                            title={t('class_card.set_teachers')}
+                            buttonText={t('class_card.set_teachers')}
                         >
                             <ItemAssignmentList
                                 fetchItems={getMembers}
                                 assignAction={makeTeacher}
-                                title='Participants'
-                                disabledItems={[userInfo?.username]}  // Prevent self from being unassigned
+                                title={t('class_card.participants')}
+                                disabledItems={[userInfo?.username]}
                             />
                         </ButtonModal>
                     </>

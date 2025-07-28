@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import AuthProvider from "../hooks/useAuth";
 import ButtonModal from "./ButtonModal";
 
-function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-secondary', buttonText = 'Dataset', disabled = false, variant = 'secondary' }) {
+function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-secondary', buttonText = null, disabled = false, variant = 'secondary' }) {
+    const { t } = useTranslation();
     const { apiRequest } = AuthProvider();
     const [dataset, setDataset] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +21,6 @@ function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-second
                 return;
             }
 
-            
             setDataset(response.data);
             setIsLoading(false);
         }
@@ -31,22 +32,21 @@ function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-second
         <ButtonModal
             variant={variant}
             className={className}
-            title="Dataset"
-            buttonText={buttonText}
+            title={t('dataset.title')}
+            buttonText={buttonText || t('dataset.title')}
             size="lg"
             footerButtons={footerButtons}
             disabled={disabled}
         >
             {isLoading ? (
-                <p>Loading...</p>
+                <p>{t('dataset.loading')}</p>
             ) : (
                 <pre className="code" style={{ userSelect: 'none', maxHeight: '70vh', overflow: 'auto' }}>
                     {dataset}
                 </pre>
             )}
         </ButtonModal>
-
-    )
+    );
 }
 
 export default ButtonShowDataset;

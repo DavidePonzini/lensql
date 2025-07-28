@@ -1,12 +1,13 @@
 import useAuth from '../../hooks/useAuth';
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ButtonModal from '../../components/ButtonModal';
 import ClassMask from './ClassMask';
 
-// Data placeholder for exercise data
 function ClassUpdate({ classId, refresh, className }) {
     const { apiRequest } = useAuth();
+    const { t } = useTranslation();
 
     const [title, setTitle] = useState('');
     const [dataset, setDataset] = useState('');
@@ -21,30 +22,27 @@ function ClassUpdate({ classId, refresh, className }) {
         refresh();
     }
 
-        const getClassData = useCallback(async () => {
-            if (!classId) {
-                return;
-            }
-    
-            const result = await apiRequest(`/api/classes/get/${classId}`, 'GET');
-    
-            setTitle(result.data.title);
-            setDataset(result.data.dataset);
-        }, [classId, apiRequest]);
-    
-        useEffect(() => {
-            getClassData();
-        }, [classId, apiRequest, getClassData]);
+    const getClassData = useCallback(async () => {
+        if (!classId) return;
+
+        const result = await apiRequest(`/api/classes/get/${classId}`, 'GET');
+        setTitle(result.data.title);
+        setDataset(result.data.dataset);
+    }, [classId, apiRequest]);
+
+    useEffect(() => {
+        getClassData();
+    }, [getClassData]);
 
     return (
         <ButtonModal
             className={className}
-            title="Edit Course"
-            buttonText="Edit"
-            size='lg'
+            title={t('class_update.modal_title')}
+            buttonText={t('class_update.button_text')}
+            size="lg"
             footerButtons={[
                 {
-                    text: 'Save',
+                    text: t('class_update.save'),
                     variant: 'primary',
                     onClick: handleEditClass,
                     autoClose: true,

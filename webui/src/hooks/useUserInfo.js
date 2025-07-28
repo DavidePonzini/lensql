@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
-import { getXpStats } from '../constants/Gamification';
+import useGamificationData from './useGamificationData';
 import useAuth from './useAuth';
 
 const UserInfoContext = createContext();
 
 function UserInfoProvider({ children }) {
     const { apiRequest, accessToken, logout } = useAuth();
+    const { getXpStats } = useGamificationData();
 
     const [userInfo, setUserInfo] = useState(null);
 
@@ -29,7 +30,7 @@ function UserInfoProvider({ children }) {
             console.error('Failed to load user info.', err);
             logout();
         }
-    }, [accessToken, apiRequest, logout]);
+    }, [accessToken, apiRequest, logout, getXpStats]);
 
     const incrementStats = useCallback((coins = 0, experience = 0) => {
         setUserInfo(prev => {
@@ -47,7 +48,7 @@ function UserInfoProvider({ children }) {
                 level: xp.level,
             };
         });
-    }, []);
+    }, [getXpStats]);
 
     const logoutUser = useCallback(() => {
         setUserInfo(null);

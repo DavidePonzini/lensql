@@ -1,12 +1,13 @@
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ButtonModal from '../../components/ButtonModal';
 import ExerciseMask from './ExerciseMask';
 
-// Data placeholder for exercise data
 function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
     const { apiRequest } = useAuth();
+    const { t } = useTranslation();
 
     const [title, setTitle] = useState('');
     const [request, setRequest] = useState('');
@@ -24,9 +25,7 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
     }
 
     const getExerciseData = useCallback(async () => {
-        if (!exerciseId) {
-            return;
-        }
+        if (!exerciseId) return;
 
         const result = await apiRequest(`/api/exercises/get/${exerciseId}`, 'GET');
 
@@ -37,16 +36,16 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
 
     useEffect(() => {
         getExerciseData();
-    }, [exerciseId, apiRequest, getExerciseData]);
+    }, [getExerciseData]);
 
     return (
         <ButtonModal
             className={className}
-            title="Edit Exercise"
-            buttonText="Edit"
+            title={t('exercise_update.title')}
+            buttonText={t('exercise_update.button')}
             footerButtons={[
                 {
-                    text: 'Save',
+                    text: t('exercise_update.save'),
                     variant: 'primary',
                     onClick: handleEditExercise,
                     autoClose: true,

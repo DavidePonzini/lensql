@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import BubbleMessage from './BubbleMessage';
 import useUserInfo from '../hooks/useUserInfo';
 
-let _setBadges = null; // mutable reference accessible globally
+let _setBadges = null;
 
 function BadgeNotifier() {
     const [queue, setQueue] = useState([]);
     const { incrementStats } = useUserInfo();
+    const { t } = useTranslation();
 
     const duration = 3000;
 
@@ -22,8 +24,7 @@ function BadgeNotifier() {
 
     const reward = queue.length ? queue[0] : null;
 
-    if (!reward)
-        return null;
+    if (!reward) return null;
 
     return (
         <BubbleMessage
@@ -43,7 +44,7 @@ function BadgeNotifier() {
             }}
         >
             <strong className='lead'>
-                <i className="fas fa-trophy"></i>&nbsp;Achievement Unlocked!
+                <i className="fas fa-trophy"></i>&nbsp;{t('badge.title')}
             </strong>
 
             {reward.reason ? (
@@ -57,7 +58,8 @@ function BadgeNotifier() {
                 <>
                     <br />
                     <span className='text text-primary'>
-                        {reward.experience >= 0 ? '+' : '-'}{Math.abs(reward.experience)} EXP <i className="fa fa-diamond" />
+                        {reward.experience >= 0 ? '+' : '-'}
+                        {t('badge.exp', { count: Math.abs(reward.experience) })} <i className="fa fa-diamond" />
                     </span>
                 </>
             ) : null}
@@ -66,7 +68,8 @@ function BadgeNotifier() {
                 <>
                     <br />
                     <span className='text text-warning'>
-                        {reward.coins >= 0 ? '+' : '-'}{Math.abs(reward.coins)} LensCoins <i className="fa fa-coins" />
+                        {reward.coins >= 0 ? '+' : '-'}
+                        {t('badge.coins', { count: Math.abs(reward.coins) })} <i className="fa fa-coins" />
                     </span>
                 </>
             ) : null}
@@ -74,7 +77,6 @@ function BadgeNotifier() {
     );
 }
 
-// Trigger function (safe fallback if component not mounted)
 function setBadges(badges) {
     if (_setBadges) {
         _setBadges(badges);

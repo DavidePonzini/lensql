@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import useAuth from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import useAuth from '../hooks/useAuth';
 
 import bg from '../res/database.jpg';
 
 function Login() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { saveTokens } = useAuth();
 
@@ -24,13 +26,12 @@ function Login() {
 
         if (!username) {
             setIsUsernameValid(false);
-            setUsernameError('Please enter a username.');
+            setUsernameError(t('login.usernameRequired'));
             return;
         }
 
         setIsUsernameValid(true);
         setUsernameError('');
-        return true;
     }
 
     function checkPassword(password) {
@@ -38,13 +39,12 @@ function Login() {
 
         if (!password) {
             setIsPasswordValid(false);
-            setPasswordError('Please enter a password.');
+            setPasswordError(t('login.passwordRequired'));
             return;
         }
 
         setIsPasswordValid(true);
         setPasswordError('');
-        return true;
     }
 
     async function handleLogin(event) {
@@ -54,16 +54,14 @@ function Login() {
         const hasPassword = passwordInput.trim();
 
         if (!hasUsername || !hasPassword) {
-            setError('Please fill in both fields.');
+            setError(t('login.errorEmptyFields'));
             return;
         }
 
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: usernameInput, password: passwordInput })
             });
 
@@ -74,15 +72,15 @@ function Login() {
                 saveTokens(data.access_token, data.refresh_token);
                 navigate('/');
             } else {
-                setError(data.message || 'Login failed');
+                setError(data.message || t('login.errorLoginFailed'));
             }
-        } catch (error) {
-            setError('Could not connect to the server.');
+        } catch (err) {
+            setError(t('login.errorServer'));
         }
     }
 
     return (
-        <div className='container-md'>
+        <div className="container-md">
             <section>
                 <div className="row g-0">
                     <div className="col-md-6 col-lg-5 d-none d-md-block" style={{
@@ -95,6 +93,7 @@ function Login() {
                         position: 'sticky',
                         zIndex: 100,
                     }}></div>
+
                     <div className="col-md-6 col-lg-7 d-flex align-items-center">
                         <div className="card-body p-4 p-lg-5 text-black">
                             <form onSubmit={handleLogin} noValidate>
@@ -102,12 +101,12 @@ function Login() {
                                     <i className="fas fa-search fa-2x me-3" style={{ color: 'var(--logo-color)' }} />
                                     <span className="h1 fw-bold mb-0">LensQL</span>
                                 </div>
-                                <h5 className="fw-normal mb-1" style={{ letterSpacing: 1 }}>Sign into your account</h5>
+
+                                <h5 className="fw-normal mb-1" style={{ letterSpacing: 1 }}>{t('login.title')}</h5>
 
                                 <Link to="/register" className="text-muted mb-4 d-block">
-                                    Don't have an account? Register here
+                                    {t('login.subtitle')}
                                 </Link>
-
 
                                 {error && (
                                     <div className="alert alert-danger" role="alert">
@@ -117,16 +116,16 @@ function Login() {
 
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="login-username">
-                                        Username
+                                        {t('login.username')}
                                     </label>
                                     <input
                                         type="text"
                                         id="login-username"
                                         className={`form-control form-control-lg ${usernameError ? 'is-invalid' : ''}`}
-                                        placeholder="Username"
+                                        placeholder={t('login.usernamePlaceholder')}
                                         value={usernameInput}
                                         onInput={(e) => checkUsername(e.target.value)}
-                                        autoFocus={true}
+                                        autoFocus
                                     />
                                     {usernameError && (
                                         <div className="invalid-feedback">
@@ -137,7 +136,7 @@ function Login() {
 
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="login-password">
-                                        Password
+                                        {t('login.password')}
                                     </label>
 
                                     <div className="input-group">
@@ -145,18 +144,15 @@ function Login() {
                                             type={showPassword ? 'text' : 'password'}
                                             id="login-password"
                                             className={`form-control form-control-lg pe-5 ${passwordError ? 'is-invalid' : ''}`}
-                                            placeholder="Password"
+                                            placeholder={t('login.passwordPlaceholder')}
                                             value={passwordInput}
                                             onInput={(e) => checkPassword(e.target.value)}
                                         />
-                                        <div
-                                            className="input-group-text"
-                                            style={{ cursor: 'pointer' }}
-                                        >
+                                        <div className="input-group-text" style={{ cursor: 'pointer' }}>
                                             <i
                                                 className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                                aria-label={showPassword ? t('login.hide') : t('login.show')}
                                                 style={{ width: '1.5rem' }}
                                             ></i>
                                         </div>
@@ -171,10 +167,10 @@ function Login() {
                                 <div className="pt-1 mb-4">
                                     <button
                                         className="btn btn-primary btn-lg btn-block w-100"
-                                        onClick={handleLogin}
+                                        type="submit"
                                         disabled={!isUsernameValid || !isPasswordValid}
                                     >
-                                        Login
+                                        {t('login.submit')}
                                     </button>
                                 </div>
                             </form>
@@ -187,4 +183,3 @@ function Login() {
 }
 
 export default Login;
-
