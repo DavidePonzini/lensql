@@ -13,7 +13,9 @@ def user_exists(username: str) -> bool:
     query = database.sql.SQL('''
         SELECT 1
         FROM {schema}.users
-        WHERE username = {username}
+        WHERE
+            username = {username}
+            AND is_active = TRUE
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username')
@@ -79,6 +81,7 @@ def can_login(username: str, password: str) -> bool:
             {schema}.users
         WHERE
             username = {username}
+            AND is_active = TRUE
     ''').format(
         schema=database.sql.Identifier(SCHEMA),
         username=database.sql.Placeholder('username')
