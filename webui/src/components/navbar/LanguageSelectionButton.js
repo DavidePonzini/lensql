@@ -5,7 +5,7 @@ function LanguageSelectionButton({ className = '' }) {
     const currentLang = i18n.language;
 
     const languageOptions = {
-        en: { label: t('components.navbar.language.en'), flag: '🇬🇧' },
+        en: { label: t('components.navbar.language.en'), flag: '🇺🇸' },
         it: { label: t('components.navbar.language.it'), flag: '🇮🇹' }
     };
 

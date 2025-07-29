@@ -423,6 +423,141 @@
                     "fix": "Suggest a fix for this error"
                 }
             }
+        },
+        "home": {
+            "hero": {
+                "title": "Learn SQL Through Mistakes – With LensQL",
+                "subtitle": "Discover SQL. Learn from your errors. Grow with Lens.",
+                "description": "LensQL is an AI-powered SQL learning platform that turns student mistakes into personalized, interactive learning moments.",
+                "cta_register": "Create or Join a Course",
+                "cta_about": "How LensQL Works"
+            },
+            "what_is": {
+                "title": "What is LensQL?",
+                "subtitle": "A smarter way to learn SQL — grounded in your mistakes, powered by AI.",
+                "features": {
+                    "ai_tutor": "🤖 <strong>AI-driven tutor</strong> that helps students debug queries and think critically",
+                    "error_pedagogy": "🧠 <strong>Error-based pedagogy</strong>: Learn from syntax, logic, and semantic mistakes",
+                    "personalization": "🎯 <strong>Personalized assignments and dashboards</strong> based on real progress"
+                },
+                "quote": "“Over 95% of queries are submitted outside class hours. LensQL supports self-paced, reflective learning.”"
+            },
+            "how_it_works": {
+                "title": "How LensQL Works",
+                "steps": [
+                    "🧑‍🏫 Teachers create exercises, optionally targeting known error types",
+                    "🎓 Students solve queries with Lens’ help — no direct answers, only interactive guidance",
+                    "📊 The system analyzes every query to extract error patterns and track progress",
+                    "🛠️ Personalized exercises are automatically generated to address specific weaknesses",
+                    "📈 Interactive learning dashboards show students and teachers how understanding evolves over time"
+                ],
+                "cta_research": "See the research behind it"
+            },
+            "meet_lens": {
+                "title": "Meet Lens: Your SQL Sidekick",
+                "description": "Lens used to be an explorer of ancient data relics — until a mysterious SQL query turned them into an AI. Now, Lens guides students through the twists and joins of query logic with curiosity, kindness, and clear feedback.",
+                "features": {
+                    "explain_errors": "❓ <strong>Explains errors</strong> in plain language",
+                    "locate_mistakes": "📌 <strong>Helps locate mistakes</strong> in your query",
+                    "show_examples": "🧪 <strong>Shows examples</strong> of similar queries",
+                    "describe_query": "🧭 <strong>Describes your query's behavior</strong> to help reflect on intent vs result",
+                    "suggest_after_reflection": "⚠️ <strong>Gives suggestions only after reflection</strong> — to foster genuine learning"
+                }
+            },
+            "why_errors": {
+                "title": "Why Learn From Errors?",
+                "students": {
+                    "title": "For Students",
+                    "items": [
+                        "🧠 <strong>Understand the why</strong>, not just the how",
+                        "🔁 <strong>Improve through iteration</strong> and trial",
+                        "🚀 <strong>Build debugging and metacognitive skills</strong>"
+                    ]
+                },
+                "teachers": {
+                    "title": "For Teachers",
+                    "items": [
+                        "📊 <strong>Identify misconceptions early</strong>",
+                        "🧩 <strong>See learning trajectories</strong>, not just correctness",
+                        "🛠️ <strong>Tailor support</strong> with data-driven insights"
+                    ]
+                }
+            },
+            "gamification": {
+                "title": "🎮 Gamified Learning That Rewards Effort and Insight",
+                "description": "Learning SQL should feel rewarding — and a little fun, too. LensQL uses two progression systems that motivate students to practice, reflect, and grow.",
+                "xp": {
+                    "title": "🔹 XP and Levels — Progress Through Practice",
+                    "description": "Earn experience by writing and running queries. Leveling up shows your growth over time and rewards consistent effort — not just correct answers.",
+                    "quote": "“You don’t need to be perfect — just consistent. The more you experiment, the more you grow.”"
+                },
+                "coins": {
+                    "title": "🪙 LensCoins — Use Wisely, Reflect Deeply",
+                    "description": "LensCoins are earned through engagement and spent when asking Lens for help. They encourage students to try before asking — and to reflect on feedback.",
+                    "quote": "“LensCoins encourage reflection. Spend them when you're truly stuck — and earn them back by solving more and helping Lens improve.”"
+                },
+                "why": {
+                    "title": "💡 Why It Works",
+                    "items": [
+                        "🎯 Encourages <strong>experimentation</strong>, not perfection",
+                        "📈 Rewards <strong>consistent effort</strong> and active learning",
+                        "🤝 Builds a <strong>dialogue</strong> between students and the AI assistant",
+                        "🔄 Helps teachers see <strong>who’s trying, not just who’s succeeding</strong>"
+                    ]
+                }
+            },
+            "dashboard": {
+                "title": "📊 Your Learning Dashboard",
+                "students": {
+                    "title": "For Students",
+                    "items": [
+                        "📌 Track how many queries you’ve run and how often they work",
+                        "📊 Understand what types of queries you write and how they change over time",
+                        "🤖 See when and why you interact with Lens, and how you respond to its suggestions",
+                        "🕒 Follow your learning progress with a timeline of queries and errors"
+                    ]
+                },
+                "teachers": {
+                    "title": "For Teachers",
+                    "items": [
+                        "📊 View aggregate metrics for each class: query activity, success rate, and help usage",
+                        "📂 Analyze errors by category: syntax, semantic, logical, or complications",
+                        "🕒 Track how query behavior and error patterns evolve over time",
+                        "🧭 Adapt instruction based on what students try, not just what they get right"
+                    ]
+                }
+            },
+            "demo": {
+                "title": "🚀 Try LensQL Now",
+                "description": "While LensQL requires registration, here’s a sneak peek of how it helps you reason about errors step by step.",
+                "example_caption": "Example: <code>SELECT name FROM students WHERE grade &gt; AVG(grade)</code>",
+                "example_note": "Lens identifies a syntax error and explains it in plain language, without giving the answer."
+            },
+            "community": {
+                "title": "🤝 Join the LensQL Community",
+                "description": "Already helping <strong>100+ students</strong> outside the classroom.",
+                "teachers": {
+                    "title": "✅ For Teachers",
+                    "items": [
+                        "📚 Create courses",
+                        "📝 Assign exercises",
+                        "📊 Track class-wide learning"
+                    ]
+                },
+                "students": {
+                    "title": "✅ For Students",
+                    "items": [
+                        "💬 Get instant feedback",
+                        "💡 Practice SQL with purpose",
+                        "🛠️ Master your weaknesses"
+                    ]
+                }
+            },
+            "cta": {
+                "title": "💡 Learning SQL doesn't start with answers. It starts with errors.",
+                "register": "Create Your Account",
+                "about": "Learn More"
+            }
         }
     },
     "gamification": {

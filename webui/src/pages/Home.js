@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import useAuth from '../hooks/useAuth';
 
@@ -9,6 +10,7 @@ import bg from '../res/database.jpg';
 
 function Home() {
     const { isLoggedIn } = useAuth();
+    const { t } = useTranslation();
 
     return (
         <Parallax image={bg}>
@@ -17,81 +19,72 @@ function Home() {
                 {/* 1. Hero Section */}
                 <section className="text-center p-3">
                     <h1 className="display-4 fw-bold text-primary">
-                        Learn SQL Through Mistakes – With LensQL
+                        {t('pages.home.hero.title')}
                     </h1>
                     <p className="lead text-secondary">
-                        Discover SQL. Learn from your errors. Grow with Lens.
+                        {t('pages.home.hero.subtitle')}
                     </p>
                     <p className="fs-5">
-                        LensQL is an AI-powered SQL learning platform that turns student mistakes into personalized, interactive learning moments.
+                        {t('pages.home.hero.description')}
                     </p>
                     <div className="mt-4">
                         <Link to={isLoggedIn ? "/classes" : "/register"} className="btn btn-primary me-3">
-                            Create or Join a Course
+                            {t('pages.home.hero.cta_register')}
                         </Link>
                         <Link to="/about" className="btn btn-outline-success">
-                            How LensQL Works
+                            {t('pages.home.hero.cta_about')}
                         </Link>
                     </div>
                 </section>
 
                 {/* 2. What is LensQL */}
                 <section className="text-center p-3 bg-white">
-                    <h2 className="text-success mb-3">What is LensQL?</h2>
-                    <p className="fs-4">
-                        A smarter way to learn SQL — grounded in your mistakes, powered by AI.
-                    </p>
+                    <h2 className="text-success mb-3">{t('pages.home.what_is.title')}</h2>
+                    <p className="fs-4">{t('pages.home.what_is.subtitle')}</p>
                     <div className="row justify-content-center mt-4">
                         <div className="col-md-8 text-start">
                             <ul className="list-unstyled fs-5">
-                                <li>🤖 <strong>AI-driven tutor</strong> that helps students debug queries and think critically</li>
-                                <li>🧠 <strong>Error-based pedagogy</strong>: Learn from syntax, logic, and semantic mistakes</li>
-                                <li>🎯 <strong>Personalized assignments and dashboards</strong> based on real progress</li>
+                                {['ai_tutor', 'error_pedagogy', 'personalization'].map(key => (
+                                    <li key={key} dangerouslySetInnerHTML={{ __html: t(`pages.home.what_is.features.${key}`) }} />
+                                ))}
                             </ul>
                         </div>
                         <blockquote className="blockquote mt-4 fst-italic text-muted">
-                            “Over 95% of queries are submitted outside class hours. LensQL supports self-paced, reflective learning.”
+                            {t('pages.home.what_is.quote')}
                         </blockquote>
                     </div>
                 </section>
 
                 {/* 3. How LensQL Works */}
                 <section id="how-it-works" className="p-3">
-                    <h2 className="text-success text-center mb-4">How LensQL Works</h2>
+                    <h2 className="text-success text-center mb-4">{t('pages.home.how_it_works.title')}</h2>
                     <div className="row justify-content-center">
                         <div className="col-md-10">
                             <ol className="list-group list-group-numbered fs-5">
-                                <li className="list-group-item">🧑‍🏫 Teachers create exercises, optionally targeting known error types</li>
-                                <li className="list-group-item">🎓 Students solve queries with Lens’ help — no direct answers, only interactive guidance</li>
-                                <li className="list-group-item">📊 The system analyzes every query to extract error patterns and track progress</li>
-                                <li className="list-group-item">🛠️ Personalized exercises are automatically generated to address specific weaknesses</li>
-                                <li className="list-group-item">📈 Learning dashboards show students and teachers how understanding evolves over time</li>
+                                {t('pages.home.how_it_works.steps', { returnObjects: true }).map((step, i) => (
+                                    <li className="list-group-item" key={i}>{step}</li>
+                                ))}
                             </ol>
                             <div className="text-center mt-4">
                                 <Link to="/about" className="btn btn-outline-secondary">
-                                    See the research behind it
+                                    {t('pages.home.how_it_works.cta_research')}
                                 </Link>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 4. Meet Lens: Your SQL Sidekick */}
+                {/* 4. Meet Lens */}
                 <section className="p-3 bg-white">
-                    <h2 className="text-success text-center mb-4">Meet Lens: Your SQL Sidekick</h2>
+                    <h2 className="text-success text-center mb-4">{t('pages.home.meet_lens.title')}</h2>
                     <div className="row justify-content-center">
                         <div className="col-md-10">
-                            <p className="fs-5">
-                                Lens used to be an explorer of ancient data relics — until a mysterious SQL query turned them into an AI.
-                                Now, Lens guides students through the twists and joins of query logic with curiosity, kindness, and clear feedback.
-                            </p>
+                            <p className="fs-5">{t('pages.home.meet_lens.description')}</p>
                             <div className="mt-4">
                                 <ul className="list-unstyled fs-5">
-                                    <li>❓ <strong>Explains errors</strong> in plain language</li>
-                                    <li>📌 <strong>Helps locate mistakes</strong> in your query</li>
-                                    <li>🧪 <strong>Shows examples</strong> of similar queries</li>
-                                    <li>🧭 <strong>Describes your query's behavior</strong> to help reflect on intent vs result</li>
-                                    <li>⚠️ <strong>Gives suggestions only after reflection</strong> — to foster genuine learning</li>
+                                    {['explain_errors', 'locate_mistakes', 'show_examples', 'describe_query', 'suggest_after_reflection'].map(key => (
+                                        <li key={key} dangerouslySetInnerHTML={{ __html: t(`pages.home.meet_lens.features.${key}`) }} />
+                                    ))}
                                 </ul>
                             </div>
                         </div>
@@ -100,112 +93,80 @@ function Home() {
 
                 {/* 5. Why Learn From Errors? */}
                 <section className="p-3">
-                    <h2 className="text-success text-center mb-4">Why Learn From Errors?</h2>
+                    <h2 className="text-success text-center mb-4">{t('pages.home.why_errors.title')}</h2>
                     <div className="row justify-content-center">
                         <div className="col-md-10">
                             <div className="row">
-                                {/* Students */}
-                                <div className="col-md-6 mb-4">
-                                    <h5 className="text-primary">For Students</h5>
-                                    <ul className="list-unstyled fs-5">
-                                        <li>🧠 <strong>Understand the why</strong>, not just the how</li>
-                                        <li>🔁 <strong>Improve through iteration</strong> and trial</li>
-                                        <li>🚀 <strong>Build debugging and metacognitive skills</strong></li>
-                                    </ul>
-                                </div>
-                                {/* Teachers */}
-                                <div className="col-md-6 mb-4">
-                                    <h5 className="text-primary">For Teachers</h5>
-                                    <ul className="list-unstyled fs-5">
-                                        <li>📊 <strong>Identify misconceptions early</strong></li>
-                                        <li>🧩 <strong>See learning trajectories</strong>, not just correctness</li>
-                                        <li>🛠️ <strong>Tailor support</strong> with data-driven insights</li>
-                                    </ul>
-                                </div>
+                                {['students', 'teachers'].map(role => (
+                                    <div className="col-md-6 mb-4" key={role}>
+                                        <h5 className="text-primary">{t(`pages.home.why_errors.${role}.title`)}</h5>
+                                        <ul className="list-unstyled fs-5">
+                                            {t(`pages.home.why_errors.${role}.items`, { returnObjects: true }).map((item, i) => (
+                                                <li key={i} dangerouslySetInnerHTML={{ __html: item }} />
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 6. Gamified Learning That Rewards Effort and Insight */}
+                {/* 6. Gamification */}
                 <section className="p-3 bg-white">
-                    <h2 className="text-success text-center mb-4">🎮 Gamified Learning That Rewards Effort and Insight</h2>
+                    <h2 className="text-success text-center mb-4">{t('pages.home.gamification.title')}</h2>
                     <div className="row justify-content-center">
                         <div className="col-md-10">
-                            <p className="fs-5">
-                                Learning SQL should feel rewarding — and a little fun, too. LensQL uses two progression systems that motivate students to practice, reflect, and grow.
-                            </p>
+                            <p className="fs-5">{t('pages.home.gamification.description')}</p>
 
-                            <h4 className="mt-4 text-primary">🔹 XP and Levels — Progress Through Practice</h4>
-                            <p className="fs-5">
-                                Earn experience by writing and running queries. Leveling up shows your growth over time and rewards consistent effort — not just correct answers.
-                            </p>
-                            <blockquote className="blockquote text-muted fst-italic">
-                                “You don’t need to be perfect — just consistent. The more you experiment, the more you grow.”
-                            </blockquote>
+                            {['xp', 'coins'].map(section => (
+                                <div key={section}>
+                                    <h4 className="mt-4 text-primary">{t(`pages.home.gamification.${section}.title`)}</h4>
+                                    <p className="fs-5">{t(`pages.home.gamification.${section}.description`)}</p>
+                                    <blockquote className="blockquote text-muted fst-italic">
+                                        {t(`pages.home.gamification.${section}.quote`)}
+                                    </blockquote>
+                                </div>
+                            ))}
 
-                            <h4 className="mt-4 text-primary">🪙 LensCoins — Use Wisely, Reflect Deeply</h4>
-                            <p className="fs-5">
-                                LensCoins are earned through engagement and spent when asking Lens for help. They encourage students to try before asking — and to reflect on feedback.
-                            </p>
-                            <blockquote className="blockquote text-muted fst-italic">
-                                “LensCoins encourage reflection. Spend them when you're truly stuck — and earn them back by solving more and helping Lens improve.”
-                            </blockquote>
-
-                            <h5 className="mt-4 text-success">💡 Why It Works</h5>
+                            <h5 className="mt-4 text-success">{t('pages.home.gamification.why.title')}</h5>
                             <ul className="list-unstyled fs-5">
-                                <li>🎯 Encourages <strong>experimentation</strong>, not perfection</li>
-                                <li>📈 Rewards <strong>consistent effort</strong> and active learning</li>
-                                <li>🤝 Builds a <strong>dialogue</strong> between students and the AI assistant</li>
-                                <li>🔄 Helps teachers see <strong>who’s trying, not just who’s succeeding</strong></li>
+                                {t('pages.home.gamification.why.items', { returnObjects: true }).map((item, i) => (
+                                    <li key={i} dangerouslySetInnerHTML={{ __html: item }} />
+                                ))}
                             </ul>
                         </div>
                     </div>
                 </section>
 
-
-                {/* 7. Your Learning Dashboard */}
+                {/* 7. Dashboard */}
                 <section className="p-3">
-                    <h2 className="text-success text-center mb-4">📊 Your Learning Dashboard</h2>
+                    <h2 className="text-success text-center mb-4">{t('pages.home.dashboard.title')}</h2>
                     <div className="row justify-content-center">
                         <div className="col-md-10">
                             <div className="row">
-                                {/* Students' View */}
-                                <div className="col-md-6 mb-4">
-                                    <h5 className="text-primary">For Students</h5>
-                                    <ul className="list-unstyled fs-5">
-                                        <li>🧯 Heatmap of error types</li>
-                                        <li>⏱️ Time on task</li>
-                                        <li>📘 Concept mastery by topic</li>
-                                        <li>📐 Confidence vs correctness chart</li>
-                                    </ul>
-                                </div>
-
-                                {/* Teachers' View */}
-                                <div className="col-md-6 mb-4">
-                                    <h5 className="text-primary">For Teachers</h5>
-                                    <ul className="list-unstyled fs-5">
-                                        <li>📊 Course-wide misconceptions</li>
-                                        <li>📈 Exercise effectiveness metrics</li>
-                                        <li>🧑‍🏫 Student clustering by learning behavior</li>
-                                        <li>🔍 Drill-down into individual learning trajectories</li>
-                                    </ul>
-                                </div>
+                                {['students', 'teachers'].map(role => (
+                                    <div className="col-md-6 mb-4" key={role}>
+                                        <h5 className="text-primary">{t(`pages.home.dashboard.${role}.title`)}</h5>
+                                        <ul className="list-unstyled fs-5">
+                                            {t(`pages.home.dashboard.${role}.items`, { returnObjects: true }).map((item, i) => (
+                                                <li key={i}>{item}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 8. Try LensQL Now */}
+                {/* 8. Demo */}
                 <section className="p-3 bg-white">
-                    <h2 className="text-success text-center mb-4">🚀 Try LensQL Now</h2>
+                    <h2 className="text-success text-center mb-4">{t('pages.home.demo.title')}</h2>
                     <div className="row justify-content-center">
                         <div className="col-md-8 text-center">
-                            <p className="fs-5">
-                                While LensQL requires registration, here’s a sneak peek of how it helps you reason about errors step by step.
-                            </p>
+                            <p className="fs-5">{t('pages.home.demo.description')}</p>
 
-                            {/* Replace src with actual GIF path or embedded player */}
                             <AlertUnderDevelopment />
                             <div className="border rounded shadow-sm p-3 bg-white">
                                 <img
@@ -213,63 +174,47 @@ function Home() {
                                     alt="LensQL query feedback demo"
                                     className="img-fluid rounded"
                                 />
-                                <small className="d-block text-muted mt-2">
-                                    Example: <code>SELECT name FROM students WHERE grade &gt; AVG(grade)</code>
-                                </small>
-                                <small className="text-muted fst-italic">
-                                    Lens identifies a syntax error and explains it in plain language, without giving the answer.
-                                </small>
+                                <small className="d-block text-muted mt-2" dangerouslySetInnerHTML={{ __html: t('pages.home.demo.example_caption') }} />
+                                <small className="text-muted fst-italic">{t('pages.home.demo.example_note')}</small>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 9. Join the LensQL Community */}
+                {/* 9. Community */}
                 <section className="p-3">
-                    <h2 className="text-success text-center mb-4">🤝 Join the LensQL Community</h2>
+                    <h2 className="text-success text-center mb-4">{t('pages.home.community.title')}</h2>
                     <div className="row justify-content-center">
                         <div className="col-md-8">
-                            <p className="fs-5 text-center mb-4">
-                                Already helping <strong>100+ students</strong> outside the classroom.
-                            </p>
+                            <p className="fs-5 text-center mb-4" dangerouslySetInnerHTML={{ __html: t('pages.home.community.description') }} />
                             <div className="row">
-                                {/* For Teachers */}
-                                <div className="col-md-6 mb-4">
-                                    <h5 className="text-primary">✅ For Teachers</h5>
-                                    <ul className="list-unstyled fs-5">
-                                        <li>📚 Create courses</li>
-                                        <li>📝 Assign exercises</li>
-                                        <li>📊 Track class-wide learning</li>
-                                    </ul>
-                                </div>
-
-                                {/* For Students */}
-                                <div className="col-md-6 mb-4">
-                                    <h5 className="text-primary">✅ For Students</h5>
-                                    <ul className="list-unstyled fs-5">
-                                        <li>💬 Get instant feedback</li>
-                                        <li>💡 Practice SQL with purpose</li>
-                                        <li>🛠️ Master your weaknesses</li>
-                                    </ul>
-                                </div>
+                                {['teachers', 'students'].map(role => (
+                                    <div className="col-md-6 mb-4" key={role}>
+                                        <h5 className="text-primary">{t(`pages.home.community.${role}.title`)}</h5>
+                                        <ul className="list-unstyled fs-5">
+                                            {t(`pages.home.community.${role}.items`, { returnObjects: true }).map((item, i) => (
+                                                <li key={i}>{item}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 10. Call to Action (Again) */}
+                {/* 10. CTA */}
                 <section className="text-center p-3 pb-5 bg-white border-top">
-                    <h2 className="mb-3">💡 Learning SQL doesn't start with answers. It starts with errors.</h2>
+                    <h2 className="mb-3">{t('pages.home.cta.title')}</h2>
                     <div className="d-flex justify-content-center gap-3 mt-4">
                         <Link to="/register" className="btn btn-lg btn-primary">
-                            Create Your Account
+                            {t('pages.home.cta.register')}
                         </Link>
                         <Link to="/about" className="btn btn-lg btn-outline-success">
-                            Learn More
+                            {t('pages.home.cta.about')}
                         </Link>
                     </div>
                 </section>
-
             </div>
         </Parallax>
     );
