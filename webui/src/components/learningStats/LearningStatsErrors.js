@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useAuth from "../hooks/useAuth";
-import ObservedOnce from "./ObservedOnce";
+import useAuth from "../../hooks/useAuth";
+import ObservedOnce from "../ObservedOnce";
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import AlertUnderDevelopment from './AlertUnderDevelopment';
+import AlertUnderDevelopment from '../AlertUnderDevelopment';
 
 function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = false }) {
     const { t } = useTranslation();
@@ -30,7 +30,7 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                 <>
                     <AlertUnderDevelopment />
                     <p className="text-muted" style={{ fontSize: '1.2rem' }}>
-                        {t(`learningStatsErrors.empty.${role}`)}
+                        {t(`components.learningStats.errors.empty.${role}`)}
                     </p>
                 </>
             ) : (
@@ -39,13 +39,13 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                         <Col>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>{t('learningStatsErrors.kind_title')}</Card.Title>
+                                    <Card.Title>{t('components.learningStats.errors.kind_title')}</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        {t(`learningStatsErrors.kind_subtitle.${role}`)}
+                                        {t(`components.learningStats.errors.kind_subtitle.${role}`)}
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
-                                    {t(`learningStatsErrors.kind_body.${role}`)}
+                                    {t(`components.learningStats.errors.kind_body.${role}`)}
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -53,13 +53,13 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                         <Col>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>{t('learningStatsErrors.common_title')}</Card.Title>
+                                    <Card.Title>{t('components.learningStats.errors.common_title')}</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        {t(`learningStatsErrors.common_subtitle.${role}`)}
+                                        {t(`components.learningStats.errors.common_subtitle.${role}`)}
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
-                                    {t(`learningStatsErrors.common_body.${role}`)}
+                                    {t(`components.learningStats.errors.common_body.${role}`)}
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -69,13 +69,13 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                         <Col>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>{t(`learningStatsErrors.timeline_title.${role}`)}</Card.Title>
+                                    <Card.Title>{t(`components.learningStats.errors.timeline_title.${role}`)}</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        {t(`learningStatsErrors.timeline_subtitle.${role}`)}
+                                        {t(`components.learningStats.errors.timeline_subtitle.${role}`)}
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
-                                    {t(`learningStatsErrors.timeline_body.${role}`)}
+                                    {t(`components.learningStats.errors.timeline_body.${role}`)}
                                 </Card.Body>
                             </Card>
                         </Col>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import useAuth from "../hooks/useAuth";
-import ObservedOnce from "./ObservedOnce";
+import useAuth from "../../hooks/useAuth";
+import ObservedOnce from "../ObservedOnce";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, PieChart, Pie, Cell } from 'recharts';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
@@ -24,15 +24,15 @@ function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = f
     const queriesSuccess = data?.queries_success || 0;
 
     const querySuccessDataAll = [
-        { name: t('learningStatsQueries.success'), value: queriesSuccess },
-        { name: t('learningStatsQueries.fail'), value: queriesTotal - queriesSuccess },
+        { name: t('components.learningStats.queries.success'), value: queriesSuccess },
+        { name: t('components.learningStats.queries.fail'), value: queriesTotal - queriesSuccess },
     ];
 
     const queriesTotalSelect = data?.queries_select || 0;
     const queriesSuccessSelect = data?.queries_success_select || 0;
     const querySuccessDataSelect = [
-        { name: t('learningStatsQueries.success'), value: queriesSuccessSelect },
-        { name: t('learningStatsQueries.fail'), value: queriesTotalSelect - queriesSuccessSelect },
+        { name: t('components.learningStats.queries.success'), value: queriesSuccessSelect },
+        { name: t('components.learningStats.queries.fail'), value: queriesTotalSelect - queriesSuccessSelect },
     ];
 
     const queryTypesData = data?.query_types.map(({ type, count, success }) => ({
@@ -43,7 +43,7 @@ function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = f
     }));
 
     const queryTypesTootlipFormatter = (value, name) => {
-        const label = t(`learningStatsQueries.${name}`) || name;
+        const label = t(`components.learningStats.queries.${name}`) || name;
         return [value === 1 ? `${value} query` : `${value} queries`, label];
     };
 
@@ -53,7 +53,7 @@ function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = f
         <ObservedOnce onFirstVisible={fetchData}>
             {queriesTotal === 0 ? (
                 <p className="text-muted" style={{ fontSize: '1.2rem' }}>
-                    {t(`learningStatsQueries.empty.${role}`)}
+                    {t(`components.learningStats.queries.empty.${role}`)}
                 </p>
             ) : (
                 <>
@@ -61,15 +61,15 @@ function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = f
                         <Col xs={4}>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>{t(`learningStatsQueries.title.${role}`)}</Card.Title>
+                                    <Card.Title>{t(`components.learningStats.queries.title.${role}`)}</Card.Title>
                                 </Card.Header>
                                 <Card.Body>
                                     <div>
-                                        <strong>{t('learningStatsQueries.stats.distinct')}:</strong> {queriesUnique}<br />
-                                        <strong>{t('learningStatsQueries.stats.total')}:</strong> {queriesTotal}
+                                        <strong>{t('components.learningStats.queries.stats.distinct')}:</strong> {queriesUnique}<br />
+                                        <strong>{t('components.learningStats.queries.stats.total')}:</strong> {queriesTotal}
                                     </div>
                                     <div className="mt-2 text-muted" style={{ fontSize: '0.9rem' }}>
-                                        {t('learningStatsQueries.stats.note')}
+                                        {t('components.learningStats.queries.stats.note')}
                                     </div>
                                 </Card.Body>
                             </Card>
@@ -78,13 +78,13 @@ function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = f
                         <Col>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
-                                    <Card.Title>{t('learningStatsQueries.success_title')}</Card.Title>
+                                    <Card.Title>{t('components.learningStats.queries.success_title')}</Card.Title>
                                 </Card.Header>
                                 <Card.Body>
                                     <Row>
                                         <Col>
                                             <div className="text-center fw-bold" style={{ fontSize: '1.2rem' }}>
-                                                {t('learningStatsQueries.select_label')}
+                                                {t('components.learningStats.queries.select_label')}
                                             </div>
                                             <ResponsiveContainer width="100%" height={100}>
                                                 <PieChart>
@@ -111,7 +111,7 @@ function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = f
                                         </Col>
                                         <Col>
                                             <div className="text-center fw-bold" style={{ fontSize: '1.2rem' }}>
-                                                {t('learningStatsQueries.all_label')}
+                                                {t('components.learningStats.queries.all_label')}
                                             </div>
                                             <ResponsiveContainer width="100%" height={100}>
                                                 <PieChart>
@@ -146,15 +146,15 @@ function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = f
                         <Col>
                             <Card>
                                 <Card.Header>
-                                    <Card.Title>{t(`learningStatsQueries.chart_title.${role}`)}</Card.Title>
+                                    <Card.Title>{t(`components.learningStats.queries.chart_title.${role}`)}</Card.Title>
                                     <Card.Subtitle className="text-muted">
-                                        {t(`learningStatsQueries.chart_subtitle.${role}`)}
+                                        {t(`components.learningStats.queries.chart_subtitle.${role}`)}
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
                                     {queriesTotal === 0 ? (
                                         <div className="text-center text-muted" style={{ fontSize: '1.2rem' }}>
-                                            {t(`learningStatsQueries.chart_empty.${role}`)}
+                                            {t(`components.learningStats.queries.chart_empty.${role}`)}
                                         </div>
                                     ) : (
                                         <ResponsiveContainer width="100%" height={40 * queryTypesData?.length || 1}>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import AuthProvider from "../hooks/useAuth";
+import AuthProvider from "../../hooks/useAuth";
 import ButtonModal from "./ButtonModal";
 
 function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-secondary', buttonText = null, disabled = false, variant = 'secondary' }) {
@@ -32,14 +32,14 @@ function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-second
         <ButtonModal
             variant={variant}
             className={className}
-            title={t('dataset.title')}
-            buttonText={buttonText || t('dataset.title')}
+            title={t('components.buttons.dataset.title')}
+            buttonText={buttonText || t('components.buttons.dataset.title')}
             size="lg"
             footerButtons={footerButtons}
             disabled={disabled}
         >
             {isLoading ? (
-                <p>{t('dataset.loading')}</p>
+                <p>{t('components.buttons.dataset.loading')}</p>
             ) : (
                 <pre className="code" style={{ userSelect: 'none', maxHeight: '70vh', overflow: 'auto' }}>
                     {dataset}

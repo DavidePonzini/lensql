@@ -5,7 +5,7 @@ function AlertUnderDevelopment() {
 
     return (
         <div className="alert alert-warning mt-4" role="alert">
-            {t('alert.under_development')}
+            {t('components.alert.under_development')}
         </div>
     );
 }

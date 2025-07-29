@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import BubbleMessage from './BubbleMessage';
-import useUserInfo from '../hooks/useUserInfo';
+import useUserInfo from '../../hooks/useUserInfo';
 
 let _setBadges = null;
 
@@ -44,7 +44,7 @@ function BadgeNotifier() {
             }}
         >
             <strong className='lead'>
-                <i className="fas fa-trophy"></i>&nbsp;{t('badge.title')}
+                <i className="fas fa-trophy"></i>&nbsp;{t('components.notifications.badge.title')}
             </strong>
 
             {reward.reason ? (
@@ -59,7 +59,7 @@ function BadgeNotifier() {
                     <br />
                     <span className='text text-primary'>
                         {reward.experience >= 0 ? '+' : '-'}
-                        {t('badge.exp', { count: Math.abs(reward.experience) })} <i className="fa fa-diamond" />
+                        {t('components.notifications.badge.exp', { count: Math.abs(reward.experience) })} <i className="fa fa-diamond" />
                     </span>
                 </>
             ) : null}
@@ -69,7 +69,7 @@ function BadgeNotifier() {
                     <br />
                     <span className='text text-warning'>
                         {reward.coins >= 0 ? '+' : '-'}
-                        {t('badge.coins', { count: Math.abs(reward.coins) })} <i className="fa fa-coins" />
+                        {t('components.notifications.badge.coins', { count: Math.abs(reward.coins) })} <i className="fa fa-coins" />
                     </span>
                 </>
             ) : null}

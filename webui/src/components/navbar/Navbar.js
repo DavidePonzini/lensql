@@ -41,13 +41,13 @@ function Navbar() {
                     <div className="navbar-text d-flex align-items-center">
                         {isLoggedIn ? (
                             <>
-                                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('nav.username_tooltip')}>
+                                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.username_tooltip')}>
                                     <i className="fa-solid fa-user" />
-                                    <span>{loadingUserInfo ? t('nav.loading') : userInfo?.username || t('nav.unknown')}</span>
+                                    <span>{loadingUserInfo ? t('components.navbar.nav.loading') : userInfo?.username || t('components.navbar.nav.unknown')}</span>
                                 </span>
 
                                 {userInfo?.isAdmin && (
-                                    <i className="fa fa-shield-alt text-danger mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('nav.admin_tooltip')}></i>
+                                    <i className="fa fa-shield-alt text-danger mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.admin_tooltip')}></i>
                                 )}
 
                                 <div className="vr mx-1" />
@@ -57,7 +57,7 @@ function Navbar() {
                                 <LanguageSelectionButton className="mx-1" />
 
                                 <button className="btn btn-outline-danger mx-1" type="button" onClick={logout}>
-                                    {t('nav.logout')}
+                                    {t('components.navbar.nav.logout')}
                                 </button>
                             </>
                         ) : (
@@ -65,11 +65,11 @@ function Navbar() {
                                 <LanguageSelectionButton />
 
                                 <NavLink to="/login" className="btn btn-primary mx-1 text-light">
-                                    <i className="fa fa-sign-in-alt"></i> {t('nav.login')}
+                                    <i className="fa fa-sign-in-alt"></i> {t('components.navbar.nav.login')}
                                 </NavLink>
 
                                 <NavLink to="/register" className="btn btn-secondary mx-1 text-light">
-                                    <i className="fa fa-user-plus"></i> {t('nav.register')}
+                                    <i className="fa fa-user-plus"></i> {t('components.navbar.nav.register')}
                                 </NavLink>
                             </>
                         )}
@@ -81,7 +81,7 @@ function Navbar() {
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item">
                             <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/" end>
-                                {t('nav.home')}
+                                {t('components.navbar.nav.home')}
                             </NavLink>
                         </li>
 
@@ -98,17 +98,17 @@ function Navbar() {
                                         onClick={() => setDropdownOpen(false)}
                                         aria-expanded={isDropdownOpen ? 'true' : 'false'}
                                     >
-                                        <i className="fa-solid fa-user-circle"></i> {t('nav.profile')}
+                                        <i className="fa-solid fa-user-circle"></i> {t('components.navbar.nav.profile')}
                                     </NavLink>
                                     <ul className={`dropdown-menu ${isDropdownOpen ? 'show' : ''}`}>
                                         <li onClick={() => setDropdownOpen(false)}>
                                             <NavLink className="dropdown-item" to="/profile">
-                                                <i className="fa-solid fa-user"></i> {t('nav.view_profile')}
+                                                <i className="fa-solid fa-user"></i> {t('components.navbar.nav.view_profile')}
                                             </NavLink>
                                         </li>
                                         <li onClick={() => setDropdownOpen(false)}>
                                             <NavLink className="dropdown-item" to="/learning">
-                                                <i className="fa-solid fa-chart-line"></i> {t('nav.learning')}
+                                                <i className="fa-solid fa-chart-line"></i> {t('components.navbar.nav.learning')}
                                             </NavLink>
                                         </li>
                                     </ul>
@@ -116,7 +116,7 @@ function Navbar() {
 
                                 <li className="nav-item">
                                     <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/classes" end>
-                                        <i className="fa-solid fa-tasks"></i> {t('nav.courses')}
+                                        <i className="fa-solid fa-tasks"></i> {t('components.navbar.nav.courses')}
                                     </NavLink>
                                 </li>
                             </>
@@ -125,7 +125,7 @@ function Navbar() {
                         {userInfo?.isAdmin && (
                             <li className="nav-item">
                                 <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/admin">
-                                    <i className="fa-solid fa-shield-alt"></i> {t('nav.admin')}
+                                    <i className="fa-solid fa-shield-alt"></i> {t('components.navbar.nav.admin')}
                                 </NavLink>
                             </li>
                         )}

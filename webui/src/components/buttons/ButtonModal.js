@@ -48,7 +48,7 @@ function ButtonModal({
                     ))}
 
                     <Button variant="secondary" onClick={handleClose}>
-                        {t('modal.close')}
+                        {t('components.buttons.modal.close')}
                     </Button>
                 </Modal.Footer>
             </Modal>

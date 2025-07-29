@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import BubbleMessage from "./BubbleMessage";
-import useUserInfo from "../hooks/useUserInfo";
+import useUserInfo from "../../hooks/useUserInfo";
 
 function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {}, duration = 2000 }) {
     const { incrementStats } = useUserInfo();
@@ -11,8 +11,8 @@ function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {}, du
     if (!reward) return null;
 
     const coinLabel = Math.abs(reward.coins) === 1
-        ? t('reward.coin_singular')
-        : t('reward.coin_plural');
+        ? t('components.reward.coin_singular')
+        : t('components.reward.coin_plural');
 
     return (
         <>
@@ -52,7 +52,7 @@ function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {}, du
                         <strong>{reward.reason}:&nbsp;</strong>
                     </>
                 ) : null}
-                {reward.experience >= 0 ? '+' : '-'}{t('reward.exp', { count: Math.abs(reward.experience) })} <i className="fa fa-diamond" />
+                {reward.experience >= 0 ? '+' : '-'}{t('components.reward.exp', { count: Math.abs(reward.experience) })} <i className="fa fa-diamond" />
             </BubbleMessage>
         </>
     );

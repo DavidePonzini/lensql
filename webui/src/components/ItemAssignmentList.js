@@ -46,7 +46,7 @@ function ItemAssignmentList({
     return (
         <div className="mb-3">
             <label className="form-label">
-                {title || t('assignment.title')}
+                {title || t('components.assignmentList.title')}
             </label>
 
             {items.length > 0 && (
@@ -59,7 +59,7 @@ function ItemAssignmentList({
                         onChange={(e) => handleSelectAll(e.target.checked)}
                     />
                     <label className="form-check-label" htmlFor="select-all">
-                        {t('assignment.select_all')}
+                        {t('components.assignmentList.select_all')}
                     </label>
                 </div>
             )}

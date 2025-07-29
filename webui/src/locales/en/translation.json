@@ -1,524 +1,536 @@
 {
-    "nav": {
-        "home": "Home",
-        "profile": "Profile",
-        "view_profile": "View Profile",
-        "learning": "Learning Insights",
-        "courses": "Courses",
-        "admin": "Admin",
-        "login": "Login",
-        "register": "Register",
-        "logout": "Logout",
-        "loading": "Loading...",
-        "unknown": "Unknown",
-        "username_tooltip": "Your username",
-        "admin_tooltip": "Admin"
-    },
-    "language": {
-        "label": "Language",
-        "en": "EN",
-        "it": "IT"
-    },
-    "gamificationStats": {
-        "level": "Level",
-        "xp": "Experience points",
-        "coins": "LensCoins"
-    },
-    "alert": {
-        "under_development": "🚧 This section is under development."
-    },
-    "badge": {
-        "title": "🏆 Achievement Unlocked!",
-        "exp": "{{count}} EXP",
-        "coins": "{{count}} LensCoins"
-    },
-    "reward": {
-        "coin_singular": "LensCoin",
-        "coin_plural": "LensCoins",
-        "exp": "{{count}} EXP"
-    },
-    "button": {
-        "locked_tooltip": "This action is locked",
-        "free": "Free"
-    },
-    "modal": {
-        "close": "Close"
-    },
-    "dataset": {
-        "title": "Dataset",
-        "loading": "Loading..."
-    },
-    "footer": {
-        "developed_by": "Developed by Davide Ponzini.",
-        "license": "GNU General Public License",
-        "contact": "Contact",
-        "social": {
-            "website": "Website",
-            "github": "GitHub",
-            "email": "Email"
-        }
-    },
-    "assignment": {
-        "title": "Assign to",
-        "select_all": "Select All"
-    },
-    "learning": {
-        "queries_teacher": "Let's look at your students' queries",
-        "queries_student": "Let's look at your queries",
-        "messages": "Turning Questions Into Progress",
-        "errors": "Where things got tricky"
-    },
-    "learningStatsErrors": {
-        "empty": {
-            "student": "You haven't encountered any errors yet. When you do, we'll show you the types of errors you faced and how they changed over time.",
-            "teacher": "Your students haven't encountered any errors yet. When they do, we'll show you the types of errors they faced and how they changed over time."
+    "components": {
+        "navbar": {
+            "nav": {
+                "home": "Home",
+                "profile": "Profile",
+                "view_profile": "View Profile",
+                "learning": "Learning Insights",
+                "courses": "Courses",
+                "admin": "Admin",
+                "login": "Login",
+                "register": "Register",
+                "logout": "Logout",
+                "loading": "Loading...",
+                "unknown": "Unknown",
+                "username_tooltip": "Your username",
+                "admin_tooltip": "Admin"
+            },
+            "language": {
+                "label": "Language",
+                "en": "EN",
+                "it": "IT"
+            },
+            "gamificationStats": {
+                "level": "Level",
+                "xp": "Experience points",
+                "coins": "LensCoins"
+            }
         },
-        "kind_title": "What kind of issues came up?",
-        "kind_subtitle": {
-            "student": "Your errors fall into a few key patterns — here's the overview.",
-            "teacher": "Your students' errors fall into a few key patterns — here's the overview."
+        "alert": {
+            "under_development": "🚧 This section is under development."
         },
-        "kind_body": {
-            "student": "Under development! This section will categorize your errors into Syntactic, Semantic, Logical Errors, and Complications.",
-            "teacher": "Under development! This section will categorize your students' errors into Syntactic, Semantic, Logical Errors, and Complications."
+        "notifications": {
+            "badge": {
+                "title": "🏆 Achievement Unlocked!",
+                "exp": "{{count}} EXP",
+                "coins": "{{count}} LensCoins"
+            },
+            "reward": {
+                "coin_singular": "LensCoin",
+                "coin_plural": "LensCoins",
+                "exp": "{{count}} EXP"
+            }
         },
-        "common_title": "Most common mistakes",
-        "common_subtitle": {
-            "student": "Here are the most frequent error patterns detected in your queries.",
-            "teacher": "Here are the most frequent error patterns detected in your students' queries."
+        "buttons": {
+            "button": {
+                "locked_tooltip": "This action is locked",
+                "free": "Free"
+            },
+            "modal": {
+                "close": "Close"
+            },
+            "dataset": {
+                "title": "Dataset",
+                "loading": "Loading..."
+            }
         },
-        "common_body": {
-            "student": "Under development! This section will show the most common error patterns in your queries.",
-            "teacher": "Under development! This section will show the most common error patterns in your students' queries."
+        "footer": {
+            "developed_by": "Developed by Davide Ponzini.",
+            "license": "GNU General Public License",
+            "contact": "Contact",
+            "social": {
+                "website": "Website",
+                "github": "GitHub",
+                "email": "Email"
+            }
         },
-        "timeline_title": {
-            "student": "How your errors changed over time",
-            "teacher": "How your students' errors changed over time"
+        "assignmentList": {
+            "title": "Assign to",
+            "select_all": "Select All"
         },
-        "timeline_subtitle": {
-            "student": "See whether you're making fewer mistakes as you progress.",
-            "teacher": "See whether your students are making fewer mistakes as they progress."
-        },
-        "timeline_body": {
-            "student": "Under development! This section will show a timeline of your errors, helping you track your progress.",
-            "teacher": "Under development! This section will show a timeline of your students' errors, helping you track their progress."
-        }
-    },
-    "learningStatsMessages": {
-        "empty": {
-            "student": "You haven't asked for help yet. When you do, we'll show you how often you asked for explanations and how well you understood the replies.",
-            "teacher": "Your students haven't asked for help yet. When they do, we'll show you how often they asked for explanations and how well they understood the replies."
-        },
-        "title_help": {
-            "student": "You asked, Lens explained",
-            "teacher": "Your students asked, Lens explained"
-        },
-        "subtitle_help": {
-            "student": "Got stuck or curious? Here's when you asked for explanations or guidance on your queries.",
-            "teacher": "Got stuck or curious? Here's when your students asked for explanations or guidance on their queries."
-        },
-        "list_title": {
-            "student": "When you asked for help:",
-            "teacher": "When your students asked for help:"
-        },
-        "list_labels": {
-            "total": "Total requests",
-            "select": "On SELECT queries"
-        },
-        "chart_title": {
-            "student": "What you were looking for:",
-            "teacher": "What your students were looking for:"
-        },
-        "understanding_results": "Understanding results",
-        "understanding_errors": "Understanding errors",
-        "title_feedback": {
-            "student": "You rated the replies",
-            "teacher": "Your students rated the replies"
-        },
-        "subtitle_feedback": {
-            "student": "You gave a thumbs-up or down on the explanations — that helps us improve.",
-            "teacher": "Your students gave a thumbs-up or down on the explanations — that helps us improve."
-        },
-        "feedback_given": "Feedback Given",
-        "feedback_not_given": "Feedback Not Given"
-    },
-    "learningStatsQueries": {
-        "empty": {
-            "student": "You haven't run any queries yet. When you do, we'll show you how many queries you tried, how often they worked, and what types of queries you used.",
-            "teacher": "Your students haven't run any queries yet. When they do, we'll show you how many queries they tried, how often they worked, and what types of queries they used."
-        },
-        "title": {
-            "student": "Your SQL Journey",
-            "teacher": "Your Students' SQL Journey"
-        },
-        "stats": {
-            "distinct": "Distinct queries tried",
-            "total": "Total queries executed",
-            "note": "Every attempt helps — even retries are part of the learning curve."
-        },
-        "success_title": "How often things worked",
-        "select_label": "SELECT Queries",
-        "all_label": "All Queries",
-        "chart_title": {
-            "student": "What kind of queries are you running?",
-            "teacher": "What kind of queries are your students running?"
-        },
-        "chart_subtitle": {
-            "student": "Here's the mix of SQL commands you've used, and how they turned out.",
-            "teacher": "Here's the mix of SQL commands your students have used, and how they turned out."
-        },
-        "chart_empty": {
-            "student": "No queries run yet. Start exploring SQL!",
-            "teacher": "No queries run yet. Wait for your students to start exploring SQL!"
-        },
-        "success": "Successful",
-        "fail": "Failed"
-    },
-    "admin": {
-        "title": "Admin page",
-        "empty": "No content here"
-    },
-    "class": {
-        "new": "New Course",
-        "save": "Save"
-    },
-    "class_card": {
-        "exercises": "Exercises",
-        "queries": "Queries executed",
-        "badge_teacher": "Teacher",
-        "join_code": "Join Code",
-        "students": "Students",
-        "open": "Open",
-        "leave": "Leave",
-        "confirm_leave": "Are you sure you want to leave this class?",
-        "learning_analytics": "Learning Analytics",
-        "set_teachers": "Set Teachers",
-        "participants": "Participants"
-    },
-    "class_list": {
-        "title": "My Courses",
-        "empty_1": "Nothing here. Join a course to see exercises.",
-        "empty_2": "If you want to run a query which hasn't been assigned to you by the teacher, please create a new course.",
-        "join": "Join Course",
-        "join_prompt": "Enter class join code:"
-    },
-    "class_mask": {
-        "title_label": "Title",
-        "dataset_label": "Dataset (Optional)",
-        "tips_title": "Tips",
-        "tips": [
-            "Include the whole script into a <code>BEGIN; ... COMMIT;</code> block",
-            "Begin the script with <code>DROP SCHEMA IF EXISTS schema_name CASCADE;</code>",
-            "Use a unique <code>search_path</code> for each dataset",
-            "Group insertions into a single <code>INSERT INTO</code> statement for each table to greatly improve performance"
-        ]
-    },
-    "class_update": {
-        "modal_title": "Edit Course",
-        "button_text": "Edit",
-        "save": "Save"
-    },
-    "exercise_add": {
-        "title": "Add Exercise",
-        "button_text": "Add New Exercise",
-        "save": "Save"
-    },
-    "exercise": {
-        "hidden": "Hidden",
-        "solved": "Solved",
-        "generated": "AI Generated",
-        "objectives": "Learning Objectives",
-        "archive": "Archive",
-        "unarchive": "Unarchive",
-        "open": "Open",
-        "analytics": "Learning Analytics",
-        "edit": "Edit",
-        "objectives_set": "Set Objectives",
-        "hide": "Hide",
-        "show": "Make Visible",
-        "delete": "Delete",
-        "delete_confirm": "Are you sure you want to delete this exercise? This action cannot be undone."
-    },
-    "exercise_list": {
-        "title": "Exercises",
-        "none": "No exercises",
-        "archived": "Archived",
-        "archived_none": "No archived exercises"
-    },
-    "exercise_mask": {
-        "title": "Title",
-        "request": "Request",
-        "answer_optional": "Answer (Optional)"
-    },
-    "exercise_update": {
-        "title": "Edit Exercise",
-        "button": "Edit",
-        "save": "Save"
-    },
-    "learning_objectives": {
-        "title": "Set Objectives",
-        "button": "Set Objectives",
-        "list_title": "Set Learning Objectives",
-        "objectives": {
-            "Simple Select": {
-                "label": "Simple SELECT",
-                "description": "Write a simple SELECT statement to retrieve data from a single table."
+        "learningStats": {
+            "learning": {
+                "queries_teacher": "Let's look at your students' queries",
+                "queries_student": "Let's look at your queries",
+                "messages": "Turning Questions Into Progress",
+                "errors": "Where things got tricky"
             },
-            "Single condition": {
-                "label": "Single condition",
-                "description": "Write queries that filter results based on a single condition."
+            "errors": {
+                "empty": {
+                    "student": "You haven't encountered any errors yet. When you do, we'll show you the types of errors you faced and how they changed over time.",
+                    "teacher": "Your students haven't encountered any errors yet. When they do, we'll show you the types of errors they faced and how they changed over time."
+                },
+                "kind_title": "What kind of issues came up?",
+                "kind_subtitle": {
+                    "student": "Your errors fall into a few key patterns — here's the overview.",
+                    "teacher": "Your students' errors fall into a few key patterns — here's the overview."
+                },
+                "kind_body": {
+                    "student": "Under development! This section will categorize your errors into Syntactic, Semantic, Logical Errors, and Complications.",
+                    "teacher": "Under development! This section will categorize your students' errors into Syntactic, Semantic, Logical Errors, and Complications."
+                },
+                "common_title": "Most common mistakes",
+                "common_subtitle": {
+                    "student": "Here are the most frequent error patterns detected in your queries.",
+                    "teacher": "Here are the most frequent error patterns detected in your students' queries."
+                },
+                "common_body": {
+                    "student": "Under development! This section will show the most common error patterns in your queries.",
+                    "teacher": "Under development! This section will show the most common error patterns in your students' queries."
+                },
+                "timeline_title": {
+                    "student": "How your errors changed over time",
+                    "teacher": "How your students' errors changed over time"
+                },
+                "timeline_subtitle": {
+                    "student": "See whether you're making fewer mistakes as you progress.",
+                    "teacher": "See whether your students are making fewer mistakes as they progress."
+                },
+                "timeline_body": {
+                    "student": "Under development! This section will show a timeline of your errors, helping you track your progress.",
+                    "teacher": "Under development! This section will show a timeline of your students' errors, helping you track their progress."
+                }
             },
-            "Distinct": {
-                "label": "DISTINCT",
-                "description": "Use the DISTINCT keyword to eliminate duplicate rows from query results."
+            "messages": {
+                "empty": {
+                    "student": "You haven't asked for help yet. When you do, we'll show you how often you asked for explanations and how well you understood the replies.",
+                    "teacher": "Your students haven't asked for help yet. When they do, we'll show you how often they asked for explanations and how well they understood the replies."
+                },
+                "title_help": {
+                    "student": "You asked, Lens explained",
+                    "teacher": "Your students asked, Lens explained"
+                },
+                "subtitle_help": {
+                    "student": "Got stuck or curious? Here's when you asked for explanations or guidance on your queries.",
+                    "teacher": "Got stuck or curious? Here's when your students asked for explanations or guidance on their queries."
+                },
+                "list_title": {
+                    "student": "When you asked for help:",
+                    "teacher": "When your students asked for help:"
+                },
+                "list_labels": {
+                    "total": "Total requests",
+                    "select": "On SELECT queries"
+                },
+                "chart_title": {
+                    "student": "What you were looking for:",
+                    "teacher": "What your students were looking for:"
+                },
+                "understanding_results": "Understanding results",
+                "understanding_errors": "Understanding errors",
+                "title_feedback": {
+                    "student": "You rated the replies",
+                    "teacher": "Your students rated the replies"
+                },
+                "subtitle_feedback": {
+                    "student": "You gave a thumbs-up or down on the explanations — that helps us improve.",
+                    "teacher": "Your students gave a thumbs-up or down on the explanations — that helps us improve."
+                },
+                "feedback_given": "Feedback Given",
+                "feedback_not_given": "Feedback Not Given"
             },
-            "Aggregate functions": {
-                "label": "Aggregate functions",
-                "description": "Use aggregate functions like COUNT, SUM, AVG, MIN, and MAX to summarize data."
-            },
-            "Subquery in SELECT": {
-                "label": "Subquery in SELECT",
-                "description": "Write queries that include subqueries in the SELECT clause."
-            },
-            "Case statements": {
-                "label": "CASE statements",
-                "description": "Use CASE statements to create conditional logic within queries."
-            },
-            "String functions": {
-                "label": "String functions",
-                "description": "Apply string functions to manipulate text data in queries."
-            },
-            "Date functions": {
-                "label": "Date functions",
-                "description": "Use date functions to manipulate and format date and time data in queries."
-            },
-            "Numeric functions": {
-                "label": "Numeric functions",
-                "description": "Apply numeric functions to perform calculations on numeric data in queries."
-            },
-            "Window functions": {
-                "label": "Window functions",
-                "description": "Use window functions to perform calculations across a set of rows related to the current row."
-            },
-            "Simple join": {
-                "label": "Simple JOIN",
-                "description": "Write queries that involve a simple join between two tables to retrieve related data."
-            },
-            "Self join": {
-                "label": "Self JOIN",
-                "description": "Write queries that involve self-joins to compare rows within the same table."
-            },
-            "Left join": {
-                "label": "LEFT JOIN",
-                "description": "Write queries that use LEFT JOIN to retrieve all rows from one table and matching rows from another."
-            },
-            "Right join": {
-                "label": "RIGHT JOIN",
-                "description": "Write queries that use RIGHT JOIN to retrieve all rows from one table and matching rows from another."
-            },
-            "Full outer join": {
-                "label": "FULL OUTER JOIN",
-                "description": "Use FULL OUTER JOIN to retrieve all rows when there is a match in either table."
-            },
-            "Subquery in FROM": {
-                "label": "Subquery in FROM",
-                "description": "Utilize subqueries in the FROM clause to create derived tables."
-            },
-            "Multiple conditions": {
-                "label": "Multiple conditions",
-                "description": "Use logical operators to filter results based on multiple conditions."
-            },
-            "Subquery in WHERE": {
-                "label": "Subquery in WHERE",
-                "description": "Use subqueries in the WHERE clause to filter results based on related data."
-            },
-            "Correlated subqueries": {
-                "label": "Correlated subqueries",
-                "description": "Write correlated subqueries that reference columns from the outer query."
-            },
-            "Group by": {
-                "label": "GROUP BY",
-                "description": "Group results using the GROUP BY clause to aggregate data based on specific columns."
-            },
-            "Group by with conditions": {
-                "label": "HAVING clause",
-                "description": "Use the HAVING clause to filter grouped results based on aggregate conditions."
-            },
-            "Order by": {
-                "label": "ORDER BY",
-                "description": "Sort query results using the ORDER BY clause."
-            },
-            "Limit and offset": {
-                "label": "LIMIT and OFFSET",
-                "description": "Use LIMIT and OFFSET to control the number of rows returned by a query."
-            },
-            "Union": {
-                "label": "UNION",
-                "description": "Combine results from multiple queries using the UNION operator."
-            },
-            "Intersect": {
-                "label": "INTERSECT",
-                "description": "Retrieve common results from multiple queries using the INTERSECT operator."
-            },
-            "Except": {
-                "label": "EXCEPT",
-                "description": "Use the EXCEPT operator to find results in one query that are not in another."
+            "queries": {
+                "empty": {
+                    "student": "You haven't run any queries yet. When you do, we'll show you how many queries you tried, how often they worked, and what types of queries you used.",
+                    "teacher": "Your students haven't run any queries yet. When they do, we'll show you how many queries they tried, how often they worked, and what types of queries they used."
+                },
+                "title": {
+                    "student": "Your SQL Journey",
+                    "teacher": "Your Students' SQL Journey"
+                },
+                "stats": {
+                    "distinct": "Distinct queries tried",
+                    "total": "Total queries executed",
+                    "note": "Every attempt helps — even retries are part of the learning curve."
+                },
+                "success_title": "How often things worked",
+                "select_label": "SELECT Queries",
+                "all_label": "All Queries",
+                "chart_title": {
+                    "student": "What kind of queries are you running?",
+                    "teacher": "What kind of queries are your students running?"
+                },
+                "chart_subtitle": {
+                    "student": "Here's the mix of SQL commands you've used, and how they turned out.",
+                    "teacher": "Here's the mix of SQL commands your students have used, and how they turned out."
+                },
+                "chart_empty": {
+                    "student": "No queries run yet. Start exploring SQL!",
+                    "teacher": "No queries run yet. Wait for your students to start exploring SQL!"
+                },
+                "success": "Successful",
+                "fail": "Failed"
             }
         }
     },
-    "profile": {
-        "learning": {
-            "title": "Welcome back, {{username}}!",
-            "subtitle": "Here's a look at your SQL progress"
+    "pages": {
+        "admin": {
+            "title": "Admin page",
+            "empty": "No content here"
         },
-        "home": {
-            "welcome": "Welcome back, {{username}}!",
-            "progress": "Here's a look at your progress",
-            "level": {
-                "title": "Current Level",
-                "exp": "EXP: {{xp}} / {{xpToNext}}",
-                "tip": "Earn more EXP by learning SQL:"
-            },
-            "coins": {
-                "title": "LensCoins",
-                "available": "{{coins}} coins available",
-                "tip": "Use LensCoins to interact with Lens:"
-            },
-            "achievements": {
-                "title": "Achievements",
-                "text": "You've earned the following achievements:"
+        "class": {
+            "new": "New Course",
+            "save": "Save"
+        },
+        "class_card": {
+            "exercises": "Exercises",
+            "queries": "Queries executed",
+            "badge_teacher": "Teacher",
+            "join_code": "Join Code",
+            "students": "Students",
+            "open": "Open",
+            "leave": "Leave",
+            "confirm_leave": "Are you sure you want to leave this class?",
+            "learning_analytics": "Learning Analytics",
+            "set_teachers": "Set Teachers",
+            "participants": "Participants"
+        },
+        "class_list": {
+            "title": "My Courses",
+            "empty_1": "Nothing here. Join a course to see exercises.",
+            "empty_2": "If you want to run a query which hasn't been assigned to you by the teacher, please create a new course.",
+            "join": "Join Course",
+            "join_prompt": "Enter class join code:"
+        },
+        "class_mask": {
+            "title_label": "Title",
+            "dataset_label": "Dataset (Optional)",
+            "tips_title": "Tips",
+            "tips": [
+                "Include the whole script into a <code>BEGIN; ... COMMIT;</code> block",
+                "Begin the script with <code>DROP SCHEMA IF EXISTS schema_name CASCADE;</code>",
+                "Use a unique <code>search_path</code> for each dataset",
+                "Group insertions into a single <code>INSERT INTO</code> statement for each table to greatly improve performance"
+            ]
+        },
+        "class_update": {
+            "modal_title": "Edit Course",
+            "button_text": "Edit",
+            "save": "Save"
+        },
+        "exercise_add": {
+            "title": "Add Exercise",
+            "button_text": "Add New Exercise",
+            "save": "Save"
+        },
+        "exercise": {
+            "hidden": "Hidden",
+            "solved": "Solved",
+            "generated": "AI Generated",
+            "objectives": "Learning Objectives",
+            "archive": "Archive",
+            "unarchive": "Unarchive",
+            "open": "Open",
+            "analytics": "Learning Analytics",
+            "edit": "Edit",
+            "objectives_set": "Set Objectives",
+            "hide": "Hide",
+            "show": "Make Visible",
+            "delete": "Delete",
+            "delete_confirm": "Are you sure you want to delete this exercise? This action cannot be undone."
+        },
+        "exercise_list": {
+            "title": "Exercises",
+            "none": "No exercises",
+            "archived": "Archived",
+            "archived_none": "No archived exercises"
+        },
+        "exercise_mask": {
+            "title": "Title",
+            "request": "Request",
+            "answer_optional": "Answer (Optional)"
+        },
+        "exercise_update": {
+            "title": "Edit Exercise",
+            "button": "Edit",
+            "save": "Save"
+        },
+        "learning_objectives": {
+            "title": "Set Objectives",
+            "button": "Set Objectives",
+            "list_title": "Set Learning Objectives",
+            "objectives": {
+                "Simple Select": {
+                    "label": "Simple SELECT",
+                    "description": "Write a simple SELECT statement to retrieve data from a single table."
+                },
+                "Single condition": {
+                    "label": "Single condition",
+                    "description": "Write queries that filter results based on a single condition."
+                },
+                "Distinct": {
+                    "label": "DISTINCT",
+                    "description": "Use the DISTINCT keyword to eliminate duplicate rows from query results."
+                },
+                "Aggregate functions": {
+                    "label": "Aggregate functions",
+                    "description": "Use aggregate functions like COUNT, SUM, AVG, MIN, and MAX to summarize data."
+                },
+                "Subquery in SELECT": {
+                    "label": "Subquery in SELECT",
+                    "description": "Write queries that include subqueries in the SELECT clause."
+                },
+                "Case statements": {
+                    "label": "CASE statements",
+                    "description": "Use CASE statements to create conditional logic within queries."
+                },
+                "String functions": {
+                    "label": "String functions",
+                    "description": "Apply string functions to manipulate text data in queries."
+                },
+                "Date functions": {
+                    "label": "Date functions",
+                    "description": "Use date functions to manipulate and format date and time data in queries."
+                },
+                "Numeric functions": {
+                    "label": "Numeric functions",
+                    "description": "Apply numeric functions to perform calculations on numeric data in queries."
+                },
+                "Window functions": {
+                    "label": "Window functions",
+                    "description": "Use window functions to perform calculations across a set of rows related to the current row."
+                },
+                "Simple join": {
+                    "label": "Simple JOIN",
+                    "description": "Write queries that involve a simple join between two tables to retrieve related data."
+                },
+                "Self join": {
+                    "label": "Self JOIN",
+                    "description": "Write queries that involve self-joins to compare rows within the same table."
+                },
+                "Left join": {
+                    "label": "LEFT JOIN",
+                    "description": "Write queries that use LEFT JOIN to retrieve all rows from one table and matching rows from another."
+                },
+                "Right join": {
+                    "label": "RIGHT JOIN",
+                    "description": "Write queries that use RIGHT JOIN to retrieve all rows from one table and matching rows from another."
+                },
+                "Full outer join": {
+                    "label": "FULL OUTER JOIN",
+                    "description": "Use FULL OUTER JOIN to retrieve all rows when there is a match in either table."
+                },
+                "Subquery in FROM": {
+                    "label": "Subquery in FROM",
+                    "description": "Utilize subqueries in the FROM clause to create derived tables."
+                },
+                "Multiple conditions": {
+                    "label": "Multiple conditions",
+                    "description": "Use logical operators to filter results based on multiple conditions."
+                },
+                "Subquery in WHERE": {
+                    "label": "Subquery in WHERE",
+                    "description": "Use subqueries in the WHERE clause to filter results based on related data."
+                },
+                "Correlated subqueries": {
+                    "label": "Correlated subqueries",
+                    "description": "Write correlated subqueries that reference columns from the outer query."
+                },
+                "Group by": {
+                    "label": "GROUP BY",
+                    "description": "Group results using the GROUP BY clause to aggregate data based on specific columns."
+                },
+                "Group by with conditions": {
+                    "label": "HAVING clause",
+                    "description": "Use the HAVING clause to filter grouped results based on aggregate conditions."
+                },
+                "Order by": {
+                    "label": "ORDER BY",
+                    "description": "Sort query results using the ORDER BY clause."
+                },
+                "Limit and offset": {
+                    "label": "LIMIT and OFFSET",
+                    "description": "Use LIMIT and OFFSET to control the number of rows returned by a query."
+                },
+                "Union": {
+                    "label": "UNION",
+                    "description": "Combine results from multiple queries using the UNION operator."
+                },
+                "Intersect": {
+                    "label": "INTERSECT",
+                    "description": "Retrieve common results from multiple queries using the INTERSECT operator."
+                },
+                "Except": {
+                    "label": "EXCEPT",
+                    "description": "Use the EXCEPT operator to find results in one query that are not in another."
+                }
             }
-        }
-    },
-    "about": {
-        "title": "About LensQL",
-        "p1": "LensQL is an interactive platform that helps students learn SQL through guided practice, personalized feedback, and gamified progression. Built with both students and teachers in mind, it supports a deeper understanding of relational databases by focusing on the reasoning behind queries — not just their correctness.",
-        "p2": "Instead of offering immediate solutions, LensQL encourages active exploration. The AI assistant, Lens, helps students reflect on their mistakes, refine their logic, and grow their skills with every attempt. Teachers, meanwhile, gain insight into how students learn, where they struggle, and how to support them effectively.",
-        "p3": "Whether you're running your first query or refining complex joins, LensQL turns every error into an opportunity to learn.",
-        "moreTitle": "🔍 Want to know more?",
-        "moreIntro": "LensQL is developed as part of ongoing research at the University of Genoa. If you're curious about the academic background or technical details, here are some publications that explore the ideas behind it:",
-        "paper1": "Analyzing Common Student Errors in SQL Query Formulation to Enhance Learning Support",
-        "paper1Desc": "A large-scale study on student SQL mistakes and how they vary across learning settings.",
-        "paper2": "Enhancing SQL Learning through Generative AI and Student Error Analysis",
-        "paper2Desc": "A framework for AI-assisted feedback, error tracking, and personalized assignment generation in SQL education.",
-        "cta": "Try LensQL"
-    },
-    "login": {
-        "title": "Sign into your account",
-        "subtitle": "Don't have an account? Register here",
-        "username": "Username",
-        "usernamePlaceholder": "Username",
-        "usernameRequired": "Please enter a username.",
-        "password": "Password",
-        "passwordPlaceholder": "Password",
-        "passwordRequired": "Please enter a password.",
-        "show": "Show password",
-        "hide": "Hide password",
-        "submit": "Login",
-        "errorEmptyFields": "Please fill in both fields.",
-        "errorServer": "Could not connect to the server.",
-        "errorLoginFailed": "Login failed"
-    },
-    "register": {
-        "title": "Register a new account",
-        "subtitle": "Already have an account? Log in here",
-        "success": "Registration successful! You can now log in with your new account.",
-        "gotoLogin": "Go to Login",
-        "submit": "Register",
-        "username": "Username",
-        "usernamePlaceholder": "Username",
-        "usernameRequired": "Please enter a username.",
-        "password": "Password",
-        "passwordPlaceholder": "Password",
-        "passwordRequired": "Please enter a password.",
-        "passwordLength": "Password must be at least 8 characters long.",
-        "passwordUpper": "Password must contain at least one uppercase letter.",
-        "passwordLower": "Password must contain at least one lowercase letter.",
-        "passwordDigit": "Password must contain at least one number.",
-        "passwordSpecial": "Password must contain at least one special character.",
-        "show": "Show password",
-        "hide": "Hide password",
-        "email": "Email (Optional)",
-        "emailPlaceholder": "Email",
-        "emailRequired": "Please enter an email address.",
-        "emailInvalid": "Please enter a valid email address.",
-        "school": "School",
-        "schoolPlaceholder": "School",
-        "schoolRequired": "Please enter your school.",
-        "errorServer": "Could not connect to the server.",
-        "errorGeneric": "Registration failed"
-    },
-    "gamification": {
-        "actions": {
-            "solve_exercises": "Solve exercises",
-            "run_queries": "Run queries",
-            "try_unique_queries": "Try new, unique queries",
-            "interact_with_lens": "Interact with Lens",
-            "feedback_on_lens": "Give feedback on Lens’ help",
-            "achievements": "Unlock achievements",
-            "check_solution": "Check if a solution is correct",
-            "ask_lens": "Ask Lens for help"
         },
-        "badges": {
-            "create_exercises": {
-                "1": "Created your first exercise and run a query in it",
-                "5": "Created 5 exercises and run a query in each of them",
-                "10": "Created 10 exercises and run a query in each of them"
+        "profile": {
+            "learning": {
+                "title": "Welcome back, {{username}}!",
+                "subtitle": "Here's a look at your SQL progress"
             },
-            "feedback": {
-                "1": "Provided your first feedback",
-                "10": "Provided feedback 10 times",
-                "50": "Provided feedback 50 times"
-            },
-            "queries_unique": {
-                "1": "Ran your first query",
-                "10": "Ran 10 different queries",
-                "50": "Ran 50 different queries",
-                "100": "Ran 100 different queries",
-                "500": "Ran 500 different queries",
-                "1000": "Ran 1000 different queries",
-                "2500": "Ran 2500 different queries",
-                "5000": "Ran 5000 different queries",
-                "10000": "Ran 10000 different queries"
-            },
-            "exercise_solutions": {
-                "1": "Solved your first exercise",
-                "5": "Solved 5 exercises",
-                "10": "Solved 10 exercises"
-            },
-            "help_usage": {
-                "1": "Interacted with Lens for the first time",
-                "10": "Interacted with Lens 10 times",
-                "50": "Interacted with Lens 50 times",
-                "100": "Interacted with Lens 100 times",
-                "500": "Interacted with Lens 500 times",
-                "1000": "Interacted with Lens 1000 times"
-            },
-            "daily_usage": {
-                "5": "Run a query in 5 different days",
-                "14": "Run a query in 14 different days",
-                "30": "Run a query in 30 different days"
-            },
-            "level_up": {
-                "3": "Reached level 3",
-                "5": "Reached level 5",
-                "10": "Reached level 10"
-            },
-            "join_course": {
-                "1": "Joined your first course"
+            "home": {
+                "welcome": "Welcome back, {{username}}!",
+                "progress": "Here's a look at your progress",
+                "level": {
+                    "title": "Current Level",
+                    "exp": "EXP: {{xp}} / {{xpToNext}}",
+                    "tip": "Earn more EXP by learning SQL:"
+                },
+                "coins": {
+                    "title": "LensCoins",
+                    "available": "{{coins}} coins available",
+                    "tip": "Use LensCoins to interact with Lens:"
+                },
+                "achievements": {
+                    "title": "Achievements",
+                    "text": "You've earned the following achievements:"
+                }
             }
         },
-        "levels": {
-            "0": "Curious Beginner",
-            "1": "Logical Thinker",
-            "2": "Query Novice",
-            "3": "Pattern Seeker",
-            "4": "Relational Explorer",
-            "5": "Intentional Analyst",
-            "6": "Data Interpreter",
-            "7": "Insight Builder",
-            "8": "Structured Thinker",
-            "9": "Query Architect"
+        "about": {
+            "title": "About LensQL",
+            "p1": "LensQL is an interactive platform that helps students learn SQL through guided practice, personalized feedback, and gamified progression. Built with both students and teachers in mind, it supports a deeper understanding of relational databases by focusing on the reasoning behind queries — not just their correctness.",
+            "p2": "Instead of offering immediate solutions, LensQL encourages active exploration. The AI assistant, Lens, helps students reflect on their mistakes, refine their logic, and grow their skills with every attempt. Teachers, meanwhile, gain insight into how students learn, where they struggle, and how to support them effectively.",
+            "p3": "Whether you're running your first query or refining complex joins, LensQL turns every error into an opportunity to learn.",
+            "moreTitle": "🔍 Want to know more?",
+            "moreIntro": "LensQL is developed as part of ongoing research at the University of Genoa. If you're curious about the academic background or technical details, here are some publications that explore the ideas behind it:",
+            "paper1": "Analyzing Common Student Errors in SQL Query Formulation to Enhance Learning Support",
+            "paper1Desc": "A large-scale study on student SQL mistakes and how they vary across learning settings.",
+            "paper2": "Enhancing SQL Learning through Generative AI and Student Error Analysis",
+            "paper2Desc": "A framework for AI-assisted feedback, error tracking, and personalized assignment generation in SQL education.",
+            "cta": "Try LensQL"
+        },
+        "login": {
+            "title": "Sign into your account",
+            "subtitle": "Don't have an account? Register here",
+            "username": "Username",
+            "usernamePlaceholder": "Username",
+            "usernameRequired": "Please enter a username.",
+            "password": "Password",
+            "passwordPlaceholder": "Password",
+            "passwordRequired": "Please enter a password.",
+            "show": "Show password",
+            "hide": "Hide password",
+            "submit": "Login",
+            "errorEmptyFields": "Please fill in both fields.",
+            "errorServer": "Could not connect to the server.",
+            "errorLoginFailed": "Login failed"
+        },
+        "register": {
+            "title": "Register a new account",
+            "subtitle": "Already have an account? Log in here",
+            "success": "Registration successful! You can now log in with your new account.",
+            "gotoLogin": "Go to Login",
+            "submit": "Register",
+            "username": "Username",
+            "usernamePlaceholder": "Username",
+            "usernameRequired": "Please enter a username.",
+            "password": "Password",
+            "passwordPlaceholder": "Password",
+            "passwordRequired": "Please enter a password.",
+            "passwordLength": "Password must be at least 8 characters long.",
+            "passwordUpper": "Password must contain at least one uppercase letter.",
+            "passwordLower": "Password must contain at least one lowercase letter.",
+            "passwordDigit": "Password must contain at least one number.",
+            "passwordSpecial": "Password must contain at least one special character.",
+            "show": "Show password",
+            "hide": "Hide password",
+            "email": "Email (Optional)",
+            "emailPlaceholder": "Email",
+            "emailRequired": "Please enter an email address.",
+            "emailInvalid": "Please enter a valid email address.",
+            "school": "School",
+            "schoolPlaceholder": "School",
+            "schoolRequired": "Please enter your school.",
+            "errorServer": "Could not connect to the server.",
+            "errorGeneric": "Registration failed"
+        },
+        "gamification": {
+            "actions": {
+                "solve_exercises": "Solve exercises",
+                "run_queries": "Run queries",
+                "try_unique_queries": "Try new, unique queries",
+                "interact_with_lens": "Interact with Lens",
+                "feedback_on_lens": "Give feedback on Lens’ help",
+                "achievements": "Unlock achievements",
+                "check_solution": "Check if a solution is correct",
+                "ask_lens": "Ask Lens for help"
+            },
+            "badges": {
+                "create_exercises": {
+                    "1": "Created your first exercise and run a query in it",
+                    "5": "Created 5 exercises and run a query in each of them",
+                    "10": "Created 10 exercises and run a query in each of them"
+                },
+                "feedback": {
+                    "1": "Provided your first feedback",
+                    "10": "Provided feedback 10 times",
+                    "50": "Provided feedback 50 times"
+                },
+                "queries_unique": {
+                    "1": "Ran your first query",
+                    "10": "Ran 10 different queries",
+                    "50": "Ran 50 different queries",
+                    "100": "Ran 100 different queries",
+                    "500": "Ran 500 different queries",
+                    "1000": "Ran 1000 different queries",
+                    "2500": "Ran 2500 different queries",
+                    "5000": "Ran 5000 different queries",
+                    "10000": "Ran 10000 different queries"
+                },
+                "exercise_solutions": {
+                    "1": "Solved your first exercise",
+                    "5": "Solved 5 exercises",
+                    "10": "Solved 10 exercises"
+                },
+                "help_usage": {
+                    "1": "Interacted with Lens for the first time",
+                    "10": "Interacted with Lens 10 times",
+                    "50": "Interacted with Lens 50 times",
+                    "100": "Interacted with Lens 100 times",
+                    "500": "Interacted with Lens 500 times",
+                    "1000": "Interacted with Lens 1000 times"
+                },
+                "daily_usage": {
+                    "5": "Run a query in 5 different days",
+                    "14": "Run a query in 14 different days",
+                    "30": "Run a query in 30 different days"
+                },
+                "level_up": {
+                    "3": "Reached level 3",
+                    "5": "Reached level 5",
+                    "10": "Reached level 10"
+                },
+                "join_course": {
+                    "1": "Joined your first course"
+                }
+            },
+            "levels": {
+                "0": "Curious Beginner",
+                "1": "Logical Thinker",
+                "2": "Query Novice",
+                "3": "Pattern Seeker",
+                "4": "Relational Explorer",
+                "5": "Intentional Analyst",
+                "6": "Data Interpreter",
+                "7": "Insight Builder",
+                "8": "Structured Thinker",
+                "9": "Query Architect"
+            }
         }
     }
 }

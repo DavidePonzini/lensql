@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import useAuth from "../hooks/useAuth";
-import ObservedOnce from "./ObservedOnce";
+import useAuth from "../../hooks/useAuth";
+import ObservedOnce from "../ObservedOnce";
 import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
@@ -27,16 +27,16 @@ function LearningStatsMessages({ classId = null, exerciseId = null, isTeacher = 
     const messagesErrorRate = messagesTotal > 0 ? messagesError / messagesTotal : 0;
 
     const messagesBreakdownData = [
-        { name: t('learningStatsMessages.understanding_results'), value: messagesSuccess },
-        { name: t('learningStatsMessages.understanding_errors'), value: messagesError },
+        { name: t('components.learningStats.messages.understanding_results'), value: messagesSuccess },
+        { name: t('components.learningStats.messages.understanding_errors'), value: messagesError },
     ];
 
     const messagesFeedback = data?.messages_feedback || 0;
     const messagesFeedbackRate = messagesTotal > 0 ? messagesFeedback / messagesTotal : 0;
 
     const messagesFeedbackData = [
-        { name: t('learningStatsMessages.feedback_given'), value: messagesFeedback },
-        { name: t('learningStatsMessages.feedback_not_given'), value: messagesTotal - messagesFeedback },
+        { name: t('components.learningStats.messages.feedback_given'), value: messagesFeedback },
+        { name: t('components.learningStats.messages.feedback_not_given'), value: messagesTotal - messagesFeedback },
     ];
 
     const role = isTeacher ? 'teacher' : 'student';
@@ -45,29 +45,29 @@ function LearningStatsMessages({ classId = null, exerciseId = null, isTeacher = 
         <ObservedOnce onFirstVisible={fetchData}>
             {messagesTotal === 0 ? (
                 <p className="text-muted" style={{ fontSize: '1.2rem' }}>
-                    {t(`learningStatsMessages.empty.${role}`)}
+                    {t(`components.learningStats.messages.empty.${role}`)}
                 </p>
             ) : (
                 <Row className="mb-4">
                     <Col xs={6}>
                         <Card style={{ height: '100%' }}>
                             <Card.Header>
-                                <Card.Title>{t(`learningStatsMessages.title_help.${role}`)}</Card.Title>
+                                <Card.Title>{t(`components.learningStats.messages.title_help.${role}`)}</Card.Title>
                                 <Card.Subtitle className="text-muted">
-                                    {t(`learningStatsMessages.subtitle_help.${role}`)}
+                                    {t(`components.learningStats.messages.subtitle_help.${role}`)}
                                 </Card.Subtitle>
                             </Card.Header>
                             <Card.Body>
                                 <Row>
                                     <Col>
-                                        <strong>{t(`learningStatsMessages.list_title.${role}`)}</strong>
+                                        <strong>{t(`components.learningStats.messages.list_title.${role}`)}</strong>
                                         <ul style={{ paddingLeft: '1.2em', marginBottom: '0.5rem' }}>
-                                            <li>{t('learningStatsMessages.list_labels.total')}: {messagesTotal}</li>
-                                            <li>{t('learningStatsMessages.list_labels.select')}: {messagesSelect}</li>
+                                            <li>{t('components.learningStats.messages.list_labels.total')}: {messagesTotal}</li>
+                                            <li>{t('components.learningStats.messages.list_labels.select')}: {messagesSelect}</li>
                                         </ul>
                                     </Col>
                                     <Col>
-                                        <strong>{t(`learningStatsMessages.chart_title.${role}`)}</strong>
+                                        <strong>{t(`components.learningStats.messages.chart_title.${role}`)}</strong>
                                         <div style={{ width: '100%', height: '90px', overflow: 'hidden' }}>
                                             <ResponsiveContainer width="100%" height={140}>
                                                 <PieChart>
@@ -91,11 +91,11 @@ function LearningStatsMessages({ classId = null, exerciseId = null, isTeacher = 
                                         </div>
                                         <div className="text-center text-muted" style={{ fontSize: '0.9rem' }}>
                                             <span style={{ color: '#0d6efd', fontWeight: 'bold' }}>
-                                                {t('learningStatsMessages.understanding_results')}
+                                                {t('components.learningStats.messages.understanding_results')}
                                             </span>: {(messagesSuccessRate * 100).toFixed(0)}%
                                             <br />
                                             <span style={{ color: '#ffc107', fontWeight: 'bold' }}>
-                                                {t('learningStatsMessages.understanding_errors')}
+                                                {t('components.learningStats.messages.understanding_errors')}
                                             </span>: {(messagesErrorRate * 100).toFixed(0)}%
                                         </div>
                                     </Col>
@@ -111,9 +111,9 @@ function LearningStatsMessages({ classId = null, exerciseId = null, isTeacher = 
                     <Col xs={4}>
                         <Card style={{ height: '100%' }}>
                             <Card.Header>
-                                <Card.Title>{t(`learningStatsMessages.title_feedback.${role}`)}</Card.Title>
+                                <Card.Title>{t(`components.learningStats.messages.title_feedback.${role}`)}</Card.Title>
                                 <Card.Subtitle className="text-muted">
-                                    {t(`learningStatsMessages.subtitle_feedback.${role}`)}
+                                    {t(`components.learningStats.messages.subtitle_feedback.${role}`)}
                                 </Card.Subtitle>
                             </Card.Header>
                             <Card.Body>

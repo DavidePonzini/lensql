@@ -9,16 +9,16 @@ function LearningStatsAll({ classId = null, exerciseId = null, isTeacher = false
     return (
         <>
             <h2 id="queries">
-                {isTeacher ? t('learning.queries_teacher') : t('learning.queries_student')}
+                {isTeacher ? t('components.learningStats.learning.queries_teacher') : t('components.learningStats.learning.queries_student')}
             </h2>
             <LearningStatsQueries classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
 
             <hr />
-            <h2 id="messages">{t('learning.messages')}</h2>
+            <h2 id="messages">{t('components.learningStats.learning.messages')}</h2>
             <LearningStatsMessages classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
 
             <hr />
-            <h2 id="errors">{t('learning.errors')}</h2>
+            <h2 id="errors">{t('components.learningStats.learning.errors')}</h2>
             <LearningStatsErrors classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
         </>
     );
