@@ -37,12 +37,12 @@ function ClassUpdate({ classId, refresh, className }) {
     return (
         <ButtonModal
             className={className}
-            title={t('class_update.modal_title')}
-            buttonText={t('class_update.button_text')}
+            title={t('pages.classes.class_update.modal_title')}
+            buttonText={t('pages.classes.class_update.button_text')}
             size="lg"
             footerButtons={[
                 {
-                    text: t('class_update.save'),
+                    text: t('pages.classes.class_update.save'),
                     variant: 'primary',
                     onClick: handleEditClass,
                     autoClose: true,

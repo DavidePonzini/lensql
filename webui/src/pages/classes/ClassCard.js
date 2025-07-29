@@ -22,7 +22,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
     }
 
     async function handleLeave() {
-        if (!window.confirm(t('class_card.confirm_leave'))) {
+        if (!window.confirm(t('pages.classes.class_card.confirm_leave'))) {
             return;
         }
 
@@ -55,18 +55,18 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
             </Card.Header>
 
             <Card.Body>
-                <strong>{t('class_card.exercises')}:</strong> {exercises}
+                <strong>{t('pages.classes.class_card.exercises')}:</strong> {exercises}
                 <br />
-                <strong>{t('class_card.queries')}:</strong> {queries}
+                <strong>{t('pages.classes.class_card.queries')}:</strong> {queries}
 
                 {isTeacher && (
                     <>
                         <hr />
-                        <span className="badge bg-success">{t('class_card.badge_teacher')}</span>
+                        <span className="badge bg-success">{t('pages.classes.class_card.badge_teacher')}</span>
                         <br />
-                        <strong>{t('class_card.join_code')}:</strong> {classId}
+                        <strong>{t('pages.classes.class_card.join_code')}:</strong> {classId}
                         <br />
-                        <strong>{t('class_card.students')}:</strong> {participants}
+                        <strong>{t('pages.classes.class_card.students')}:</strong> {participants}
                     </>
                 )}
             </Card.Body>
@@ -76,7 +76,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                     to={classId}
                     className="btn btn-primary me-2"
                 >
-                    {t('class_card.open')}
+                    {t('pages.classes.class_card.open')}
                 </NavLink>
 
                 <ButtonShowDataset
@@ -90,7 +90,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                     onClick={handleLeave}
                     className='me-2'
                 >
-                    {t('class_card.leave')}
+                    {t('pages.classes.class_card.leave')}
                 </Button>
 
                 {isTeacher && (
@@ -99,8 +99,8 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
 
                         <ButtonModal
                             className="btn btn-info me-2"
-                            title={t('class_card.learning_analytics')}
-                            buttonText={t('class_card.learning_analytics')}
+                            title={t('pages.classes.class_card.learning_analytics')}
+                            buttonText={t('pages.classes.class_card.learning_analytics')}
                             fullscreen={true}
                         >
                             <LearningStatsAll classId={classId} isTeacher={isTeacher} />
@@ -115,13 +115,13 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
 
                         <ButtonModal
                             className="btn btn-warning me-2"
-                            title={t('class_card.set_teachers')}
-                            buttonText={t('class_card.set_teachers')}
+                            title={t('pages.classes.class_card.set_teachers')}
+                            buttonText={t('pages.classes.class_card.set_teachers')}
                         >
                             <ItemAssignmentList
                                 fetchItems={getMembers}
                                 assignAction={makeTeacher}
-                                title={t('class_card.participants')}
+                                title={t('pages.classes.class_card.participants')}
                                 disabledItems={[userInfo?.username]}
                             />
                         </ButtonModal>

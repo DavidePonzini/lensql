@@ -68,7 +68,7 @@ function ExerciseCard({
     }
 
     async function handleDelete() {
-        if (!window.confirm(t('exercise.delete_confirm'))) {
+        if (!window.confirm(t('pages.classes.exercise.delete_confirm'))) {
             return;
         }
 
@@ -89,8 +89,8 @@ function ExerciseCard({
             <Card.Header>
                 <h5 className="card-title">
                     {title}
-                    {hidden && <span className="badge bg-secondary ms-2">{t('exercise.hidden')}</span>}
-                    {isSolved && <span className="badge bg-success ms-2">{t('exercise.solved')}</span>}
+                    {hidden && <span className="badge bg-secondary ms-2">{t('pages.classes.exercise.hidden')}</span>}
+                    {isSolved && <span className="badge bg-success ms-2">{t('pages.classes.exercise.solved')}</span>}
                 </h5>
             </Card.Header>
 
@@ -101,7 +101,7 @@ function ExerciseCard({
                     {isTeacher && learningObjectives.length > 0 && (
                         <>
                             <div className='col'>
-                                <b>{t('exercise.objectives')}:</b>
+                                <b>{t('pages.classes.exercise.objectives')}:</b>
                                 <div>
                                     {learningObjectives.map((o, index) => (
                                         <span
@@ -127,7 +127,7 @@ function ExerciseCard({
                     <div className='col'>
                         {isGenerated && (
                             <span className="badge bg-info mx-1 my-2">
-                                {t('exercise.generated')}
+                                {t('pages.classes.exercise.generated')}
                             </span>
                         )}
                     </div>
@@ -141,7 +141,7 @@ function ExerciseCard({
                         className="me-2 mb-1"
                         onClick={handleUnsubmit}
                     >
-                        {t('exercise.unarchive')}
+                        {t('pages.classes.exercise.unarchive')}
                     </Button>
                 ) : (
                     <>
@@ -149,7 +149,7 @@ function ExerciseCard({
                             to={`/exercises/${exerciseId}`}
                             className="btn btn-primary me-2 mb-1"
                         >
-                            {t('exercise.open')}
+                            {t('pages.classes.exercise.open')}
                         </NavLink>
 
                         <Button
@@ -157,7 +157,7 @@ function ExerciseCard({
                             className="me-2 mb-1"
                             onClick={handleSubmit}
                         >
-                            {t('exercise.archive')}
+                            {t('pages.classes.exercise.archive')}
                         </Button>
 
                         {isTeacher && (
@@ -166,9 +166,9 @@ function ExerciseCard({
 
                                 <ButtonModal
                                     className="btn btn-info me-2 mb-1"
-                                    title={t('exercise.analytics')}
+                                    title={t('pages.classes.exercise.analytics')}
                                     fullscreen
-                                    buttonText={t('exercise.analytics')}
+                                    buttonText={t('pages.classes.exercise.analytics')}
                                 >
                                     <LearningStatsAll exerciseId={exerciseId} isTeacher={isTeacher} />
                                 </ButtonModal>
@@ -191,7 +191,7 @@ function ExerciseCard({
                                         className="me-2 mb-1"
                                         onClick={handleUnhide}
                                     >
-                                        <i className="fa fa-eye"></i> {t('exercise.show')}
+                                        <i className="fa fa-eye"></i> {t('pages.classes.exercise.show')}
                                     </Button>
                                 ) : (
                                     <Button
@@ -199,7 +199,7 @@ function ExerciseCard({
                                         className="me-2 mb-1"
                                         onClick={handleHide}
                                     >
-                                        <i className="fa fa-eye-slash"></i> {t('exercise.hide')}
+                                        <i className="fa fa-eye-slash"></i> {t('pages.classes.exercise.hide')}
                                     </Button>
                                 )}
 
@@ -208,7 +208,7 @@ function ExerciseCard({
                                     className="me-2 mb-1"
                                     onClick={handleDelete}
                                 >
-                                    <i className="fa fa-trash"></i> {t('exercise.delete')}
+                                    <i className="fa fa-trash"></i> {t('pages.classes.exercise.delete')}
                                 </Button>
                             </>
                         )}

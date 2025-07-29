@@ -31,7 +31,7 @@ function Register() {
         setUsernameInput(username);
         if (!username) {
             setIsUsernameValid(false);
-            setUsernameError(t('register.usernameRequired'));
+            setUsernameError(t('pages.register.usernameRequired'));
             return false;
         }
         setIsUsernameValid(true);
@@ -42,12 +42,12 @@ function Register() {
     function checkPassword(password) {
         setPasswordInput(password);
 
-        if (!password) return invalidate(t('register.passwordRequired'));
-        if (password.length < 8) return invalidate(t('register.passwordLength'));
-        if (!/[A-Z]/.test(password)) return invalidate(t('register.passwordUpper'));
-        if (!/[a-z]/.test(password)) return invalidate(t('register.passwordLower'));
-        if (!/[0-9]/.test(password)) return invalidate(t('register.passwordDigit'));
-        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return invalidate(t('register.passwordSpecial'));
+        if (!password) return invalidate(t('pages.register.passwordRequired'));
+        if (password.length < 8) return invalidate(t('pages.register.passwordLength'));
+        if (!/[A-Z]/.test(password)) return invalidate(t('pages.register.passwordUpper'));
+        if (!/[a-z]/.test(password)) return invalidate(t('pages.register.passwordLower'));
+        if (!/[0-9]/.test(password)) return invalidate(t('pages.register.passwordDigit'));
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return invalidate(t('pages.register.passwordSpecial'));
 
         setIsPasswordValid(true);
         setPasswordError('');
@@ -65,7 +65,7 @@ function Register() {
         if (!email) return valid(); // Optional
         if (!email.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
             setIsEmailValid(false);
-            setEmailError(t('register.emailInvalid'));
+            setEmailError(t('pages.register.emailInvalid'));
             return false;
         }
         return valid();
@@ -81,7 +81,7 @@ function Register() {
         setSchoolInput(school);
         if (!school) {
             setIsSchoolValid(false);
-            setSchoolError(t('register.schoolRequired'));
+            setSchoolError(t('pages.register.schoolRequired'));
             return false;
         }
         setIsSchoolValid(true);
@@ -109,10 +109,10 @@ function Register() {
                 setError('');
                 setSuccess(true);
             } else {
-                setError(data.message || t('register.errorGeneric'));
+                setError(data.message || t('pages.register.errorGeneric'));
             }
         } catch {
-            setError(t('register.errorServer'));
+            setError(t('pages.register.errorServer'));
         }
     }
 
@@ -138,10 +138,10 @@ function Register() {
                                     <span className="h1 fw-bold mb-0">LensQL</span>
                                 </div>
 
-                                <h5 className="fw-normal mb-1">{t('register.title')}</h5>
+                                <h5 className="fw-normal mb-1">{t('pages.register.title')}</h5>
 
                                 <Link to="/login" className="text-muted mb-4 d-block">
-                                    {t('register.subtitle')}
+                                    {t('pages.register.subtitle')}
                                 </Link>
 
                                 {error && (
@@ -152,22 +152,22 @@ function Register() {
 
                                 {success && (
                                     <div className="alert alert-success" role="alert">
-                                        {t('register.success')}
+                                        {t('pages.register.success')}
                                         <br />
-                                        <Link to="/login" className="alert-link">{t('register.gotoLogin')}</Link>
+                                        <Link to="/login" className="alert-link">{t('pages.register.gotoLogin')}</Link>
                                     </div>
                                 )}
 
                                 {/* Username */}
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="register-username">
-                                        {t('register.username')}
+                                        {t('pages.register.username')}
                                     </label>
                                     <input
                                         type="text"
                                         id="register-username"
                                         className={`form-control form-control-lg ${usernameError ? 'is-invalid' : ''}`}
-                                        placeholder={t('register.usernamePlaceholder')}
+                                        placeholder={t('pages.register.usernamePlaceholder')}
                                         value={usernameInput}
                                         onInput={(e) => checkUsername(e.target.value)}
                                         autoFocus
@@ -178,14 +178,14 @@ function Register() {
                                 {/* Password */}
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="register-password">
-                                        {t('register.password')}
+                                        {t('pages.register.password')}
                                     </label>
                                     <div className="input-group">
                                         <input
                                             type={showPassword ? 'text' : 'password'}
                                             id="register-password"
                                             className={`form-control form-control-lg pe-5 ${passwordError ? 'is-invalid' : ''}`}
-                                            placeholder={t('register.passwordPlaceholder')}
+                                            placeholder={t('pages.register.passwordPlaceholder')}
                                             value={passwordInput}
                                             onInput={(e) => checkPassword(e.target.value)}
                                         />
@@ -193,7 +193,7 @@ function Register() {
                                             <i
                                                 className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                aria-label={showPassword ? t('register.hide') : t('register.show')}
+                                                aria-label={showPassword ? t('pages.register.hide') : t('pages.register.show')}
                                             />
                                         </div>
                                         {passwordError && <div className="invalid-feedback">{passwordError}</div>}
@@ -203,13 +203,13 @@ function Register() {
                                 {/* Email */}
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="register-email">
-                                        {t('register.email')}
+                                        {t('pages.register.email')}
                                     </label>
                                     <input
                                         type="email"
                                         id="register-email"
                                         className={`form-control form-control-lg ${emailError ? 'is-invalid' : ''}`}
-                                        placeholder={t('register.emailPlaceholder')}
+                                        placeholder={t('pages.register.emailPlaceholder')}
                                         value={emailInput}
                                         onInput={(e) => checkEmail(e.target.value)}
                                     />
@@ -219,13 +219,13 @@ function Register() {
                                 {/* School */}
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="register-school">
-                                        {t('register.school')}
+                                        {t('pages.register.school')}
                                     </label>
                                     <input
                                         type="text"
                                         id="register-school"
                                         className={`form-control form-control-lg ${schoolError ? 'is-invalid' : ''}`}
-                                        placeholder={t('register.schoolPlaceholder')}
+                                        placeholder={t('pages.register.schoolPlaceholder')}
                                         value={schoolInput}
                                         onInput={(e) => checkSchool(e.target.value)}
                                     />
@@ -241,7 +241,7 @@ function Register() {
                                             !isUsernameValid || !isPasswordValid || !isEmailValid || !isSchoolValid
                                         }
                                     >
-                                        {t('register.submit')}
+                                        {t('pages.register.submit')}
                                     </button>
                                 </div>
                             </form>

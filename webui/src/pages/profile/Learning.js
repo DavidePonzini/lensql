@@ -9,9 +9,9 @@ function Learning() {
     return (
         <div className="container-md">
             <h1 className="display-3">
-                {t('profile.learning.title', { username: userInfo?.username || 'user' })}
+                {t('pages.profile.learning.title', { username: userInfo?.username || 'user' })}
             </h1>
-            <p className="lead">{t('profile.learning.subtitle')}</p>
+            <p className="lead">{t('pages.profile.learning.subtitle')}</p>
 
             <hr />
             <LearningStatsAll />

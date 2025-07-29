@@ -14,7 +14,7 @@ function ClassList() {
     const [classes, setClasses] = useState([]);
 
     async function handleJoinClass() {
-        const joinCode = prompt(t('class_list.join_prompt'));
+        const joinCode = prompt(t('pages.classes.class_list.join_prompt'));
         const code = joinCode?.trim().toUpperCase();
 
         if (!code) return;
@@ -42,12 +42,12 @@ function ClassList() {
 
     return (
         <div className="container-md">
-            <h1>{t('class_list.title')}</h1>
+            <h1>{t('pages.classes.class_list.title')}</h1>
             <CardList>
                 {classes.length === 0 && (
                     <>
-                        <p>{t('class_list.empty_1')}</p>
-                        <p>{t('class_list.empty_2')}</p>
+                        <p>{t('pages.classes.class_list.empty_1')}</p>
+                        <p>{t('pages.classes.class_list.empty_2')}</p>
                     </>
                 )}
 
@@ -68,7 +68,7 @@ function ClassList() {
             <hr />
             <Button variant="primary" onClick={handleJoinClass} className="me-2 mb-2">
                 <i className="fa fa-plus me-1"></i>
-                {t('class_list.join')}
+                {t('pages.classes.class_list.join')}
             </Button>
 
             <ClassAdd

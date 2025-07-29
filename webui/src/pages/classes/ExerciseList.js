@@ -50,10 +50,10 @@ function ExerciseList() {
 
     return (
         <div className="container-md">
-            <h1>{t('exercise_list.title')}</h1>
+            <h1>{t('pages.classes.exercise_list.title')}</h1>
             <CardList>
                 {unsubmittedExercises.length === 0 && (
-                    <p className="no-assignments">{t('exercise_list.none')}</p>
+                    <p className="no-assignments">{t('pages.classes.exercise_list.none')}</p>
                 )}
 
                 {unsubmittedExercises.map((exercise) => (
@@ -75,10 +75,10 @@ function ExerciseList() {
                 ))}
             </CardList>
 
-            <h1 className="mt-3">{t('exercise_list.archived')}</h1>
+            <h1 className="mt-3">{t('pages.classes.exercise_list.archived')}</h1>
             <CardList>
                 {submittedExercises.length === 0 && (
-                    <p>{t('exercise_list.archived_none')}</p>
+                    <p>{t('pages.classes.exercise_list.archived_none')}</p>
                 )}
 
                 {submittedExercises.map((exercise) => (

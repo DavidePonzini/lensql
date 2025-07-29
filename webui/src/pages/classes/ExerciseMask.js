@@ -6,7 +6,7 @@ function ExerciseMask({ title, setTitle, request, setRequest, answer, setAnswer 
     return (
         <>
             <div className="mb-3">
-                <label className="form-label">{t('exercise_mask.title')}</label>
+                <label className="form-label">{t('pages.classes.exercise_mask.title')}</label>
                 <input
                     type="text"
                     className="form-control"
@@ -16,7 +16,7 @@ function ExerciseMask({ title, setTitle, request, setRequest, answer, setAnswer 
             </div>
 
             <div className="mb-3">
-                <label className="form-label">{t('exercise_mask.request')}</label>
+                <label className="form-label">{t('pages.classes.exercise_mask.request')}</label>
                 <textarea
                     className="form-control"
                     rows="3"
@@ -26,7 +26,7 @@ function ExerciseMask({ title, setTitle, request, setRequest, answer, setAnswer 
             </div>
 
             <div className="mb-3">
-                <label className="form-label">{t('exercise_mask.answer_optional')}</label>
+                <label className="form-label">{t('pages.classes.exercise_mask.answer_optional')}</label>
                 <textarea
                     className="form-control"
                     rows="3"

@@ -5,8 +5,8 @@ function Admin() {
 
     return (
         <div className="container-md">
-            <h1>{t('admin.title')}</h1>
-            <p>{t('admin.empty')}</p>
+            <h1>{t('pages.admin.title')}</h1>
+            <p>{t('pages.admin.empty')}</p>
         </div>
     );
 }

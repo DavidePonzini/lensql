@@ -26,11 +26,11 @@ function ExerciseAdd({ refresh, classId }) {
     return (
         <ButtonModal
             className="btn btn-success"
-            title={t('exercise_add.title')}
-            buttonText={t('exercise_add.button_text')}
+            title={t('pages.classes.exercise_add.title')}
+            buttonText={t('pages.classes.exercise_add.button_text')}
             footerButtons={[
                 {
-                    text: t('exercise_add.save'),
+                    text: t('pages.classes.exercise_add.save'),
                     variant: 'primary',
                     onClick: handleAddExercise,
                     autoClose: true,

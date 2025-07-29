@@ -17,19 +17,19 @@ function Profile() {
 
     return (
         <div className="container-md">
-            <h1 className="display-3 mb-3">{t('profile.home.welcome', { username })}</h1>
-            <p className="lead">{t('profile.home.progress')}</p>
+            <h1 className="display-3 mb-3">{t('pages.profile.profile.welcome', { username })}</h1>
+            <p className="lead">{t('pages.profile.profile.progress')}</p>
 
             <hr className="my-4" />
 
             <section className="mb-4">
-                <h5><i className="fa fa-star me-2" />{t('profile.home.level.title')}</h5>
+                <h5><i className="fa fa-star me-2" />{t('pages.profile.profile.level.title')}</h5>
                 <p className="mb-1"><LevelTitle level={level} /></p>
                 <p>
                     <i className="fa fa-diamond me-2" />
-                    {t('profile.home.level.exp', { xp, xpToNext })}
+                    {t('pages.profile.profile.level.exp', { xp, xpToNext })}
                 </p>
-                <small className="text-muted">{t('profile.home.level.tip')}</small>
+                <small className="text-muted">{t('pages.profile.profile.level.tip')}</small>
                 <ul className="mt-2">
                     {expActions.map((a, i) => (
                         <li key={i}>
@@ -40,9 +40,9 @@ function Profile() {
             </section>
 
             <section>
-                <h5><i className="fa fa-coins me-2" />{t('profile.home.coins.title')}</h5>
-                <p>{t('profile.home.coins.available', { coins })}</p>
-                <small className="text-muted">{t('profile.home.coins.tip')}</small>
+                <h5><i className="fa fa-coins me-2" />{t('pages.profile.profile.coins.title')}</h5>
+                <p>{t('pages.profile.profile.coins.available', { coins })}</p>
+                <small className="text-muted">{t('pages.profile.profile.coins.tip')}</small>
                 <ul className="mt-2">
                     {coinActions.map((a, i) => (
                         <li key={i}>
@@ -55,8 +55,8 @@ function Profile() {
             <hr className="my-4" />
 
             <section>
-                <h5><i className="fa fa-trophy me-2" />{t('profile.home.achievements.title')}</h5>
-                <p>{t('profile.home.achievements.text')}</p>
+                <h5><i className="fa fa-trophy me-2" />{t('pages.profile.profile.achievements.title')}</h5>
+                <p>{t('pages.profile.profile.achievements.text')}</p>
                 <AlertUnderDevelopment />
             </section>
         </div>

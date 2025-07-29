@@ -11,7 +11,7 @@ function SetLearningObjectives({ exerciseId, refreshExercises, className }) {
         const data = await apiRequest(`/api/exercises/objectives?exercise_id=${exerciseId}`, 'GET');
 
         return data.data.map((o) => {
-            const key = `learning_objectives.objectives.${o.objective_id}`;
+            const key = `learning_objectives.${o.objective_id}`;
             const label = t(`${key}.label`, o);
             const description = t(`${key}.description`, o);
 
@@ -42,13 +42,13 @@ function SetLearningObjectives({ exerciseId, refreshExercises, className }) {
     return (
         <ButtonModal
             className={className}
-            title={t('learning_objectives.title')}
-            buttonText={t('learning_objectives.button')}
+            title={t('pages.classes.learning_objectives.title')}
+            buttonText={t('pages.classes.learning_objectives.button')}
         >
             <ItemAssignmentList
                 fetchItems={fetchObjectives}
                 assignAction={assignObjective}
-                title={t('learning_objectives.list_title')}
+                title={t('pages.classes.learning_objectives.list_title')}
             />
         </ButtonModal>
     );

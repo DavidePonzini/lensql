@@ -22,16 +22,16 @@ function ClassAdd({ refresh, className }) {
     return (
         <ButtonModal
             className={className}
-            title={t('class.new')}
+            title={t('pages.classes.class.new')}
             size='lg'
             buttonText={
                 <span>
-                    <i className="fa fa-plus me-1"></i> {t('class.new')}
+                    <i className="fa fa-plus me-1"></i> {t('pages.classes.class.new')}
                 </span>
             }
             footerButtons={[
                 {
-                    text: t('class.save'),
+                    text: t('pages.classes.class.save'),
                     variant: 'primary',
                     onClick: handleAdd,
                     autoClose: true,

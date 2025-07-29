@@ -189,192 +189,88 @@
             "title": "Admin page",
             "empty": "No content here"
         },
-        "class": {
-            "new": "New Course",
-            "save": "Save"
-        },
-        "class_card": {
-            "exercises": "Exercises",
-            "queries": "Queries executed",
-            "badge_teacher": "Teacher",
-            "join_code": "Join Code",
-            "students": "Students",
-            "open": "Open",
-            "leave": "Leave",
-            "confirm_leave": "Are you sure you want to leave this class?",
-            "learning_analytics": "Learning Analytics",
-            "set_teachers": "Set Teachers",
-            "participants": "Participants"
-        },
-        "class_list": {
-            "title": "My Courses",
-            "empty_1": "Nothing here. Join a course to see exercises.",
-            "empty_2": "If you want to run a query which hasn't been assigned to you by the teacher, please create a new course.",
-            "join": "Join Course",
-            "join_prompt": "Enter class join code:"
-        },
-        "class_mask": {
-            "title_label": "Title",
-            "dataset_label": "Dataset (Optional)",
-            "tips_title": "Tips",
-            "tips": [
-                "Include the whole script into a <code>BEGIN; ... COMMIT;</code> block",
-                "Begin the script with <code>DROP SCHEMA IF EXISTS schema_name CASCADE;</code>",
-                "Use a unique <code>search_path</code> for each dataset",
-                "Group insertions into a single <code>INSERT INTO</code> statement for each table to greatly improve performance"
-            ]
-        },
-        "class_update": {
-            "modal_title": "Edit Course",
-            "button_text": "Edit",
-            "save": "Save"
-        },
-        "exercise_add": {
-            "title": "Add Exercise",
-            "button_text": "Add New Exercise",
-            "save": "Save"
-        },
-        "exercise": {
-            "hidden": "Hidden",
-            "solved": "Solved",
-            "generated": "AI Generated",
-            "objectives": "Learning Objectives",
-            "archive": "Archive",
-            "unarchive": "Unarchive",
-            "open": "Open",
-            "analytics": "Learning Analytics",
-            "edit": "Edit",
-            "objectives_set": "Set Objectives",
-            "hide": "Hide",
-            "show": "Make Visible",
-            "delete": "Delete",
-            "delete_confirm": "Are you sure you want to delete this exercise? This action cannot be undone."
-        },
-        "exercise_list": {
-            "title": "Exercises",
-            "none": "No exercises",
-            "archived": "Archived",
-            "archived_none": "No archived exercises"
-        },
-        "exercise_mask": {
-            "title": "Title",
-            "request": "Request",
-            "answer_optional": "Answer (Optional)"
-        },
-        "exercise_update": {
-            "title": "Edit Exercise",
-            "button": "Edit",
-            "save": "Save"
-        },
-        "learning_objectives": {
-            "title": "Set Objectives",
-            "button": "Set Objectives",
-            "list_title": "Set Learning Objectives",
-            "objectives": {
-                "Simple Select": {
-                    "label": "Simple SELECT",
-                    "description": "Write a simple SELECT statement to retrieve data from a single table."
-                },
-                "Single condition": {
-                    "label": "Single condition",
-                    "description": "Write queries that filter results based on a single condition."
-                },
-                "Distinct": {
-                    "label": "DISTINCT",
-                    "description": "Use the DISTINCT keyword to eliminate duplicate rows from query results."
-                },
-                "Aggregate functions": {
-                    "label": "Aggregate functions",
-                    "description": "Use aggregate functions like COUNT, SUM, AVG, MIN, and MAX to summarize data."
-                },
-                "Subquery in SELECT": {
-                    "label": "Subquery in SELECT",
-                    "description": "Write queries that include subqueries in the SELECT clause."
-                },
-                "Case statements": {
-                    "label": "CASE statements",
-                    "description": "Use CASE statements to create conditional logic within queries."
-                },
-                "String functions": {
-                    "label": "String functions",
-                    "description": "Apply string functions to manipulate text data in queries."
-                },
-                "Date functions": {
-                    "label": "Date functions",
-                    "description": "Use date functions to manipulate and format date and time data in queries."
-                },
-                "Numeric functions": {
-                    "label": "Numeric functions",
-                    "description": "Apply numeric functions to perform calculations on numeric data in queries."
-                },
-                "Window functions": {
-                    "label": "Window functions",
-                    "description": "Use window functions to perform calculations across a set of rows related to the current row."
-                },
-                "Simple join": {
-                    "label": "Simple JOIN",
-                    "description": "Write queries that involve a simple join between two tables to retrieve related data."
-                },
-                "Self join": {
-                    "label": "Self JOIN",
-                    "description": "Write queries that involve self-joins to compare rows within the same table."
-                },
-                "Left join": {
-                    "label": "LEFT JOIN",
-                    "description": "Write queries that use LEFT JOIN to retrieve all rows from one table and matching rows from another."
-                },
-                "Right join": {
-                    "label": "RIGHT JOIN",
-                    "description": "Write queries that use RIGHT JOIN to retrieve all rows from one table and matching rows from another."
-                },
-                "Full outer join": {
-                    "label": "FULL OUTER JOIN",
-                    "description": "Use FULL OUTER JOIN to retrieve all rows when there is a match in either table."
-                },
-                "Subquery in FROM": {
-                    "label": "Subquery in FROM",
-                    "description": "Utilize subqueries in the FROM clause to create derived tables."
-                },
-                "Multiple conditions": {
-                    "label": "Multiple conditions",
-                    "description": "Use logical operators to filter results based on multiple conditions."
-                },
-                "Subquery in WHERE": {
-                    "label": "Subquery in WHERE",
-                    "description": "Use subqueries in the WHERE clause to filter results based on related data."
-                },
-                "Correlated subqueries": {
-                    "label": "Correlated subqueries",
-                    "description": "Write correlated subqueries that reference columns from the outer query."
-                },
-                "Group by": {
-                    "label": "GROUP BY",
-                    "description": "Group results using the GROUP BY clause to aggregate data based on specific columns."
-                },
-                "Group by with conditions": {
-                    "label": "HAVING clause",
-                    "description": "Use the HAVING clause to filter grouped results based on aggregate conditions."
-                },
-                "Order by": {
-                    "label": "ORDER BY",
-                    "description": "Sort query results using the ORDER BY clause."
-                },
-                "Limit and offset": {
-                    "label": "LIMIT and OFFSET",
-                    "description": "Use LIMIT and OFFSET to control the number of rows returned by a query."
-                },
-                "Union": {
-                    "label": "UNION",
-                    "description": "Combine results from multiple queries using the UNION operator."
-                },
-                "Intersect": {
-                    "label": "INTERSECT",
-                    "description": "Retrieve common results from multiple queries using the INTERSECT operator."
-                },
-                "Except": {
-                    "label": "EXCEPT",
-                    "description": "Use the EXCEPT operator to find results in one query that are not in another."
-                }
+        "classes": {
+            "class": {
+                "new": "New Course",
+                "save": "Save"
+            },
+            "class_card": {
+                "exercises": "Exercises",
+                "queries": "Queries executed",
+                "badge_teacher": "Teacher",
+                "join_code": "Join Code",
+                "students": "Students",
+                "open": "Open",
+                "leave": "Leave",
+                "confirm_leave": "Are you sure you want to leave this class?",
+                "learning_analytics": "Learning Analytics",
+                "set_teachers": "Set Teachers",
+                "participants": "Participants"
+            },
+            "class_list": {
+                "title": "My Courses",
+                "empty_1": "Nothing here. Join a course to see exercises.",
+                "empty_2": "If you want to run a query which hasn't been assigned to you by the teacher, please create a new course.",
+                "join": "Join Course",
+                "join_prompt": "Enter class join code:"
+            },
+            "class_mask": {
+                "title_label": "Title",
+                "dataset_label": "Dataset (Optional)",
+                "tips_title": "Tips",
+                "tips": [
+                    "Include the whole script into a <code>BEGIN; ... COMMIT;</code> block",
+                    "Begin the script with <code>DROP SCHEMA IF EXISTS schema_name CASCADE;</code>",
+                    "Use a unique <code>search_path</code> for each dataset",
+                    "Group insertions into a single <code>INSERT INTO</code> statement for each table to greatly improve performance"
+                ]
+            },
+            "class_update": {
+                "modal_title": "Edit Course",
+                "button_text": "Edit",
+                "save": "Save"
+            },
+            "exercise_add": {
+                "title": "Add Exercise",
+                "button_text": "Add New Exercise",
+                "save": "Save"
+            },
+            "exercise": {
+                "hidden": "Hidden",
+                "solved": "Solved",
+                "generated": "AI Generated",
+                "objectives": "Learning Objectives",
+                "archive": "Archive",
+                "unarchive": "Unarchive",
+                "open": "Open",
+                "analytics": "Learning Analytics",
+                "edit": "Edit",
+                "objectives_set": "Set Objectives",
+                "hide": "Hide",
+                "show": "Make Visible",
+                "delete": "Delete",
+                "delete_confirm": "Are you sure you want to delete this exercise? This action cannot be undone."
+            },
+            "exercise_list": {
+                "title": "Exercises",
+                "none": "No exercises",
+                "archived": "Archived",
+                "archived_none": "No archived exercises"
+            },
+            "exercise_mask": {
+                "title": "Title",
+                "request": "Request",
+                "answer_optional": "Answer (Optional)"
+            },
+            "exercise_update": {
+                "title": "Edit Exercise",
+                "button": "Edit",
+                "save": "Save"
+            },
+            "learning_objectives": {
+                "title": "Set Objectives",
+                "button": "Set Objectives",
+                "list_title": "Set Learning Objectives"
             }
         },
         "profile": {
@@ -382,7 +278,7 @@
                 "title": "Welcome back, {{username}}!",
                 "subtitle": "Here's a look at your SQL progress"
             },
-            "home": {
+            "profile": {
                 "welcome": "Welcome back, {{username}}!",
                 "progress": "Here's a look at your progress",
                 "level": {
@@ -458,79 +354,185 @@
             "schoolRequired": "Please enter your school.",
             "errorServer": "Could not connect to the server.",
             "errorGeneric": "Registration failed"
+        }
+    },
+    "gamification": {
+        "actions": {
+            "solve_exercises": "Solve exercises",
+            "run_queries": "Run queries",
+            "try_unique_queries": "Try new, unique queries",
+            "interact_with_lens": "Interact with Lens",
+            "feedback_on_lens": "Give feedback on Lens’ help",
+            "achievements": "Unlock achievements",
+            "check_solution": "Check if a solution is correct",
+            "ask_lens": "Ask Lens for help"
         },
-        "gamification": {
-            "actions": {
-                "solve_exercises": "Solve exercises",
-                "run_queries": "Run queries",
-                "try_unique_queries": "Try new, unique queries",
-                "interact_with_lens": "Interact with Lens",
-                "feedback_on_lens": "Give feedback on Lens’ help",
-                "achievements": "Unlock achievements",
-                "check_solution": "Check if a solution is correct",
-                "ask_lens": "Ask Lens for help"
+        "badges": {
+            "create_exercises": {
+                "1": "Created your first exercise and run a query in it",
+                "5": "Created 5 exercises and run a query in each of them",
+                "10": "Created 10 exercises and run a query in each of them"
             },
-            "badges": {
-                "create_exercises": {
-                    "1": "Created your first exercise and run a query in it",
-                    "5": "Created 5 exercises and run a query in each of them",
-                    "10": "Created 10 exercises and run a query in each of them"
-                },
-                "feedback": {
-                    "1": "Provided your first feedback",
-                    "10": "Provided feedback 10 times",
-                    "50": "Provided feedback 50 times"
-                },
-                "queries_unique": {
-                    "1": "Ran your first query",
-                    "10": "Ran 10 different queries",
-                    "50": "Ran 50 different queries",
-                    "100": "Ran 100 different queries",
-                    "500": "Ran 500 different queries",
-                    "1000": "Ran 1000 different queries",
-                    "2500": "Ran 2500 different queries",
-                    "5000": "Ran 5000 different queries",
-                    "10000": "Ran 10000 different queries"
-                },
-                "exercise_solutions": {
-                    "1": "Solved your first exercise",
-                    "5": "Solved 5 exercises",
-                    "10": "Solved 10 exercises"
-                },
-                "help_usage": {
-                    "1": "Interacted with Lens for the first time",
-                    "10": "Interacted with Lens 10 times",
-                    "50": "Interacted with Lens 50 times",
-                    "100": "Interacted with Lens 100 times",
-                    "500": "Interacted with Lens 500 times",
-                    "1000": "Interacted with Lens 1000 times"
-                },
-                "daily_usage": {
-                    "5": "Run a query in 5 different days",
-                    "14": "Run a query in 14 different days",
-                    "30": "Run a query in 30 different days"
-                },
-                "level_up": {
-                    "3": "Reached level 3",
-                    "5": "Reached level 5",
-                    "10": "Reached level 10"
-                },
-                "join_course": {
-                    "1": "Joined your first course"
-                }
+            "feedback": {
+                "1": "Provided your first feedback",
+                "10": "Provided feedback 10 times",
+                "50": "Provided feedback 50 times"
             },
-            "levels": {
-                "0": "Curious Beginner",
-                "1": "Logical Thinker",
-                "2": "Query Novice",
-                "3": "Pattern Seeker",
-                "4": "Relational Explorer",
-                "5": "Intentional Analyst",
-                "6": "Data Interpreter",
-                "7": "Insight Builder",
-                "8": "Structured Thinker",
-                "9": "Query Architect"
+            "queries_unique": {
+                "1": "Ran your first query",
+                "10": "Ran 10 different queries",
+                "50": "Ran 50 different queries",
+                "100": "Ran 100 different queries",
+                "500": "Ran 500 different queries",
+                "1000": "Ran 1000 different queries",
+                "2500": "Ran 2500 different queries",
+                "5000": "Ran 5000 different queries",
+                "10000": "Ran 10000 different queries"
+            },
+            "exercise_solutions": {
+                "1": "Solved your first exercise",
+                "5": "Solved 5 exercises",
+                "10": "Solved 10 exercises"
+            },
+            "help_usage": {
+                "1": "Interacted with Lens for the first time",
+                "10": "Interacted with Lens 10 times",
+                "50": "Interacted with Lens 50 times",
+                "100": "Interacted with Lens 100 times",
+                "500": "Interacted with Lens 500 times",
+                "1000": "Interacted with Lens 1000 times"
+            },
+            "daily_usage": {
+                "5": "Run a query in 5 different days",
+                "14": "Run a query in 14 different days",
+                "30": "Run a query in 30 different days"
+            },
+            "level_up": {
+                "3": "Reached level 3",
+                "5": "Reached level 5",
+                "10": "Reached level 10"
+            },
+            "join_course": {
+                "1": "Joined your first course"
             }
+        },
+        "levels": {
+            "0": "Curious Beginner",
+            "1": "Logical Thinker",
+            "2": "Query Novice",
+            "3": "Pattern Seeker",
+            "4": "Relational Explorer",
+            "5": "Intentional Analyst",
+            "6": "Data Interpreter",
+            "7": "Insight Builder",
+            "8": "Structured Thinker",
+            "9": "Query Architect"
+        }
+    },
+    "learning_objectives": {
+        "Simple Select": {
+            "label": "Simple SELECT",
+            "description": "Write a simple SELECT statement to retrieve data from a single table."
+        },
+        "Single condition": {
+            "label": "Single condition",
+            "description": "Write queries that filter results based on a single condition."
+        },
+        "Distinct": {
+            "label": "DISTINCT",
+            "description": "Use the DISTINCT keyword to eliminate duplicate rows from query results."
+        },
+        "Aggregate functions": {
+            "label": "Aggregate functions",
+            "description": "Use aggregate functions like COUNT, SUM, AVG, MIN, and MAX to summarize data."
+        },
+        "Subquery in SELECT": {
+            "label": "Subquery in SELECT",
+            "description": "Write queries that include subqueries in the SELECT clause."
+        },
+        "Case statements": {
+            "label": "CASE statements",
+            "description": "Use CASE statements to create conditional logic within queries."
+        },
+        "String functions": {
+            "label": "String functions",
+            "description": "Apply string functions to manipulate text data in queries."
+        },
+        "Date functions": {
+            "label": "Date functions",
+            "description": "Use date functions to manipulate and format date and time data in queries."
+        },
+        "Numeric functions": {
+            "label": "Numeric functions",
+            "description": "Apply numeric functions to perform calculations on numeric data in queries."
+        },
+        "Window functions": {
+            "label": "Window functions",
+            "description": "Use window functions to perform calculations across a set of rows related to the current row."
+        },
+        "Simple join": {
+            "label": "Simple JOIN",
+            "description": "Write queries that involve a simple join between two tables to retrieve related data."
+        },
+        "Self join": {
+            "label": "Self JOIN",
+            "description": "Write queries that involve self-joins to compare rows within the same table."
+        },
+        "Left join": {
+            "label": "LEFT JOIN",
+            "description": "Write queries that use LEFT JOIN to retrieve all rows from one table and matching rows from another."
+        },
+        "Right join": {
+            "label": "RIGHT JOIN",
+            "description": "Write queries that use RIGHT JOIN to retrieve all rows from one table and matching rows from another."
+        },
+        "Full outer join": {
+            "label": "FULL OUTER JOIN",
+            "description": "Use FULL OUTER JOIN to retrieve all rows when there is a match in either table."
+        },
+        "Subquery in FROM": {
+            "label": "Subquery in FROM",
+            "description": "Utilize subqueries in the FROM clause to create derived tables."
+        },
+        "Multiple conditions": {
+            "label": "Multiple conditions",
+            "description": "Use logical operators to filter results based on multiple conditions."
+        },
+        "Subquery in WHERE": {
+            "label": "Subquery in WHERE",
+            "description": "Use subqueries in the WHERE clause to filter results based on related data."
+        },
+        "Correlated subqueries": {
+            "label": "Correlated subqueries",
+            "description": "Write correlated subqueries that reference columns from the outer query."
+        },
+        "Group by": {
+            "label": "GROUP BY",
+            "description": "Group results using the GROUP BY clause to aggregate data based on specific columns."
+        },
+        "Group by with conditions": {
+            "label": "HAVING clause",
+            "description": "Use the HAVING clause to filter grouped results based on aggregate conditions."
+        },
+        "Order by": {
+            "label": "ORDER BY",
+            "description": "Sort query results using the ORDER BY clause."
+        },
+        "Limit and offset": {
+            "label": "LIMIT and OFFSET",
+            "description": "Use LIMIT and OFFSET to control the number of rows returned by a query."
+        },
+        "Union": {
+            "label": "UNION",
+            "description": "Combine results from multiple queries using the UNION operator."
+        },
+        "Intersect": {
+            "label": "INTERSECT",
+            "description": "Retrieve common results from multiple queries using the INTERSECT operator."
+        },
+        "Except": {
+            "label": "EXCEPT",
+            "description": "Use the EXCEPT operator to find results in one query that are not in another."
         }
     }
 }

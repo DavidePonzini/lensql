@@ -26,7 +26,7 @@ function Login() {
 
         if (!username) {
             setIsUsernameValid(false);
-            setUsernameError(t('login.usernameRequired'));
+            setUsernameError(t('pages.login.usernameRequired'));
             return;
         }
 
@@ -39,7 +39,7 @@ function Login() {
 
         if (!password) {
             setIsPasswordValid(false);
-            setPasswordError(t('login.passwordRequired'));
+            setPasswordError(t('pages.login.passwordRequired'));
             return;
         }
 
@@ -54,7 +54,7 @@ function Login() {
         const hasPassword = passwordInput.trim();
 
         if (!hasUsername || !hasPassword) {
-            setError(t('login.errorEmptyFields'));
+            setError(t('pages.login.errorEmptyFields'));
             return;
         }
 
@@ -72,10 +72,10 @@ function Login() {
                 saveTokens(data.access_token, data.refresh_token);
                 navigate('/');
             } else {
-                setError(data.message || t('login.errorLoginFailed'));
+                setError(data.message || t('pages.login.errorLoginFailed'));
             }
         } catch (err) {
-            setError(t('login.errorServer'));
+            setError(t('pages.login.errorServer'));
         }
     }
 
@@ -102,10 +102,10 @@ function Login() {
                                     <span className="h1 fw-bold mb-0">LensQL</span>
                                 </div>
 
-                                <h5 className="fw-normal mb-1" style={{ letterSpacing: 1 }}>{t('login.title')}</h5>
+                                <h5 className="fw-normal mb-1" style={{ letterSpacing: 1 }}>{t('pages.login.title')}</h5>
 
                                 <Link to="/register" className="text-muted mb-4 d-block">
-                                    {t('login.subtitle')}
+                                    {t('pages.login.subtitle')}
                                 </Link>
 
                                 {error && (
@@ -116,13 +116,13 @@ function Login() {
 
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="login-username">
-                                        {t('login.username')}
+                                        {t('pages.login.username')}
                                     </label>
                                     <input
                                         type="text"
                                         id="login-username"
                                         className={`form-control form-control-lg ${usernameError ? 'is-invalid' : ''}`}
-                                        placeholder={t('login.usernamePlaceholder')}
+                                        placeholder={t('pages.login.usernamePlaceholder')}
                                         value={usernameInput}
                                         onInput={(e) => checkUsername(e.target.value)}
                                         autoFocus
@@ -136,7 +136,7 @@ function Login() {
 
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="login-password">
-                                        {t('login.password')}
+                                        {t('pages.login.password')}
                                     </label>
 
                                     <div className="input-group">
@@ -144,7 +144,7 @@ function Login() {
                                             type={showPassword ? 'text' : 'password'}
                                             id="login-password"
                                             className={`form-control form-control-lg pe-5 ${passwordError ? 'is-invalid' : ''}`}
-                                            placeholder={t('login.passwordPlaceholder')}
+                                            placeholder={t('pages.login.passwordPlaceholder')}
                                             value={passwordInput}
                                             onInput={(e) => checkPassword(e.target.value)}
                                         />
@@ -152,7 +152,7 @@ function Login() {
                                             <i
                                                 className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                aria-label={showPassword ? t('login.hide') : t('login.show')}
+                                                aria-label={showPassword ? t('pages.login.hide') : t('pages.login.show')}
                                                 style={{ width: '1.5rem' }}
                                             ></i>
                                         </div>
@@ -170,7 +170,7 @@ function Login() {
                                         type="submit"
                                         disabled={!isUsernameValid || !isPasswordValid}
                                     >
-                                        {t('login.submit')}
+                                        {t('pages.login.submit')}
                                     </button>
                                 </div>
                             </form>
