@@ -1,6 +1,6 @@
 from . import tools, prompts, format, chatgpt
 
-def explain_error_message(username: str, code: str, exception: str) -> str:
+def explain_error_message(username: str, code: str, exception: str, language: str = 'en') -> str:
     message = chatgpt.Message()
     
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -14,7 +14,7 @@ def explain_error_message(username: str, code: str, exception: str) -> str:
 
     return str(answer)
 
-def locate_error_cause(username: str, code: str, exception: str) -> str:
+def locate_error_cause(username: str, code: str, exception: str, language: str = 'en') -> str:
     message = chatgpt.Message()
     
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -28,7 +28,7 @@ def locate_error_cause(username: str, code: str, exception: str) -> str:
 
     return str(answer)
 
-def provide_error_example(username: str, code: str, exception: str) -> str:
+def provide_error_example(username: str, code: str, exception: str, language: str = 'en') -> str:
     message = chatgpt.Message()
 
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -44,7 +44,7 @@ def provide_error_example(username: str, code: str, exception: str) -> str:
 
     return str(answer)
 
-def fix_query(username: str, code: str, exception: str) -> str:
+def fix_query(username: str, code: str, exception: str, language: str = 'en') -> str:
     message = chatgpt.Message()
 
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -60,7 +60,7 @@ def fix_query(username: str, code: str, exception: str) -> str:
 
     return str(answer)
 
-def describe_my_query(username: str, code: str) -> str:
+def describe_my_query(username: str, code: str, language: str = 'en') -> str:
     message = chatgpt.Message()
     
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)
@@ -76,7 +76,7 @@ def describe_my_query(username: str, code: str) -> str:
 
     return str(answer)
 
-def explain_my_query(username: str, code: str) -> str:
+def explain_my_query(username: str, code: str, language: str = 'en') -> str:
     message = chatgpt.Message()
     
     message.add_message_system(prompts.SYSTEM_INSTRUCTIONS)

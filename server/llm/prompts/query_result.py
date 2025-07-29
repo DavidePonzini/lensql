@@ -1,25 +1,25 @@
 from server.sql import SQLCode
 from . import util
 
-def describe_my_query(code: str, language='PostgreSQL'):
+def describe_my_query(code: str, sql_language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
 
     return f'''
-Hi Lens! I would like to understand the purpose of the following {language} query. What is it trying to achieve?
+Hi Lens! I would like to understand the purpose of the following {sql_language} query. What is it trying to achieve?
 The query is not necessarily correct, so I don't need you to fix it. I just want to understand its goal.
 Also, I know that the query has been deliberately formulated this way, so I don't need you to assume that it is a mistake or an error.
 
 {util.RESPONSE_FORMAT}
 
--- {language} Query --
+-- {sql_language} Query --
 {query}
 
 -- Template answer --
 Let me see... it looks like your query <b>GOAL DESCRIPTION</b>.
 '''
 
-def explain_my_query(code: str, language='PostgreSQL'):
+def explain_my_query(code: str, sql_language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
 
@@ -61,14 +61,14 @@ def explain_my_query(code: str, language='PostgreSQL'):
     templates = ''.join([f'<li>{clause["template"]}</li>' for clause in clauses])
 
     return f'''
-Hi Lens! I'm interested in diving deeper into the purpose of the following {language} query.
+Hi Lens! I'm interested in diving deeper into the purpose of the following {sql_language} query.
 Could you please explain what each part of the query does?
 You don't need to fix the query—just help me understand its structure and purpose.
 Also, I know that the query has been deliberately formulated this way, so I don't need you to assume that it is a mistake or an error.
 
 {util.RESPONSE_FORMAT}
 
--- {language} Query --
+-- {sql_language} Query --
 {query}
 
 -- Template answer --
