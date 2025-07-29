@@ -118,7 +118,7 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
                     className="me-1 mb-1"
                     onClick={handleCheckResult}
                     disabled={isExecuting || sqlText.trim().length === 0 || !hasSolution}
-                    cost={hasSolution ? Coins.checkSolutionCost(attempts) : null}
+                    cost={hasSolution ? Coins.getCheckSolutionCost(attempts) : null}
                 >
                     {t('pages.exercises.buttons.exercise.check_result')}
                     <span className="text-muted ms-2">

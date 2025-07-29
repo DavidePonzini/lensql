@@ -18,9 +18,11 @@ function useGamificationData() {
 
         EXERCISE_SOLVED: 100,
 
-        checkSolutionCost: (attempts) => {
-            if (attempts === 0) return 0;
-            return -Math.min(attempts, Coins.MAX_CHECK_SOLUTION_COST);
+        getCheckSolutionCost: (attempts) => {
+            if (attempts === 0)
+                return 0;
+
+            return Math.min(attempts, Coins.MAX_CHECK_SOLUTION_COST);
         }
     };
 
