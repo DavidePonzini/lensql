@@ -1,7 +1,8 @@
 import useAuth from '../../hooks/useAuth';
-import ItemAssignmentList from '../../components/ItemAssignmentList';
-import ButtonModal from '../../components/ButtonModal';
 import { useTranslation } from 'react-i18next';
+
+import ButtonModal from '../../components/buttons/ButtonModal';
+import ItemAssignmentList from '../../components/ItemAssignmentList';
 
 function SetLearningObjectives({ exerciseId, refreshExercises, className }) {
     const { apiRequest } = useAuth();

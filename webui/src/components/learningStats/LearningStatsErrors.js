@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import useAuth from "../../hooks/useAuth";
-import ObservedOnce from "../ObservedOnce";
+
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+
+import ObservedOnce from "../ObservedOnce";
 import AlertUnderDevelopment from '../AlertUnderDevelopment';
 
 function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = false }) {

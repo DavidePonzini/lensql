@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
-import useGamificationData from './useGamificationData';
+
 import useAuth from './useAuth';
+
+import useGamificationData from './useGamificationData';
 
 const UserInfoContext = createContext();
 

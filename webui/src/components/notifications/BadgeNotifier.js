@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import BubbleMessage from './BubbleMessage';
+
 import useUserInfo from '../../hooks/useUserInfo';
+
+import BubbleMessage from './BubbleMessage';
 
 let _setBadges = null;
 

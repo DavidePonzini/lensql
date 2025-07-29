@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 import "./Query.css";
 
@@ -9,6 +10,8 @@ import ButtonsDatabase from "./ButtonsDatabase";
 import ButtonsExercise from "./ButtonsExercise";
 
 function Query({ exerciseId, classId, exerciseTitle, exerciseText, attempts, hasSolution }) {
+    const { t } = useTranslation();
+
     const SCROLL_GRACE_PERIOD = 500; // milliseconds
 
     const [sqlText, setSqlText] = useState('');
@@ -145,8 +148,8 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, attempts, has
                         boxShadow: '0 2px 6px rgba(0,0,0,.3)',
                         cursor: 'pointer'
                     }}
-                    aria-label='Back to top'
-                    title='Back to top'
+                    aria-label={t('pages.exercises.query.back_to_top')}
+                    title={t('pages.exercises.query.back_to_top')}
                 >
                     ↑
                 </button>

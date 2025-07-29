@@ -1,8 +1,10 @@
-import useAuth from '../../hooks/useAuth';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import ButtonModal from '../../components/ButtonModal';
+import useAuth from '../../hooks/useAuth';
+
+import ButtonModal from '../../components/buttons/ButtonModal';
+
 import ClassMask from './ClassMask';
 
 function ClassUpdate({ classId, refresh, className }) {

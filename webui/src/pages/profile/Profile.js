@@ -1,8 +1,11 @@
-import useUserInfo from '../../hooks/useUserInfo';
-import LevelTitle from './LevelTitle';
-import useGamificationData from '../../hooks/useGamificationData';
-import AlertUnderDevelopment from '../../components/AlertUnderDevelopment';
 import { useTranslation } from 'react-i18next';
+
+import useUserInfo from '../../hooks/useUserInfo';
+import useGamificationData from '../../hooks/useGamificationData';
+
+import LevelTitle from './LevelTitle';
+
+import AlertUnderDevelopment from '../../components/AlertUnderDevelopment';
 
 function Profile() {
     const { userInfo } = useUserInfo();

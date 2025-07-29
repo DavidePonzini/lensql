@@ -1,13 +1,18 @@
 import { useState } from 'react';
-import useAuth from '../../hooks/useAuth';
+import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import ButtonModal from '../../components/ButtonModal';
+
+import useAuth from '../../hooks/useAuth';
+
+import ButtonModal from '../../components/buttons/ButtonModal';
+import LearningStatsAll from '../../components/learningStats/LearningStatsAll';
+
 import SetLearningObjectives from './SetLearningObjectives';
 import ExerciseUpdate from './ExerciseUpdate';
-import { NavLink } from 'react-router-dom';
-import LearningStatsAll from '../../components/LearningStatsAll';
-import { useTranslation } from 'react-i18next';
+
 
 function ExerciseCard({
     children,

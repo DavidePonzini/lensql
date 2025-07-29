@@ -1,12 +1,16 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { useAuth, RequestSizeError } from '../../hooks/useAuth';
 
+import ButtonAction from '../../components/buttons/ButtonAction';
+import BubbleStatsChange from '../../components/notifications/BubbleStatsChange';
+import { setBadges } from '../../components/notifications/BadgeNotifier';
+
 import ButtonCategory from './ButtonCategory';
-import ButtonAction from '../../components/ButtonAction';
-import BubbleStatsChange from '../../components/BubbleStatsChange';
-import { setBadges } from '../../components/BadgeNotifier';
 
 function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result, setResult }) {
+    const { t } = useTranslation();
     const { apiRequest } = useAuth();
     const [rewards, setRewards] = useState([]);
 
@@ -29,10 +33,8 @@ function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result
 
             while (true) {
                 const { value, done } = await reader.read();
-                
-                if (done)
-                    break;
-                
+                if (done) break;
+
                 if (value) {
                     buffer += decoder.decode(value, { stream: true });
 
@@ -40,8 +42,7 @@ function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result
                     buffer = lines.pop(); // Keep last partial line
 
                     for (let line of lines) {
-                        if (line.trim() === '')
-                            continue;
+                        if (line.trim() === '') continue;
 
                         try {
                             const parsed = JSON.parse(line);
@@ -75,7 +76,9 @@ function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result
 
         } catch (error) {
             if (error instanceof RequestSizeError) {
-                alert(`Query too large. Please try to split it into smaller parts. You need to remove at least ${error.size - error.maxSize} characters.`);
+                alert(t('pages.exercises.buttons.query.query_too_large', {
+                    excess: error.size - error.maxSize
+                }));
             } else {
                 alert(error);
                 console.error('Streaming error:', error);
@@ -89,11 +92,10 @@ function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result
         setResult([]);
     }
 
-
     return (
         <>
             <ButtonCategory
-                text="Query"
+                text={t('pages.exercises.buttons.category.query')}
                 iconClassName='fas fa-align-left'
                 className="text-primary"
             />
@@ -105,7 +107,7 @@ function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result
                     onClick={handleExecute}
                     disabled={isExecuting || sqlText.trim().length === 0}
                 >
-                    Execute
+                    {t('pages.exercises.buttons.query.execute')}
                     {isExecuting && (
                         <span className="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
                     )}
@@ -117,7 +119,7 @@ function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result
                     onClick={handleClearOutput}
                     disabled={isExecuting || result.length === 0}
                 >
-                    Clear output
+                    {t('pages.exercises.buttons.query.clear_output')}
                 </ButtonAction>
 
                 <BubbleStatsChange

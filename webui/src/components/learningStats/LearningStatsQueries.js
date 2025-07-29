@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+
 import useAuth from "../../hooks/useAuth";
-import ObservedOnce from "../ObservedOnce";
+
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, PieChart, Pie, Cell } from 'recharts';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+
+import ObservedOnce from "../ObservedOnce";
 
 function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = false }) {
     const { apiRequest } = useAuth();

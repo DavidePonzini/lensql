@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+
 import useAuth from '../hooks/useAuth';
 
 import bg from '../res/database.jpg';

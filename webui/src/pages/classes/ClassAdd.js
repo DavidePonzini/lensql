@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ButtonModal from '../../components/ButtonModal';
+
 import useAuth from '../../hooks/useAuth';
+
+import ButtonModal from '../../components/buttons/ButtonModal';
 import ClassMask from './ClassMask';
 
 function ClassAdd({ refresh, className }) {

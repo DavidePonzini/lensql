@@ -354,6 +354,75 @@
             "schoolRequired": "Please enter your school.",
             "errorServer": "Could not connect to the server.",
             "errorGeneric": "Registration failed"
+        },
+        "exercises": {
+            "buttons": {
+                "category": {
+                    "database": "Database",
+                    "exercise": "Exercise",
+                    "query": "Query"
+                },
+                "database": {
+                    "show_search_path": "Show Search Path",
+                    "list_tables": "List Tables",
+                    "list_tables_current": "Current Schema",
+                    "list_tables_all": "All Schemas",
+                    "list_schemas": "List Schemas",
+                    "list_constraints": "List Constraints"
+                },
+                "exercise": {
+                    "dataset": "Dataset",
+                    "create": "Create",
+                    "check_result": "Check Result",
+                    "no_solution": "No solution available",
+                    "attempt_singular": "{{count}} attempt",
+                    "attempt_plural": "{{count}} attempts",
+                    "dataset_error": "Error when creating dataset. See console for details.\nIf the dataset is very large, you can try manually executing commands in smaller batches."
+                },
+                "query": {
+                    "execute": "Execute",
+                    "clear_output": "Clear output",
+                    "query_too_large": "Query too large. Please try to split it into smaller parts. You need to remove at least {{excess}} characters."
+                }
+            },
+            "exercise": {
+                "loading": "Loading..."
+            },
+            "message": {
+                "feedback_invite": "You can earn LensCoins by providing feedback on this message"
+            },
+            "messageBox": {
+                "assistant_name": "Lens",
+                "user_name": "You"
+            },
+            "query": {
+                "back_to_top": "Back to top"
+            },
+            "query_result": {
+                "builtin": "LensQL built-in function",
+                "user": "User query"
+            },
+            "chat": {
+                "initial_prompt": "Would you like to ask me anything about this result?",
+                "followup_prompt": "Would you like to ask something else?",
+                "thinking": "Lens is thinking...",
+                "buttons": {
+                    "describe": "Describe query",
+                    "explain": "Explain query",
+                    "explain_error": "Explain error",
+                    "example": "Show example",
+                    "locate": "Where to look",
+                    "fix": "Suggest fix"
+                },
+                "prompts": {
+                    "describe": "Describe what my query does",
+                    "explain": "Explain what each clause in my query is doing",
+                    "explain_error": "Explain what this error means",
+                    "example": "Show a simplified example that can cause this problem",
+                    "locate": "Show me which query part is causing this error",
+                    "fix": "Suggest a fix for this error"
+                }
+            }
         }
     },
     "gamification": {

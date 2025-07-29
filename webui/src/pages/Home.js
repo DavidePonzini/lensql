@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
+
 import useAuth from '../hooks/useAuth';
+
 import Parallax from '../components/Parallax';
 import AlertUnderDevelopment from '../components/AlertUnderDevelopment';
 

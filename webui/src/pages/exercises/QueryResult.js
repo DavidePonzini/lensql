@@ -1,9 +1,13 @@
 import { forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import Chat from './Chat';
 
 import './QueryResult.css';
 
 const QueryResult = forwardRef(({ result, isBuiltin, queryId, query, success, isMessage, notices }, ref) => {
+    const { t } = useTranslation();
+    
     return (
         <div
             className={`query-result alert ${success ? isBuiltin ? 'alert-secondary' : 'alert-primary' : 'alert-danger'}`}
@@ -13,12 +17,12 @@ const QueryResult = forwardRef(({ result, isBuiltin, queryId, query, success, is
                 {isBuiltin ? (
                     <span>
                         <i className="fas fa-search" />
-                        <b>LensQL builtin function</b>
+                        <b>{t('pages.exercises.query_result.builtin')}</b>
                     </span>
                 ) : (
                     <span>
                         <i className="fas fa-user" />
-                        <b>User query</b>
+                        <b>{t('pages.exercises.query_result.user')}</b>
                     </span>
                 )}
                 <pre style={{ maxHeight: '500px', overflow: 'auto' }}>{query}</pre>

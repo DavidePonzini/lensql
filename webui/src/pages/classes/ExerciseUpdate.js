@@ -2,8 +2,9 @@ import useAuth from '../../hooks/useAuth';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import ButtonModal from '../../components/ButtonModal';
 import ExerciseMask from './ExerciseMask';
+
+import ButtonModal from '../../components/buttons/ButtonModal';
 
 function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
     const { apiRequest } = useAuth();

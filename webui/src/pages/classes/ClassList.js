@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button } from 'react-bootstrap';
+
 import useAuth from '../../hooks/useAuth';
 
-import { useTranslation } from 'react-i18next';
-import ClassCard from './ClassCard';
 import CardList from '../../components/CardList';
-import { Button } from 'react-bootstrap';
+
+import ClassCard from './ClassCard';
 import ClassAdd from './ClassAdd';
 
 function ClassList() {

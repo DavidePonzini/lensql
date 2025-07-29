@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import useAuth from '../../hooks/useAuth';
 
-import ExerciseCard from './ExerciseCard';
 import CardList from '../../components/CardList';
+
+import ExerciseCard from './ExerciseCard';
 import ExerciseAdd from './ExerciseAdd';
 
 function ExerciseList() {

@@ -1,12 +1,15 @@
 import { NavLink } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+
 import useAuth from '../../hooks/useAuth';
+
 import ItemAssignmentList from '../../components/ItemAssignmentList';
-import ButtonModal from '../../components/ButtonModal';
+import ButtonModal from '../../components/buttons/ButtonModal';
+import ButtonShowDataset from '../../components/buttons/ButtonShowDataset';
+import LearningStatsAll from '../../components/learningStats/LearningStatsAll';
+
 import ClassUpdate from './ClassUpdate';
-import ButtonShowDataset from '../../components/ButtonShowDataset';
-import LearningStatsAll from '../../components/LearningStatsAll';
 
 function ClassCard({ title, classId, isTeacher = false, participants, exercises, queries, refreshClasses }) {
     const { apiRequest, userInfo } = useAuth();

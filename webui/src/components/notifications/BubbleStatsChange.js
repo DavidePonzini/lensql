@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import BubbleMessage from "./BubbleMessage";
+
 import useUserInfo from "../../hooks/useUserInfo";
+
+import BubbleMessage from "./BubbleMessage";
 
 function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {}, duration = 2000 }) {
     const { incrementStats } = useUserInfo();

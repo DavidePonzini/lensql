@@ -1,26 +1,29 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
+
 import useAuth from "../../hooks/useAuth";
-import MessageBox from "./MessageBox";
-import ButtonAction from "../../components/ButtonAction";
-import BubbleStatsChange from "../../components/BubbleStatsChange";
-import { setBadges } from "../../components/BadgeNotifier";
 import useGamificationData from "../../hooks/useGamificationData";
 
+import ButtonAction from "../../components/buttons/ButtonAction";
+import BubbleStatsChange from "../../components/notifications/BubbleStatsChange";
+import { setBadges } from "../../components/notifications/BadgeNotifier";
+
+import MessageBox from "./MessageBox";
 
 function Chat({ queryId, success }) {
     const { apiRequest } = useAuth();
     const { Coins } = useGamificationData();
+    const { t } = useTranslation();
 
     const [messages, setMessages] = useState([
         {
-            text: 'Would you like to ask me anything about this result?',
+            text: t('pages.exercises.chat.initial_prompt'),
             isFromAssistant: true,
             isThinking: false,
             messageId: null,
         }
     ]);
     const [rewards, setRewards] = useState([]);
-
     const [isThinking, setIsThinking] = useState(false);
     const messagesEndRef = useRef(null);
 
@@ -32,24 +35,19 @@ function Chat({ queryId, success }) {
     const buttonErrorFixLocked = false;
 
     function addMessage(text, isFromAssistant, isThinking = false, messageId = null) {
-        setMessages((prevMessages) => [...prevMessages, {
-            text,
-            isFromAssistant,
-            isThinking,
-            messageId,
-        }]);
-    };
+        setMessages(prev => [...prev, { text, isFromAssistant, isThinking, messageId }]);
+    }
 
     function addFollowupPrompt() {
-        addMessage('Would you like to ask something else?', true);
+        addMessage(t('pages.exercises.chat.followup_prompt'), true);
     }
 
     function removeLastMessage() {
-        setMessages((prevMessages) => prevMessages.slice(0, -1));
+        setMessages(prev => prev.slice(0, -1));
     }
 
     function startThinking() {
-        addMessage("Thinking...", true, true);
+        addMessage(t('pages.exercises.chat.thinking'), true, true);
         setIsThinking(true);
     }
 
@@ -60,15 +58,15 @@ function Chat({ queryId, success }) {
 
     function getLastMessageIdx() {
         return messages.filter(m => !m.isFromAssistant).length;
-    };
+    }
 
     async function handleDescribeQuery() {
-        addMessage("Describe what my query does", false);
+        addMessage(t('pages.exercises.chat.prompts.describe'), false);
         startThinking();
 
         const data = await apiRequest('/api/messages/success/describe', 'POST', {
-            'query_id': queryId,
-            'msg_idx': getLastMessageIdx(),
+            query_id: queryId,
+            msg_idx: getLastMessageIdx(),
         });
 
         stopThinking();
@@ -80,12 +78,12 @@ function Chat({ queryId, success }) {
     }
 
     async function handleExplainQuery() {
-        addMessage("Explain what each clause in my query is doing", false);
+        addMessage(t('pages.exercises.chat.prompts.explain'), false);
         startThinking();
 
         const data = await apiRequest('/api/messages/success/explain', 'POST', {
-            'query_id': queryId,
-            'msg_idx': getLastMessageIdx(),
+            query_id: queryId,
+            msg_idx: getLastMessageIdx(),
         });
 
         stopThinking();
@@ -97,12 +95,12 @@ function Chat({ queryId, success }) {
     }
 
     async function handleExplainError() {
-        addMessage("Explain what this error means", false);
+        addMessage(t('pages.exercises.chat.prompts.explain_error'), false);
         startThinking();
 
         const data = await apiRequest('/api/messages/error/explain', 'POST', {
-            'query_id': queryId,
-            'msg_idx': getLastMessageIdx(),
+            query_id: queryId,
+            msg_idx: getLastMessageIdx(),
         });
 
         stopThinking();
@@ -114,12 +112,12 @@ function Chat({ queryId, success }) {
     }
 
     async function handleShowExample() {
-        addMessage("Show a simplified example that can cause this problem", false);
+        addMessage(t('pages.exercises.chat.prompts.example'), false);
         startThinking();
 
         const data = await apiRequest('/api/messages/error/example', 'POST', {
-            'query_id': queryId,
-            'msg_idx': getLastMessageIdx(),
+            query_id: queryId,
+            msg_idx: getLastMessageIdx(),
         });
 
         stopThinking();
@@ -131,12 +129,12 @@ function Chat({ queryId, success }) {
     }
 
     async function handleWhereToLook() {
-        addMessage("Show me which query part is causing this error", false);
+        addMessage(t('pages.exercises.chat.prompts.locate'), false);
         startThinking();
 
         const data = await apiRequest('/api/messages/error/locate', 'POST', {
-            'query_id': queryId,
-            'msg_idx': getLastMessageIdx(),
+            query_id: queryId,
+            msg_idx: getLastMessageIdx(),
         });
 
         stopThinking();
@@ -148,12 +146,12 @@ function Chat({ queryId, success }) {
     }
 
     async function handleSuggestFix() {
-        addMessage("Suggest a fix for this error", false);
+        addMessage(t('pages.exercises.chat.prompts.fix'), false);
         startThinking();
 
         const data = await apiRequest('/api/messages/error/fix', 'POST', {
-            'query_id': queryId,
-            'msg_idx': getLastMessageIdx(),
+            query_id: queryId,
+            msg_idx: getLastMessageIdx(),
         });
 
         stopThinking();
@@ -170,7 +168,6 @@ function Chat({ queryId, success }) {
         }
     }
 
-
     return (
         <div id={`chat-${queryId}`}>
             {messages.map((message, index) => (
@@ -181,7 +178,6 @@ function Chat({ queryId, success }) {
                     messageId={message.messageId}
                     key={index}
                 >
-                    {/* Buttons -- shown only on last message when not thinking */}
                     {!isThinking && index === messages.length - 1 && (
                         <div className="mt-2">
                             {success ? (
@@ -193,7 +189,7 @@ function Chat({ queryId, success }) {
                                         cost={-Coins.HELP_SUCCESS_DESCRIBE}
                                         locked={buttonSuccessDescribeLocked}
                                     >
-                                        Describe query
+                                        {t('pages.exercises.chat.buttons.describe')}
                                     </ButtonAction>
 
                                     <ButtonAction
@@ -203,7 +199,7 @@ function Chat({ queryId, success }) {
                                         cost={-Coins.HELP_SUCCESS_EXPLAIN}
                                         locked={buttonSuccessExplainLocked}
                                     >
-                                        Explain query
+                                        {t('pages.exercises.chat.buttons.explain')}
                                     </ButtonAction>
                                 </>
                             ) : (
@@ -215,7 +211,7 @@ function Chat({ queryId, success }) {
                                         cost={-Coins.HELP_ERROR_EXPLAIN}
                                         locked={buttonErrorExplainLocked}
                                     >
-                                        Explain error
+                                        {t('pages.exercises.chat.buttons.explain_error')}
                                     </ButtonAction>
 
                                     <ButtonAction
@@ -225,7 +221,7 @@ function Chat({ queryId, success }) {
                                         cost={-Coins.HELP_ERROR_EXAMPLE}
                                         locked={buttonErrorExampleLocked}
                                     >
-                                        Show example
+                                        {t('pages.exercises.chat.buttons.example')}
                                     </ButtonAction>
 
                                     <ButtonAction
@@ -235,7 +231,7 @@ function Chat({ queryId, success }) {
                                         cost={-Coins.HELP_ERROR_LOCATE}
                                         locked={buttonErrorLocateLocked}
                                     >
-                                        Where to look
+                                        {t('pages.exercises.chat.buttons.locate')}
                                     </ButtonAction>
 
                                     <ButtonAction
@@ -245,7 +241,7 @@ function Chat({ queryId, success }) {
                                         cost={-Coins.HELP_ERROR_FIX}
                                         locked={buttonErrorFixLocked}
                                     >
-                                        Suggest fix
+                                        {t('pages.exercises.chat.buttons.fix')}
                                     </ButtonAction>
                                 </>
                             )}

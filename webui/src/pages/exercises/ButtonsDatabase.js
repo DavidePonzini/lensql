@@ -1,14 +1,18 @@
-import ButtonAction from "../../components/ButtonAction";
-import ButtonCategory from "./ButtonCategory";
-import ButtonActionDropdown from "../../components/ButtonActionDropdown";
+import { useTranslation } from "react-i18next";
+
 import useAuth from "../../hooks/useAuth";
+
+import ButtonAction from "../../components/buttons/ButtonAction";
+import ButtonActionDropdown from "../../components/buttons/ButtonActionDropdown";
+
+import ButtonCategory from "./ButtonCategory";
 
 function ButtonsDatabase({ exerciseId, isExecuting, setIsExecuting, setResult }) {
     const { apiRequest } = useAuth();
+    const { t } = useTranslation();
 
     async function handleShowSearchPath() {
         setIsExecuting(true);
-
         const data = await apiRequest('/api/queries/builtin/show-search-path', 'POST', {
             'exercise_id': exerciseId,
         });
@@ -18,7 +22,6 @@ function ButtonsDatabase({ exerciseId, isExecuting, setIsExecuting, setResult })
 
     async function handleListSchemas() {
         setIsExecuting(true);
-
         const data = await apiRequest('/api/queries/builtin/list-schemas', 'POST', {
             'exercise_id': exerciseId,
         });
@@ -28,7 +31,6 @@ function ButtonsDatabase({ exerciseId, isExecuting, setIsExecuting, setResult })
 
     async function handleListTables() {
         setIsExecuting(true);
-
         const data = await apiRequest('/api/queries/builtin/list-tables', 'POST', {
             'exercise_id': exerciseId,
         });
@@ -38,7 +40,6 @@ function ButtonsDatabase({ exerciseId, isExecuting, setIsExecuting, setResult })
 
     async function handleListAllTables() {
         setIsExecuting(true);
-
         const data = await apiRequest('/api/queries/builtin/list-all-tables', 'POST', {
             'exercise_id': exerciseId,
         });
@@ -48,7 +49,6 @@ function ButtonsDatabase({ exerciseId, isExecuting, setIsExecuting, setResult })
 
     async function handleListConstraints() {
         setIsExecuting(true);
-
         const data = await apiRequest('/api/queries/builtin/list-constraints', 'POST', {
             'exercise_id': exerciseId,
         });
@@ -59,34 +59,34 @@ function ButtonsDatabase({ exerciseId, isExecuting, setIsExecuting, setResult })
     return (
         <>
             <ButtonCategory
-                text="Database"
+                text={t('pages.exercises.buttons.category.database')}
                 iconClassName='fas fa-database'
                 className="text-secondary"
             />
-            <div className="col">
 
+            <div className="col">
                 <ButtonAction
                     variant="secondary"
                     className="me-1 mb-1"
                     onClick={handleShowSearchPath}
                     disabled={isExecuting}
                 >
-                    Show Search Path
+                    {t('pages.exercises.buttons.database.show_search_path')}
                 </ButtonAction>
 
                 <ButtonActionDropdown
-                    title="List Tables"
+                    title={t('pages.exercises.buttons.database.list_tables')}
                     disabled={isExecuting}
                     variant="secondary"
                     className="me-1 mb-1"
                     buttons={[
                         {
-                            label: 'Current Schema',
+                            label: t('pages.exercises.buttons.database.list_tables_current'),
                             onClick: handleListTables,
                             disabled: isExecuting,
                         },
                         {
-                            label: 'All Schemas',
+                            label: t('pages.exercises.buttons.database.list_tables_all'),
                             onClick: handleListAllTables,
                             disabled: isExecuting,
                         },
@@ -99,7 +99,7 @@ function ButtonsDatabase({ exerciseId, isExecuting, setIsExecuting, setResult })
                     onClick={handleListSchemas}
                     disabled={isExecuting}
                 >
-                    List Schemas
+                    {t('pages.exercises.buttons.database.list_schemas')}
                 </ButtonAction>
 
                 <ButtonAction
@@ -108,7 +108,7 @@ function ButtonsDatabase({ exerciseId, isExecuting, setIsExecuting, setResult })
                     onClick={handleListConstraints}
                     disabled={isExecuting}
                 >
-                    List Constraints
+                    {t('pages.exercises.buttons.database.list_constraints')}
                 </ButtonAction>
             </div>
         </>

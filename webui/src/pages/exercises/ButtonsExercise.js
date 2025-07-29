@@ -1,17 +1,21 @@
 import { useState } from 'react';
-import useAuth from "../../hooks/useAuth";
+import { useTranslation } from 'react-i18next';
 
-import ButtonAction from "../../components/ButtonAction";
-import ButtonShowDataset from "../../components/ButtonShowDataset";
-import ButtonCategory from "./ButtonCategory";
-import BubbleStatsChange from '../../components/BubbleStatsChange';
-import { setBadges } from '../../components/BadgeNotifier';
+import useAuth from "../../hooks/useAuth";
 import useGamificationData from '../../hooks/useGamificationData';
 
+import ButtonAction from "../../components/buttons/ButtonAction";
+import ButtonShowDataset from "../../components/buttons/ButtonShowDataset";
+import { setBadges } from '../../components/notifications/BadgeNotifier';
+import BubbleStatsChange from '../../components/notifications/BubbleStatsChange';
+
+import ButtonCategory from "./ButtonCategory";
+
 function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecuting, setResult, attempts: initialAttempts, hasSolution }) {
+    const { t } = useTranslation();
     const { apiRequest } = useAuth();
     const { Coins } = useGamificationData();
-    
+
     const [rewards, setRewards] = useState([]);
     const [attempts, setAttempts] = useState(initialAttempts);
 
@@ -59,7 +63,7 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
             }
 
         } catch (error) {
-            alert('Error when creating dataset. See console for details.\nIf the dataset is very large, you can try manually executing commands in smaller batches.');
+            alert(t('pages.exercises.buttons.exercise.dataset_error'));
             console.error('Streaming error:', error);
         } finally {
             setIsExecuting(false);
@@ -86,7 +90,7 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
     return (
         <>
             <ButtonCategory
-                text="Exercise"
+                text={t('pages.exercises.buttons.category.exercise')}
                 iconClassName='fas fa-tasks'
                 className="text-info"
             />
@@ -95,12 +99,12 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
                 <ButtonShowDataset
                     variant="info"
                     className="me-1 mb-1"
-                    buttonText="Dataset"
+                    buttonText={t('pages.exercises.buttons.exercise.dataset')}
                     classId={classId}
                     disabled={isExecuting}
                     footerButtons={[
                         {
-                            text: 'Create',
+                            text: t('pages.exercises.buttons.exercise.create'),
                             variant: 'primary',
                             onClick: handleCreateDataset,
                             autoClose: true,
@@ -116,12 +120,17 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
                     disabled={isExecuting || sqlText.trim().length === 0 || !hasSolution}
                     cost={hasSolution ? Coins.checkSolutionCost(attempts) : null}
                 >
-                    Check Result
+                    {t('pages.exercises.buttons.exercise.check_result')}
                     <span className="text-muted ms-2">
                         (
                         {hasSolution ?
-                            attempts === 1 ? `${attempts} attempt` : `${attempts} attempts`
-                            : 'No solution available'}
+                            t(
+                                attempts === 1
+                                    ? 'pages.exercises.buttons.exercise.attempt_singular'
+                                    : 'pages.exercises.buttons.exercise.attempt_plural',
+                                { count: attempts }
+                            )
+                            : t('pages.exercises.buttons.exercise.no_solution')}
                         )
                     </span>
                 </ButtonAction>
@@ -134,7 +143,6 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
             </div>
         </>
     );
-
 }
 
 export default ButtonsExercise;

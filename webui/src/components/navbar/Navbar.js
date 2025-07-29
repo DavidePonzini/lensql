@@ -1,14 +1,15 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useState } from 'react';
-import AppName from '../AppName';
-import useAuth from '../../hooks/useAuth';
-import useUserInfo from '../../hooks/useUserInfo';
-import LanguageSelectionButton from './LanguageSelectionButton';
 import { useTranslation } from 'react-i18next';
 
-import './Navbar.css';
+import useAuth from '../../hooks/useAuth';
+import useUserInfo from '../../hooks/useUserInfo';
 
+import AppName from '../AppName';
+import LanguageSelectionButton from './LanguageSelectionButton';
 import GamificationStats from './GamificationStats';
+
+import './Navbar.css';
 
 function Navbar() {
     const { t } = useTranslation();

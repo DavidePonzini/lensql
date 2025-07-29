@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next';
+
 import useAuth from '../../hooks/useAuth';
 
 import Query from './Query';
 
 function Exercise() {
+    const { t } = useTranslation();
     const { apiRequest } = useAuth();
     const { exerciseId } = useParams();
+
     const [exercise, setExercise] = useState(null);
 
     useEffect(() => {
@@ -20,7 +24,7 @@ function Exercise() {
     }, [exerciseId, apiRequest]);
 
     if (!exercise) return (
-        <div>Loading...</div>
+        <div>{t('pages.exercises.exercise.loading')}</div>
     );
 
     return (

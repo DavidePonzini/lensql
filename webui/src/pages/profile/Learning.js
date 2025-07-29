@@ -1,6 +1,8 @@
-import useUserInfo from "../../hooks/useUserInfo";
-import LearningStatsAll from "../../components/LearningStatsAll";
 import { useTranslation } from "react-i18next";
+
+import useUserInfo from "../../hooks/useUserInfo";
+
+import LearningStatsAll from "../../components/learningStats/LearningStatsAll";
 
 function Learning() {
     const { userInfo } = useUserInfo();

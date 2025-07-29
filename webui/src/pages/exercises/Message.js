@@ -1,14 +1,16 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import useAuth from '../../hooks/useAuth';
-import BubbleStatsChange from '../../components/BubbleStatsChange';
-import { setBadges } from '../../components/BadgeNotifier';
-import useGamificationData from '../../hooks/useGamificationData';
+
+import BubbleStatsChange from '../../components/notifications/BubbleStatsChange';
+import { setBadges } from '../../components/notifications/BadgeNotifier';
 
 import './Message.css';
 
 function Message({ children, text, messageId = null }) {
+    const { t } = useTranslation();
     const { apiRequest } = useAuth();
-    const { Coins } = useGamificationData();
 
     const [feedback, setFeedback] = useState(null);
     const [rewards, setRewards] = useState([]);
@@ -53,7 +55,7 @@ function Message({ children, text, messageId = null }) {
                         {
                             !sessionStorage.getItem('hasProvidedFeedback') && (
                                 <span className="text-muted">
-                                    You can earn {Coins.HELP_FEEDBACK} LensCoins by providing feedback on this message
+                                    {t('pages.exercises.message.feedback_invite')}
                                     <i className="fa fa-arrow-right mx-1" />
                                 </span>
                             )
