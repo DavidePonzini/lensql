@@ -21,7 +21,7 @@
                 "en": "EN",
                 "it": "IT"
             },
-            "gamificationStats": {
+            "gamification_stats": {
                 "level": "Level",
                 "xp": "Experience points",
                 "coins": "LensCoins"
