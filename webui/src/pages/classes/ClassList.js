@@ -47,10 +47,7 @@ function ClassList() {
             <h1>{t('pages.classes.class_list.title')}</h1>
             <CardList>
                 {classes.length === 0 && (
-                    <>
-                        <p>{t('pages.classes.class_list.empty_1')}</p>
-                        <p>{t('pages.classes.class_list.empty_2')}</p>
-                    </>
+                    <p>{t('pages.classes.class_list.empty')}</p>
                 )}
 
                 {classes.map((cl) => (
@@ -66,6 +63,8 @@ function ClassList() {
                     />
                 ))}
             </CardList>
+
+            <p>{t('pages.classes.class_list.new_course_suggestion')}</p>
 
             <hr />
             <Button variant="primary" onClick={handleJoinClass} className="me-2 mb-2">

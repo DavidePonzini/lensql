@@ -209,8 +209,8 @@
             },
             "class_list": {
                 "title": "I miei corsi",
-                "empty_1": "Nessun corso trovato. Unisciti a un corso per vedere gli esercizi.",
-                "empty_2": "Se vuoi eseguire una query non assegnata da un docente, crea un nuovo corso.",
+                "empty": "Nessun corso trovato. Unisciti a un corso per vedere gli esercizi.",
+                "new_course_suggestion": "Se vuoi eseguire una query non assegnata da un docente, crea un nuovo corso.",
                 "join": "Unisciti a un corso",
                 "join_prompt": "Inserisci il codice del corso:"
             },

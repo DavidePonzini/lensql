@@ -209,8 +209,8 @@
             },
             "class_list": {
                 "title": "My Courses",
-                "empty_1": "Nothing here. Join a course to see exercises.",
-                "empty_2": "If you want to run a query which hasn't been assigned to you by the teacher, please create a new course.",
+                "empty": "Nothing here. Join a course to see exercises.",
+                "new_course_suggestion": "If you want to run a query which hasn't been assigned to you by the teacher, please create a new course.",
                 "join": "Join Course",
                 "join_prompt": "Enter class join code:"
             },
