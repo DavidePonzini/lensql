@@ -22,7 +22,7 @@ function Navbar() {
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container-fluid d-flex justify-content-between align-items-center">
                 {/* Brand on the left */}
-                <Link className="navbar-brand me-auto" to="/"><AppName /></Link>
+                <Link className="navbar-brand me-3" to="/"><AppName /></Link>
 
                 {/* Toggler button on the far right */}
                 <button
