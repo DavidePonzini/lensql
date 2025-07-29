@@ -43,7 +43,7 @@ locales_extract: $(VENV)
 	$(VENV_BIN)/pybabel update -i server/messages.pot -d server/locales
 	rm -r server/messages.pot
 
-locales_compile:
+locales_compile: $(VENV)
 	$(VENV_BIN)/pybabel compile -d server/locales
 	
 
