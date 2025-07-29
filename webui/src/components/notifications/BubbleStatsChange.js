@@ -13,8 +13,8 @@ function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {}, du
     if (!reward) return null;
 
     const coinLabel = Math.abs(reward.coins) === 1
-        ? t('components.reward.coin_singular')
-        : t('components.reward.coin_plural');
+        ? t('components.notifications.reward.coin_singular')
+        : t('components.notifications.reward.coin_plural');
 
     return (
         <>
@@ -54,7 +54,7 @@ function BubbleStatsChange({ rewards, setRewards, isAlert = true, style = {}, du
                         <strong>{reward.reason}:&nbsp;</strong>
                     </>
                 ) : null}
-                {reward.experience >= 0 ? '+' : '-'}{t('components.reward.exp', { count: Math.abs(reward.experience) })} <i className="fa fa-diamond" />
+                {reward.experience >= 0 ? '+' : '-'}{t('components.notifications.reward.exp', { count: Math.abs(reward.experience) })} <i className="fa fa-diamond" />
             </BubbleMessage>
         </>
     );

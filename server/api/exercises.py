@@ -5,6 +5,7 @@ from typing import Iterable
 from flask import Blueprint, request
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_babel import _
 
 from .util import responses
 from server import db
@@ -21,8 +22,8 @@ class ExerciseAPI(MethodView):
         class_id = request.args.get('class_id')
 
         if not db.admin.classes.has_participant(username, class_id):
-            return responses.response(False, message='You are not a participant of this class.')
-        
+            return responses.response(False, message=_('You are not a participant of this class.'))
+
         if db.admin.classes.has_teacher(username, class_id):
             # Teachers can see all exercises
             result = db.admin.exercises.get_from_class(username=username, class_id=class_id, include_hidden=True)
@@ -78,7 +79,7 @@ class ExerciseAPI(MethodView):
         success = db.admin.exercises.delete(exercise_id)
         
         if not success:
-            return responses.response(False, message='Cannot delete exercise. There are queries associated with it.')
+            return responses.response(False, message=_('Cannot delete exercise. There are queries associated with it.'))
         return responses.response(True)
 
 # Register all methods (GET, POST, PUT, DELETE) on /
@@ -108,7 +109,7 @@ class ObjectivesAPI(MethodView):
 
         class_id = db.admin.exercises.get_class(exercise_id)
         if not db.admin.classes.has_teacher(username, class_id):
-            return responses.response(False, message='You are not authorized to set learning objectives for this exercise.')
+            return responses.response(False, message=_('You are not authorized to set learning objectives for this exercise.'))
 
         if value:
             db.admin.exercises.set_learning_objective(
@@ -139,7 +140,7 @@ def hide_exercise():
 
     class_id = db.admin.exercises.get_class(exercise_id)
     if not db.admin.classes.has_teacher(username, class_id):
-        return responses.response(False, message='You are not authorized to edit this exercise.')
+        return responses.response(False, message=_('You are not authorized to edit this exercise.'))
 
     if value:
         db.admin.exercises.hide(exercise_id)
@@ -183,7 +184,7 @@ def get_exercise(exercise_id):
     result = db.admin.exercises.get_data(exercise_id=exercise_id, username=username)
 
     if not result:
-        return responses.response(False, message='Exercise not found.')
+        return responses.response(False, message=_('Exercise not found.'))
 
     return responses.response(True, data=result)
 
@@ -199,9 +200,9 @@ def submit_exercise():
 
     if value:
         if not db.admin.exercises.submit(username=username, exercise_id=exercise_id):
-            return responses.response(False, message='Failed to submit exercise.')
+            return responses.response(False, message=_('Failed to submit exercise.'))
         return responses.response(True)
     else:
         if not db.admin.exercises.unsubmit(username=username, exercise_id=exercise_id):
-            return responses.response(False, message='Failed to unsubmit exercise.')
+            return responses.response(False, message=_('Failed to unsubmit exercise.'))
         return responses.response(True)

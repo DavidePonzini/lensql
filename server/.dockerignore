@@ -6,3 +6,7 @@ log/
 Dockerfile
 .dockerignore
 .env
+
+# translation files
+messages.pot
+locales/**/*.po

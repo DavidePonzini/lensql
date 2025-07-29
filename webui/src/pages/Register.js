@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import bg from '../res/database.jpg';
 
 function Register() {
-    const { t } = useTranslation();
-    
+    const { t, i18n } = useTranslation();
+
     const [usernameInput, setUsernameInput] = useState('');
     const [usernameError, setUsernameError] = useState('');
     const [isUsernameValid, setIsUsernameValid] = useState(false);
@@ -95,7 +95,10 @@ function Register() {
         try {
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Language': i18n.language || 'en', // Use the current language from i18n
+                },
                 body: JSON.stringify({
                     username: usernameInput,
                     password: passwordInput,

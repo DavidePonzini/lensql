@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_babel import _
 
 from server import db
 from .util import responses
@@ -34,7 +35,7 @@ def get_query_stats():
         result = db.admin.users.get_query_stats(username)
     else:
         if not db.admin.classes.has_participant(username=username, class_id=class_id):
-            return responses.response(False, message="User is not a participant in the specified class.")
+            return responses.response(False, message=_("User is not a participant in the specified class."))
 
         is_teacher = db.admin.classes.has_teacher(username=username, class_id=class_id)
 
@@ -75,7 +76,7 @@ def get_message_stats():
         result = db.admin.users.get_message_stats(username)
     else:
         if not db.admin.classes.has_participant(username=username, class_id=class_id):
-            return responses.response(False, message="User is not a participant in the specified class.")
+            return responses.response(False, message=_("User is not a participant in the specified class."))
 
         is_teacher = db.admin.classes.has_teacher(username=username, class_id=class_id)
 

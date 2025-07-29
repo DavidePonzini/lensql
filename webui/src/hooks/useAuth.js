@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const AuthContext = createContext();
 
@@ -11,6 +12,8 @@ class RequestSizeError extends Error {
 }
 
 function AuthProvider({ children }) {
+    const { i18n } = useTranslation();
+
     const MAX_REQUEST_SIZE = 1024 * 1024 * 20;
 
     const [accessToken, setAccessToken] = useState(sessionStorage.getItem('access_token'));
@@ -61,7 +64,8 @@ function AuthProvider({ children }) {
                 method,
                 headers: {
                     'Authorization': 'Bearer ' + currentToken,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Language': i18n.language,
                 },
                 body: content,
             });
@@ -81,7 +85,7 @@ function AuthProvider({ children }) {
         }
 
         return stream ? response.body : response.json();
-    }, [accessToken, refreshAccessToken, MAX_REQUEST_SIZE]);
+    }, [accessToken, refreshAccessToken, MAX_REQUEST_SIZE, i18n.language]);
 
     const saveTokens = useCallback((access, refresh) => {
         sessionStorage.setItem('access_token', access);

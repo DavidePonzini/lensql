@@ -7,7 +7,7 @@ import useAuth from '../hooks/useAuth';
 import bg from '../res/database.jpg';
 
 function Login() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { saveTokens } = useAuth();
 
@@ -62,7 +62,10 @@ function Login() {
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Language': i18n.language || 'en', // Use the current language from i18n
+                },
                 body: JSON.stringify({ username: usernameInput, password: passwordInput })
             });
 

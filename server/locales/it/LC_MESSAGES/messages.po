@@ -1,0 +1,150 @@
+
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-07-29 17:03+0200\n"
+"PO-Revision-Date: 2025-07-29 15:17+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: it\n"
+"Language-Team: it <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: server/api/auth.py:22
+msgid "Cannot login. Please check your username and password."
+msgstr "Accesso non riuscito. Controlla nome utente e password."
+
+#: server/api/auth.py:48
+msgid "Username already exists. Please choose a different username."
+msgstr "Il nome utente esiste già. Scegline un altro."
+
+#: server/api/auth.py:51
+msgid "Registration failed. Please try again."
+msgstr "Registrazione non riuscita. Riprova."
+
+#: server/api/auth.py:64
+msgid "Failed to reset password. Please try again."
+msgstr "Impossibile reimpostare la password. Riprova."
+
+#: server/api/auth.py:66
+msgid "Password reset successfully."
+msgstr "Password reimpostata con successo."
+
+#: server/api/classes.py:68
+msgid "You do not have access to this class."
+msgstr "Non hai accesso a questa classe."
+
+#: server/api/classes.py:83
+msgid "Class does not exist."
+msgstr "La classe non esiste."
+
+#: server/api/classes.py:106
+msgid ""
+"You cannot leave this class, as you are a teacher and it has data "
+"associated with it."
+msgstr ""
+"Non puoi abbandonare questa classe perché sei un insegnante e contiene "
+"dei dati associati."
+
+#: server/api/classes.py:130 server/api/classes.py:150
+msgid "You are not a teacher of this class."
+msgstr "Non sei un insegnante di questa classe."
+
+#: server/api/classes.py:133
+msgid "You cannot set yourself as a teacher of this class."
+msgstr "Non puoi assegnarti come insegnante di questa classe."
+
+#: server/api/datasets.py:21
+msgid "You do not have access to this dataset."
+msgstr "Non hai accesso a questo dataset."
+
+#: server/api/exercises.py:25
+msgid "You are not a participant of this class."
+msgstr "Non sei un partecipante di questa classe."
+
+#: server/api/exercises.py:82
+msgid "Cannot delete exercise. There are queries associated with it."
+msgstr "Impossibile eliminare l'esercizio. Ci sono query associate."
+
+#: server/api/exercises.py:112
+msgid "You are not authorized to set learning objectives for this exercise."
+msgstr ""
+"Non sei autorizzato a impostare gli obiettivi didattici per questo "
+"esercizio."
+
+#: server/api/exercises.py:143
+msgid "You are not authorized to edit this exercise."
+msgstr "Non sei autorizzato a modificare questo esercizio."
+
+#: server/api/exercises.py:187
+msgid "Exercise not found."
+msgstr "Esercizio non trovato."
+
+#: server/api/exercises.py:203
+msgid "Failed to submit exercise."
+msgstr "Invio dell'esercizio non riuscito."
+
+#: server/api/exercises.py:207
+msgid "Failed to unsubmit exercise."
+msgstr "Annullamento dell'invio non riuscito."
+
+#: server/api/users.py:38 server/api/users.py:79
+msgid "User is not a participant in the specified class."
+msgstr "L'utente non è un partecipante della classe specificata."
+
+#: server/db/users/queries/builtin/solution.py:106
+msgid "No solution found for this exercise."
+msgstr "Nessuna soluzione trovata per questo esercizio."
+
+#: server/db/users/queries/builtin/solution.py:112
+msgid "Your query is not supported. Please ensure it is a valid SQL SELECT query."
+msgstr ""
+"La tua query non è supportata. Assicurati che sia una query SQL SELECT "
+"valida."
+
+#: server/db/users/queries/builtin/solution.py:118
+msgid "Teacher-provided solution is not supported."
+msgstr "La soluzione fornita dall'insegnante non è supportata."
+
+#: server/db/users/queries/builtin/solution.py:124
+msgid ""
+"Your query has different columns from the solution. Cannot compare "
+"results."
+msgstr ""
+"La tua query ha colonne diverse rispetto alla soluzione. Impossibile "
+"confrontare i risultati."
+
+#: server/db/users/queries/builtin/solution.py:125
+#: server/db/users/queries/builtin/solution.py:136
+msgid "Expected:"
+msgstr "Atteso:"
+
+#: server/db/users/queries/builtin/solution.py:126
+#: server/db/users/queries/builtin/solution.py:137
+msgid "Your query:"
+msgstr "La tua query:"
+
+#: server/db/users/queries/builtin/solution.py:135
+msgid ""
+"Your query has different data types from the solution. Cannot compare "
+"results."
+msgstr ""
+"La tua query ha tipi di dati diversi rispetto alla soluzione. Impossibile"
+" confrontare i risultati."
+
+#: server/db/users/queries/builtin/solution.py:145
+msgid "Solution is correct."
+msgstr "La soluzione è corretta."
+
+#: server/gamification/__init__.py:8
+msgid ""
+"You don't have enough coins to use this feature. Check the Profile page "
+"to learn how to earn more."
+msgstr ""
+"Non hai abbastanza monete per usare questa funzione. Consulta la pagina "
+"del profilo per scoprire come guadagnarne di più."
+

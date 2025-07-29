@@ -1,12 +1,14 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_babel import Babel
 import os
 
+from .util import localization
 from server import db
 
 jwt = JWTManager()
-
+babel = Babel()
 
 def create_app() -> Flask:
     """Create and configure the Flask application."""
@@ -14,12 +16,18 @@ def create_app() -> Flask:
     app = Flask(__name__)
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'key')
     app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH', 1024*1024*20))   # 20MB
+    app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+    app.config['BABEL_TRANSLATION_DIRECTORIES'] = '../locales'  # Relative path starts from the app root, which is this file's directory
 
-    # CORS(app)
+    # Setup CORS
     CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True,
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
      allow_headers=["Content-Type", "Authorization"])
+    
+    # Setup localization
+    babel.init_app(app, locale_selector=localization.get_locale)
 
+    # Setup JWT
     jwt.init_app(app)
 
     # Register blueprints

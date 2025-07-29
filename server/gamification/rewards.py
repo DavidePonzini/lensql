@@ -33,67 +33,69 @@ class Actions:
         FEEDBACK = Reward('Provided feedback', experience=5, coins=10)
 
 class Badges:
+    # NOTE: make sure the names here match the ones in `webui/src/locales/*/translations.json` > `gamification.badges`
+
     '''Create exercises and run at least one query in it'''
     CREATE_EXERCISES = {
-        1: Reward('Created your first exercise and run a query in it', coins=20),
-        5: Reward('Created 5 exercises and run a query in each of them', coins=50),
-        10: Reward('Created 10 exercises and run a query in each of them', coins=75),
+        1: Reward('create_exercises.1', coins=20),
+        5: Reward('create_exercises.5', coins=50),
+        10: Reward('create_exercises.10', coins=75),
 
     }
 
     '''Give feedback on help messages'''
     FEEDBACK = {
-        1: Reward('Provided your first feedback', coins=10),
-        10: Reward('Provided feedback 10 times', coins=25),
-        50: Reward('Provided feedback 50 times', coins=50),
+        1: Reward('feedback.1', coins=10),
+        10: Reward('feedback.10', coins=25),
+        50: Reward('feedback.50', coins=50),
     }
 
     '''Run unique queries'''
     QUERIES_UNIQUE = {
-        1: Reward('Ran your first query', coins=5),
-        10: Reward('Ran 10 different queries', coins=10),
-        50: Reward('Ran 50 different queries', coins=25),
-        100: Reward('Ran 100 different queries', coins=50),
-        500: Reward('Ran 500 different queries', coins=50),
-        1000: Reward('Ran 1000 different queries', coins=100),
-        2500: Reward('Ran 2500 different queries', coins=100),
-        5000: Reward('Ran 5000 different queries', coins=100),
-        10000: Reward('Ran 10000 different queries', coins=200),
+        1: Reward('queries_unique.1', coins=5),
+        10: Reward('queries_unique.10', coins=10),
+        50: Reward('queries_unique.50', coins=25),
+        100: Reward('queries_unique.100', coins=50),
+        500: Reward('queries_unique.500', coins=50),
+        1000: Reward('queries_unique.1000', coins=100),
+        2500: Reward('queries_unique.2500', coins=100),
+        5000: Reward('queries_unique.5000', coins=100),
+        10000: Reward('queries_unique.10000', coins=200),
     }
 
     '''Solve exercises'''
     EXERCISE_SOLUTIONS = {
-        1: Reward('Solved your first exercise', coins=10),
-        5: Reward('Solved 5 exercises', coins=20),
-        10: Reward('Solved 10 exercises', coins=50),
+        1: Reward('exercise_solutions.1', coins=10),
+        5: Reward('exercise_solutions.5', coins=20),
+        10: Reward('exercise_solutions.10', coins=50),
     }
 
     '''Use Lens' help'''
     HELP_USAGE = {
-        1: Reward('Interacted with Lens for the first time', coins=5),
-        10: Reward('Interacted with Lens 10 times', coins=20),
-        50: Reward('Interacted with Lens 50 times', coins=50),
-        100: Reward('Interacted with Lens 100 times', coins=75),
-        500: Reward('Interacted with Lens 500 times', coins=100),
-        1000: Reward('Interacted with Lens 1000 times', coins=200),
+        1: Reward('help_usage.1', coins=5),
+        10: Reward('help_usage.10', coins=20),
+        50: Reward('help_usage.50', coins=50),
+        100: Reward('help_usage.100', coins=75),
+        500: Reward('help_usage.500', coins=100),
+        1000: Reward('help_usage.1000', coins=200),
     }
 
     '''Use LensQL on different days'''
     DAILY_USAGE = {
-        5: Reward('Run a query in 5 different days', coins=25),
-        14: Reward('Run a query in 14 different days', coins=50),
-        30: Reward('Run a query in 30 different days', coins=75),
+        5: Reward('daily_usage.5', coins=25),
+        14: Reward('daily_usage.14', coins=50),
+        30: Reward('daily_usage.30', coins=75),
     }
 
     # TODO
     '''Reach levels'''
     LEVEL_UP = {
-        3: Reward('Reached level 3', coins=10),
-        5: Reward('Reached level 5', coins=25),
-        10: Reward('Reached level 10', coins=50),
+        3: Reward('level_up.3', coins=10),
+        5: Reward('level_up.5', coins=25),
+        10: Reward('level_up.10', coins=50),
     }
 
     '''Join your first course'''
     JOIN_COURSE = {
-        1: Reward('Joined your first course', coins=20)
+        1: Reward('join_course.1', coins=20)
     }

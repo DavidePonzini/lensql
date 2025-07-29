@@ -3,6 +3,7 @@
 from flask import Blueprint, request
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_babel import _
 
 from server import db, gamification
 from .util import responses
@@ -64,7 +65,7 @@ def get_class(class_id):
         return responses.response(False, message='Class does not exist.')
 
     if not db.admin.classes.has_participant(class_id=class_id, username=username):
-        return responses.response(False, message='You do not have access to this class.')
+        return responses.response(False, message=_('You do not have access to this class.'))
 
     result = db.admin.classes.get(class_id)
 
@@ -79,8 +80,8 @@ def join_class():
     class_id = str(data['class_id']).strip().upper()    # sanitize join code
 
     if not db.admin.classes.exists(class_id):
-        return responses.response(False, message='Class does not exist.')
-    
+        return responses.response(False, message=_('Class does not exist.'))
+
     db.admin.classes.join(username, class_id)
 
     badges = []
@@ -102,7 +103,7 @@ def leave_class():
     if db.admin.classes.leave(username, class_id):
         return responses.response(True)
     else:
-        return responses.response(False, message='You cannot leave this class, as you are a teacher and it has data associated with it.')
+        return responses.response(False, message=_('You cannot leave this class, as you are a teacher and it has data associated with it.'))
 
 
 @bp.route('/is-teacher/<class_id>', methods=['GET'])
@@ -126,10 +127,10 @@ def set_teacher():
     value = data['value']
 
     if not db.admin.classes.has_teacher(current_username, class_id):
-        return responses.response(False, message='You are not a teacher of this class.')
+        return responses.response(False, message=_('You are not a teacher of this class.'))
 
     if current_username == username:
-        return responses.response(False, message='You cannot set yourself as a teacher of this class.')
+        return responses.response(False, message=_('You cannot set yourself as a teacher of this class.'))
 
     if value:
         db.admin.classes.make_teacher(username, class_id)
@@ -146,8 +147,8 @@ def get_members(class_id):
     username = get_jwt_identity()
 
     if not db.admin.classes.has_teacher(username, class_id):
-        return responses.response(False, message='You are not a teacher of this class.')
-    
+        return responses.response(False, message=_('You are not a teacher of this class.'))
+
     members = db.admin.classes.get_members(class_id)
 
     return responses.response(True, members=members)

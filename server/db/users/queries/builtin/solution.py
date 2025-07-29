@@ -1,8 +1,10 @@
 import pandas as pd
+from dav_tools import messages
+from flask_babel import _
+
 from . import util
 from server.sql import QueryResult, QueryResultDataset, QueryResultMessage, SQLCode, Column, get_datatype_name
-from server.db.users.connection import get_connection
-from dav_tools import messages
+from ...connection import get_connection
 
 NAME = 'CHECK_SOLUTION'
 
@@ -16,6 +18,25 @@ class CheckSolutionResult:
     def __repr__(self):
         return f'CheckSolutionResult(correct={self.correct}, execution_success={self.execution_success}'
 
+def _result_message(correct: bool | None, execution_success: bool | None, message: str) -> CheckSolutionResult:
+    query = SQLCode(NAME, builtin=True)
+    result = QueryResultMessage(message, query=query)
+
+    return CheckSolutionResult(
+        correct=correct,
+        execution_success=execution_success,
+        result=result
+    )
+
+def _result_dataset(correct: bool | None, execution_success: bool | None, result: pd.DataFrame, columns: list[Column]) -> CheckSolutionResult:
+    query = SQLCode(NAME, builtin=True)
+    dataset = QueryResultDataset(result=result, columns=columns, query=query)
+
+    return CheckSolutionResult(
+        correct=correct,
+        execution_success=execution_success,
+        result=dataset
+    )
 
 def _execute(username: str, query: str) -> tuple[QueryResultDataset | None, bool]:
     '''
@@ -82,62 +103,47 @@ def check(username: str, query_user: str, query_solution: str) -> CheckSolutionR
     '''
 
     if not query_solution:
-        return CheckSolutionResult(None, None, QueryResultMessage(
-            message=f'No solution found for this exercise.',
-            query=SQLCode(NAME, builtin=True)),
-        )
+        message = _('No solution found for this exercise.')
+        return _result_message(None, None, message)
 
     result_user, execution_success = _execute(username, query_user)
     if result_user is None:
-        return CheckSolutionResult(False, execution_success, QueryResultMessage(
-            message=f'<i class="fa fa-exclamation-triangle text-danger me-1"></i>User query is not supported. Please ensure it is a valid SQL SELECT query.',
-            query=SQLCode(NAME, builtin=True)),
-        )
+        message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+        message += _('Your query is not supported. Please ensure it is a valid SQL SELECT query.')
+        return _result_message(False, execution_success, message)
 
-
-    result_solution, _ = _execute(username, query_solution)
+    result_solution, execution_success_solution = _execute(username, query_solution)
     if result_solution is None:
-        return CheckSolutionResult(None, execution_success, QueryResultMessage(
-            message=f'Teacher-provided solution is not supported',
-            query=SQLCode(NAME, builtin=True)),
-        )
+        message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+        message += _('Teacher-provided solution is not supported.')
+        return _result_message(None, execution_success, message)
 
     # ensure both results have the same columns
     if not result_user.compare_column_names(result_solution):
         message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
-        message += 'Your query has different columns from the solution. Cannot compare results.<br/>'
-        message += f'Expected: <code>{"</code>, <code>".join([col.name for col in result_solution.columns])}</code><br/>'
-        message += f'Your query: <code>{"</code>, <code>".join([col.name for col in result_user.columns])}</code><br/>'
+        message += _('Your query has different columns from the solution. Cannot compare results.') + '<br/>'
+        message += _('Expected:') + f' <code>{"</code>, <code>".join([col.name for col in result_solution.columns])}</code><br/>'
+        message += _('Your query:') + f' <code>{"</code>, <code>".join([col.name for col in result_user.columns])}</code><br/>'
 
-        return CheckSolutionResult(False, execution_success, QueryResultMessage(
-            message=message,
-            query=SQLCode(NAME, builtin=True))
-        )
+        return _result_message(False, execution_success, message)
 
     # check for wrong data types
     wrong_types = result_user.compare_column_types(result_solution)
 
     if wrong_types:
         message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
-        message += 'Your query has different data types from the solution. Cannot compare results.<br/>'
-        message += f'Expected: <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_solution.columns])}</code><br/>'
-        message += f'Your query: <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_user.columns])}</code><br/>'
+        message += _('Your query has different data types from the solution. Cannot compare results.') + '<br/>'
+        message += _('Expected:') + f' <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_solution.columns])}</code><br/>'
+        message += _('Your query:') + f' <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_user.columns])}</code><br/>'
 
-        return CheckSolutionResult(False, execution_success, QueryResultMessage(
-            message=message,
-            query=SQLCode(NAME, builtin=True))
-        )
+        return _result_message(False, execution_success, message)
+
     has_same_result, comparison = result_user.compare_results(result_solution)
 
     if has_same_result:
-        return CheckSolutionResult(True, execution_success, QueryResultMessage(
-            message=f'<i class="fa fa-check text-success me-1"></i>Solution is correct.',
-            query=SQLCode(NAME, builtin=True))
-        )
+        message = '<i class="fa fa-check text-success me-1"></i>'
+        message += _('Solution is correct.') + '<br/>'
+        return _result_message(True, execution_success, message)
     else:
-        return CheckSolutionResult(False, execution_success, QueryResultDataset(
-            result=comparison,
-            query=SQLCode(NAME, builtin=True),
-            columns=result_user.columns)
-        )
+        return _result_dataset(False, execution_success, result=comparison, columns=result_user.columns)
 

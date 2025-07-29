@@ -52,7 +52,7 @@ function BadgeNotifier() {
             {reward.reason ? (
                 <>
                     <br />
-                    {reward.reason}
+                    {t(`gamification.badges.${reward.reason}`)}
                 </>
             ) : null}
 

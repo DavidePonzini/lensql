@@ -1,0 +1,150 @@
+# English translations for LensQL.
+# Copyright (C) 2025 University of Genoa
+# This file is distributed under the same license as the LensQL project.
+# DAVIDE PONZINI <davide.ponzini@edu.unige.it>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-07-29 17:03+0200\n"
+"PO-Revision-Date: 2025-07-29 15:17+0200\n"
+"Last-Translator: Davide Ponzini <davide.ponzini@edu.unige.it>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: server/api/auth.py:22
+msgid "Cannot login. Please check your username and password."
+msgstr "Cannot login. Please check your username and password."
+
+#: server/api/auth.py:48
+msgid "Username already exists. Please choose a different username."
+msgstr "Username already exists. Please choose a different username."
+
+#: server/api/auth.py:51
+msgid "Registration failed. Please try again."
+msgstr "Registration failed. Please try again."
+
+#: server/api/auth.py:64
+msgid "Failed to reset password. Please try again."
+msgstr "Failed to reset password. Please try again."
+
+#: server/api/auth.py:66
+msgid "Password reset successfully."
+msgstr "Password reset successfully."
+
+#: server/api/classes.py:68
+msgid "You do not have access to this class."
+msgstr "You do not have access to this class."
+
+#: server/api/classes.py:83
+msgid "Class does not exist."
+msgstr "Class does not exist."
+
+#: server/api/classes.py:106
+msgid ""
+"You cannot leave this class, as you are a teacher and it has data "
+"associated with it."
+msgstr ""
+"You cannot leave this class, as you are a teacher and it has data "
+"associated with it."
+
+#: server/api/classes.py:130 server/api/classes.py:150
+msgid "You are not a teacher of this class."
+msgstr "You are not a teacher of this class."
+
+#: server/api/classes.py:133
+msgid "You cannot set yourself as a teacher of this class."
+msgstr "You cannot set yourself as a teacher of this class."
+
+#: server/api/datasets.py:21
+msgid "You do not have access to this dataset."
+msgstr "You do not have access to this dataset."
+
+#: server/api/exercises.py:25
+msgid "You are not a participant of this class."
+msgstr "You are not a participant of this class."
+
+#: server/api/exercises.py:82
+msgid "Cannot delete exercise. There are queries associated with it."
+msgstr "Cannot delete exercise. There are queries associated with it."
+
+#: server/api/exercises.py:112
+msgid "You are not authorized to set learning objectives for this exercise."
+msgstr "You are not authorized to set learning objectives for this exercise."
+
+#: server/api/exercises.py:143
+msgid "You are not authorized to edit this exercise."
+msgstr "You are not authorized to edit this exercise."
+
+#: server/api/exercises.py:187
+msgid "Exercise not found."
+msgstr "Exercise not found."
+
+#: server/api/exercises.py:203
+msgid "Failed to submit exercise."
+msgstr "Failed to submit exercise."
+
+#: server/api/exercises.py:207
+msgid "Failed to unsubmit exercise."
+msgstr "Failed to unsubmit exercise."
+
+#: server/api/users.py:38 server/api/users.py:79
+msgid "User is not a participant in the specified class."
+msgstr "User is not a participant in the specified class."
+
+#: server/db/users/queries/builtin/solution.py:106
+msgid "No solution found for this exercise."
+msgstr "No solution found for this exercise."
+
+#: server/db/users/queries/builtin/solution.py:112
+msgid "Your query is not supported. Please ensure it is a valid SQL SELECT query."
+msgstr "Your query is not supported. Please ensure it is a valid SQL SELECT query."
+
+#: server/db/users/queries/builtin/solution.py:118
+msgid "Teacher-provided solution is not supported."
+msgstr "Teacher-provided solution is not supported."
+
+#: server/db/users/queries/builtin/solution.py:124
+msgid ""
+"Your query has different columns from the solution. Cannot compare "
+"results."
+msgstr ""
+"Your query has different columns from the solution. Cannot compare "
+"results."
+
+#: server/db/users/queries/builtin/solution.py:125
+#: server/db/users/queries/builtin/solution.py:136
+msgid "Expected:"
+msgstr "Expected:"
+
+#: server/db/users/queries/builtin/solution.py:126
+#: server/db/users/queries/builtin/solution.py:137
+msgid "Your query:"
+msgstr "Your query:"
+
+#: server/db/users/queries/builtin/solution.py:135
+msgid ""
+"Your query has different data types from the solution. Cannot compare "
+"results."
+msgstr ""
+"Your query has different data types from the solution. Cannot compare "
+"results."
+
+#: server/db/users/queries/builtin/solution.py:145
+msgid "Solution is correct."
+msgstr "Solution is correct."
+
+#: server/gamification/__init__.py:8
+msgid ""
+"You don't have enough coins to use this feature. Check the Profile page "
+"to learn how to earn more."
+msgstr ""
+"You don't have enough coins to use this feature. Check the Profile page "
+"to learn how to earn more."
+

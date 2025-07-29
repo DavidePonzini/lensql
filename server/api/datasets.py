@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_babel import _
 
 from .util import responses
 from server import db
@@ -17,8 +18,8 @@ def get_dataset(class_id):
     username = get_jwt_identity()
 
     if db.admin.classes.has_participant(class_id=class_id, username=username) is False:
-        return responses.response(False, message='You do not have access to this dataset.')
-    
+        return responses.response(False, message=_('You do not have access to this dataset.'))
+
     result = db.admin.classes.get_dataset(class_id)
 
     return responses.response(True, data=result)
