@@ -19,7 +19,7 @@ def locate_error_cause(username: str, code: str, exception: str) -> str:
     
     message.add_message_system(prompts.get_system_instructions())
     message.add_message_user(prompts.locate_error_cause(code, exception))
-    answer = chatgpt.generate_answer(message, json_format=format.MessageFormatWithCode,
+    answer = chatgpt.generate_answer(message, json_format=format.MessageFormat,
         tools=[
             tools.get_search_path,
             tools.get_tables,
