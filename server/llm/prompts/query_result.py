@@ -1,83 +1,155 @@
 from server.sql import SQLCode
 from . import util
 
-def describe_my_query(code: str, sql_language='PostgreSQL'):
+def describe_my_query(code: str, *, sql_language='PostgreSQL', language='en'):
     query = SQLCode(code)
     query = query.strip_comments()
 
-    return f'''
+    request = {
+        'en': f'''
 Hi Lens! I would like to understand the purpose of the following {sql_language} query. What is it trying to achieve?
 The query is not necessarily correct, so I don't need you to fix it. I just want to understand its goal.
 Also, I know that the query has been deliberately formulated this way, so I don't need you to assume that it is a mistake or an error.
+''',
+        'it': f'''
+Ciao Lens! Vorrei capire lo scopo della seguente query {sql_language}. Cosa sta cercando di ottenere?
+La query non è necessariamente corretta, quindi non ho bisogno che tu la corregga. Voglio solo capire il suo obiettivo.
+Inoltre, so che la query è stata formulata deliberatamente in questo modo, quindi non ho bisogno che tu assuma che ci sia un errore.
+''',
+    }
 
-{util.RESPONSE_FORMAT}
+    template = {
+        'en': '''
+Let me see... it looks like your query <b>GOAL DESCRIPTION</b>.
+''',
+        'it': '''
+Fammi vedere... sembra che la tua query <b>GOAL DESCRIPTION</b>.
+''',
+    }
 
--- {sql_language} Query --
+    return f'''
+{util.get_localized(request, language)}
+
+{util.get_localized(util.RESPONSE_FORMAT, language)}
+
+{util.get_localized(util.SECTION_QUERY, language).format(language=language)}
 {query}
 
--- Template answer --
-Let me see... it looks like your query <b>GOAL DESCRIPTION</b>.
+{util.get_localized(util.SECTION_TEMPLATE, language)}
+{util.get_localized(template, language)}
 '''
 
-def explain_my_query(code: str, sql_language='PostgreSQL'):
+def explain_my_query(code: str, *, sql_language='PostgreSQL', language='en'):
     query = SQLCode(code)
     query = query.strip_comments()
+    
+    request = {
+        'en': f'''
+Hi Lens! I'm interested in diving deeper into the purpose of the following {sql_language} query.
+Could you please explain what each part of the query does?
+You don't need to fix the query—just help me understand its structure and purpose.
+Also, I know that the query has been deliberately formulated this way, so I don't need you to assume that it is a mistake or an error.
+''',
+        'it': f'''
+Ciao Lens! Sono interessato a esplorare più a fondo lo scopo della seguente query {sql_language}.
+Potresti spiegarmi cosa fa ogni parte della query?
+Non è necessario che tu corregga la query, voglio solo capire la sua struttura e il suo scopo.
+Inoltre, so che la query è stata formulata deliberatamente in questo modo, quindi non ho bisogno che tu assuma che ci sia un errore.
+''',
+    }
 
     clauses = [
         {
             'sql': 'FROM',
-            'template': 'The <code>FROM</code> clause reads data from EXPLANATION OF FROM CLAUSE.'
+            'template': {
+                'en': 'The <code>FROM</code> clause reads data from EXPLANATION OF FROM CLAUSE.',
+                'it': 'La clausola <code>FROM</code> legge i dati da SPIEGAZIONE DELLA CLAUSOLA FROM.',
+            }
         },
         {
             'sql': 'WHERE',
-            'template': 'The <code>WHERE</code> clause keeps only the rows EXPLANATION OF WHERE CLAUSE.'
+            'template': {
+                'en': 'The <code>WHERE</code> clause keeps only the rows EXPLANATION OF WHERE CLAUSE.',
+                'it': 'La clausola <code>WHERE</code> mantiene solo le righe SPIEGAZIONE DELLA CLAUSOLA WHERE.',
+            }
         },
         {
             'sql': 'GROUP BY',
-            'template': 'The <code>GROUP BY</code> clause groups the data EXPLANATION OF GROUP BY CLAUSE.'
+            'template': {
+                'en': 'The <code>GROUP BY</code> clause groups the data EXPLANATION OF GROUP BY CLAUSE.',
+                'it': 'La clausola <code>GROUP BY</code> raggruppa i dati SPIEGAZIONE DELLA CLAUSOLA GROUP BY.',
+            }
         },
         {
             'sql': 'HAVING',
-            'template': 'The <code>HAVING</code> clause keeps only the groups EXPLANATION OF HAVING CLAUSE.'
+            'template': {
+                'en': 'The <code>HAVING</code> clause keeps only the groups EXPLANATION OF HAVING CLAUSE.',
+                'it': 'La clausola <code>HAVING</code> mantiene solo i gruppi SPIEGAZIONE DELLA CLAUSOLA HAVING.'
+            }
         },
         {
             'sql': 'ORDER BY',
-            'template': 'The <code>ORDER BY</code> clause sorts the results EXPLANATION OF ORDER BY CLAUSE.'
+            'template': {
+                'en': 'The <code>ORDER BY</code> clause sorts the results EXPLANATION OF ORDER BY CLAUSE.',
+                'it': 'La clausola <code>ORDER BY</code> ordina i risultati SPIEGAZIONE DELLA CLAUSOLA ORDER BY.',
+            }
         },
         {
             'sql': 'LIMIT',
-            'template': 'The <code>LIMIT</code> clause keeps only the first EXPLANATION OF LIMIT CLAUSE rows.'
+            'template': {
+                'en': 'The <code>LIMIT</code> clause keeps only the first EXPLANATION OF LIMIT CLAUSE rows.',
+                'it': 'La clausola <code>LIMIT</code> mantiene solo le prime SPIEGAZIONE DELLA CLAUSOLA LIMIT righe.',
+            }
         },
         {
             'sql': 'SELECT',
-            'template': 'The <code>SELECT</code> clause makes the query return EXPLANATION OF SELECT CLAUSE.'
-        }
+            'template': {
+                'en': 'The <code>SELECT</code> clause makes the query return EXPLANATION OF SELECT CLAUSE.',
+                'it': 'La clausola <code>SELECT</code> fa sì che la query restituisca SPIEGAZIONE DELLA CLAUSOLA SELECT.',
+            }
+        },
     ]
 
     # keep only the clauses present in the query
     clauses = [clause for clause in clauses if query.has_clause(clause['sql'])]
 
     # templates for each clause present in the query
-    templates = ''.join([f'<li>{clause["template"]}</li>' for clause in clauses])
+    clauses_template_values = []
+    for clause in clauses:
+        clauses_template_values.append(clause['template'].get(language, clause['template']['en']))
+    clauses_template = ''.join([f'<li>{clause}</li>' for clause in clauses_template_values])
 
-    return f'''
-Hi Lens! I'm interested in diving deeper into the purpose of the following {sql_language} query.
-Could you please explain what each part of the query does?
-You don't need to fix the query—just help me understand its structure and purpose.
-Also, I know that the query has been deliberately formulated this way, so I don't need you to assume that it is a mistake or an error.
-
-{util.RESPONSE_FORMAT}
-
--- {sql_language} Query --
-{query}
-
--- Template answer --
+    template = {
+        'en': f'''
 <div class="hidden">
 The query you wrote <b>GOAL DESCRIPTION</b>.
 <br><br>
 </div>
 Here is a detailed explanation of your query:
 <ol class="detailed-explanantion">
-{templates}
+{clauses_template}
 </ol>
+''',
+        'it': f'''
+<div class="hidden">
+La query che hai scritto <b>DESCRIZIONE OBIETTIVO</b>.
+<br><br>
+</div>
+Ecco una spiegazione dettagliata della tua query:
+<ol class="detailed-explanantion">
+{clauses_template}
+</ol>
+''',
+    }
+
+    return f'''
+{util.get_localized(request, language)}
+
+{util.get_localized(util.RESPONSE_FORMAT, language)}
+
+{util.get_localized(util.SECTION_QUERY, language).format(language=language)}
+{query}
+
+{util.get_localized(util.SECTION_TEMPLATE, language)}
+{util.get_localized(template, language)}
 '''
