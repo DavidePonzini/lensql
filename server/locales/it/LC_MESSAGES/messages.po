@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-29 17:03+0200\n"
+"POT-Creation-Date: 2025-07-30 13:08+0200\n"
 "PO-Revision-Date: 2025-07-29 15:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: it\n"
@@ -147,4 +147,12 @@ msgid ""
 msgstr ""
 "Non hai abbastanza monete per usare questa funzione. Consulta la pagina "
 "del profilo per scoprire come guadagnarne di più."
+
+#: server/sql/result/dataset.py:88
+msgid "Your query"
+msgstr "La tua query"
+
+#: server/sql/result/dataset.py:89
+msgid "Solution"
+msgstr "Soluzione"
 

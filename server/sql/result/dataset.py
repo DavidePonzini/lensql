@@ -5,6 +5,7 @@ from ..code import SQLCode
 
 from typing import Self
 import pandas as pd
+from flask_babel import _
 
 
 class QueryResultDataset(QueryResult):
@@ -84,8 +85,8 @@ class QueryResultDataset(QueryResult):
             rows['only_in'] = origin
             return rows
 
-        only_in_self = expand_rows(merged, 1, 'Your query')
-        only_in_other = expand_rows(merged, -1, 'Solution')
+        only_in_self = expand_rows(merged, 1, _('Your query'))
+        only_in_other = expand_rows(merged, -1, _('Solution'))
 
         diff_rows = pd.concat([only_in_self, only_in_other], ignore_index=True)
 
