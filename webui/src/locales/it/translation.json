@@ -445,7 +445,7 @@
             "how_it_works": {
                 "title": "Come Funziona LensQL",
                 "steps": [
-                    "🧑‍🏫 Gli insegnanti creano esercizi, anche mirati a errori comuni",
+                    "🧑‍🏫 Gli insegnanti creano esercizi, se vogliono, mirati a errori comuni",
                     "🎓 Gli studenti risolvono query con l’aiuto di Lens — niente risposte dirette, solo guida interattiva",
                     "📊 Il sistema analizza ogni query per rilevare errori e tracciare i progressi",
                     "🛠️ Gli esercizi vengono generati automaticamente per colmare lacune specifiche",
