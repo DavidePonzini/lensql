@@ -9,10 +9,6 @@ def get_localized(values: dict[str, str]) -> str:
 
     result = values.get(language, values['en']).strip()
 
-    from dav_tools import messages
-    messages.debug(f'Localized value for language "{language}": {result}')
-    messages.debug(language, type(language))
-    
     return result
 
 ##################################################################################################################
