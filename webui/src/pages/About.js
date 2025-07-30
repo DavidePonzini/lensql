@@ -41,7 +41,7 @@ function About() {
             </ul>
 
             <div className="mt-4 text-center">
-                <Link className="btn btn-success" to="/register" role="button">{t('pages.about..cta')}</Link>
+                <Link className="btn btn-success" to="/register" role="button">{t('pages.about.cta')}</Link>
             </div>
         </div>
     );
