@@ -36,20 +36,20 @@ function useGamificationData() {
     };
 
     const expActions = [
-        { label: t('gamification.actions.solve_exercises'), value: '+1000 XP', positive: true },
-        { label: t('gamification.actions.run_queries'), value: '+5 XP each', positive: true },
-        { label: t('gamification.actions.try_unique_queries'), value: '+25 XP each', positive: true },
-        { label: t('gamification.actions.interact_with_lens'), value: '+5 XP', positive: true },
-        { label: t('gamification.actions.feedback_on_lens'), value: '+5 XP', positive: true },
-        { label: t('gamification.actions.achievements'), value: 'variable amounts', positive: true },
+        { label: t('gamification.actions.solve_exercises.label'), value: t('gamification.actions.solve_exercises.xp'), positive: true },
+        { label: t('gamification.actions.run_queries.label'), value: t('gamification.actions.run_queries.xp'), positive: true },
+        { label: t('gamification.actions.try_unique_queries.label'), value: t('gamification.actions.try_unique_queries.xp'), positive: true },
+        { label: t('gamification.actions.interact_with_lens.label'), value: t('gamification.actions.interact_with_lens.xp'), positive: true },
+        { label: t('gamification.actions.feedback_on_lens.label'), value: t('gamification.actions.feedback_on_lens.xp'), positive: true },
+        { label: t('gamification.actions.achievements.label'), value: t('gamification.actions.achievements.xp'), positive: true },
     ];
 
     const coinActions = [
-        { label: t('gamification.actions.check_solution'), value: 'from 0 to -5 coins', positive: false },
-        { label: t('gamification.actions.ask_lens'), value: 'from 0 to -10 coins', positive: false },
-        { label: t('gamification.actions.feedback_on_lens'), value: '+10 coins', positive: true },
-        { label: t('gamification.actions.solve_exercises'), value: '+100 coins', positive: true },
-        { label: t('gamification.actions.achievements'), value: 'variable amounts', positive: true },
+        { label: t('gamification.actions.check_solution.label'), value: t('gamification.actions.check_solution.coins'), positive: false },
+        { label: t('gamification.actions.ask_lens.label'), value: t('gamification.actions.ask_lens.coins'), positive: false },
+        { label: t('gamification.actions.feedback_on_lens.label'), value: t('gamification.actions.feedback_on_lens.coins'), positive: true },
+        { label: t('gamification.actions.solve_exercises.label'), value: t('gamification.actions.solve_exercises.coins'), positive: true },
+        { label: t('gamification.actions.achievements.label'), value: t('gamification.actions.achievements.coins'), positive: true },
     ];
 
     const levelTitles = Array.from({ length: 10 }, (_, i) => t(`gamification.levels.${i}`));

@@ -562,14 +562,47 @@
     },
     "gamification": {
         "actions": {
-            "solve_exercises": "Solve exercises",
-            "run_queries": "Run queries",
-            "try_unique_queries": "Try new, unique queries",
-            "interact_with_lens": "Interact with Lens",
-            "feedback_on_lens": "Give feedback on Lens’ help",
-            "achievements": "Unlock achievements",
-            "check_solution": "Check if a solution is correct",
-            "ask_lens": "Ask Lens for help"
+            "solve_exercises": {
+                "label": "Solve exercises",
+                "xp": "+1000 XP",
+                "coins": "+100 coins"
+            },
+            "run_queries": {
+                "label": "Run queries",
+                "xp": "+5 XP",
+                "coins": ""
+            },
+            "try_unique_queries": {
+                "label": "Try new, unique queries",
+                "xp": "+25 XP for each new query",
+                "coins": ""
+            },
+            "interact_with_lens": {
+                "label": "Interact with Lens",
+                "xp": "+5 XP",
+                "coins": ""
+            },
+            "feedback_on_lens": {
+                "label": "Give feedback on Lens’ help",
+                "xp": "+5 XP",
+                "coins": "+10 coins"
+            },
+            "achievements": {
+                "label": "Unlock achievements",
+                "xp": "variable amounts",
+                "coins": "variable amounts"
+            },
+            "check_solution": {
+                "label": "Check if a solution is correct",
+                "xp": "",
+                "coins": "from 0 to -5 coins"
+            },
+            "ask_lens": {
+                "label": "Ask Lens for help",
+                "xp": "",
+                "coins": "from -1 to -10 coins"
+            },
+            "_variable_amounts": "variable amounts"
         },
         "badges": {
             "create_exercises": {

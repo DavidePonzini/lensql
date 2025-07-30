@@ -562,14 +562,46 @@
     },
     "gamification": {
         "actions": {
-            "solve_exercises": "Risolvi esercizi",
-            "run_queries": "Esegui query",
-            "try_unique_queries": "Prova nuove query uniche",
-            "interact_with_lens": "Interagisci con Lens",
-            "feedback_on_lens": "Dai un feedback sull’aiuto di Lens",
-            "achievements": "Sblocca obiettivi",
-            "check_solution": "Controlla se la soluzione è corretta",
-            "ask_lens": "Chiedi aiuto a Lens"
+            "solve_exercises": {
+                "label": "Risolvi esercizi",
+                "xp": "+1000 XP",
+                "coins": "+100 monete"
+            },
+            "run_queries": {
+                "label": "Esegui query",
+                "xp": "+5 XP",
+                "coins": ""
+            },
+            "try_unique_queries": {
+                "label": "Prova nuove query uniche",
+                "xp": "+25 XP per nuova query",
+                "coins": ""
+            },
+            "interact_with_lens": {
+                "label": "Interagisci con Lens",
+                "xp": "+5 XP",
+                "coins": ""
+            },
+            "feedback_on_lens": {
+                "label": "Dai un feedback sull’aiuto di Lens",
+                "xp": "+5 XP",
+                "coins": "+10 monete"
+            },
+            "achievements": {
+                "label": "Sblocca obiettivi",
+                "xp": "quantità variabili",
+                "coins": "quantità variabili"
+            },
+            "check_solution": {
+                "label": "Controlla se la soluzione è corretta",
+                "xp": "",
+                "coins": "da 0 a -5 monete"
+            },
+            "ask_lens": {
+                "label": "Chiedi aiuto a Lens",
+                "xp": "",
+                "coins": "da -1 a -10 monete"
+            }
         },
         "badges": {
             "create_exercises": {
