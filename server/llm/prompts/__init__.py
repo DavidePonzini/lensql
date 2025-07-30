@@ -1,3 +1,5 @@
+from flask_babel import get_locale
+
 from .query_error import explain_error, locate_error_cause, provide_error_example, fix_query
 from .query_result import describe_my_query, explain_my_query
 
@@ -123,5 +125,6 @@ Per ogni domanda, fornirai:
 ''',
 }
 
-def get_system_instructions(language: str) -> str:
+def get_system_instructions() -> str:
+    language = get_locale().language
     return _SYSTEM_INSTRUCTIONS.get(language, _SYSTEM_INSTRUCTIONS['en'])

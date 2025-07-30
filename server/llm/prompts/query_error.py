@@ -1,7 +1,7 @@
 from server.sql import SQLCode
 from . import util
 
-def explain_error(code: str, exception: str, *, sql_language='PostgreSQL', language='en'):
+def explain_error(code: str, exception: str, *, sql_language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
 
@@ -32,23 +32,23 @@ Questo di solito si verifica quando RAGIONE.
     }
 
     return f'''
-{util.get_localized(request, language)}
+{util.get_localized(request)}
 
-{util.get_localized(util.RESPONSE_FORMAT, language)}
+{util.get_localized(util.RESPONSE_FORMAT)}
 
-{util.get_localized(util.SECTION_QUERY, language).format(language=language)}
+{util.get_localized(util.SECTION_QUERY).format(sql_language=sql_language)}
 {query}
 
-{util.get_localized(util.SECTION_ERROR, language)}
+{util.get_localized(util.SECTION_ERROR)}
 {exception}
 
-{util.get_localized(util.SECTION_TEMPLATE, language)}
-{util.get_localized(template, language)}
+{util.get_localized(util.SECTION_TEMPLATE)}
+{util.get_localized(template)}
 '''
 
-def provide_error_example(code: str, exception: str, *, sql_language='PostgreSQL', language='en'):
-    query = SQLCode(code)
-    query = query.strip_comments()
+def provide_error_example(code: str, exception: str, *, sql_language='PostgreSQL'):
+    # query = SQLCode(code)
+    # query = query.strip_comments()
 
     request = {
         'en': f'''
@@ -79,18 +79,18 @@ Vediamo una query simile che SPIEGAZIONE BREVE DELLA CAUSA DELL'ERRORE.
     }
 
     return f'''
-{util.get_localized(request, language)}
+{util.get_localized(request)}
 
-{util.get_localized(util.RESPONSE_FORMAT, language)}
+{util.get_localized(util.RESPONSE_FORMAT)}
 
-{util.get_localized(util.SECTION_ERROR, language)}
+{util.get_localized(util.SECTION_ERROR)}
 {exception}
 
-{util.get_localized(util.SECTION_TEMPLATE, language)}
-{util.get_localized(template, language)}
+{util.get_localized(util.SECTION_TEMPLATE)}
+{util.get_localized(template)}
 '''
 
-def locate_error_cause(code: str, exception: str, *, sql_language='PostgreSQL', language='en'):
+def locate_error_cause(code: str, exception: str, *, sql_language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
 
@@ -119,21 +119,21 @@ Diamo un'occhiata alla query e vediamo quale parte di essa ha probabilmente caus
     }
 
     return f'''
-{util.get_localized(request, language)}
+{util.get_localized(request)}
 
-{util.get_localized(util.RESPONSE_FORMAT, language)}
+{util.get_localized(util.RESPONSE_FORMAT)}
 
-{util.get_localized(util.SECTION_QUERY, language).format(language=language)}
+{util.get_localized(util.SECTION_QUERY).format(sql_language=sql_language)}
 {query}
 
-{util.get_localized(util.SECTION_ERROR, language)}
+{util.get_localized(util.SECTION_ERROR)}
 {exception}
 
-{util.get_localized(util.SECTION_TEMPLATE, language)}
-{util.get_localized(template, language)}
+{util.get_localized(util.SECTION_TEMPLATE)}
+{util.get_localized(template)}
 '''
 
-def fix_query(code: str, exception: str, *, sql_language='PostgreSQL', language='en'):
+def fix_query(code: str, exception: str, *, sql_language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
 
@@ -166,16 +166,16 @@ in:
     }
 
     return f'''
-{util.get_localized(request, language)}
+{util.get_localized(request)}
 
-{util.get_localized(util.RESPONSE_FORMAT, language)}
+{util.get_localized(util.RESPONSE_FORMAT)}
 
-{util.get_localized(util.SECTION_QUERY, language).format(language=language)}
+{util.get_localized(util.SECTION_QUERY).format(sql_language=sql_language)}
 {query}
 
-{util.get_localized(util.SECTION_ERROR, language)}
+{util.get_localized(util.SECTION_ERROR)}
 {exception}
 
-{util.get_localized(util.SECTION_TEMPLATE, language)}
-{util.get_localized(template, language)}
+{util.get_localized(util.SECTION_TEMPLATE)}
+{util.get_localized(template)}
 '''

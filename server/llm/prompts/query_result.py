@@ -1,7 +1,7 @@
 from server.sql import SQLCode
 from . import util
 
-def describe_my_query(code: str, *, sql_language='PostgreSQL', language='en'):
+def describe_my_query(code: str, *, sql_language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
 
@@ -28,18 +28,18 @@ Fammi vedere... sembra che la tua query <b>GOAL DESCRIPTION</b>.
     }
 
     return f'''
-{util.get_localized(request, language)}
+{util.get_localized(request)}
 
-{util.get_localized(util.RESPONSE_FORMAT, language)}
+{util.get_localized(util.RESPONSE_FORMAT)}
 
-{util.get_localized(util.SECTION_QUERY, language).format(language=language)}
+{util.get_localized(util.SECTION_QUERY).format(sql_language=sql_language)}
 {query}
 
-{util.get_localized(util.SECTION_TEMPLATE, language)}
-{util.get_localized(template, language)}
+{util.get_localized(util.SECTION_TEMPLATE)}
+{util.get_localized(template)}
 '''
 
-def explain_my_query(code: str, *, sql_language='PostgreSQL', language='en'):
+def explain_my_query(code: str, *, sql_language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
     
@@ -116,7 +116,7 @@ Inoltre, so che la query è stata formulata deliberatamente in questo modo, quin
     # templates for each clause present in the query
     clauses_template_values = []
     for clause in clauses:
-        clauses_template_values.append(clause['template'].get(language, clause['template']['en']))
+        clauses_template_values.append(util.get_localized(clause['template']))
     clauses_template = ''.join([f'<li>{clause}</li>' for clause in clauses_template_values])
 
     template = {
@@ -143,13 +143,13 @@ Ecco una spiegazione dettagliata della tua query:
     }
 
     return f'''
-{util.get_localized(request, language)}
+{util.get_localized(request)}
 
-{util.get_localized(util.RESPONSE_FORMAT, language)}
+{util.get_localized(util.RESPONSE_FORMAT)}
 
-{util.get_localized(util.SECTION_QUERY, language).format(language=language)}
+{util.get_localized(util.SECTION_QUERY).format(sql_language=sql_language)}
 {query}
 
-{util.get_localized(util.SECTION_TEMPLATE, language)}
-{util.get_localized(template, language)}
+{util.get_localized(util.SECTION_TEMPLATE)}
+{util.get_localized(template)}
 '''

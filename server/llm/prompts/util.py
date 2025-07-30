@@ -1,32 +1,24 @@
-def get_localized(values: dict[str, str], language: str) -> str:
+from flask_babel import get_locale
+
+def get_localized(values: dict[str, str]) -> str:
     '''
     Returns the localized value for the given language, or the English value if the language is not found.
     '''
 
-    result = values.get(language, values['it']).strip()
+    language = get_locale().language
+
+    result = values.get(language, values['en']).strip()
 
     from dav_tools import messages
     messages.debug(f'Localized value for language "{language}": {result}')
+    messages.debug(language, type(language))
     
     return result
 
-def build_prompt(request: dict[str, str], query: str, template: dict[str, str], language: str) -> str:
-        return f'''
-{request.get(language, request['en'])}
-
-{RESPONSE_FORMAT.get(language, RESPONSE_FORMAT['en'])}
-
-{SECTION_QUERY.get(language, SECTION_QUERY['en']).format(language=language)}
-{query}
-
-{SECTION_TEMPLATE.get(language, SECTION_TEMPLATE['en'])}
-{template.get(language, template['en'])}
-'''
-
 ##################################################################################################################
 SECTION_QUERY = {
-    'en': '-- {language} Query --',
-    'it': '-- Query {language} --',
+    'en': '-- {sql_language} Query --',
+    'it': '-- Query {sql_language} --',
 }
 
 SECTION_TEMPLATE = {
