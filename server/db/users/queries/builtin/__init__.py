@@ -6,6 +6,7 @@ from . import solution
 from server.sql import SQLCode
 
 import pandas as pd
+import psycopg2 as pg
 
 from dav_tools import messages
 
@@ -30,11 +31,11 @@ def _execute_builtin(username: str, query: _Queries) -> QueryResult:
             columns=[Column(name=col.name, data_type=col.type_code) for col in cur.description] if cur.description else [],
             query=SQLCode(query.name, builtin=True),
             notices=conn.notices)
-    except Exception as e:
+    except pg.Error as e:
         try:
             conn.rollback()
             conn.update_last_operation_ts()
-        except Exception as e2:
+        except pg.Error as e2:
             messages.error(f"Error rolling back connection for user {username}: {e2}")
         return QueryResultError(
             exception=SQLException(e),

@@ -4,6 +4,7 @@ from server.sql import SQLCode, SQLException, QueryResult, QueryResultDataset, Q
 
 import pandas as pd
 from typing import Iterable
+import psycopg2 as pg
 
 from dav_tools import messages
 
@@ -51,11 +52,11 @@ def execute(username: str, query_str: str, *, strip_comments: bool = True) -> It
                     notices=conn.notices)
 
             conn.update_last_operation_ts()
-        except Exception as e:
+        except pg.Error as e:
             try:
                 conn.rollback()
                 conn.update_last_operation_ts()
-            except Exception as e2:
+            except pg.Error as e2:
                 messages.error(f"Error rolling back connection for user {username}: {e2}")
             
             yield QueryResultError(

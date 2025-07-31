@@ -21,4 +21,4 @@ class QueryResultError(QueryResult):
 
     @property
     def result_text(self) -> dict:
-        return self.result_html
+        return self._result.error_code
