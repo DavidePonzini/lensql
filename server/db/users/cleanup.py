@@ -16,11 +16,15 @@ def _connection_cleanup_thread():
 
     while True:
         now = datetime.datetime.now()
+
+        to_remove = [] # don't remove while iterating
         for username, conn in connections.items():
             if now - conn.last_operation_ts <= MAX_CONNECTION_AGE:
                 continue
-        
-            with conn_lock:
+
+            to_remove.append(username)
+        with conn_lock:
+            for username in to_remove:
                 try:
                     connections[username].close()
                     del connections[username]
