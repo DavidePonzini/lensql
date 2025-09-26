@@ -65,6 +65,7 @@ def list_classes(username: str) -> list[dict]:
                 WHERE
                     cm2.class_id = c.id
                     AND cm2.is_teacher = FALSE
+                    AND cm2.is_active = TRUE
             ) AS participants,
 
             -- total number of exercises in the class
@@ -100,6 +101,7 @@ def list_classes(username: str) -> list[dict]:
         LEFT JOIN {schema}.queries q ON q.batch_id = qb.id
 
         WHERE cm.username = {username}
+        AND cm.is_active = TRUE
 
         GROUP BY c.id, c.name, cm.is_teacher, cm.joined_ts
         ORDER BY cm.joined_ts DESC, c.name;

@@ -54,7 +54,7 @@ def count_all_classes_joined(username: str) -> int:
         SELECT
             COUNT(*)
         FROM
-            {schema}.classes_participants
+            {schema}.class_members
         WHERE
             username = {username}
             AND is_teacher = FALSE
