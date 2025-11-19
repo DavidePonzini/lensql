@@ -3,11 +3,20 @@
 from flask import Blueprint, request
 import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sql_error_categorizer import detectors, get_errors, build_catalog
 
 from server import db, gamification
 from server.sql.code import SQLCode
 from server.sql.result import QueryResultMessage, QueryResult
 from .util import responses
+
+
+DETECTORS = [
+    detectors.SyntaxErrorDetector,
+    detectors.SemanticErrorDetector,
+    detectors.LogicalErrorDetector,
+    detectors.ComplicationDetector,
+]
 
 bp = Blueprint('query', __name__)
 
@@ -57,6 +66,8 @@ def run_query():
 
     db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
 
+    exercise_solutions, exercise_search_path = db.admin.exercises.get_solution_and_search_path(exercise_id)
+    
     def generate_results():
         yield json.dumps({
             'rewards': [reward.to_dict() for reward in rewards],
@@ -64,11 +75,13 @@ def run_query():
         }) + '\n'  # Important: one JSON object per line
 
         for query_result in db.users.queries.execute(username=username, query_str=query):
+            search_path = db.users.queries.metadata.get_search_path(username)
+
             query_id = db.admin.queries.log(
                 username=username,
                 batch_id=batch_id,
                 query=query_result.query.query,
-                search_path=db.users.queries.metadata.get_search_path(username),
+                search_path=search_path,
                 success=query_result.success,
                 result=query_result.result_text,
                 query_type=query_result.query.query_type,
@@ -76,11 +89,37 @@ def run_query():
             )
             query_result.id = query_id
 
-            db.admin.queries.log_context(
-                query_id=query_id,
-                columns=db.users.queries.metadata.get_columns(username),
-                unique_columns=db.users.queries.metadata.get_unique_columns(username)
-            )
+            context_columns = db.users.queries.metadata.get_columns(username)
+            context_unique_columns = db.users.queries.metadata.get_unique_columns(username)
+
+            # Log context and errors for SELECT queries
+            if query_result.query.query_type == 'SELECT':
+                db.admin.queries.log_context(
+                    query_id=query_id,
+                    columns=context_columns,
+                    unique_columns=context_unique_columns
+                )
+
+                catalog = build_catalog(
+                    columns_info=context_columns,
+                    unique_constraints_info=context_unique_columns
+                )
+
+                errors = get_errors(
+                    query_str=query_result.query.query,
+                    solutions=exercise_solutions,
+                    catalog=catalog,
+                    search_path=search_path,
+                    solution_search_path=exercise_search_path,
+                    detectors=DETECTORS,
+                    debug=True
+                )
+                print(flush=True)
+
+                db.admin.queries.log_errors(
+                    query_id=query_id,
+                    errors=errors
+                )
 
             yield json.dumps({
                 'success': query_result.success,
@@ -109,6 +148,7 @@ def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> i
         username=username,
         batch_id=batch_id,
         query=result.query.query,
+        search_path='BUILTIN',
         success=result.success,
         result=result.result_text,
         query_type='BUILTIN',
@@ -196,7 +236,7 @@ def check_solution():
             attempts=attempts,
         )
 
-    solution = db.admin.exercises.get_solution(exercise_id)
+    solution = db.admin.exercises.get_solution_and_search_path(exercise_id)
     
     check = db.users.queries.builtin.solution.check(username, query_user=query, query_solution=solution)
     
@@ -208,6 +248,7 @@ def check_solution():
     query_id = db.admin.queries.log(
         username=username,
         batch_id=batch_id,
+        search_path='BUILTIN',
         query=query,
         success=check.execution_success,
         result=check.result.result_text,

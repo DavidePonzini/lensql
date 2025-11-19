@@ -70,6 +70,7 @@ CREATE TABLE exercises (
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
     solution TEXT DEFAULT NULL,
+    search_path TEXT NOT NULL DEFAULT 'public',
     created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if exercises are assigned
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
@@ -155,10 +156,10 @@ CREATE TABLE errors (
 );
 
 CREATE TABLE has_error(
+    id SERIAL PRIMARY KEY,
     query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
-    error_id INTEGER NOT NULL REFERENCES errors(id) ON DELETE RESTRICT,  -- prevent deletion of error if it is associated with a query
-
-    PRIMARY KEY (query_id, error_id)
+    error_id INTEGER NOT NULL REFERENCES errors(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    details TEXT[] DEFAULT NULL
 );
 
 CREATE TABLE messages (

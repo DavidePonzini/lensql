@@ -2,6 +2,8 @@ import json
 from dav_tools import database
 import pandas as pd
 from .connection import db, SCHEMA
+from sql_error_categorizer import DetectedError
+from sql_error_categorizer.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
 
 def log_batch(username: str, exercise_id: int) -> int:
     '''Log a new query batch for a user and exercise ID.'''
@@ -18,7 +20,7 @@ def log(*,
         username: str,
         batch_id: int,
         query: str,
-        search_path: str | None = None,
+        search_path: str,
         success: bool,
         result: str,
         query_type: str,
@@ -57,6 +59,17 @@ def log(*,
 
     return query_id
 
+def log_errors(query_id: int,
+               errors: list[DetectedError]) -> None:
+    '''Log errors for a given query'''
+
+    for error in errors:
+        db.insert(SCHEMA, 'has_error', {
+            'query_id': query_id,
+            'error_id': error.error.value,
+            'details': [str(v) for v in error.data]
+        })
+
 def is_new_query(username: str, query: str) -> bool:
     '''Check if a query is new for the user.'''
 
@@ -78,31 +91,31 @@ def is_new_query(username: str, query: str) -> bool:
 
     return result[0][0] == 0
 
-def log_context(query_id: int, columns: list[dict], unique_columns: list[dict]) -> None:
+def log_context(query_id: int, columns: list[CatalogColumnInfo], unique_columns: list[CatalogUniqueConstraintInfo]) -> None:
     '''Log context for a query.'''
 
     for column in columns:
         db.insert(SCHEMA, 'query_context_columns', {
             'query_id': query_id,
-            'schema_name': column['schema_name'],
-            'table_name': column['table_name'],
-            'column_name': column['column_name'],
-            'column_type': column['column_type'],
-            'numeric_precision': column['numeric_precision'],
-            'numeric_scale': column['numeric_scale'],
-            'is_nullable': column['is_nullable'],
-            'foreign_key_schema': column['foreign_key_schema'],
-            'foreign_key_table': column['foreign_key_table'],
-            'foreign_key_column': column['foreign_key_column'],
+            'schema_name': column.schema_name,
+            'table_name': column.table_name,
+            'column_name': column.column_name,
+            'column_type': column.column_type,
+            'numeric_precision': column.numeric_precision,
+            'numeric_scale': column.numeric_scale,
+            'is_nullable': column.is_nullable,
+            'foreign_key_schema': column.foreign_key_schema,
+            'foreign_key_table': column.foreign_key_table,
+            'foreign_key_column': column.foreign_key_column,
         })
 
     for column in unique_columns:
         db.insert(SCHEMA, 'query_context_columns_unique', {
             'query_id': query_id,
-            'schema_name': column['schema_name'],
-            'table_name': column['table_name'],
-            'constraint_type': column['constraint_type'],
-            'columns': column['columns'],
+            'schema_name': column.schema_name,
+            'table_name': column.table_name,
+            'constraint_type': column.constraint_type,
+            'columns': column.columns,
         })
 
 def get(query_id: int) -> str:

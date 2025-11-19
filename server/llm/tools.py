@@ -8,7 +8,7 @@ def get_search_path(username: str) -> str:
 
 @llm_tool('Returns a list of tables, along with their columns and their properties, in the current database. Useful for checking what data is actually available.')
 def get_tables(username: str) -> str:
-    columns = db.users.queries.metadata.get_columns(username)
-    unique = db.users.queries.metadata.get_unique_columns(username)
+    columns = [col.to_dict() for col in db.users.queries.metadata.get_columns(username)]
+    unique = [col.to_dict() for col in db.users.queries.metadata.get_unique_columns(username)]
 
     return json.dumps(columns) + '\n\n' + json.dumps(unique)

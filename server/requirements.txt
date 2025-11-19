@@ -12,3 +12,5 @@ gunicorn
 pyarrow
 openai
 pydantic
+sql-error-categorizer>=0.1.7
+sql-assignment-generator

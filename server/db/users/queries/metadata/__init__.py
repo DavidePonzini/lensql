@@ -1,5 +1,6 @@
 from ._queries import Queries as _Queries
 from ...connection import get_connection as _get_connection
+from sql_error_categorizer.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
 
 import pandas as pd
 
@@ -22,38 +23,38 @@ def get_search_path(username: str) -> str:
 
     return result[0][0]
 
-def get_columns(username: str) -> list[dict]:
+def get_columns(username: str) -> list[CatalogColumnInfo]:
     '''Lists all tables'''
 
     result = _execute(username, _Queries.COLUMNS)
 
     return [
-        {
-            'schema_name': row[0],
-            'table_name': row[1],
-            'column_name': row[2],
-            'column_type': row[3],
-            'numeric_precision': row[4],
-            'numeric_scale': row[5],
-            'is_nullable': row[6],
-            'foreign_key_schema': row[7],
-            'foreign_key_table': row[8],
-            'foreign_key_column': row[9],
-        }
+        CatalogColumnInfo(
+            schema_name=row[0],
+            table_name=row[1],
+            column_name=row[2],
+            column_type=row[3],
+            numeric_precision=row[4],
+            numeric_scale=row[5],
+            is_nullable=row[6],
+            foreign_key_schema=row[7],
+            foreign_key_table=row[8],
+            foreign_key_column=row[9],
+        )
         for row in result
     ]
 
-def get_unique_columns(username: str) -> list[dict]:
+def get_unique_columns(username: str) -> list[CatalogUniqueConstraintInfo]:
     '''Lists unique columns.'''
 
     result = _execute(username, _Queries.UNIQUE_COLUMNS)
 
     return [
-        {
-            'schema_name': row[0],
-            'table_name': row[1],
-            'constraint_type': row[2],
-            'columns': row[3]
-        }
+        CatalogUniqueConstraintInfo(
+            schema_name=row[0],
+            table_name=row[1],
+            constraint_type=row[2],
+            columns=row[3]
+        )
         for row in result
     ]

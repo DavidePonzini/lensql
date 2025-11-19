@@ -258,7 +258,7 @@ def get_data(exercise_id: int, username: str) -> dict:
         'attempts': count_attempts(exercise_id, username),
     }
 
-def create(username: str, title: str, *, class_id: str, request: str, solution: str | None = None, is_ai_generated: bool = False) -> int:
+def create(username: str, title: str, *, class_id: str, request: str, solution: str | None = None, search_path: str = 'public', is_ai_generated: bool = False) -> int:
     '''Create a new exercise'''
 
     result = db.insert(SCHEMA, 'exercises', {
@@ -266,6 +266,7 @@ def create(username: str, title: str, *, class_id: str, request: str, solution: 
         'class_id': class_id,
         'request': request,
         'solution': solution,
+        'search_path': search_path,
         'created_by': username,
         'is_ai_generated': is_ai_generated,
     }, ['id'])
@@ -404,11 +405,13 @@ def get_learning_objectives(exercise_id: int) -> list[str]:
     return [row[0] for row in result]
                              
 
-def get_solution(exercise_id: int) -> str | None:
+def get_solution_and_search_path(exercise_id: int) -> tuple[list[str], str]:
     '''Get the solution for an exercise, if it exists'''
 
     query = database.sql.SQL('''
-        SELECT solution
+        SELECT
+            solution,
+            search_path
         FROM {schema}.exercises
         WHERE id = {exercise_id}
     ''').format(
@@ -421,9 +424,10 @@ def get_solution(exercise_id: int) -> str | None:
     })
 
     if len(result) == 0:
-        return None
+        return [], 'public'
 
-    return result[0][0]
+    row = result[0]
+    return [row[0]], row[1]
 
 
 def submit(username: str, exercise_id: int) -> None:

@@ -92,5 +92,20 @@ GROUP BY
 
 -- CREATE INDEX ON v_stats_messages_by_user(username);
 
+CREATE VIEW v_errors_by_user AS
+SELECT
+    qb.username,
+    q.id AS query_id,
+    e.*,
+    he.details
+FROM
+    query_batches qb
+    JOIN queries q ON q.batch_id = qb.id
+    JOIN has_error he ON he.query_id = q.id
+    JOIN errors e ON e.id = he.error_id
+ORDER BY
+    q.id DESC,
+    e.id;
+
 
 COMMIT;

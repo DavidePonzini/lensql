@@ -23,7 +23,7 @@ stop:
 	docker compose --profile dev --profile prod down
 
 setup:
-	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/setup.py
+	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/setup/setup.py
 
 psql:
 	docker exec -it $(COMPOSE_PROJECT_NAME)_db_admin psql -U postgres
