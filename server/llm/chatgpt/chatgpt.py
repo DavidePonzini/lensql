@@ -18,6 +18,8 @@ def generate_answer(message: Message, *, json_format: BaseModel, tools: list[Too
     Generate an answer from the LLM using the provided message and tools.
     '''
 
+    # message.print_chat()
+
     schema = json_format.model_json_schema()
     schema['additionalProperties'] = False      # Required for strict validation
 
@@ -43,8 +45,6 @@ def generate_answer(message: Message, *, json_format: BaseModel, tools: list[Too
 
         msg = response.choices[0].message
         message.append(msg)
-
-        messages.debug(msg)
 
         # A. Did the model call a tool?
         if msg.tool_calls:
