@@ -18,8 +18,8 @@ SECTION_QUERY = {
 }
 
 SECTION_TEMPLATE = {
-    'en': '--- Answer Template --',
-    'it': '--- Template di Risposta --',
+    'en': '-- Answer Template --',
+    'it': '-- Template di Risposta --',
 }
 
 SECTION_ERROR = {
