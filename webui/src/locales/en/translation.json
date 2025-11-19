@@ -7,6 +7,7 @@
                 "view_profile": "View Profile",
                 "learning": "Learning Insights",
                 "courses": "Courses",
+                "explore_sql": "Explore SQL",
                 "admin": "Admin",
                 "login": "Login",
                 "register": "Register",
@@ -430,7 +431,7 @@
                 "subtitle": "Discover SQL. Learn from your errors. Grow with Lens.",
                 "description": "LensQL is an AI-powered SQL learning platform that turns student mistakes into personalized, interactive learning moments.",
                 "cta_register": "Create or Join a Course",
-                "cta_about": "How LensQL Works"
+                "cta_about": "How Does LensQL Work"
             },
             "what_is": {
                 "title": "What is LensQL?",
@@ -443,7 +444,7 @@
                 "quote": "“Over 95% of queries are submitted outside class hours. LensQL supports self-paced, reflective learning.”"
             },
             "how_it_works": {
-                "title": "How LensQL Works",
+                "title": "How Does LensQL Work",
                 "steps": [
                     "🧑‍🏫 Teachers create exercises, optionally targeting known error types",
                     "🎓 Students solve queries with Lens’ help — no direct answers, only interactive guidance",
@@ -455,7 +456,7 @@
             },
             "meet_lens": {
                 "title": "Meet Lens: Your SQL Sidekick",
-                "description": "Lens used to be an explorer of ancient data relics — until a mysterious SQL query turned them into an AI. Now, Lens guides students through the twists and joins of query logic with curiosity, kindness, and clear feedback.",
+                "description": "Lens used to be an explorer of ancient data relics — until a mysterious SQL query turned them into an AI. Now, Lens guides students through the twists and the joins of query logic with curiosity, kindness, and clear feedback.",
                 "features": {
                     "explain_errors": "❓ <strong>Explains errors</strong> in plain language",
                     "locate_mistakes": "📌 <strong>Helps locate mistakes</strong> in your query",
