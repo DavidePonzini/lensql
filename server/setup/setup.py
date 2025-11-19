@@ -67,11 +67,11 @@ if __name__ == '__main__':
             dataset = f.read()
         class_id = db.admin.classes.create(class_name, dataset=dataset)
 
+        db.admin.classes.make_teacher('lens', class_id)
+        
         for user, _, is_admin, _ in users:
             db.admin.classes.join(user, class_id)
             messages.info(f'User {user} enrolled in class {class_name}')
-            if is_admin:
-                db.admin.classes.make_teacher(user, class_id)
 
         for exercise in exercises:
             exercise_id = db.admin.exercises.create(username='lens', class_id=class_id, title=exercise['name'], request=exercise['request'], solution=exercise['solution'], search_path=exercise['search_path'])

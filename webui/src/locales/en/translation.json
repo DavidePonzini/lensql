@@ -772,5 +772,39 @@
             "label": "EXCEPT",
             "description": "Use the EXCEPT operator to find results in one query that are not in another."
         }
+    },
+    "errors": {
+        "categories": {
+            "syn": {
+                "name": "Syntax Errors",
+                "description": "Incorrect SQL syntax, such as missing keywords, incorrect punctuation, or malformed statements."
+            },
+            "sem": {
+                "name": "Semantic Errors",
+                "description": "Correct syntax but query is meaningless, such as always returning an empty result set."
+            },
+            "log": {
+                "name": "Logical Errors",
+                "description": "Query runs without errors but produces incorrect results due to flawed logic or misunderstanding of requirements."
+            },
+            "com": {
+                "name": "Complications",
+                "description": "Query returns the correct result but uses inefficient methods or complex constructs that could be simplified."
+            }
+        },
+        "errors": {
+            "1": {
+                "name": "Omitting correlation names",
+                "description": "When using multiple tables, table (or table alias) is not specified for a column present in both tables."
+            },
+            "2": {
+                "name": "Ambiguous column",
+                "description": "When using multiple tables, a column present in more than one table is referenced without specifying which table it belongs to."
+            },
+            "71": {
+                "name": "Missing column from SELECT",
+                "description": "A column required to produce the correct result is not included in the SELECT clause."
+            }
+        }
     }
 }
