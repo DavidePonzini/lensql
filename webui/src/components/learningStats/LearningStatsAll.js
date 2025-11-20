@@ -15,12 +15,12 @@ function LearningStatsAll({ classId = null, exerciseId = null, isTeacher = false
             <LearningStatsQueries classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
 
             <hr />
-            <h2 id="messages">{t('components.learningStats.learning.messages')}</h2>
-            <LearningStatsMessages classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
-
-            <hr />
             <h2 id="errors">{t('components.learningStats.learning.errors')}</h2>
             <LearningStatsErrors classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
+
+            <hr />
+            <h2 id="messages">{t('components.learningStats.learning.messages')}</h2>
+            <LearningStatsMessages classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
         </>
     );
 }

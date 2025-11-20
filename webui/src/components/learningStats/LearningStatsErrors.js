@@ -160,7 +160,6 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                 </p>
             ) : (
                 <>
-                    {/* PIE + BAR */}
                     <Row className="mb-4">
                         {/* PIE */}
                         <Col>
@@ -192,48 +191,7 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                             </Card>
                         </Col>
 
-                        {/* BAR */}
-                        <Col>
-                            <Card style={{ height: '100%' }}>
-                                <Card.Header>
-                                    <Card.Title>{t('components.learningStats.errors.common_title')}</Card.Title>
-                                    <Card.Subtitle className="text-muted">
-                                        {t(`components.learningStats.errors.common_subtitle.${role}`)}
-                                    </Card.Subtitle>
-                                </Card.Header>
-                                <Card.Body>
-                                    <ResponsiveContainer width="100%" height={40 * perErrorData.length}>
-                                        <BarChart layout="vertical" data={perErrorData} margin={{ left: 60, right: 60 }}>
-                                            <XAxis type="number" hide />
-                                            <YAxis type="category" dataKey="name" />
-                                            <Tooltip content={barTooltip} />
-                                            <Bar
-                                                dataKey="count"
-                                                isAnimationActive={false}
-                                                shape={(props) => {
-                                                    const barColor = CATEGORY_COLOR[props.payload.cat];
-                                                    return (
-                                                        <rect
-                                                            x={props.x}
-                                                            y={props.y}
-                                                            width={props.width}
-                                                            height={props.height}
-                                                            fill={barColor}
-                                                        />
-                                                    );
-                                                }}
-                                            >
-                                                <LabelList dataKey="count" position="right" fill="#000" />
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    </Row>
-
-                    {/* TIMELINE */}
-                    <Row className="mb-4">
+                        {/* TIMELINE */}
                         <Col>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
@@ -248,7 +206,7 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                                             <CartesianGrid strokeDasharray="3 3" />
 
                                             <XAxis dataKey="dateFormatted" />
-                                            <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+                                            <YAxis domain={[0, 100]} tickFormatter={(v) => `${v.toFixed(0)}%`} />
 
                                             <Tooltip
                                                 formatter={(value, name) => {
@@ -301,6 +259,48 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                                 </Card.Body>
                             </Card>
                         </Col>
+                    </Row>
+
+                    <Row className="mb-4">
+                        {/* BAR */}
+                        <Col>
+                            <Card style={{ height: '100%' }}>
+                                <Card.Header>
+                                    <Card.Title>{t('components.learningStats.errors.common_title')}</Card.Title>
+                                    <Card.Subtitle className="text-muted">
+                                        {t(`components.learningStats.errors.common_subtitle.${role}`)}
+                                    </Card.Subtitle>
+                                </Card.Header>
+                                <Card.Body>
+                                    <ResponsiveContainer width="100%" height={40 * perErrorData.length}>
+                                        <BarChart layout="vertical" data={perErrorData}>
+                                            <XAxis type="number" hide />
+                                            <YAxis type="category" dataKey="name" width={200} />
+                                            <Tooltip content={barTooltip} />
+                                            <Bar
+                                                dataKey="count"
+                                                isAnimationActive={false}
+                                                shape={(props) => {
+                                                    const barColor = CATEGORY_COLOR[props.payload.cat];
+                                                    return (
+                                                        <rect
+                                                            x={props.x}
+                                                            y={props.y}
+                                                            width={props.width}
+                                                            height={props.height}
+                                                            fill={barColor}
+                                                        />
+                                                    );
+                                                }}
+                                            >
+                                                <LabelList dataKey="count" position="right" fill="#000" />
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+
                     </Row>
                 </>
             )}
