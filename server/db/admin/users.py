@@ -436,11 +436,11 @@ def get_message_stats(username: str, *, class_id: str | None = None, exercise_id
     }
 
 
-def get_error_stats(username: str, *, class_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> list[dict[str, int]]:
+def get_error_stats(username: str, *, class_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
     '''Get statistics about errors for a user'''
 
     if class_id is None and exercise_id is not None:
-        return []  # fallback case
+        return {}  # fallback case
     
     if class_id is None:
         # Global stats
@@ -448,7 +448,7 @@ def get_error_stats(username: str, *, class_id: str | None = None, exercise_id: 
             '''
                 SELECT
                     error_id,
-                    COUNT(*)
+                    COUNT(DISTINCT he.query_id)
                 FROM
                     {schema}.has_error he
                     JOIN {schema}.queries q ON q.id = he.query_id
@@ -471,7 +471,7 @@ def get_error_stats(username: str, *, class_id: str | None = None, exercise_id: 
                 '''
                     SELECT
                         he.error_id,
-                        COUNT(*)
+                        COUNT(DISTINCT he.query_id)
                     FROM
                         {schema}.has_error he
                         JOIN {schema}.queries q ON q.id = he.query_id
@@ -494,7 +494,7 @@ def get_error_stats(username: str, *, class_id: str | None = None, exercise_id: 
                 '''
                     SELECT
                         he.error_id,
-                        COUNT(*)
+                        COUNT(DISTINCT he.query_id)
                     FROM
                         {schema}.has_error he
                         JOIN {schema}.queries q ON q.id = he.query_id
@@ -520,7 +520,7 @@ def get_error_stats(username: str, *, class_id: str | None = None, exercise_id: 
                 '''
                     SELECT
                         he.error_id,
-                        COUNT(*)
+                        COUNT(DISTINCT he.query_id)
                     FROM
                         {schema}.has_error he
                         JOIN {schema}.queries q ON q.id = he.query_id
@@ -543,7 +543,7 @@ def get_error_stats(username: str, *, class_id: str | None = None, exercise_id: 
                 '''
                     SELECT
                         he.error_id,
-                        COUNT(*)
+                        COUNT(DISTINCT he.query_id)
                     FROM
                         {schema}.has_error he
                         JOIN {schema}.queries q ON q.id = he.query_id
@@ -563,12 +563,166 @@ def get_error_stats(username: str, *, class_id: str | None = None, exercise_id: 
 
     result = db.execute_and_fetch(query, params)
 
+    timeline = get_error_timeline(username, class_id=class_id, exercise_id=exercise_id, is_teacher=is_teacher)
+
+    return {
+        'errors': [
+            {
+                'error_id': row[0],
+                'count': row[1],                
+            } for row in result
+        ],
+        'timeline': timeline,
+    }
+
+def get_error_timeline(username: str, *, class_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> list[dict]:
+    '''Get a timeline of errors for a user'''
+
+    if class_id is None and exercise_id is not None:
+        return []  # fallback case
+    
+    if class_id is None:
+        # Global stats
+        query = database.sql.SQL(
+            '''
+                SELECT
+                    DATE(q.ts) AS day,
+                    he.error_id,
+                    COUNT(DISTINCT he.query_id)
+                FROM
+                    {schema}.has_error he
+                    JOIN {schema}.queries q ON q.id = he.query_id
+                    JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                WHERE
+                    qb.username = {username}
+                GROUP BY
+                    day, he.error_id
+                ORDER BY
+                    day ASC
+            '''
+        ).format(
+            schema=database.sql.Identifier(SCHEMA),
+            username=database.sql.Placeholder('username')
+        )
+        params = {'username': username}
+    elif exercise_id is None:
+        if is_teacher:
+            # Class-wide stats for teacher (excluding other teachers)
+            query = database.sql.SQL(
+                '''
+                    SELECT
+                        DATE(q.ts) AS day,
+                        he.error_id,
+                        COUNT(DISTINCT he.query_id)
+                    FROM
+                        {schema}.has_error he
+                        JOIN {schema}.queries q ON q.id = he.query_id
+                        JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                        JOIN {schema}.class_members cm ON cm.username = qb.username
+                    WHERE
+                        cm.class_id = {class_id}
+                        AND cm.is_teacher = FALSE
+                    GROUP BY
+                        day, he.error_id
+                    ORDER BY
+                        day ASC
+                '''
+            ).format(
+                schema=database.sql.Identifier(SCHEMA),
+                class_id=database.sql.Placeholder('class_id')
+            )
+            params = {'class_id': class_id}
+        else:
+            # Class stats for student
+            query = database.sql.SQL(
+                '''
+                    SELECT
+                        DATE(q.ts) AS day,
+                        he.error_id,
+                        COUNT(DISTINCT he.query_id)
+                    FROM
+                        {schema}.has_error he
+                        JOIN {schema}.queries q ON q.id = he.query_id
+                        JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                        JOIN {schema}.class_members cm ON cm.username = qb.username
+                    WHERE
+                        cm.class_id = {class_id}
+                        AND qb.username = {username}
+                    GROUP BY
+                        day, he.error_id
+                    ORDER BY
+                        day ASC
+                '''
+            ).format(
+                schema=database.sql.Identifier(SCHEMA),
+                class_id=database.sql.Placeholder('class_id'),
+                username=database.sql.Placeholder('username')
+            )
+            params = {'class_id': class_id, 'username': username}
+    else:
+        if is_teacher:
+            # Exercise stats for all students
+            query = database.sql.SQL(
+                '''
+                    SELECT
+                        DATE(q.ts) AS day,
+                        he.error_id,
+                        COUNT(DISTINCT he.query_id)
+                    FROM
+                        {schema}.has_error he
+                        JOIN {schema}.queries q ON q.id = he.query_id
+                        JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                        JOIN {schema}.class_members cm ON cm.username = qb.username
+                    WHERE
+                        q.exercise_id = {exercise_id}
+                        AND cm.is_teacher = FALSE
+                    GROUP BY
+                        day, he.error_id
+                    ORDER BY
+                        day ASC
+                '''
+            ).format(
+                schema=database.sql.Identifier(SCHEMA),
+                exercise_id=database.sql.Placeholder('exercise_id')
+            )
+            params = {'exercise_id': exercise_id}
+        else:
+            # Exercise stats for a student
+            query = database.sql.SQL(
+                '''
+                    SELECT
+                        DATE(q.ts) AS day,
+                        he.error_id,
+                        COUNT(DISTINCT he.query_id)
+                    FROM
+                        {schema}.has_error he
+                        JOIN {schema}.queries q ON q.id = he.query_id
+                        JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                    WHERE
+                        q.exercise_id = {exercise_id}
+                        AND qb.username = {username}
+                    GROUP BY
+                        day, he.error_id
+                    ORDER BY
+                        day ASC
+                '''
+            ).format(
+                schema=database.sql.Identifier(SCHEMA),
+                exercise_id=database.sql.Placeholder('exercise_id'),
+                username=database.sql.Placeholder('username')
+            )
+            params = {'exercise_id': exercise_id, 'username': username}
+
+    result = db.execute_and_fetch(query, params)
+
     return [
         {
-            'error_id': row[0],
-            'count': row[1]
+            'date': row[0],
+            'error_id': row[1],
+            'count': row[2],
         } for row in result
     ]
+            
 
 def add_rewards(username: str, *, rewards: list[gamification.Reward], badges: list[gamification.Reward]) -> None:
     '''Add rewards to a user'''

@@ -2,14 +2,22 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAuth from "../../hooks/useAuth";
 
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LabelList } from 'recharts';
+import {
+    PieChart, Pie, Cell,
+    BarChart, Bar, XAxis, YAxis,
+    ResponsiveContainer, Tooltip, LabelList,
+    AreaChart, Area, CartesianGrid, Legend
+} from 'recharts';
+
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ObservedOnce from "../ObservedOnce";
 
 function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = false }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = i18n.resolvedLanguage || 'en';
+
     const { apiRequest } = useAuth();
     const [data, setData] = useState(null);
 
@@ -18,12 +26,20 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
             `/api/users/stats/errors?class_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
             'GET'
         );
-        setData(response.data);  
+        setData(response.data);
     }
 
     const role = isTeacher ? 'teacher' : 'student';
 
-    // ---------------- CATEGORY MAPPING (your rules) ----------------
+    // ----------------------------------------------------------------------
+    // REAL DATA
+    // ----------------------------------------------------------------------
+    const dataErrors = data?.errors || [];        // [{ error_id, count }]
+    const dataTimeline = data?.timeline || [];    // [{ date, error_id, count }]
+
+    // ----------------------------------------------------------------------
+    // CATEGORY MAPPING
+    // ----------------------------------------------------------------------
     function categoryOf(id) {
         if (id < 39) return 'syn';
         if (id < 52) return 'sem';
@@ -31,27 +47,13 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
         return 'com';
     }
 
-    // ---------------- CATEGORY COLORS ----------------
     const CATEGORY_COLOR = {
-        syn: '#d9534f',   // reddish
-        sem: '#fd7e14',   // orange
-        log: '#0d6efd',   // blue
-        com: '#198754',   // green
+        syn: '#d9534f',
+        sem: '#fd7e14',
+        log: '#0d6efd',
+        com: '#198754',
     };
 
-    // ---------------- FULL ERROR NAME + DESCRIPTION MAPPING ----------------
-    // You will fill translations later in i18n files.
-    const ERROR_NAME = {
-        // example: 1: t('errors.1.name'),
-        // fill all IDs here
-    };
-
-    const ERROR_DESC = {
-        // example: 1: t('errors.1.desc'),
-        // fill all IDs here
-    };
-
-    // ---------------- CATEGORY DESCRIPTION (shown in pie hover) ----------------
     const CATEGORY_DESC = {
         syn: t('errors.categories.syn.description'),
         sem: t('errors.categories.sem.description'),
@@ -59,11 +61,11 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
         com: t('errors.categories.com.description'),
     };
 
-    // ---------------- DATA PREPARATION ----------------
-    const errorList = data || [];
-
+    // ----------------------------------------------------------------------
+    // PIE DATA
+    // ----------------------------------------------------------------------
     const categoryCounts = { syn: 0, sem: 0, log: 0, com: 0 };
-    for (const { error_id, count } of errorList) {
+    for (const { error_id, count } of dataErrors) {
         categoryCounts[categoryOf(error_id)] += count;
     }
 
@@ -74,8 +76,10 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
         { cat: 'com', name: t('errors.categories.com.name'), value: categoryCounts.com },
     ];
 
-    // per-error chart data
-    const perErrorData = [...errorList]
+    // ----------------------------------------------------------------------
+    // PER-ERROR BAR DATA
+    // ----------------------------------------------------------------------
+    const perErrorData = [...dataErrors]
         .sort((a, b) => b.count - a.count)
         .map(({ error_id, count }) => ({
             id: error_id,
@@ -84,9 +88,46 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
             cat: categoryOf(error_id),
         }));
 
-    const hasErrors = errorList.length > 0;
+    const hasErrors = dataErrors.length > 0;
 
-    // ---------------- TOOLTIP FORMATTERS ----------------
+    // ----------------------------------------------------------------------
+    // TIMELINE: GROUP + NORMALIZE + FORMAT DATE
+    // ----------------------------------------------------------------------
+    const timelineMap = {};
+
+    for (const row of dataTimeline) {
+        const cat = categoryOf(row.error_id);
+        const dateKey = new Date(row.date).toISOString().split('T')[0];
+
+        if (!timelineMap[dateKey]) {
+            timelineMap[dateKey] = { date: dateKey, syn: 0, sem: 0, log: 0, com: 0 };
+        }
+        timelineMap[dateKey][cat] += row.count;
+    }
+
+    // convert to array + percentages
+    const timelineData = Object.values(timelineMap)
+        .map(row => {
+            const total = row.syn + row.sem + row.log + row.com;
+            if (total === 0) return row;
+
+            return {
+                ...row,
+                syn: (row.syn / total) * 100,
+                sem: (row.sem / total) * 100,
+                log: (row.log / total) * 100,
+                com: (row.com / total) * 100,
+                dateFormatted: new Date(row.date).toLocaleDateString(locale, {
+                    month: 'short',
+                    day: 'numeric'
+                })
+            };
+        })
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+    // ----------------------------------------------------------------------
+    // TOOLTIP FUNCTIONS
+    // ----------------------------------------------------------------------
     const pieTooltip = ({ payload }) => {
         if (!payload || !payload.length) return null;
         const { name, value, payload: p } = payload[0];
@@ -119,9 +160,9 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                 </p>
             ) : (
                 <>
-                    {/* CATEGORY PIE + COMMON ERRORS BAR CHART */}
+                    {/* PIE + BAR */}
                     <Row className="mb-4">
-                        {/* PIE CHART */}
+                        {/* PIE */}
                         <Col>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
@@ -151,7 +192,7 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                             </Card>
                         </Col>
 
-                        {/* COMMON ERROR BAR CHART */}
+                        {/* BAR */}
                         <Col>
                             <Card style={{ height: '100%' }}>
                                 <Card.Header>
@@ -166,9 +207,8 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                                             <XAxis type="number" hide />
                                             <YAxis type="category" dataKey="name" />
                                             <Tooltip content={barTooltip} />
-                                            <Bar 
-                                                dataKey="count" 
-                                                fill="#000" 
+                                            <Bar
+                                                dataKey="count"
                                                 isAnimationActive={false}
                                                 shape={(props) => {
                                                     const barColor = CATEGORY_COLOR[props.payload.cat];
@@ -192,7 +232,7 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                         </Col>
                     </Row>
 
-                    {/* TIMELINE PLACEHOLDER */}
+                    {/* TIMELINE */}
                     <Row className="mb-4">
                         <Col>
                             <Card style={{ height: '100%' }}>
@@ -203,7 +243,61 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                                     </Card.Subtitle>
                                 </Card.Header>
                                 <Card.Body>
-                                    {t(`components.learningStats.errors.timeline_body.${role}`)}
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <AreaChart data={timelineData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                                            <CartesianGrid strokeDasharray="3 3" />
+
+                                            <XAxis dataKey="dateFormatted" />
+                                            <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+
+                                            <Tooltip
+                                                formatter={(value, name) => {
+                                                    const label = t(`errors.categories.${name}.name`);
+                                                    return [`${value.toFixed(1)}%`, label];
+                                                }}
+                                                itemSorter={(entry) => {
+                                                    // Desired order (top → bottom)
+                                                    const ORDER = { com: 1, log: 2, sem: 3, syn: 4 };
+                                                    return ORDER[entry.dataKey];
+                                                }}
+                                            />
+
+                                            <Legend formatter={(v) => t(`errors.categories.${v}.name`)} />
+
+                                            <Area
+                                                type="monotone"
+                                                dataKey="syn"
+                                                stackId="1"
+                                                stroke={CATEGORY_COLOR.syn}
+                                                fill={CATEGORY_COLOR.syn}
+                                                fillOpacity={0.35}
+                                            />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="sem"
+                                                stackId="1"
+                                                stroke={CATEGORY_COLOR.sem}
+                                                fill={CATEGORY_COLOR.sem}
+                                                fillOpacity={0.35}
+                                            />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="log"
+                                                stackId="1"
+                                                stroke={CATEGORY_COLOR.log}
+                                                fill={CATEGORY_COLOR.log}
+                                                fillOpacity={0.35}
+                                            />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="com"
+                                                stackId="1"
+                                                stroke={CATEGORY_COLOR.com}
+                                                fill={CATEGORY_COLOR.com}
+                                                fillOpacity={0.35}
+                                            />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
                                 </Card.Body>
                             </Card>
                         </Col>

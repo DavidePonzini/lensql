@@ -1,5 +1,6 @@
 dav_tools==0.4.16
-sqlparse
+sql-error-categorizer>=0.1.8
+sql-assignment-generator
 Flask>=3.1.0
 Flask_Cors>=5.0.0
 flask_babel
@@ -12,5 +13,3 @@ gunicorn
 pyarrow
 openai
 pydantic
-sql-error-categorizer>=0.1.7
-sql-assignment-generator
