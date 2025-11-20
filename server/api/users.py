@@ -96,8 +96,30 @@ def get_message_stats():
 @jwt_required()
 def get_error_stats():
     username = get_jwt_identity()
+    class_id = request.args.get('class_id', None) or None   # required for empty string handling
+    exercise_id = request.args.get('exercise_id', None, type=int)
 
-    result = db.admin.users.get_error_stats(username)
+    # if we have an exercise, then we have a class
+    #   (ignore class ID passed as argument, just to be safe)
+    if exercise_id is not None:
+        class_id = db.admin.exercises.get_class(exercise_id)
+
+    if class_id is None:
+        # if no class ID is provided, the user is querying their own stats
+        result = db.admin.users.get_error_stats(username)
+    else:
+        if not db.admin.classes.has_participant(username=username, class_id=class_id):
+            return responses.response(False, message=_("User is not a participant in the specified class."))
+
+        is_teacher = db.admin.classes.has_teacher(username=username, class_id=class_id)
+        
+        result = db.admin.users.get_error_stats(
+            username=username,
+            class_id=class_id,
+            exercise_id=exercise_id,
+            is_teacher=is_teacher
+        )
+
     if result is None:
         return responses.response(False)
     
