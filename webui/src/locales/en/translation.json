@@ -801,9 +801,417 @@
                 "name": "Ambiguous column",
                 "description": "When using multiple tables, a column present in more than one table is referenced without specifying which table it belongs to."
             },
+            "3": {
+                "name": "Ambiguous function",
+                "description": ""
+            },
+            "4": {
+                "name": "Undefined column",
+                "description": ""
+            },
+            "5": {
+                "name": "Undefined function",
+                "description": ""
+            },
+            "6": {
+                "name": "Undefined parameter",
+                "description": ""
+            },
+            "7": {
+                "name": "Undefined object",
+                "description": ""
+            },
+            "8": {
+                "name": "Invalid schema name",
+                "description": ""
+            },
+            "9": {
+                "name": "Misspellings",
+                "description": ""
+            },
+            "10": {
+                "name": "Synonyms",
+                "description": ""
+            },
+            "11": {
+                "name": "Omitting quotes around character data",
+                "description": ""
+            },
+            "12": {
+                "name": "Failure to specify column name twice",
+                "description": ""
+            },
+            "13": {
+                "name": "Data type mismatch",
+                "description": ""
+            },
+            "14": {
+                "name": "Using aggregate function outside SELECT or HAVING",
+                "description": ""
+            },
+            "15": {
+                "name": "Grouping error: aggregate functions cannot be nested",
+                "description": ""
+            },
+            "16": {
+                "name": "Grouping error: extraneous or omitted grouping column",
+                "description": ""
+            },
+            "17": {
+                "name": "Strange HAVING: HAVING without GROUP BY",
+                "description": ""
+            },
+            "18": {
+                "name": "Confusing function with function parameter",
+                "description": ""
+            },
+            "19": {
+                "name": "Using WHERE twice",
+                "description": ""
+            },
+            "20": {
+                "name": "Omitting the FROM clause",
+                "description": ""
+            },
+            "21": {
+                "name": "Comparison with NULL",
+                "description": ""
+            },
+            "22": {
+                "name": "Omitting the semicolon",
+                "description": ""
+            },
+            "23": {
+                "name": "Date time field overflow",
+                "description": ""
+            },
+            "24": {
+                "name": "Duplicate clause",
+                "description": ""
+            },
+            "25": {
+                "name": "Using an undefined correlation name",
+                "description": ""
+            },
+            "26": {
+                "name": "Too many columns in subquery",
+                "description": ""
+            },
+            "27": {
+                "name": "Confusing table names with column names",
+                "description": ""
+            },
+            "28": {
+                "name": "Restriction in SELECT clause (e.g., SELECT fee > 10)",
+                "description": ""
+            },
+            "29": {
+                "name": "Projection in WHERE clause (e.g., WHERE firstname, surname)",
+                "description": ""
+            },
+            "30": {
+                "name": "Confusing the order of keywords (e.g., FROM customer SELECT fee)",
+                "description": ""
+            },
+            "31": {
+                "name": "Confusing the logic of keywords (e.g., grouping instead of ordering)",
+                "description": ""
+            },
+            "32": {
+                "name": "Confusing the syntax of keywords (e.g., LIKE (‘A’, ‘B’))",
+                "description": ""
+            },
+            "33": {
+                "name": "Omitting commas",
+                "description": ""
+            },
+            "34": {
+                "name": "Curly, square or unmatched brackets",
+                "description": ""
+            },
+            "35": {
+                "name": "IS where not applicable",
+                "description": ""
+            },
+            "36": {
+                "name": "Nonstandard keywords or standard keywords in wrong context",
+                "description": ""
+            },
+            "37": {
+                "name": "Nonstandard operators (e.g., &&, || or ==)",
+                "description": ""
+            },
+            "38": {
+                "name": "Additional semicolon",
+                "description": ""
+            },
+            "39": {
+                "name": "AND instead of OR (empty result table)",
+                "description": ""
+            },
+            "40": {
+                "name": "Implied, tautological or inconsistent expression",
+                "description": ""
+            },
+            "41": {
+                "name": "DISTINCT in SUM or AVG",
+                "description": ""
+            },
+            "42": {
+                "name": "DISTINCT that might remove important duplicates",
+                "description": ""
+            },
+            "43": {
+                "name": "Wildcards without LIKE",
+                "description": ""
+            },
+            "44": {
+                "name": "Incorrect wildcard: using _ instead of % or using, e.g., *",
+                "description": ""
+            },
+            "45": {
+                "name": "Mixing a > 0 with IS NOT NULL or empty string with NULL",
+                "description": ""
+            },
+            "46": {
+                "name": "NULL in IN/ANY/ALL subquery",
+                "description": ""
+            },
+            "47": {
+                "name": "Join on incorrect column (matches impossible)",
+                "description": ""
+            },
+            "48": {
+                "name": "Omitting a join",
+                "description": ""
+            },
+            "49": {
+                "name": "Many duplicates",
+                "description": ""
+            },
+            "50": {
+                "name": "Constant column output",
+                "description": ""
+            },
+            "51": {
+                "name": "Duplicate column output",
+                "description": ""
+            },
+            "52": {
+                "name": "OR instead of AND",
+                "description": ""
+            },
+            "53": {
+                "name": "Extraneous NOT operator",
+                "description": ""
+            },
+            "54": {
+                "name": "Missing NOT operator",
+                "description": ""
+            },
+            "55": {
+                "name": "Substituting existence negation with <>",
+                "description": ""
+            },
+            "56": {
+                "name": "Putting NOT in front of incorrect IN/EXISTS",
+                "description": ""
+            },
+            "57": {
+                "name": "Incorrect comparison operator or incorrect value compared",
+                "description": ""
+            },
+            "58": {
+                "name": "Join on incorrect table",
+                "description": ""
+            },
+            "59": {
+                "name": "Join when join needs to be omitted",
+                "description": ""
+            },
+            "60": {
+                "name": "Join on incorrect column (matches possible)",
+                "description": ""
+            },
+            "61": {
+                "name": "Join with incorrect comparison operator",
+                "description": ""
+            },
+            "62": {
+                "name": "Missing join",
+                "description": ""
+            },
+            "63": {
+                "name": "Improper nesting of expressions",
+                "description": ""
+            },
+            "64": {
+                "name": "Improper nesting of subqueries",
+                "description": ""
+            },
+            "65": {
+                "name": "Extraneous quotes",
+                "description": ""
+            },
+            "66": {
+                "name": "Missing expression",
+                "description": ""
+            },
+            "67": {
+                "name": "Expression on incorrect column",
+                "description": ""
+            },
+            "68": {
+                "name": "Extraneous expression",
+                "description": ""
+            },
+            "69": {
+                "name": "Expression in incorrect clause",
+                "description": ""
+            },
+            "70": {
+                "name": "Extraneous column in SELECT",
+                "description": ""
+            },
             "71": {
                 "name": "Missing column from SELECT",
                 "description": "A column required to produce the correct result is not included in the SELECT clause."
+            },
+            "72": {
+                "name": "Missing DISTINCT from SELECT",
+                "description": ""
+            },
+            "73": {
+                "name": "Missing AS from SELECT",
+                "description": ""
+            },
+            "74": {
+                "name": "Missing column from ORDER BY clause",
+                "description": ""
+            },
+            "75": {
+                "name": "Incorrect column in ORDER BY clause",
+                "description": ""
+            },
+            "76": {
+                "name": "Extraneous ORDER BY clause",
+                "description": ""
+            },
+            "77": {
+                "name": "Incorrect ordering of rows",
+                "description": ""
+            },
+            "78": {
+                "name": "DISTINCT as function parameter where not applicable",
+                "description": ""
+            },
+            "79": {
+                "name": "Missing DISTINCT from function parameter",
+                "description": ""
+            },
+            "80": {
+                "name": "Incorrect function",
+                "description": ""
+            },
+            "81": {
+                "name": "Incorrect column as function parameter",
+                "description": ""
+            },
+            "82": {
+                "name": "Unnecessary complication",
+                "description": ""
+            },
+            "83": {
+                "name": "Unnecessary DISTINCT in SELECT clause",
+                "description": ""
+            },
+            "84": {
+                "name": "Unnecessary join",
+                "description": ""
+            },
+            "85": {
+                "name": "Unused correlation name",
+                "description": ""
+            },
+            "86": {
+                "name": "Correlation names are always identical",
+                "description": ""
+            },
+            "87": {
+                "name": "Unnecessarily general comparison operator",
+                "description": ""
+            },
+            "88": {
+                "name": "LIKE without wildcards",
+                "description": ""
+            },
+            "89": {
+                "name": "Unnecessarily complicated SELECT in EXISTS subquery",
+                "description": ""
+            },
+            "90": {
+                "name": "IN/EXISTS can be replaced by comparison",
+                "description": ""
+            },
+            "91": {
+                "name": "Unnecessary aggregate function",
+                "description": ""
+            },
+            "92": {
+                "name": "Unnecessary DISTINCT in aggregate function",
+                "description": ""
+            },
+            "93": {
+                "name": "Unnecessary argument of COUNT",
+                "description": ""
+            },
+            "94": {
+                "name": "Unnecessary GROUP BY in EXISTS subquery",
+                "description": ""
+            },
+            "95": {
+                "name": "GROUP BY with singleton groups",
+                "description": ""
+            },
+            "96": {
+                "name": "GROUP BY with only a single group",
+                "description": ""
+            },
+            "97": {
+                "name": "GROUP BY can be replaced with DISTINCT",
+                "description": ""
+            },
+            "98": {
+                "name": "UNION can be replaced by OR",
+                "description": ""
+            },
+            "99": {
+                "name": "Unnecessary column in ORDER BY clause",
+                "description": ""
+            },
+            "100": {
+                "name": "ORDER BY in subquery",
+                "description": ""
+            },
+            "101": {
+                "name": "Inefficient HAVING",
+                "description": ""
+            },
+            "102": {
+                "name": "Inefficient UNION",
+                "description": ""
+            },
+            "103": {
+                "name": "Condition in the subquery can be moved up",
+                "description": ""
+            },
+            "104": {
+                "name": "Condition on left table in LEFT OUTER JOIN",
+                "description": ""
+            },
+            "105": {
+                "name": "OUTER JOIN can be replaced by INNER JOIN",
+                "description": ""
             }
         }
     }
