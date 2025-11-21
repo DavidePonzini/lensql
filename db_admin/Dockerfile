@@ -2,6 +2,7 @@ FROM postgres:latest
 
 WORKDIR /docker-entrypoint-initdb.d
 
-COPY . .
+COPY setup/* .
+COPY datasets/* /datasets/
 
 

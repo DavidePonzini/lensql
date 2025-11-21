@@ -1,1 +1,6 @@
-from . import auth, classes, exercises, messages, queries, teachers, users
+from . import exercises
+
+from .datasets import Dataset
+from .messages import Message
+from .queries import Query, QueryBatch
+from .users import User

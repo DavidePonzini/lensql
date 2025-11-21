@@ -1,509 +1,415 @@
 from dav_tools import database
+from typing import Any
+
 from .connection import db, SCHEMA
+from .datasets import Dataset
+from .users import User
 
+class Exercise:
+    '''Class for managing exercises'''
 
-def get_class(exercise_id: int) -> str:
-    '''Get the class ID for a given exercise ID'''
+    def __init__(self, exercise_id: int, *,
+                 dataset: Dataset | None = None,
+                 is_hidden: bool = False,
+                 title: str | None = None,
+                 request: str | None = None,
+                 solution: str | None = None,
+                 search_path: str | None = None,
+                 is_ai_generated: bool = False,
+                 learning_objectives: list[str] | None = None
+                ) -> None:
+        self.exercise_id = exercise_id
 
-    query = database.sql.SQL(
-        '''
-        SELECT class_id
-        FROM {schema}.exercises
-        WHERE id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
-
-    result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id
-    })
-
-    if len(result) == 0:
-        return None
-
-    return result[0][0]
-
-def count_own_exercises_with_at_least_one_own_query(username: str) -> int:
-    '''Get the count of exercises created by a user that have at least one execution'''
-
-    query = database.sql.SQL('''
-        SELECT COUNT(*)
-        FROM {schema}.exercises e
-        WHERE e.created_by = {username}
-        AND EXISTS (
-            SELECT 1
-            FROM {schema}.query_batches qb
-            WHERE qb.exercise_id = e.id
-            AND qb.username = {username}
-        )
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        username=database.sql.Placeholder('username')
-    )
-
-    result = db.execute_and_fetch(query, {
-        'username': username
-    })
-
-    return result[0][0] if result else 0
-
-def count_created_by(username: str) -> int:
-    '''Get the number of exercises created by a user'''
-
-    query = database.sql.SQL('''
-        SELECT COUNT(*)
-        FROM {schema}.exercises
-        WHERE created_by = {username}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        username=database.sql.Placeholder('username')
-    )
-
-    result = db.execute_and_fetch(query, {
-        'username': username
-    })
-
-    return result[0][0] if result else 0
-
-def count_attempts(exercise_id: int, username: str) -> int:
-    '''Get the number of solution attempts for an exercise by a user'''
-
-    query = database.sql.SQL('''
-        SELECT COUNT(*)
-        FROM {schema}.exercise_solutions
-        WHERE exercise_id = {exercise_id}
-        AND username = {username}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id'),
-        username=database.sql.Placeholder('username')
-    )
-
-    result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id,
-        'username': username
-    })
-
-    return result[0][0] if result else 0
-
-def count_query_batches(exercise_id: int, username: str) -> int:
-    '''Get the number of query batches for an exercise by a user'''
-
-    query = database.sql.SQL('''
-        SELECT COUNT(*)
-        FROM {schema}.query_batches
-        WHERE exercise_id = {exercise_id}
-        AND username = {username}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id'),
-        username=database.sql.Placeholder('username')
-    )
-
-    result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id,
-        'username': username
-    })
-
-    return result[0][0] if result else 0
-
-def is_solved(exercise_id: int, username: str) -> bool:
-    '''Check if an exercise has been solved by a user'''
-
-    query = database.sql.SQL('''
-        SELECT EXISTS (
-            SELECT 1
-            FROM {schema}.exercise_solutions
-            WHERE
-                exercise_id = {exercise_id}
-                AND username = {username}
-                AND is_correct = TRUE
-        )
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id'),
-        username=database.sql.Placeholder('username')
-    )
-
-    result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id,
-        'username': username
-    })
-
-    return result[0][0] if result else False
-
-def get_from_class(username: str, class_id: str, include_hidden: bool = False) -> list[dict]:
-    '''Get all exercises assigned to a class'''
-
-    if include_hidden:
-        query = database.sql.SQL(
-        '''
-            SELECT
-                e.id,
-                e.title,
-                e.request,
-                e.is_ai_generated,
-                e.is_hidden,
-                es.username IS NOT NULL AS submitted,
-                (SELECT EXISTS (
-                    SELECT 1
-                    FROM {schema}.exercise_solutions
-                    WHERE
-                        exercise_id = e.id
-                        AND username = {username}
-                        AND is_correct = TRUE
-                )) AS is_solved
-            FROM
-                {schema}.exercises e
-                LEFT JOIN {schema}.exercise_submissions es ON e.id = es.exercise_id AND es.username = {username}
-            WHERE
-                e.class_id = {class_id}
-            ORDER BY
-                e.title,
-                e.id
-        ''').format(
-            schema=database.sql.Identifier(SCHEMA),
-            class_id=database.sql.Placeholder('class_id'),
-            username=database.sql.Placeholder('username'),
-        )
-    else:
-        query = database.sql.SQL(
-        '''
-            SELECT
-                e.id,
-                e.title,
-                e.request,
-                e.is_ai_generated,
-                FALSE AS is_hidden,
-                es.username IS NOT NULL AS submitted,
-                (SELECT EXISTS (
-                    SELECT 1
-                    FROM {schema}.exercise_solutions
-                    WHERE
-                        exercise_id = e.id
-                        AND username = {username}
-                        AND is_correct = TRUE
-                )) AS is_solved
-            FROM
-                {schema}.exercises e
-                LEFT JOIN {schema}.exercise_submissions es ON e.id = es.exercise_id AND es.username = {username}
-            WHERE
-                e.class_id = {class_id}
-                AND e.is_hidden = FALSE
-            ORDER BY
-                e.title,
-                e.id
-        ''').format(
-            schema=database.sql.Identifier(SCHEMA),
-            class_id=database.sql.Placeholder('class_id'),
-            username=database.sql.Placeholder('username'),
-        )
-
-    result = db.execute_and_fetch(query, {
-        'class_id': class_id,
-        'username': username,
-    })
-
-    return [
-        {
-            'exercise_id': row[0],
-            'title': row[1],
-            'request': row[2],
-            'is_ai_generated': row[3],
-            'is_hidden': row[4],
-            'submitted': row[5],
-            'is_solved': row[6],
-            'learning_objectives': get_learning_objectives(row[0]),
-        }
-        for row in result
-    ]
-
-def get_data(exercise_id: int, username: str) -> dict:
-    '''Get the exercise for a given ID, if the user is assigned to it'''
-
-    query = database.sql.SQL(
-    '''
-        SELECT
-            e.title,
-            e.request,
-            e.solution,
-            e.class_id
-        FROM
-            {schema}.exercises e
-            JOIN {schema}.classes c ON e.class_id = c.id
-            JOIN {schema}.class_members cm ON c.id = cm.class_id
-        WHERE
-            e.id = {exercise_id}
-            AND cm.username = {username}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id'),
-        username=database.sql.Placeholder('username'),
-    )
-    result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id,
-        'username': username,
-    })
-    if len(result) == 0:
-        return None
+        # Lazy properties
+        self._dataset = dataset
+        self._is_hidden = is_hidden
+        self._title = title
+        self._request = request
+        self._solution = solution
+        self._search_path = search_path
+        self._is_ai_generated = is_ai_generated
+        self._learning_objectives = learning_objectives
     
-    result = result[0]
+    # region Properties
+    @property
+    def dataset(self) -> Dataset:
+        '''Get the dataset (class) this exercise belongs to'''
 
-    return {
-        'title': result[0],
-        'request': result[1],
-        'solution': result[2],
-        'class_id': result[3],
-        'attempts': count_attempts(exercise_id, username),
-    }
+        if self._dataset is None:
+            self._load_properties()
 
-def create(username: str, title: str, *, class_id: str, request: str, solution: str | None = None, search_path: str = 'public', is_ai_generated: bool = False) -> int:
-    '''Create a new exercise'''
+        assert self._dataset is not None, "Dataset should be loaded by _load_properties"
 
-    result = db.insert(SCHEMA, 'exercises', {
-        'title': title,
-        'class_id': class_id,
-        'request': request,
-        'solution': solution,
-        'search_path': search_path,
-        'created_by': username,
-        'is_ai_generated': is_ai_generated,
-    }, ['id'])
+        return self._dataset
 
-    exercise_id = result[0][0]
+    @property
+    def is_hidden(self) -> bool:
+        '''Check if the exercise is hidden from students'''
 
-    return exercise_id
+        if self._is_hidden is None:
+            self._load_properties()
 
-def update(exercise_id: int, title: str, request: str, solution: str | None) -> None:
-    '''Update an existing exercise'''
+        assert self._is_hidden is not None, "is_hidden should be loaded by _load_properties"
 
-    query = database.sql.SQL('''
-        UPDATE {schema}.exercises
-        SET title = {title},
-            request = {request},
-            solution = {solution}
-        WHERE id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        title=database.sql.Placeholder('title'),
-        request=database.sql.Placeholder('request'),
-        solution=database.sql.Placeholder('solution'),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
-    db.execute(query, {
-        'title': title,
-        'request': request,
-        'solution': solution,
-        'exercise_id': exercise_id
-    })
+        return self._is_hidden
+    
+    @property
+    def title(self) -> str:
+        '''Get the title of the exercise'''
 
-def delete(exercise_id: int) -> bool:
-    '''Delete an exercise'''
+        if self._title is None:
+            self._load_properties()
 
-    try:
+        assert self._title is not None, "Title should be loaded by _load_properties"
+
+        return self._title
+
+    @property
+    def request(self) -> str:
+        '''Get the request (description) of the exercise'''
+
+        if self._request is None:
+            self._load_properties()
+
+        assert self._request is not None, "Request should be loaded by _load_properties"
+
+        return self._request
+    
+    @property
+    def solution(self) -> str:
+        '''Get the solution of the exercise'''
+
+        if self._solution is None:
+            self._load_properties()
+
+        assert self._solution is not None, "Solution should be loaded by _load_properties"
+
+        return self._solution
+    
+    @property
+    def search_path(self) -> str:
+        '''Get the search path of the exercise'''
+
+        if self._search_path is None:
+            self._load_properties()
+
+        assert self._search_path is not None, "Search path should be loaded by _load_properties"
+
+        return self._search_path
+
+    @property
+    def is_ai_generated(self) -> bool:
+        '''Check if the exercise was generated by AI'''
+
+        if self._is_ai_generated is None:
+            self._load_properties()
+
+        assert self._is_ai_generated is not None, "is_ai_generated should be loaded by _load_properties"
+
+        return self._is_ai_generated
+
+    @property
+    def learning_objectives(self) -> list[str]:
+        '''Get the learning objectives of the exercise'''
+
+        if self._learning_objectives is None:
+            query = database.sql.SQL(
+            '''
+                SELECT
+                    hlo.objective_id
+                FROM
+                    {schema}.has_learning_objective hlo
+                WHERE
+                    hlo.exercise_id = {exercise_id}
+                ORDER BY
+                    hlo.objective_id
+            ''').format(
+                schema=database.sql.Identifier(SCHEMA),
+                exercise_id=database.sql.Placeholder('exercise_id')
+            )
+
+            result = db.execute_and_fetch(query, {
+                'exercise_id': self.exercise_id
+            })
+
+            self._learning_objectives = [ row[0] for row in result ]
+
+        return self._learning_objectives
+
+    def count_attempts(self, user: User) -> int:
+        '''Get the number of solution attempts for an exercise by a user'''
+
         query = database.sql.SQL('''
-            DELETE FROM {schema}.exercises
-            WHERE id = {exercise_id}
+            SELECT COUNT(*)
+            FROM {schema}.exercise_solutions
+            WHERE exercise_id = {exercise_id}
+            AND username = {username}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            exercise_id=database.sql.Placeholder('exercise_id'),
+            username=database.sql.Placeholder('username')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'exercise_id': self.exercise_id,
+            'username': user.username
+        })
+
+        return result[0][0] if result else 0
+
+    def count_query_batches(self, user: User) -> int:
+        '''Get the number of query batches for an exercise by a user'''
+
+        query = database.sql.SQL('''
+            SELECT COUNT(*)
+            FROM {schema}.query_batches
+            WHERE exercise_id = {exercise_id}
+            AND username = {username}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            exercise_id=database.sql.Placeholder('exercise_id'),
+            username=database.sql.Placeholder('username')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'exercise_id': self.exercise_id,
+            'username': user.username
+        })
+
+        return result[0][0] if result else 0
+
+    def has_been_solved_by_user(self, user: User) -> bool:
+        '''Check if an exercise has been solved by a user'''
+
+        query = database.sql.SQL(
+        '''
+            SELECT EXISTS (
+                SELECT 1
+                FROM
+                    {schema}.exercise_solutions es
+                    JOIN {schema}.queries q ON es.id = q.id
+                    JOIN {schema}.query_batches qb ON q.batch_id = qb.id
+                WHERE
+                    qb.exercise_id = {exercise_id}
+                    AND qb.username = {username}
+                    AND is_correct = TRUE
+            )
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            exercise_id=database.sql.Placeholder('exercise_id'),
+            username=database.sql.Placeholder('username')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'exercise_id': self.exercise_id,
+            'username': user.username
+        })
+
+        return result[0][0] if result else False
+    # endregion
+
+    # region CRUD Operations
+    def _load_properties(self) -> None:
+        # NOTE: since we usually access multiple properties at once, we load them all together
+        '''Load properties from the database'''
+
+        query = database.sql.SQL(
+        '''
+            SELECT
+                e.title,
+                e.dataset_id,
+                e.is_hidden,
+                e.title,
+                e.request,
+                e.solution,
+                e.search_path,
+                e.is_ai_generated
+            FROM
+                {schema}.exercises e
+            WHERE
+                e.id = {exercise_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             exercise_id=database.sql.Placeholder('exercise_id')
         )
-        db.execute(query, {
-            'exercise_id': exercise_id
+
+        result = db.execute_and_fetch(query, {
+            'exercise_id': self.exercise_id
         })
 
-        return True
-    except Exception:
-        return False
+        if len(result) == 0:
+            raise ValueError(f'Exercise with ID {self.exercise_id} does not exist.')
 
-def set_learning_objective(exercise_id: int, objective_id: str) -> None:
-    '''Set a learning objective for an exercise'''
+        row = result[0]
+        self._title = row[0]
+        self._dataset = Dataset(row[1])
+        self._is_hidden = row[2]
+        self._request = row[3]
+        self._solution = row[4]
+        self._search_path = row[5]
+        self._is_ai_generated = row[6]
 
-    query = database.sql.SQL('''
-        INSERT INTO {schema}.has_learning_objective (exercise_id, objective_id)
-        VALUES ({exercise_id}, {objective_id})
-        ON CONFLICT (exercise_id, objective_id) DO NOTHING
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id'),
-        objective_id=database.sql.Placeholder('objective_id')
-    )
+    @staticmethod
+    def create(title: str, *,
+               user: User,
+               dataset: Dataset,
+               request: str,
+               solution: str | None = None,
+               search_path: str = 'public',
+               is_ai_generated: bool = False
+              ) -> 'Exercise':
+        '''Create a new exercise'''
 
-    db.execute(query, {
-        'exercise_id': exercise_id,
-        'objective_id': objective_id
-    })
+        result = db.insert(SCHEMA, 'exercises', {
+            'title': title,
+            'dataset_id': dataset.dataset_id,
+            'is_hidden': False,
+            'request': request,
+            'solution': solution,
+            'search_path': search_path,
+            'created_by': user.username,
+            'is_ai_generated': is_ai_generated,
+        }, ['id'])
 
-def unset_learning_objective(exercise_id: int, objective_id: str) -> None:
-    '''Unset a learning objective for an exercise'''
+        assert result is not None and len(result) == 1, "Insert should return the new exercise ID"
 
-    query = database.sql.SQL('''
-        DELETE FROM {schema}.has_learning_objective
-        WHERE exercise_id = {exercise_id}
-        AND objective_id = {objective_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id'),
-        objective_id=database.sql.Placeholder('objective_id')
-    )
+        exercise_id = int(result[0][0])
 
-    db.execute(query, {
-        'exercise_id': exercise_id,
-        'objective_id': objective_id
-    })
+        return Exercise(exercise_id=exercise_id,
+                        dataset=dataset,
+                        is_hidden=False,
+                        title=title,
+                        request=request,
+                        solution=solution,
+                        search_path=search_path,
+                        is_ai_generated=is_ai_generated)
 
-def list_learning_objectives(exercise_id: int) -> list[str]:
-    '''List all learning objectives status for an exercise'''
+    def update(self, *, title: str, request: str, solution: str | None, search_path: str = 'public') -> None:
+        '''Update an existing exercise'''
 
-    query = database.sql.SQL('''
-        SELECT
-            lo.id,
-            (hlo.objective_id IS NOT NULL) AS is_set
-        FROM
-            {schema}.learning_objectives lo
-            LEFT JOIN {schema}.has_learning_objective hlo ON lo.id = hlo.objective_id AND hlo.exercise_id = {exercise_id}
-        ORDER BY
-            lo.id
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
+        query = database.sql.SQL('''
+            UPDATE {schema}.exercises
+            SET title = {title},
+                request = {request},
+                solution = {solution},
+                search_path = {search_path}
+            WHERE id = {exercise_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            title=database.sql.Placeholder('title'),
+            request=database.sql.Placeholder('request'),
+            solution=database.sql.Placeholder('solution'),
+            search_path=database.sql.Placeholder('search_path'),
+            exercise_id=database.sql.Placeholder('exercise_id'),
+        )
+        db.execute(query, {
+            'title': title,
+            'request': request,
+            'solution': solution,
+            'search_path': search_path,
+            'exercise_id': self.exercise_id
+        })
 
-    result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id
-    })
+    def delete(self) -> bool:
+        '''Delete an exercise'''
 
-    return [{
-        'objective_id': row[0],
-        'is_set': row[1]
-    } for row in result]
+        try:
+            query = database.sql.SQL('''
+                DELETE FROM {schema}.exercises
+                WHERE id = {exercise_id}
+            ''').format(
+                schema=database.sql.Identifier(SCHEMA),
+                exercise_id=database.sql.Placeholder('exercise_id')
+            )
+            db.execute(query, {
+                'exercise_id': self.exercise_id
+            })
 
-def get_learning_objectives(exercise_id: int) -> list[str]:
-    '''Get the learning objectives for an exercise'''
+            return True
+        except Exception:
+            return False
+    # endregion
 
-    query = database.sql.SQL(
-    '''
-        SELECT
-            hlo.objective_id
-        FROM
-            {schema}.has_learning_objective hlo
-            JOIN {schema}.learning_objectives lo ON hlo.objective_id = lo.id
-        WHERE
-            hlo.exercise_id = {exercise_id}
-        ORDER BY
-            hlo.objective_id
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
+    # region Learning Objectives
+    def set_learning_objective(self, objective_id: str, is_set: bool = True) -> None:
+        '''Set a learning objective for an exercise'''
 
-    result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id
-    })
+        if not is_set:
+            return self._unset_learning_objective(objective_id)
 
-    return [row[0] for row in result]
-                             
+        query = database.sql.SQL('''
+            INSERT INTO {schema}.has_learning_objective (exercise_id, objective_id)
+            VALUES ({exercise_id}, {objective_id})
+            ON CONFLICT (exercise_id, objective_id) DO NOTHING
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            exercise_id=database.sql.Placeholder('exercise_id'),
+            objective_id=database.sql.Placeholder('objective_id')
+        )
 
-def get_solution_and_search_path(exercise_id: int) -> tuple[list[str], str]:
-    '''Get the solution for an exercise, if it exists'''
+        db.execute(query, {
+            'exercise_id': self.exercise_id,
+            'objective_id': objective_id
+        })
 
-    query = database.sql.SQL('''
-        SELECT
-            solution,
-            search_path
-        FROM {schema}.exercises
-        WHERE id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
+    def _unset_learning_objective(self, objective_id: str) -> None:
+        '''Unset a learning objective for an exercise'''
 
-    result = db.execute_and_fetch(query, {
-        'exercise_id': exercise_id
-    })
+        query = database.sql.SQL('''
+            DELETE FROM {schema}.has_learning_objective
+            WHERE exercise_id = {exercise_id}
+            AND objective_id = {objective_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            exercise_id=database.sql.Placeholder('exercise_id'),
+            objective_id=database.sql.Placeholder('objective_id')
+        )
 
-    if len(result) == 0:
-        return [], 'public'
+        db.execute(query, {
+            'exercise_id': self.exercise_id,
+            'objective_id': objective_id
+        })
 
-    row = result[0]
-    return [row[0]], row[1]
+    def list_all_learning_objectives_status(self) -> list[tuple[str, bool]]:
+        '''List all learning objectives status for an exercise'''
 
+        query = database.sql.SQL('''
+            SELECT
+                lo.id,
+                (hlo.objective_id IS NOT NULL) AS is_set
+            FROM
+                {schema}.learning_objectives lo
+                LEFT JOIN {schema}.has_learning_objective hlo ON lo.id = hlo.objective_id AND hlo.exercise_id = {exercise_id}
+            ORDER BY
+                lo.id
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            exercise_id=database.sql.Placeholder('exercise_id')
+        )
 
-def submit(username: str, exercise_id: int) -> None:
-    '''Submit an exercise for a user'''
+        result = db.execute_and_fetch(query, {
+            'exercise_id': self.exercise_id
+        })
 
-    query = database.sql.SQL('''
-        INSERT INTO {schema}.exercise_submissions (username, exercise_id)
-        VALUES ({username}, {exercise_id})
-        ON CONFLICT (username, exercise_id) DO NOTHING
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        username=database.sql.Placeholder('username'),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
+        return [(row[0], row[1]) for row in result]
+    # endregion
 
-    db.execute(query, {
-        'username': username,
-        'exercise_id': exercise_id
-    })
+    # region Visibility
+    def set_hidden(self, is_hidden: bool) -> None:
+        '''Hide or unhide an exercise from students'''
 
-def unsubmit(username: str, exercise_id: int) -> None:
-    '''Unsubmit an exercise for a user'''
+        query = database.sql.SQL('''
+            UPDATE {schema}.exercises
+            SET is_hidden = {is_hidden}
+            WHERE id = {exercise_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            is_hidden=database.sql.Placeholder('is_hidden'),
+            exercise_id=database.sql.Placeholder('exercise_id')
+        )
 
-    query = database.sql.SQL('''
-        DELETE FROM {schema}.exercise_submissions
-        WHERE username = {username}
-        AND exercise_id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        username=database.sql.Placeholder('username'),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
-
-    db.execute(query, {
-        'username': username,
-        'exercise_id': exercise_id
-    })
-
-def hide(exercise_id: int) -> None:
-    '''Hide an exercise from students'''
-
-    query = database.sql.SQL('''
-        UPDATE {schema}.exercises
-        SET is_hidden = TRUE
-        WHERE id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
-
-    db.execute(query, {
-        'exercise_id': exercise_id
-    })
-
-def unhide(exercise_id: int) -> None:
-    '''Unhide an exercise for students'''
-
-    query = database.sql.SQL('''
-        UPDATE {schema}.exercises
-        SET is_hidden = FALSE
-        WHERE id = {exercise_id}
-    ''').format(
-        schema=database.sql.Identifier(SCHEMA),
-        exercise_id=database.sql.Placeholder('exercise_id')
-    )
-
-    db.execute(query, {
-        'exercise_id': exercise_id
-    })
-
-def log_solution_attempt(query_id: int, username: str, exercise_id: int, is_correct: bool) -> None:
-    '''Log a solution attempt for an exercise'''
-
-    db.insert(SCHEMA, 'exercise_solutions', {
-        'id': query_id,
-        'exercise_id': exercise_id,
-        'username': username,
-        'is_correct': is_correct,
-    })
+        db.execute(query, {
+            'exercise_id': self.exercise_id,
+            'is_hidden': is_hidden
+        })
+    # endregion

@@ -6,7 +6,7 @@ SET search_path TO lensql;
 -- Query stats
 CREATE VIEW v_stats_queries_by_exercise AS
 SELECT
-    cm.class_id,
+    cm.dataset_id,
     qb.exercise_id,
     qb.username,
     q.query_type,
@@ -17,17 +17,17 @@ FROM
     queries q
     JOIN query_batches qb ON qb.id = q.batch_id
     JOIN exercises e ON qb.exercise_id = e.id
-    JOIN class_members cm ON cm.username = qb.username AND cm.class_id = e.class_id
+    JOIN dataset_members cm ON cm.username = qb.username AND cm.dataset_id = e.dataset_id
 WHERE
     q.query_type NOT IN ('BUILTIN', 'CHECK_SOLUTION')
     AND cm.is_teacher = FALSE
 GROUP BY
-    cm.class_id,
+    cm.dataset_id,
     qb.exercise_id,
     qb.username,
     q.query_type;
 
--- CREATE INDEX ON v_stats_queries_by_exercise(class_id);
+-- CREATE INDEX ON v_stats_queries_by_exercise(dataset_id);
 -- CREATE INDEX ON v_stats_queries_by_exercise(exercise_id);
 -- CREATE INDEX ON v_stats_queries_by_exercise(username);
 
@@ -52,7 +52,7 @@ GROUP BY
 -- Message stats
 CREATE VIEW v_stats_messages_by_exercise AS
 SELECT
-    cm.class_id,
+    cm.dataset_id,
     qb.exercise_id,
     qb.username,
     COUNT(m.button) AS messages,
@@ -64,15 +64,15 @@ FROM
     JOIN queries q ON q.id = m.query_id
     JOIN query_batches qb ON qb.id = q.batch_id
     JOIN exercises e ON qb.exercise_id = e.id
-    JOIN class_members cm ON cm.username = qb.username AND cm.class_id = e.class_id
+    JOIN dataset_members cm ON cm.username = qb.username AND cm.dataset_id = e.dataset_id
 WHERE
     cm.is_teacher = FALSE
 GROUP BY
-    cm.class_id,
+    cm.dataset_id,
     qb.exercise_id,
     qb.username;
 
--- CREATE INDEX ON v_stats_messages_by_exercise(class_id);
+-- CREATE INDEX ON v_stats_messages_by_exercise(dataset_id);
 -- CREATE INDEX ON v_stats_messages_by_exercise(exercise_id);
 -- CREATE INDEX ON v_stats_messages_by_exercise(username);
 

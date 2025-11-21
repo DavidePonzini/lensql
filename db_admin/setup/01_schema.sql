@@ -5,12 +5,15 @@
 
 BEGIN;
 
+-- Drop existing schema if exists ------------------------------------------------------------------------------
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'lensql') THEN
         EXECUTE format('ALTER SCHEMA lensql RENAME TO lensql_bak_%s', TO_CHAR(NOW(), 'YYYYMMDD_HH24MISS'));
     END IF;
 END $$;
+
+-- Create schema -----------------------------------------------------------------------------------------------
 CREATE SCHEMA lensql;
 
 GRANT USAGE ON SCHEMA lensql TO lensql;
@@ -19,6 +22,29 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA lensql GRANT ALL ON SEQUENCES TO lensql;
 
 SET search_path TO lensql;
 
+-- Function to generate random alphanumeric IDs ----------------------------------------------------------------
+CREATE OR REPLACE FUNCTION generate_alphanumeric_id(n int)
+RETURNS text AS $$
+DECLARE
+    chars constant text := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    result text := '';
+BEGIN
+    IF n <= 0 THEN
+        RAISE EXCEPTION 'Length must be positive';
+    END IF;
+
+    SELECT string_agg(
+        substr(chars, (random()*35)::int + 1, 1),
+        ''
+    )
+    INTO result
+    FROM generate_series(1, n);
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+-- Tables -------------------------------------------------------------------------------------------------------
 CREATE TABLE users (
     username VARCHAR(255) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
@@ -47,25 +73,25 @@ CREATE TABLE user_unique_queries (
     PRIMARY KEY (username, query_hash)
 );
 
-CREATE TABLE classes (
-    id CHAR(8) PRIMARY KEY DEFAULT UPPER(SUBSTRING(MD5(RANDOM()::TEXT), 1, 8)),
+CREATE TABLE datasets (
+    id TEXT PRIMARY KEY DEFAULT generate_alphanumeric_id(8),
     name VARCHAR(255) NOT NULL,
     dataset TEXT DEFAULT NULL
 );
 
-CREATE TABLE class_members (
+CREATE TABLE dataset_members (
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,
-    class_id CHAR(8) NOT NULL REFERENCES classes(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- class can only be deleted if no members are present
+    dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- dataset can only be deleted if no members are present
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
     joined_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
-    PRIMARY KEY (username, class_id)
+    PRIMARY KEY (username, dataset_id)
 );
 
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
-    class_id CHAR(8) NOT NULL REFERENCES classes(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of class if exercises are assigned
+    dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of dataset if exercises are assigned
     is_hidden BOOLEAN NOT NULL DEFAULT TRUE,
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
@@ -74,14 +100,6 @@ CREATE TABLE exercises (
     created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if exercises are assigned
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-CREATE TABLE exercise_submissions (
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if submissions exist
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if submissions exist
-    submission_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-
-    PRIMARY KEY (exercise_id, username)
 );
 
 CREATE TABLE learning_objectives (
@@ -117,8 +135,6 @@ CREATE TABLE queries (
 -- solutions attempted by students
 CREATE TABLE exercise_solutions (
     id INTEGER NOT NULL REFERENCES queries(id) PRIMARY KEY,
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT,  -- prevent deletion of exercise if solutions exist
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if solutions exist
     is_correct BOOLEAN,
     solution_ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
