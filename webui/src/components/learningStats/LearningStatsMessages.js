@@ -17,7 +17,7 @@ function LearningStatsMessages({ classId = null, exerciseId = null, isTeacher = 
 
     async function fetchData() {
         const response = await apiRequest(
-            `/api/users/stats/messages?class_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
+            `/api/users/stats/messages?dataset_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
             'GET');
         setData(response.data);
     }

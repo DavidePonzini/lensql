@@ -9,7 +9,7 @@ import ButtonsQuery from "./ButtonsQuery";
 import ButtonsDatabase from "./ButtonsDatabase";
 import ButtonsExercise from "./ButtonsExercise";
 
-function Query({ exerciseId, classId, exerciseTitle, exerciseText, attempts, hasSolution }) {
+function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, hasSolution }) {
     const { t } = useTranslation();
 
     const SCROLL_GRACE_PERIOD = 500; // milliseconds
@@ -92,7 +92,7 @@ function Query({ exerciseId, classId, exerciseTitle, exerciseText, attempts, has
                 <div className="row">
                     <ButtonsExercise
                         exerciseId={exerciseId}
-                        classId={classId}
+                        datasetId={datasetId}
                         sqlText={sqlText}
                         attempts={attempts}
                         hasSolution={hasSolution}

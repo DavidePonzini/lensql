@@ -10,7 +10,7 @@ import ExerciseCard from './ExerciseCard';
 import ExerciseAdd from './ExerciseAdd';
 
 function ExerciseList() {
-    const { classId } = useParams();
+    const { datasetId } = useParams();
     const { apiRequest } = useAuth();
     const { t } = useTranslation();
 
@@ -29,12 +29,12 @@ function ExerciseList() {
     }
 
     const getExercises = useCallback(async () => {
-        const response = await apiRequest(`/api/exercises?class_id=${classId}`, 'GET');
+        const response = await apiRequest(`/api/exercises?dataset_id=${datasetId}`, 'GET');
         const submitted = response.data.filter((exercise) => exercise.submitted);
         const unsubmitted = response.data.filter((exercise) => !exercise.submitted);
         setUnsubmittedExercises(unsubmitted);
         setSubmittedExercises(submitted);
-    }, [classId, apiRequest]);
+    }, [datasetId, apiRequest]);
 
     useEffect(() => {
         getExercises();
@@ -42,12 +42,12 @@ function ExerciseList() {
 
     useEffect(() => {
         async function checkIfTeacher() {
-            const response = await apiRequest(`/api/classes/is-teacher/${classId}`, 'GET');
+            const response = await apiRequest(`/api/classes/is-teacher/${datasetId}`, 'GET');
             setIsTeacher(response.is_teacher);
         }
 
         checkIfTeacher();
-    }, [classId, apiRequest]);
+    }, [datasetId, apiRequest]);
 
     return (
         <div className="container-md">
@@ -106,7 +106,7 @@ function ExerciseList() {
                     <hr />
                     <ExerciseAdd
                         refresh={getExercises}
-                        classId={classId}
+                        datasetId={datasetId}
                     />
                 </>
             )}

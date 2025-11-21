@@ -11,7 +11,7 @@ import BubbleStatsChange from '../../components/notifications/BubbleStatsChange'
 
 import ButtonCategory from "./ButtonCategory";
 
-function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecuting, setResult, attempts: initialAttempts, hasSolution }) {
+function ButtonsExercise({ exerciseId, datasetId, sqlText, isExecuting, setIsExecuting, setResult, attempts: initialAttempts, hasSolution }) {
     const { t } = useTranslation();
     const { apiRequest } = useAuth();
     const { Coins } = useGamificationData();
@@ -100,7 +100,7 @@ function ButtonsExercise({ exerciseId, classId, sqlText, isExecuting, setIsExecu
                     variant="info"
                     className="me-1 mb-1"
                     buttonText={t('pages.exercises.buttons.exercise.dataset')}
-                    classId={classId}
+                    datasetId={datasetId}
                     disabled={isExecuting}
                     footerButtons={[
                         {

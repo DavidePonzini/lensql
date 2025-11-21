@@ -23,7 +23,7 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
 
     async function fetchData() {
         const response = await apiRequest(
-            `/api/users/stats/errors?class_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
+            `/api/users/stats/errors?dataset_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
             'GET'
         );
         setData(response.data);

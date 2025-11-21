@@ -6,7 +6,7 @@
                 "profile": "Profile",
                 "view_profile": "View Profile",
                 "learning": "Learning Insights",
-                "courses": "Courses",
+                "datasets": "Datasets",
                 "explore_sql": "Explore SQL",
                 "admin": "Admin",
                 "login": "Login",
@@ -190,12 +190,12 @@
             "title": "Admin page",
             "empty": "No content here"
         },
-        "classes": {
-            "class": {
-                "new": "New Course",
+        "datasets": {
+            "dataset": {
+                "new": "New Dataset",
                 "save": "Save"
             },
-            "class_card": {
+            "dataset_card": {
                 "exercises": "Exercises",
                 "queries": "Queries executed",
                 "badge_teacher": "Teacher",
@@ -203,19 +203,19 @@
                 "students": "Students",
                 "open": "Open",
                 "leave": "Leave",
-                "confirm_leave": "Are you sure you want to leave this class?",
+                "confirm_leave": "Are you sure you want to leave this dataset?",
                 "learning_analytics": "Learning Analytics",
                 "set_teachers": "Set Teachers",
                 "participants": "Participants"
             },
-            "class_list": {
-                "title": "My Courses",
-                "empty": "Nothing here. Join a course to see exercises.",
-                "new_course_suggestion": "If you want to run a query which hasn't been assigned to you by the teacher, please create a new course.",
-                "join": "Join Course",
-                "join_prompt": "Enter class join code:"
+            "dataset_list": {
+                "title": "My Datasets",
+                "empty": "Nothing here. Join a dataset to see exercises.",
+                "new_dataset_suggestion": "If you want to run a query which hasn't been assigned to you by the teacher, please create a new dataset.",
+                "join": "Join Dataset",
+                "join_prompt": "Enter dataset join code:"
             },
-            "class_mask": {
+            "dataset_mask": {
                 "title_label": "Title",
                 "dataset_label": "Dataset (Optional)",
                 "tips_title": "Tips",
@@ -226,8 +226,8 @@
                     "Group insertions into a single <code>INSERT INTO</code> statement for each table to greatly improve performance"
                 ]
             },
-            "class_update": {
-                "modal_title": "Edit Course",
+            "dataset_update": {
+                "modal_title": "Edit Dataset",
                 "button_text": "Edit",
                 "save": "Save"
             },
@@ -430,7 +430,7 @@
                 "title": "Learn SQL Through Mistakes – With LensQL",
                 "subtitle": "Discover SQL. Learn from your errors. Grow with Lens.",
                 "description": "LensQL is an AI-powered SQL learning platform that turns student mistakes into personalized, interactive learning moments.",
-                "cta_register": "Create or Join a Course",
+                "cta_register": "Create or Join a Dataset",
                 "cta_about": "How Does LensQL Work"
             },
             "what_is": {
@@ -521,7 +521,7 @@
                 "teachers": {
                     "title": "For Teachers",
                     "items": [
-                        "📊 View aggregate metrics for each class: query activity, success rate, and help usage",
+                        "📊 View aggregate metrics for each dataset: query activity, success rate, and help usage",
                         "📂 Analyze errors by category: syntax, semantic, logical, or complications",
                         "🕒 Track how query behavior and error patterns evolve over time",
                         "🧭 Adapt instruction based on what students try, not just what they get right"
@@ -540,9 +540,9 @@
                 "teachers": {
                     "title": "✅ For Teachers",
                     "items": [
-                        "📚 Create courses",
+                        "📚 Create datasets",
                         "📝 Assign exercises",
-                        "📊 Track class-wide learning"
+                        "📊 Track dataset-wide learning"
                     ]
                 },
                 "students": {
@@ -650,8 +650,8 @@
                 "5": "Reached level 5",
                 "10": "Reached level 10"
             },
-            "join_course": {
-                "1": "Joined your first course"
+            "join_dataset": {
+                "1": "Joined your first Dataset"
             }
         },
         "levels": {

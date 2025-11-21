@@ -7,7 +7,7 @@ import ButtonModal from '../../components/buttons/ButtonModal';
 
 import ExerciseMask from './ExerciseMask';
 
-function ExerciseAdd({ refresh, classId }) {
+function ExerciseAdd({ refresh, datasetId }) {
     const { apiRequest } = useAuth();
     const { t } = useTranslation();
 
@@ -20,7 +20,7 @@ function ExerciseAdd({ refresh, classId }) {
             'title': exerciseTitle,
             'request': exerciseRequest,
             'solution': exerciseAnswer,
-            'class_id': classId,
+            'dataset_id': datasetId,
         });
 
         refresh();

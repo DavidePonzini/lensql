@@ -17,7 +17,7 @@ function LearningStatsQueries({ classId = null, exerciseId = null, isTeacher = f
 
     async function fetchData() {
         const response = await apiRequest(
-            `/api/users/stats/queries?class_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
+            `/api/users/stats/queries?dataset_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
             'GET');
         setData(response.data);
     }

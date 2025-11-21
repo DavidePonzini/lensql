@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next';
 
-function ClassMask({ title, setTitle, dataset, setDataset }) {
+function DatasetMask({ title, setTitle, dataset, setDataset }) {
     const { t } = useTranslation();
 
-    const tips = t('pages.classes.class_mask.tips', { returnObjects: true });
+    const tips = t('pages.datasets.dataset_mask.tips', { returnObjects: true });
 
     return (
         <>
             <div className="mb-3">
-                <label className="form-label">{t('pages.classes.class_mask.title_label')}</label>
+                <label className="form-label">{t('pages.datasets.dataset_mask.title_label')}</label>
                 <input
                     type="text"
                     className="form-control"
@@ -17,7 +17,7 @@ function ClassMask({ title, setTitle, dataset, setDataset }) {
                 />
             </div>
             <div className="mb-3">
-                <label className="form-label">{t('pages.classes.class_mask.dataset_label')}</label>
+                <label className="form-label">{t('pages.datasets.dataset_mask.dataset_label')}</label>
                 <textarea
                     className="form-control monospace"
                     rows="10"
@@ -25,7 +25,7 @@ function ClassMask({ title, setTitle, dataset, setDataset }) {
                     onInput={(e) => setDataset(e.target.value)}
                 />
                 <div>
-                    <b>{t('pages.classes.class_mask.tips_title')}</b>
+                    <b>{t('pages.datasets.dataset_mask.tips_title')}</b>
                     <ul>
                         {tips.map((tip, idx) => (
                             <li key={idx} dangerouslySetInnerHTML={{ __html: tip }} />

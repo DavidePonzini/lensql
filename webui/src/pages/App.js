@@ -47,7 +47,7 @@ function App() {
 
                                     <Route path="classes">
                                         <Route index element={<ClassList />} />
-                                        <Route path=":classId" element={<ExerciseList />} />
+                                        <Route path=":datasetId" element={<ExerciseList />} />
                                     </Route>
 
                                     <Route path="exercises/:exerciseId" element={<Exercise />} />

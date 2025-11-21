@@ -5,9 +5,9 @@ import useAuth from '../../hooks/useAuth';
 
 import ButtonModal from '../../components/buttons/ButtonModal';
 
-import ClassMask from './ClassMask';
+import DatasetMask from './DatasetMask';
 
-function ClassUpdate({ classId, refresh, className }) {
+function DatasetUpdate({ datasetId, refresh, className }) {
     const { apiRequest } = useAuth();
     const { t } = useTranslation();
 
@@ -15,8 +15,8 @@ function ClassUpdate({ classId, refresh, className }) {
     const [dataset, setDataset] = useState('');
 
     async function handleEditClass() {
-        await apiRequest('/api/classes', 'PUT', {
-            'class_id': classId,
+        await apiRequest('/api/datasets', 'PUT', {
+            'dataset_id': datasetId,
             'title': title,
             'dataset': dataset,
         });
@@ -25,12 +25,12 @@ function ClassUpdate({ classId, refresh, className }) {
     }
 
     const getClassData = useCallback(async () => {
-        if (!classId) return;
+        if (!datasetId) return;
 
-        const result = await apiRequest(`/api/classes/get/${classId}`, 'GET');
+        const result = await apiRequest(`/api/datasets/get/${datasetId}`, 'GET');
         setTitle(result.data.title);
         setDataset(result.data.dataset);
-    }, [classId, apiRequest]);
+    }, [datasetId, apiRequest]);
 
     useEffect(() => {
         getClassData();
@@ -39,19 +39,19 @@ function ClassUpdate({ classId, refresh, className }) {
     return (
         <ButtonModal
             className={className}
-            title={t('pages.classes.class_update.modal_title')}
-            buttonText={t('pages.classes.class_update.button_text')}
+            title={t('pages.datasets.dataset_update.modal_title')}
+            buttonText={t('pages.datasets.dataset_update.button_text')}
             size="lg"
             footerButtons={[
                 {
-                    text: t('pages.classes.class_update.save'),
+                    text: t('pages.datasets.dataset_update.save'),
                     variant: 'primary',
-                    onClick: handleEditClass,
+                    onClick: handleEditDataset,
                     autoClose: true,
                 },
             ]}
         >
-            <ClassMask
+            <DatasetMask
                 title={title}
                 setTitle={setTitle}
                 dataset={dataset}
@@ -61,4 +61,4 @@ function ClassUpdate({ classId, refresh, className }) {
     );
 }
 
-export default ClassUpdate;
+export default DatasetUpdate;

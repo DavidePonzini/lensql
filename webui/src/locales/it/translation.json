@@ -6,7 +6,7 @@
                 "profile": "Profilo",
                 "view_profile": "Visualizza Profilo",
                 "learning": "Statistiche di Apprendimento",
-                "courses": "Corsi",
+                "datasets": "Dataset",
                 "explore_sql": "Esplora SQL",
                 "admin": "Admin",
                 "login": "Accedi",
@@ -190,12 +190,12 @@
             "title": "Pagina di amministrazione",
             "empty": "Nessun contenuto disponibile"
         },
-        "classes": {
-            "class": {
-                "new": "Nuovo Corso",
+        "datasetes": {
+            "dataset": {
+                "new": "Nuovo Dataset",
                 "save": "Salva"
             },
-            "class_card": {
+            "dataset_card": {
                 "exercises": "Esercizi",
                 "queries": "Query eseguite",
                 "badge_teacher": "Docente",
@@ -203,19 +203,19 @@
                 "students": "Studenti",
                 "open": "Apri",
                 "leave": "Lascia",
-                "confirm_leave": "Sei sicuro di voler lasciare questa classe?",
+                "confirm_leave": "Sei sicuro di voler abbandonare questo dataset?",
                 "learning_analytics": "Statistiche di Apprendimento",
                 "set_teachers": "Imposta Docenti",
                 "participants": "Partecipanti"
             },
-            "class_list": {
-                "title": "I miei corsi",
-                "empty": "Nessun corso trovato. Unisciti a un corso per vedere gli esercizi.",
-                "new_course_suggestion": "Se vuoi eseguire una query non assegnata da un docente, crea un nuovo corso.",
-                "join": "Unisciti a un corso",
-                "join_prompt": "Inserisci il codice del corso:"
+            "dataset_list": {
+                "title": "I miei dataset",
+                "empty": "Nessun dataset trovato. Unisciti a un dataset o creane uno nuovo.",
+                "new_dataset_suggestion": "Se vuoi eseguire una query non assegnata da un docente, crea un nuovo dataset.",
+                "join": "Unisciti a un dataset",
+                "join_prompt": "Inserisci il codice del dataset:"
             },
-            "class_mask": {
+            "dataset_mask": {
                 "title_label": "Titolo",
                 "dataset_label": "Dataset (Opzionale)",
                 "tips_title": "Suggerimenti",
@@ -226,8 +226,8 @@
                     "Raggruppa le inserzioni in un unico comando <code>INSERT INTO</code> per ogni tabella per migliorare le prestazioni"
                 ]
             },
-            "class_update": {
-                "modal_title": "Modifica Corso",
+            "dataset_update": {
+                "modal_title": "Modifica Dataset",
                 "button_text": "Modifica",
                 "save": "Salva"
             },
@@ -430,7 +430,7 @@
                 "title": "Impara SQL Sbagliando – Con LensQL",
                 "subtitle": "Scopri SQL. Impara dagli errori. Cresci con Lens.",
                 "description": "LensQL è una piattaforma di apprendimento SQL potenziata dall'IA che trasforma gli errori degli studenti in momenti di apprendimento personalizzati e interattivi.",
-                "cta_register": "Crea o Unisciti a un Corso",
+                "cta_register": "Crea o Unisciti a un Dataset",
                 "cta_about": "Come Funziona LensQL"
             },
             "what_is": {
@@ -649,8 +649,8 @@
                 "5": "Hai raggiunto il livello 5",
                 "10": "Hai raggiunto il livello 10"
             },
-            "join_course": {
-                "1": "Ti sei unito al tuo primo corso"
+            "join_dataset": {
+                "1": "Ti sei unito al tuo primo Dataset"
             }
         },
         "levels": {

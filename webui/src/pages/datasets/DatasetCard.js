@@ -9,14 +9,14 @@ import ButtonModal from '../../components/buttons/ButtonModal';
 import ButtonShowDataset from '../../components/buttons/ButtonShowDataset';
 import LearningStatsAll from '../../components/learningStats/LearningStatsAll';
 
-import ClassUpdate from './ClassUpdate';
+import DatasetUpdate from './DatasetUpdate';
 
-function ClassCard({ title, classId, isTeacher = false, participants, exercises, queries, refreshClasses }) {
+function DatasetCard({ title, datasetId, isTeacher = false, participants, exercises, queries, refreshDatasets }) {
     const { apiRequest, userInfo } = useAuth();
     const { t } = useTranslation();
 
     async function getMembers() {
-        const response = await apiRequest(`/api/classes/members/${classId}`, 'GET');
+        const response = await apiRequest(`/api/datasets/members/${datasetId}`, 'GET');
         return response.members.map(member => ({
             id: member.username,
             label: member.username,
@@ -25,12 +25,12 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
     }
 
     async function handleLeave() {
-        if (!window.confirm(t('pages.classes.class_card.confirm_leave'))) {
+        if (!window.confirm(t('pages.datasets.dataset_card.confirm_leave'))) {
             return;
         }
 
-        const result = await apiRequest('/api/classes/leave', 'POST', {
-            'class_id': classId,
+        const result = await apiRequest('/api/datasets/leave', 'POST', {
+            'dataset_id': datasetId,
         });
 
         if (!result.success) {
@@ -38,17 +38,17 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
             return;
         }
 
-        refreshClasses();
+        refreshDatasets();
     }
 
     async function makeTeacher(id, value) {
-        await apiRequest('/api/classes/set-teacher', 'POST', {
-            'class_id': classId,
+        await apiRequest('/api/datasets/set-teacher', 'POST', {
+            'dataset_id': datasetId,
             'username': id,
             'value': value,
         });
 
-        refreshClasses();
+        refreshDatasets();
     }
 
     return (
@@ -58,33 +58,33 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
             </Card.Header>
 
             <Card.Body>
-                <strong>{t('pages.classes.class_card.exercises')}:</strong> {exercises}
+                <strong>{t('pages.datasets.dataset_card.exercises')}:</strong> {exercises}
                 <br />
-                <strong>{t('pages.classes.class_card.queries')}:</strong> {queries}
+                <strong>{t('pages.datasets.dataset_card.queries')}:</strong> {queries}
 
                 {isTeacher && (
                     <>
                         <hr />
-                        <span className="badge bg-success">{t('pages.classes.class_card.badge_teacher')}</span>
+                        <span className="badge bg-success">{t('pages.datasets.dataset_card.badge_teacher')}</span>
                         <br />
-                        <strong>{t('pages.classes.class_card.join_code')}:</strong> {classId}
+                        <strong>{t('pages.datasets.dataset_card.join_code')}:</strong> {datasetId}
                         <br />
-                        <strong>{t('pages.classes.class_card.students')}:</strong> {participants}
+                        <strong>{t('pages.datasets.dataset_card.students')}:</strong> {participants}
                     </>
                 )}
             </Card.Body>
 
             <Card.Footer>
                 <NavLink
-                    to={classId}
+                    to={datasetId}
                     className="btn btn-primary me-2"
                 >
-                    {t('pages.classes.class_card.open')}
+                    {t('pages.datasets.dataset_card.open')}
                 </NavLink>
 
                 <ButtonShowDataset
                     className="btn btn-secondary me-2"
-                    classId={classId}
+                    datasetId={datasetId}
                     title={title}
                 />
 
@@ -93,7 +93,7 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
                     onClick={handleLeave}
                     className='me-2'
                 >
-                    {t('pages.classes.class_card.leave')}
+                    {t('pages.datasets.dataset_card.leave')}
                 </Button>
 
                 {isTeacher && (
@@ -102,29 +102,29 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
 
                         <ButtonModal
                             className="btn btn-info me-2"
-                            title={t('pages.classes.class_card.learning_analytics')}
-                            buttonText={t('pages.classes.class_card.learning_analytics')}
+                            title={t('pages.datasets.dataset_card.learning_analytics')}
+                            buttonText={t('pages.datasets.dataset_card.learning_analytics')}
                             fullscreen={true}
                         >
-                            <LearningStatsAll classId={classId} isTeacher={isTeacher} />
+                            <LearningStatsAll datasetId={datasetId} isTeacher={isTeacher} />
                         </ButtonModal>
 
-                        <ClassUpdate
-                            classId={classId}
+                        <DatasetUpdate
+                            datasetId={datasetId}
                             title={title}
-                            refresh={refreshClasses}
+                            refresh={refreshDatasets}
                             className="btn btn-warning me-2"
                         />
 
                         <ButtonModal
                             className="btn btn-warning me-2"
-                            title={t('pages.classes.class_card.set_teachers')}
-                            buttonText={t('pages.classes.class_card.set_teachers')}
+                            title={t('pages.datasets.dataset_card.set_teachers')}
+                            buttonText={t('pages.datasets.dataset_card.set_teachers')}
                         >
                             <ItemAssignmentList
                                 fetchItems={getMembers}
                                 assignAction={makeTeacher}
-                                title={t('pages.classes.class_card.participants')}
+                                title={t('pages.datasets.dataset_card.participants')}
                                 disabledItems={[userInfo?.username]}
                             />
                         </ButtonModal>
@@ -135,4 +135,4 @@ function ClassCard({ title, classId, isTeacher = false, participants, exercises,
     );
 }
 
-export default ClassCard;
+export default DatasetCard;
