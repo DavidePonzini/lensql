@@ -12,14 +12,17 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
 
     const [title, setTitle] = useState('');
     const [request, setRequest] = useState('');
-    const [answer, setAnswer] = useState('');
+    const [solutions, setSolutions] = useState([]);
 
     async function handleEditExercise() {
+        // remove empty solutions
+        const filteredSolutions = solutions.filter(sol => sol.trim() !== '');
+
         await apiRequest('/api/exercises', 'PUT', {
             'exercise_id': exerciseId,
             'title': title,
             'request': request,
-            'solution': answer,
+            'solutions': JSON.stringify(filteredSolutions),
         });
 
         refreshExercises();
@@ -30,9 +33,11 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
 
         const result = await apiRequest(`/api/exercises/get/${exerciseId}`, 'GET');
 
+        console.log('Fetched exercise data:', result);
+
         setTitle(result.data.title);
         setRequest(result.data.request);
-        setAnswer(result.data.solution);
+        setSolutions(result.data.solutions);
     }, [exerciseId, apiRequest]);
 
     useEffect(() => {
@@ -42,11 +47,11 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
     return (
         <ButtonModal
             className={className}
-            title={t('pages.classes.exercise_update.title')}
-            buttonText={t('pages.classes.exercise_update.button')}
+            title={t('pages.datasets.exercise_update.title')}
+            buttonText={t('pages.datasets.exercise_update.button')}
             footerButtons={[
                 {
-                    text: t('pages.classes.exercise_update.save'),
+                    text: t('pages.datasets.exercise_update.save'),
                     variant: 'primary',
                     onClick: handleEditExercise,
                     autoClose: true,
@@ -58,8 +63,8 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
                 setTitle={setTitle}
                 request={request}
                 setRequest={setRequest}
-                answer={answer}
-                setAnswer={setAnswer}
+                solutions={solutions}
+                setSolutions={setSolutions}
             />
         </ButtonModal>
     );

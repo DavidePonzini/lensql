@@ -95,7 +95,7 @@ CREATE TABLE exercises (
     is_hidden BOOLEAN NOT NULL DEFAULT TRUE,
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
-    solution TEXT DEFAULT NULL,
+    solutions TEXT NOT NULL DEFAULT '[]',  -- JSON array of solution strings
     search_path TEXT NOT NULL DEFAULT 'public',
     created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if exercises are assigned
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),

@@ -28,45 +28,46 @@ def run_query():
     Run a SQL query and return the results in a streaming response.
     This endpoint is used to execute user-submitted SQL queries against the database.
     '''
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    query = data['query']
-    exercise_id = int(data['exercise_id'])
+    query_str = data['query_str']
+    excercise = db.admin.Exercise(data['exercise_id'])
 
     rewards = []
     badges = []
 
     # Gamification: query execution in own exercise, if this is the first query for this exercise
     # At this point, the batch has not been logged yet
-    if db.admin.exercises.count_query_batches(exercise_id, username) == 0:
-        own_exercises_with_at_least_one_own_query = db.admin.exercises.count_own_exercises_with_at_least_one_own_query(username)
+    if excercise.count_query_batches(user) == 0:
+        own_exercises_with_at_least_one_own_query = user.count_own_exercises_with_at_least_one_own_query()
         if own_exercises_with_at_least_one_own_query in gamification.rewards.Badges.CREATE_EXERCISES:
             badges.append(gamification.rewards.Badges.CREATE_EXERCISES[own_exercises_with_at_least_one_own_query])
 
     # Gamification: query execution
-    if db.admin.queries.is_new_query(username, query):
+    if db.admin.Query.is_new(query_str, user):
         rewards.append(gamification.rewards.Actions.Query.UNIQUE_RUN)
     
-        unique_queries_count = db.admin.users.count_unique_queries(username)
+        unique_queries_count = user.count_unique_queries()
         if unique_queries_count in gamification.rewards.Badges.QUERIES_UNIQUE:
             badges.append(gamification.rewards.Badges.QUERIES_UNIQUE[unique_queries_count])
     else:
         rewards.append(gamification.rewards.Actions.Query.RUN)
 
     # -------------------------- From here on, the batch is logged -------------------
-    batch_id = db.admin.queries.log_batch(
-        username=username,
-        exercise_id=exercise_id if exercise_id > 0 else None
+    batch = db.admin.QueryBatch.log(
+        user=user,
+        exercise=excercise
     )
 
     # Gamification: daily usage
-    days_active = db.admin.users.count_days_active(username)
+    days_active = user.count_days_active()
     if days_active in gamification.rewards.Badges.DAILY_USAGE:
         badges.append(gamification.rewards.Badges.DAILY_USAGE[days_active])
 
-    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
-
-    exercise_solutions, exercise_search_path = db.admin.exercises.get_solution_and_search_path(exercise_id)
+    user.add_rewards(rewards=rewards, badges=badges)
+    exercise_solutions = excercise.solutions
+    exercise_search_path = excercise.search_path
     
     def generate_results():
         yield json.dumps({
@@ -74,28 +75,26 @@ def run_query():
             'badges': [badge.to_dict() for badge in badges],
         }) + '\n'  # Important: one JSON object per line
 
-        for query_result in db.users.queries.execute(username=username, query_str=query):
-            search_path = db.users.queries.metadata.get_search_path(username)
+        for query_result in db.users.queries.execute(username=user.username, query_str=query_str):
+            search_path = db.users.queries.metadata.get_search_path(user.username)
 
-            query_id = db.admin.queries.log(
-                username=username,
-                batch_id=batch_id,
-                query=query_result.query.query,
+            query = db.admin.Query.log(
+                query_batch=batch,
+                sql_string=query_result.query.query,
                 search_path=search_path,
                 success=query_result.success,
                 result=query_result.result_text,
                 query_type=query_result.query.query_type,
                 query_goal=query_result.query.query_goal
             )
-            query_result.id = query_id
+            query_result.query_id = query.query_id
 
-            context_columns = db.users.queries.metadata.get_columns(username)
-            context_unique_columns = db.users.queries.metadata.get_unique_columns(username)
+            context_columns = db.users.queries.metadata.get_columns(user.username)
+            context_unique_columns = db.users.queries.metadata.get_unique_columns(user.username)
 
             # Log context and errors for SELECT queries
             if query_result.query.query_type == 'SELECT':
-                db.admin.queries.log_context(
-                    query_id=query_id,
+                query.log_context(
                     columns=context_columns,
                     unique_columns=context_unique_columns
                 )
@@ -116,10 +115,7 @@ def run_query():
                 )
                 print(flush=True)
 
-                db.admin.queries.log_errors(
-                    query_id=query_id,
-                    errors=errors
-                )
+                query.log_errors(errors)
 
             yield json.dumps({
                 'success': query_result.success,
@@ -127,27 +123,27 @@ def run_query():
                 'query': query_result.query.query,
                 'type': query_result.data_type,
                 'data': query_result.result_html,
-                'id': query_id,
+                'id': query.query_id,
                 'notices': query_result.notices,
             }) + '\n'  # Important: one JSON object per line
 
     return responses.streaming_response(generate_results())
 
 
-def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> int:
+def log_builtin_query(user: db.admin.User, exercise: db.admin.Exercise, result: QueryResult) -> int:
     '''
     Log a built-in query result and return the query ID.
     This function is used to log the results of built-in queries executed by users.
     '''
-    batch_id = db.admin.queries.log_batch(
-        username=username,
-        exercise_id=exercise_id if exercise_id > 0 else None
+
+    batch = db.admin.QueryBatch.log(
+        user=user,
+        exercise=exercise
     )
 
-    query_id = db.admin.queries.log(
-        username=username,
-        batch_id=batch_id,
-        query=result.query.query,
+    query = db.admin.Query.log(
+        query_batch=batch,
+        sql_string=result.query.query,
         search_path='BUILTIN',
         success=result.success,
         result=result.result_text,
@@ -155,78 +151,83 @@ def log_builtin_query(username: str, exercise_id: int, result: QueryResult) -> i
         query_goal='BUILTIN'
     )
 
-    return query_id
+    return query.query_id
 
 @bp.route('/builtin/show-search-path', methods=['POST'])
 @jwt_required()
 def show_search_path():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    exercise_id = int(data['exercise_id'])
+    exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.show_search_path(username)
-    result.id = log_builtin_query(username, exercise_id, result)
+    result = db.users.queries.builtin.show_search_path(user.username)
+    result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
 
 @bp.route('/builtin/list-schemas', methods=['POST'])
 @jwt_required()
 def list_schemas():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
     data = request.get_json()
-    exercise_id = int(data['exercise_id'])
+    exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.list_schemas(username)
-    result.id = log_builtin_query(username, exercise_id, result)
+    result = db.users.queries.builtin.list_schemas(user.username)
+    result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
 
 @bp.route('/builtin/list-tables', methods=['POST'])
 @jwt_required()
 def list_tables():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    exercise_id = int(data['exercise_id'])
+    exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.list_tables(username)
-    result.id = log_builtin_query(username, exercise_id, result)
+    result = db.users.queries.builtin.list_tables(user.username)
+    result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
 
 @bp.route('/builtin/list-all-tables', methods=['POST'])
 @jwt_required()
 def list_all_tables():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    exercise_id = int(data['exercise_id'])
+    exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.list_all_tables(username)
-    result.id = log_builtin_query(username, exercise_id, result)
+    result = db.users.queries.builtin.list_all_tables(user.username)
+    result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
 
 @bp.route('/builtin/list-constraints', methods=['POST'])
 @jwt_required()
 def list_constraints():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    exercise_id = int(data['exercise_id'])
+    exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.list_constraints(username)
-    result.id = log_builtin_query(username, exercise_id, result)
+    result = db.users.queries.builtin.list_constraints(user.username)
+    result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
 
 @bp.route('/check-solution', methods=['POST'])
 @jwt_required()
 def check_solution():
-    username = get_jwt_identity()
-    data = request.get_json()
-    query = data['query']
-    exercise_id = int(data['exercise_id'])
+    user = db.admin.User(get_jwt_identity())
 
-    coins = db.admin.users.get_coins(username)
-    attempts = db.admin.exercises.count_attempts(exercise_id, username)
+    data = request.get_json()
+    query_str = data['query']
+    exercise = db.admin.Exercise(int(data['exercise_id']))
+
+    coins = user.get_coins()
+    attempts = exercise.count_attempts(user)
     cost = gamification.rewards.Actions.Exercise.check_solution_cost(attempts)  # value is negative
 
     if coins + cost.coins < 0:
@@ -236,35 +237,31 @@ def check_solution():
             attempts=attempts,
         )
 
-    solution = db.admin.exercises.get_solution_and_search_path(exercise_id)
-    
-    check = db.users.queries.builtin.solution.check(username, query_user=query, query_solution=solution)
-    
-    batch_id = db.admin.queries.log_batch(
-        username=username,
-        exercise_id=exercise_id if exercise_id > 0 else None
+    check = db.users.queries.builtin.solution.check(user.username, query_user=query_str, query_solution=exercise.solutions)
+
+    batch = db.admin.QueryBatch.log(
+        user=user,
+        exercise=exercise
     )
 
-    query_id = db.admin.queries.log(
-        username=username,
-        batch_id=batch_id,
+    query = db.admin.Query.log(
+        query_batch=batch,
+        sql_string=query_str,
         search_path='BUILTIN',
-        query=query,
-        success=check.execution_success,
+        success=check.execution_success == True,
         result=check.result.result_text,
         query_type='CHECK_SOLUTION',
         query_goal='CHECK_SOLUTION'
     )
 
-    db.admin.queries.log_context(
-        query_id=query_id,
-        columns=db.users.queries.metadata.get_columns(username),
-        unique_columns=db.users.queries.metadata.get_unique_columns(username)
+    query.log_context(
+        columns=db.users.queries.metadata.get_columns(user.username),
+        unique_columns=db.users.queries.metadata.get_unique_columns(user.username)
     )
 
-    already_solved = db.admin.exercises.is_solved(exercise_id, username)
+    already_solved = exercise.has_been_solved_by_user(user)
     
-    db.admin.exercises.log_solution_attempt(query_id=query_id, username=username, exercise_id=exercise_id, is_correct=check.correct)
+    query.log_solution_attempt(check.correct == True)
 
     rewards = []
     badges = []
@@ -277,13 +274,13 @@ def check_solution():
             rewards.append(gamification.rewards.Actions.Exercise.SOLVED)
 
             # Gamification: check Exercise Solved badge
-            solved_count = db.admin.users.count_exercises_solved(username)
+            solved_count = user.count_exercises_solved()
             if solved_count in gamification.rewards.Badges.EXERCISE_SOLUTIONS:
                 badges.append(gamification.rewards.Badges.EXERCISE_SOLUTIONS[solved_count])
         else:
             rewards.append(gamification.rewards.Actions.Exercise.REPEATED)
 
-    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
+    user.add_rewards(rewards=rewards, badges=badges)
 
     return responses.response_query(
         check.result,

@@ -249,7 +249,8 @@ class Query:
                 'details': [str(v) for v in error.data]
             })
 
-    def is_new(self) -> bool:
+    @staticmethod
+    def is_new(query_str: str, user: User) -> bool:
         '''Check if a query is new for the user.'''
 
         statement = database.sql.SQL('''
@@ -264,8 +265,8 @@ class Query:
         )
 
         result = db.execute_and_fetch(statement, {
-            'username': self.user.username,
-            'query': self.sql_string
+            'username': user.username,
+            'query': query_str
         })
 
         return result[0][0] == 0

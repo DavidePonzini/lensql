@@ -116,8 +116,8 @@ function Navbar() {
                                 </li>
 
                                 <li className="nav-item">
-                                    <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/classes" end>
-                                        <i className="fa-solid fa-tasks"></i> {t('components.navbar.nav.courses')}
+                                    <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/datasets" end>
+                                        <i className="fa-solid fa-database"></i> {t('components.navbar.nav.datasets')}
                                     </NavLink>
                                 </li>
                             </>

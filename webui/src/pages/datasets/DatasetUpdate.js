@@ -14,7 +14,7 @@ function DatasetUpdate({ datasetId, refresh, className }) {
     const [title, setTitle] = useState('');
     const [dataset, setDataset] = useState('');
 
-    async function handleEditClass() {
+    async function handleEditDataset() {
         await apiRequest('/api/datasets', 'PUT', {
             'dataset_id': datasetId,
             'title': title,
@@ -24,17 +24,17 @@ function DatasetUpdate({ datasetId, refresh, className }) {
         refresh();
     }
 
-    const getClassData = useCallback(async () => {
+    const getDatasetData = useCallback(async () => {
         if (!datasetId) return;
 
         const result = await apiRequest(`/api/datasets/get/${datasetId}`, 'GET');
         setTitle(result.data.title);
-        setDataset(result.data.dataset);
+        setDataset(result.data.dataset_str);
     }, [datasetId, apiRequest]);
 
     useEffect(() => {
-        getClassData();
-    }, [getClassData]);
+        getDatasetData();
+    }, [getDatasetData]);
 
     return (
         <ButtonModal

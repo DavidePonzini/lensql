@@ -19,6 +19,17 @@ class User:
     def __init__(self, username: str):
         self.username = username
 
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, User):
+            return False
+        return self.username == value.username
+
+    def __repr__(self) -> str:
+        return f'User(username={self.username})'
+    
+    def __str__(self) -> str:
+        return self.username
+
     # region Auth
     def exists(self) -> bool:
         '''Check if the user exists in the database'''
@@ -63,7 +74,7 @@ class User:
         
         return result[0][0]
 
-    def register_account(self, password: str, *, school: str, email: str, is_admin: bool = False) -> bool:
+    def register_account(self, password: str, *, school: str, email: str | None = None, is_admin: bool = False) -> bool:
         '''Register a new user'''
 
         if self.exists():
@@ -181,14 +192,14 @@ class User:
 
         return result[0][0] if result else 0
 
-    def count_all_classes_joined(self) -> int:
-        '''Get the amount of classes a user has joined'''
+    def count_all_datasets_joined(self) -> int:
+        '''Get the amount of datasets a user has joined'''
 
         query = database.sql.SQL('''
             SELECT
                 COUNT(*)
             FROM
-                {schema}.class_members
+                {schema}.dataset_members
             WHERE
                 username = {username}
                 AND is_teacher = FALSE
@@ -294,8 +305,22 @@ class User:
         
         return result[0][0]
 
+    def can_afford(self, cost: gamification.Reward) -> bool:
+        '''Check if the user can afford an action with the given cost'''
+
+        coins = self.get_coins()
+        return coins >= abs(cost.coins)
+
     def get_info(self) -> dict:
-        '''Get general information about a user'''
+        '''
+            Retrieve using a single query all relevant user info
+        
+            Returns a dictionary with keys:
+            - username
+            - is_admin
+            - xp
+            - coins
+        '''
 
         query = database.sql.SQL(
             '''
@@ -466,22 +491,22 @@ class User:
     # ✅    | ✅        | ✅        | exercise stats for ALL students                                                                       #
     ########################################################################################################################################
 
-    def get_query_stats(self, *, class_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
+    def get_query_stats(self, *, dataset_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
         '''
             Get, for each query type, the amount of queries run by the user.
             Supports different levels of granularity.
 
             Parameters:
             - username: The username of the user to get stats for.
-            - class_id: The ID of the class to get stats for (optional). If provided, will return stats only for the class.
+            - dataset_id: The ID of the class to get stats for (optional). If provided, will return stats only for the class.
             - exercise_id: The ID of the exercise to get stats for (optional). If provided, will return stats only for the exercise.
             - is_teacher: Whether the user is a teacher. If True, will return stats for all students in the class or exercise, else will return stats only for the current user.
         '''
 
-        if class_id is None and exercise_id is not None:
+        if dataset_id is None and exercise_id is not None:
             return {}  # fallback case
 
-        if class_id is None:
+        if dataset_id is None:
             # Global stats
             query = database.sql.SQL('''
                 SELECT query_type, queries, queries_d, queries_success
@@ -499,25 +524,25 @@ class User:
                 query = database.sql.SQL('''
                     SELECT query_type, SUM(queries), SUM(queries_d), SUM(queries_success)
                     FROM {schema}.v_stats_queries_by_exercise
-                    WHERE class_id = {class_id}
+                    WHERE dataset_id = {dataset_id}
                     GROUP BY query_type
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
-                    class_id=database.sql.Placeholder('class_id')
+                    dataset_id=database.sql.Placeholder('dataset_id')
                 )
-                params = {'class_id': class_id}
+                params = {'dataset_id': dataset_id}
             else:
                 # Class stats for student
                 query = database.sql.SQL('''
                     SELECT query_type, queries, queries_d, queries_success
                     FROM {schema}.v_stats_queries_by_exercise
-                    WHERE class_id = {class_id} AND username = {username}
+                    WHERE dataset_id = {dataset_id} AND username = {username}
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
-                    class_id=database.sql.Placeholder('class_id'),
+                    dataset_id=database.sql.Placeholder('dataset_id'),
                     username=database.sql.Placeholder('username')
                 )
-                params = {'class_id': class_id, 'username': self.username}
+                params = {'dataset_id': dataset_id, 'username': self.username}
 
         else:
             if is_teacher:
@@ -563,13 +588,13 @@ class User:
             ],
         }
 
-    def get_message_stats(self, *, class_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
+    def get_message_stats(self, *, dataset_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
         '''Get statistics about chat interactions for a user'''
 
-        if class_id is None and exercise_id is not None:
+        if dataset_id is None and exercise_id is not None:
             return {}  # fallback case
 
-        if class_id is None:
+        if dataset_id is None:
             # Global stats
             query = database.sql.SQL('''
                 SELECT messages, messages_select, messages_success, messages_feedback
@@ -586,23 +611,23 @@ class User:
                 query = database.sql.SQL('''
                     SELECT SUM(messages), SUM(messages_select), SUM(messages_success), SUM(messages_feedback)
                     FROM {schema}.v_stats_messages_by_exercise
-                    WHERE class_id = {class_id}
+                    WHERE dataset_id = {dataset_id}
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
-                    class_id=database.sql.Placeholder('class_id')
+                    dataset_id=database.sql.Placeholder('dataset_id')
                 )
-                params = {'class_id': class_id}
+                params = {'dataset_id': dataset_id}
             else:
                 query = database.sql.SQL('''
                     SELECT SUM(messages), SUM(messages_select), SUM(messages_success), SUM(messages_feedback)
                     FROM {schema}.v_stats_messages_by_exercise
-                    WHERE class_id = {class_id} AND username = {username}
+                    WHERE dataset_id = {dataset_id} AND username = {username}
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
-                    class_id=database.sql.Placeholder('class_id'),
+                    dataset_id=database.sql.Placeholder('dataset_id'),
                     username=database.sql.Placeholder('username')
                 )
-                params = {'class_id': class_id, 'username': self.username}
+                params = {'dataset_id': dataset_id, 'username': self.username}
 
         else:
             if is_teacher:
@@ -646,13 +671,13 @@ class User:
             'messages_feedback': result[3] or 0,
         }
 
-    def get_error_stats(self, *, class_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
+    def get_error_stats(self, *, dataset_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
         '''Get statistics about errors for a user'''
 
-        if class_id is None and exercise_id is not None:
+        if dataset_id is None and exercise_id is not None:
             return {}  # fallback case
         
-        if class_id is None:
+        if dataset_id is None:
             # Global stats
             query = database.sql.SQL(
                 '''
@@ -688,16 +713,16 @@ class User:
                             JOIN {schema}.query_batches qb ON qb.id = q.batch_id
                             JOIN {schema}.class_members cm ON cm.username = qb.username
                         WHERE
-                            cm.class_id = {class_id}
+                            cm.dataset_id = {dataset_id}
                             AND cm.is_teacher = FALSE
                         GROUP BY
                             he.error_id
                     '''
                 ).format(
                     schema=database.sql.Identifier(SCHEMA),
-                    class_id=database.sql.Placeholder('class_id')
+                    dataset_id=database.sql.Placeholder('dataset_id')
                 )
-                params = {'class_id': class_id}
+                params = {'dataset_id': dataset_id}
             else:
                 # Class stats for student
                 query = database.sql.SQL(
@@ -711,17 +736,17 @@ class User:
                             JOIN {schema}.query_batches qb ON qb.id = q.batch_id
                             JOIN {schema}.class_members cm ON cm.username = qb.username
                         WHERE
-                            cm.class_id = {class_id}
+                            cm.dataset_id = {dataset_id}
                             AND qb.username = {username}
                         GROUP BY
                             he.error_id
                     '''
                 ).format(
                     schema=database.sql.Identifier(SCHEMA),
-                    class_id=database.sql.Placeholder('class_id'),
+                    dataset_id=database.sql.Placeholder('dataset_id'),
                     username=database.sql.Placeholder('username')
                 )
-                params = {'class_id': class_id, 'username': self.username}
+                params = {'dataset_id': dataset_id, 'username': self.username}
 
         else:
             if is_teacher:
@@ -773,7 +798,7 @@ class User:
 
         result = db.execute_and_fetch(query, params)
 
-        timeline = self.get_error_timeline(class_id=class_id, exercise_id=exercise_id, is_teacher=is_teacher)
+        timeline = self.get_error_timeline(dataset_id=dataset_id, exercise_id=exercise_id, is_teacher=is_teacher)
         return {
             'errors': [
                 {
@@ -784,13 +809,13 @@ class User:
             'timeline': timeline,
         }
 
-    def get_error_timeline(self, *, class_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> list[dict]:
+    def get_error_timeline(self, *, dataset_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> list[dict]:
         '''Get a timeline of errors for a user'''
 
-        if class_id is None and exercise_id is not None:
+        if dataset_id is None and exercise_id is not None:
             return []  # fallback case
         
-        if class_id is None:
+        if dataset_id is None:
             # Global stats
             query = database.sql.SQL(
                 '''
@@ -829,7 +854,7 @@ class User:
                             JOIN {schema}.query_batches qb ON qb.id = q.batch_id
                             JOIN {schema}.class_members cm ON cm.username = qb.username
                         WHERE
-                            cm.class_id = {class_id}
+                            cm.dataset_id = {dataset_id}
                             AND cm.is_teacher = FALSE
                         GROUP BY
                             day, he.error_id
@@ -838,9 +863,9 @@ class User:
                     '''
                 ).format(
                     schema=database.sql.Identifier(SCHEMA),
-                    class_id=database.sql.Placeholder('class_id')
+                    dataset_id=database.sql.Placeholder('dataset_id')
                 )
-                params = {'class_id': class_id}
+                params = {'dataset_id': dataset_id}
             else:
                 # Class stats for student
                 query = database.sql.SQL(
@@ -855,7 +880,7 @@ class User:
                             JOIN {schema}.query_batches qb ON qb.id = q.batch_id
                             JOIN {schema}.class_members cm ON cm.username = qb.username
                         WHERE
-                            cm.class_id = {class_id}
+                            cm.dataset_id = {dataset_id}
                             AND qb.username = {username}
                         GROUP BY
                             day, he.error_id
@@ -864,10 +889,10 @@ class User:
                     '''
                 ).format(
                     schema=database.sql.Identifier(SCHEMA),
-                    class_id=database.sql.Placeholder('class_id'),
+                    dataset_id=database.sql.Placeholder('dataset_id'),
                     username=database.sql.Placeholder('username')
                 )
-                params = {'class_id': class_id, 'username': self.username}
+                params = {'dataset_id': dataset_id, 'username': self.username}
         else:
             if is_teacher:
                 # Exercise stats for all students

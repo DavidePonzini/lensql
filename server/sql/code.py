@@ -7,13 +7,16 @@ STRIP_COMMENTS_MAX_LENGTH = 1000
 
 
 class SQLCode:
+    '''Represents a SQL code snippet with utility methods.'''
     def __init__(self, query: str, builtin: bool = False):
         self.query = query
+        '''The SQL query string.'''
+
         self._parse_cache = None
         self._query_type_cache = None
         self.builtin = builtin
 
-    def strip_comments(self, *, force: bool = False) -> Self:
+    def strip_comments(self, *, force: bool = False) -> 'SQLCode':
         '''
             Remove comments from the SQL query
             If the query is too long, it will not be stripped unless force is set to True.
@@ -35,7 +38,7 @@ class SQLCode:
         '''Check if the SQL query has a specific clause'''
         return clause.upper() in self.query.upper()
 
-    def split(self) -> Iterable[Self]:
+    def split(self) -> Iterable['SQLCode']:
         '''Split the SQL query into individual statements'''
         for query in sqlparse.split(self.query, strip_semicolon=False):
             yield SQLCode(query)
@@ -44,11 +47,11 @@ class SQLCode:
         '''Parse the SQL query and return the first statement'''
         if self._parse_cache is None:
             self._parse_cache = sqlparse.parse(self.query)
-        
+
         return self._parse_cache 
     
     @property
-    def first_token(self) -> str:
+    def first_token(self) -> str | None:
         statement = self._parse()[0]
         first_token = statement.token_first(skip_cm=True)
         
@@ -136,14 +139,14 @@ class SQLCode:
         return query_type
     
     @property
-    def query_goal(self) -> str | None:
+    def query_goal(self) -> str:
         '''Get the goal of the SQL query'''
 
         if self.builtin:
-            return QueryGoal.BUILTIN
+            return QueryGoal.BUILTIN.value
 
         # Only consider SELECT queries
         if self.query_type != 'SELECT':
-            return None
+            return 'UNKNOWN'
         
         # TODO

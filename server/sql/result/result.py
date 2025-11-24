@@ -9,11 +9,20 @@ class QueryResult(ABC):
                  query: SQLCode,
                  success: bool,
                  notices: list[str]):
+        
         self.query = query
+        '''The SQL code that was executed.'''
+
         self.success = success
+        '''Whether the query executed successfully.'''
+
         self.data_type = data_type
+        '''The type of data returned by the query.'''
+
         self.notices = notices
-        self.id = None
+        '''Any notices or warnings generated during query execution.'''
+
+        self.query_id: int | None = None
 
     @property
     @abstractmethod
@@ -23,10 +32,10 @@ class QueryResult(ABC):
 
     @property
     @abstractmethod
-    def result_text(self) -> dict | None:
-        '''Returns the result of the query as a dictionary.'''
+    def result_text(self) -> str:
+        '''Returns the result of the query as a string.'''
         pass
 
     def __repr__(self):
-        return f'QueryResult(result="{self.result_html[:10]}", query="{self.query[:10]}", success={self.success})'
+        return f'QueryResult(result="{self.result_html[:10]}", query="{self.query.query[:10]}", success={self.success})'
     

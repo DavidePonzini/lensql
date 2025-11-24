@@ -15,8 +15,8 @@ import Login from './Login';
 import Register from './Register';
 import Profile from './profile/Profile';
 import Learning from './profile/Learning';
-import ExerciseList from './classes/ExerciseList';
-import ClassList from './classes/ClassList';
+import ExerciseList from './datasets/ExerciseList';
+import DatasetList from './datasets/DatasetList';
 import Exercise from './exercises/Exercise';
 import Admin from './admin/Admin';
 
@@ -45,8 +45,8 @@ function App() {
                                     <Route path="profile" element={<Profile />} />
                                     <Route path="learning" element={<Learning />} />
 
-                                    <Route path="classes">
-                                        <Route index element={<ClassList />} />
+                                    <Route path="datasets">
+                                        <Route index element={<DatasetList />} />
                                         <Route path=":datasetId" element={<ExerciseList />} />
                                     </Route>
 

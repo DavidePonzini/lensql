@@ -37,4 +37,4 @@ function DatasetMask({ title, setTitle, dataset, setDataset }) {
     );
 }
 
-export default ClassMask;
+export default DatasetMask;

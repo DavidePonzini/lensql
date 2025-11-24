@@ -10,9 +10,10 @@ bp = Blueprint('user', __name__)
 @bp.route('/info', methods=['GET'])
 @jwt_required()
 def get_user_info():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
 
-    result = db.admin.users.get_info(username)
+    result = user.get_info()
+
     if result is None:
         return responses.response(False)
     
@@ -21,27 +22,30 @@ def get_user_info():
 @bp.route('/stats/queries', methods=['GET'])
 @jwt_required()
 def get_query_stats():
-    username = get_jwt_identity()
-    class_id = request.args.get('class_id', None) or None   # required for empty string handling
+    user = db.admin.User(get_jwt_identity())
+
+    dataset_id = request.args.get('dataset_id', None, type=str) or None # required to handle empty string
+    # if we have a class ID, load the dataset
     exercise_id = request.args.get('exercise_id', None, type=int)
 
     # if we have an exercise, then we have a class
     #   (ignore class ID passed as argument, just to be safe)
     if exercise_id is not None:
-        class_id = db.admin.exercises.get_class(exercise_id)
+        dataset_id = db.admin.Exercise(exercise_id).dataset_id
 
-    if class_id is None:
-        # if no class ID is provided, the user is querying their own stats
-        result = db.admin.users.get_query_stats(username)
+    if dataset_id is None:
+        # if no dataset ID is provided, the user is querying their own stats
+        result = user.get_query_stats(dataset_id=None, exercise_id=None)
     else:
-        if not db.admin.classes.has_participant(username=username, class_id=class_id):
+        dataset = db.admin.Dataset(dataset_id)
+
+        if not dataset.has_participant(user):
             return responses.response(False, message=_("User is not a participant in the specified class."))
 
-        is_teacher = db.admin.classes.has_teacher(username=username, class_id=class_id)
+        is_teacher = dataset.has_teacher(user)
 
-        result = db.admin.users.get_query_stats(
-            username=username,
-            class_id=class_id,
+        result = user.get_query_stats(
+            dataset_id=dataset.dataset_id,
             exercise_id=exercise_id,
             is_teacher=is_teacher
         )
@@ -54,35 +58,35 @@ def get_query_stats():
 @bp.route('/stats/unique_queries', methods=['GET'])
 @jwt_required()
 def get_unique_queries_count():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
 
-    count = db.admin.users.count_unique_queries(username)
+    count = user.count_unique_queries()
     return responses.response(True, data=count)
 
 @bp.route('/stats/messages', methods=['GET'])
 @jwt_required()
 def get_message_stats():
-    username = get_jwt_identity()
-    class_id = request.args.get('class_id', None) or None   # required for empty string handling
+    user = db.admin.User(get_jwt_identity())
+
+    dataset_id = request.args.get('dataset_id', None, type=str) or None # required to handle empty string
     exercise_id = request.args.get('exercise_id', None, type=int)
 
     # if we have an exercise, then we have a class
     #   (ignore class ID passed as argument, just to be safe)
     if exercise_id is not None:
-        class_id = db.admin.exercises.get_class(exercise_id)
+        dataset_id = db.admin.Exercise(exercise_id).dataset_id
 
-    if class_id is None:
+    if dataset_id is None:
         # if no class ID is provided, the user is querying their own stats
-        result = db.admin.users.get_message_stats(username)
+        result = user.get_message_stats()
     else:
-        if not db.admin.classes.has_participant(username=username, class_id=class_id):
+        dataset = db.admin.Dataset(dataset_id)
+        if not dataset.has_participant(user):
             return responses.response(False, message=_("User is not a participant in the specified class."))
 
-        is_teacher = db.admin.classes.has_teacher(username=username, class_id=class_id)
-
-        result = db.admin.users.get_message_stats(
-            username=username,
-            class_id=class_id,
+        is_teacher = dataset.has_teacher(user)
+        result = user.get_message_stats(
+            dataset_id=dataset.dataset_id,
             exercise_id=exercise_id,
             is_teacher=is_teacher
         )
@@ -95,27 +99,29 @@ def get_message_stats():
 @bp.route('/stats/errors', methods=['GET'])
 @jwt_required()
 def get_error_stats():
-    username = get_jwt_identity()
-    class_id = request.args.get('class_id', None) or None   # required for empty string handling
+    user = db.admin.User(get_jwt_identity())
+
+    dataset_id = request.args.get('dataset_id', None, type=str) or None # required to handle empty string
     exercise_id = request.args.get('exercise_id', None, type=int)
 
     # if we have an exercise, then we have a class
     #   (ignore class ID passed as argument, just to be safe)
     if exercise_id is not None:
-        class_id = db.admin.exercises.get_class(exercise_id)
+        dataset_id = db.admin.Exercise(exercise_id).dataset_id
 
-    if class_id is None:
+    if dataset_id is None:
         # if no class ID is provided, the user is querying their own stats
-        result = db.admin.users.get_error_stats(username)
+        result = user.get_error_stats()
     else:
-        if not db.admin.classes.has_participant(username=username, class_id=class_id):
+        dataset = db.admin.Dataset(dataset_id)
+
+        if not dataset.has_participant(user):
             return responses.response(False, message=_("User is not a participant in the specified class."))
 
-        is_teacher = db.admin.classes.has_teacher(username=username, class_id=class_id)
+        is_teacher = dataset.has_teacher(user)
         
-        result = db.admin.users.get_error_stats(
-            username=username,
-            class_id=class_id,
+        result = user.get_error_stats(
+            dataset_id=dataset.dataset_id,
             exercise_id=exercise_id,
             is_teacher=is_teacher
         )

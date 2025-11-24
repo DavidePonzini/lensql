@@ -5,7 +5,7 @@ import AuthProvider from "../../hooks/useAuth";
 
 import ButtonModal from "./ButtonModal";
 
-function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-secondary', buttonText = null, disabled = false, variant = 'secondary' }) {
+function ButtonShowDataset({ datasetId, footerButtons, className = 'btn btn-secondary', buttonText = null, disabled = false, variant = 'secondary' }) {
     const { t } = useTranslation();
     const { apiRequest } = AuthProvider();
     const [dataset, setDataset] = useState('');
@@ -15,7 +15,7 @@ function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-second
         async function fetchDataset() {
             setIsLoading(true);
 
-            const response = await apiRequest(`/api/datasets/${classId}`, 'GET');
+            const response = await apiRequest(`/api/datasets/${datasetId}/str`, 'GET');
 
             if (!response.success) {
                 alert(response.message);
@@ -28,7 +28,7 @@ function ButtonShowDataset({ classId, footerButtons, className = 'btn btn-second
         }
 
         fetchDataset();
-    }, [classId, apiRequest]);
+    }, [datasetId, apiRequest]);
 
     return (
         <ButtonModal

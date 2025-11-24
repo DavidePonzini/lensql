@@ -9,17 +9,12 @@ from server.gamification import NOT_ENOUGH_COINS_MESSAGE
 
 bp = Blueprint('message', __name__)
 
-def _check_coins(username: str, cost: gamification.Reward) -> bool:
-    '''Check if the user has enough coins to perform an action.'''
-    coins = db.admin.users.get_coins(username)
-    return coins >= abs(cost.coins)
-
-def _get_usage_badges(username: str) -> list[gamification.Reward]:
+def _get_usage_badges(user: db.admin.User) -> list[gamification.Reward]:
     '''Check if the user has earned any badges related to message usage.'''
     
     badges = []
 
-    help_usage_count = db.admin.users.count_help_usage(username)
+    help_usage_count = user.count_help_usage()
     if help_usage_count in gamification.rewards.Badges.HELP_USAGE:
         badges.append(gamification.rewards.Badges.HELP_USAGE[help_usage_count])
 
@@ -30,27 +25,24 @@ def _get_usage_badges(username: str) -> list[gamification.Reward]:
 @jwt_required()
 def feedback():
     '''Log feedback for a message.'''
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    message_id = data['message_id']
+    message = db.admin.Message(data['message_id'])
     feedback = data['feedback']
 
-    db.admin.messages.log_feedback(
-        message_id=message_id,
-        feedback=feedback,
-        username=username,
-    )
+    message.log_feedback(feedback=feedback, user=user)
 
     rewards = []
     badges = []
 
     rewards.append(gamification.rewards.Actions.Messages.FEEDBACK)
-    feedback_count = db.admin.users.count_feedbacks(username)
+    feedback_count = user.count_feedbacks()
 
     if feedback_count in gamification.rewards.Badges.FEEDBACK:
         badges.append(gamification.rewards.Badges.FEEDBACK[feedback_count])
 
-    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
+    user.add_rewards(rewards=rewards, badges=badges)
 
     return responses.response(True, rewards=rewards, badges=badges)
 
@@ -58,183 +50,182 @@ def feedback():
 @bp.route('/error/explain', methods=['POST'])
 @jwt_required()
 def explain_error_message():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    query_id = data['query_id']
-    msg_idx = data['msg_idx']
+
+    query = db.admin.Query(data['query_id'])
+    msg_idx = int(data['msg_idx'])
 
     cost = gamification.rewards.Actions.Messages.HELP_ERROR_EXPLAIN
 
-    if not _check_coins(username, cost):
+    if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
     
-    query = db.admin.queries.get(query_id)
-    exception = db.admin.queries.get_result(query_id)
-    answer = llm.explain_error_message(username, query, exception)
+    exception = query.result
+    answer_str = llm.explain_error_message(user.username, query.sql_string, exception)
 
-    answer_id = db.admin.messages.log(
-        answer=answer,
+    answer = db.admin.Message.log(
+        answer=answer_str,
         button=request.path,
-        query_id=query_id,
+        query=query,
         msg_idx=msg_idx
     )
 
     rewards = [cost]
-    badges = _get_usage_badges(username)
+    badges = _get_usage_badges(user)
 
-    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
+    user.add_rewards(rewards=rewards, badges=badges)
 
-    return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
+    return responses.response(answer=answer_str, id=answer.message_id, rewards=rewards, badges=badges)
 
 @bp.route('/error/locate', methods=['POST'])
 @jwt_required()
 def locate_error_cause():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    query_id = data['query_id']
-    msg_idx = data['msg_idx']
+    query = db.admin.Query(data['query_id'])
+    msg_idx = int(data['msg_idx'])
 
     cost = gamification.rewards.Actions.Messages.HELP_ERROR_LOCATE
 
-    if not _check_coins(username, cost):
+    if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
-    query = db.admin.queries.get(query_id)
-    exception = db.admin.queries.get_result(query_id)
-    answer = llm.locate_error_cause(username, query, exception)
+    exception = query.result
+    answer_str = llm.locate_error_cause(user.username, query.sql_string, exception)
 
-    answer_id = db.admin.messages.log(
-        answer=answer,
+    answer = db.admin.Message.log(
+        answer=answer_str,
         button=request.path,
-        query_id=query_id,
+        query=query,
         msg_idx=msg_idx
     )
 
     rewards = [cost]
-    badges = _get_usage_badges(username)
+    badges = _get_usage_badges(user)
 
-    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
+    user.add_rewards(rewards=rewards, badges=badges)
 
-    return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
+    return responses.response(answer=answer_str, id=answer.message_id, rewards=rewards, badges=badges)
 
 @bp.route('/error/example', methods=['POST'])
 @jwt_required()
 def provide_error_example():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    query_id = data['query_id']
-    msg_idx = data['msg_idx']
+    query = db.admin.Query(data['query_id'])
+    msg_idx = int(data['msg_idx'])
 
     cost = gamification.rewards.Actions.Messages.HELP_ERROR_EXAMPLE
 
-    if not _check_coins(username, cost):
+    if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
-    query = db.admin.queries.get(query_id)
-    exception = db.admin.queries.get_result(query_id)
-    answer = llm.provide_error_example(username, query, exception)
+    exception = query.result
+    answer_str = llm.provide_error_example(user.username, query.sql_string, exception)
     
-    answer_id = db.admin.messages.log(
-        answer=answer,
+    answer = db.admin.Message.log(
+        answer=answer_str,
         button=request.path,
-        query_id=query_id,
+        query=query,
         msg_idx=msg_idx
     )
 
     rewards = [cost]
-    badges = _get_usage_badges(username)
+    badges = _get_usage_badges(user)
 
-    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
+    user.add_rewards(rewards=rewards, badges=badges)
 
-    return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
+    return responses.response(answer=answer_str, id=answer.message_id, rewards=rewards, badges=badges)
 
 @bp.route('/error/fix', methods=['POST'])
 @jwt_required()
 def fix_query():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    query_id = data['query_id']
-    msg_idx = data['msg_idx']
+    query = db.admin.Query(data['query_id'])
+    msg_idx = int(data['msg_idx'])
 
     cost = gamification.rewards.Actions.Messages.HELP_ERROR_FIX
 
-    if not _check_coins(username, cost):
+    if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
-    query = db.admin.queries.get(query_id)
-    exception = db.admin.queries.get_result(query_id)
-    answer = llm.fix_query(username, query, exception)
+    exception = query.result
+    answer_str = llm.fix_query(user.username, query.sql_string, exception)
 
-    answer_id = db.admin.messages.log(
-        answer=answer,
+    answer = db.admin.Message.log(
+        answer=answer_str,
         button=request.path,
-        query_id=query_id,
+        query=query,
         msg_idx=msg_idx
     )
 
     rewards = [cost]
-    badges = _get_usage_badges(username)
+    badges = _get_usage_badges(user)
 
-    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
+    user.add_rewards(rewards=rewards, badges=badges)
 
-    return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
+    return responses.response(answer=answer_str, id=answer.message_id, rewards=rewards, badges=badges)
 
 @bp.route('/success/describe', methods=['POST'])
 @jwt_required()
 def describe_my_query():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    query_id = data['query_id']
-    msg_idx = data['msg_idx']
+    query = db.admin.Query(data['query_id'])
+    msg_idx = int(data['msg_idx'])
 
     cost = gamification.rewards.Actions.Messages.HELP_SUCCESS_DESCRIBE
 
-    if not _check_coins(username, cost):
+    if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
-    query = db.admin.queries.get(query_id)
-    answer = llm.describe_my_query(username, query)
-
-    answer_id = db.admin.messages.log(
-        answer=answer,
+    answer_str = llm.describe_my_query(user.username, query.sql_string)
+    answer = db.admin.Message.log(
+        answer=answer_str,
         button=request.path,
-        query_id=query_id,
+        query=query,
         msg_idx=msg_idx
     )
 
     rewards = [cost]
-    badges = _get_usage_badges(username)
+    badges = _get_usage_badges(user)
 
-    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
+    user.add_rewards(rewards=rewards, badges=badges)
 
-    return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
+    return responses.response(answer=answer_str, id=answer.message_id, rewards=rewards, badges=badges)
 
 @bp.route('/success/explain', methods=['POST'])
 @jwt_required()
 def explain_my_query():
-    username = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
-    query_id = data['query_id']
-    msg_idx = data['msg_idx']
+    query = db.admin.Query(data['query_id'])
+    msg_idx = int(data['msg_idx'])
 
     cost = gamification.rewards.Actions.Messages.HELP_SUCCESS_EXPLAIN
 
-    if not _check_coins(username, cost):
+    if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
-    query = db.admin.queries.get(query_id)
-    answer = llm.explain_my_query(username, query)
-
-    answer_id = db.admin.messages.log(
-        answer=answer,
+    answer_str = llm.explain_my_query(user.username, query.sql_string)
+    answer = db.admin.Message.log(
+        answer=answer_str,
         button=request.path,
-        query_id=query_id,
+        query=query,
         msg_idx=msg_idx
     )
 
     rewards = [cost]
-    badges = _get_usage_badges(username)
+    badges = _get_usage_badges(user)
 
-    db.admin.users.add_rewards(username, rewards=rewards, badges=badges)
+    user.add_rewards(rewards=rewards, badges=badges)
 
-    return responses.response(answer=answer, id=answer_id, rewards=rewards, badges=badges)
+    return responses.response(answer=answer_str, id=answer.message_id, rewards=rewards, badges=badges)

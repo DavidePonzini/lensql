@@ -8,7 +8,7 @@ from .exercises import Exercise
 class Dataset:
     '''Dataset-related database operations'''
 
-    def __init__(self, dataset_id: int, *,
+    def __init__(self, dataset_id: str, *,
                  name: str | None = None,
                  dataset_str: str | None = None
                 ) -> None:
@@ -70,6 +70,11 @@ class Dataset:
             self._dataset_str = result[0][0] or ''
         
         return self._dataset_str
+    
+    @property
+    def is_special(self) -> bool:
+        '''Check if the dataset is special (ID starts with a special character)'''
+        return not self.dataset_id[0].isalnum()
     # endregion
 
     # region CRUD
@@ -93,21 +98,28 @@ class Dataset:
         return result[0][0] > 0
 
     @staticmethod
-    def create(title: str, dataset: str) -> 'Dataset':
-        '''Create a new dataset'''
+    def create(title: str, dataset_str: str, *, dataset_id: str | None = None) -> 'Dataset':
+        '''Create a new dataset, optionally with a specified ID'''
 
-        result = db.insert(SCHEMA, 'datasets', {
-            'name': title,
-            'dataset': dataset.strip() or None
-        }, ['id'])
+        if dataset_id is not None:
+            result = db.insert(SCHEMA, 'datasets', {
+                'id': dataset_id,
+                'name': title,
+                'dataset': dataset_str.strip() or None
+            }, ['id'])
+        else:
+            result = db.insert(SCHEMA, 'datasets', {
+                'name': title,
+                'dataset': dataset_str.strip() or None
+            }, ['id'])
 
         assert result is not None and len(result) > 0, 'Failed to create dataset'
 
-        dataset_id = int(result[0][0])
+        dataset_id = result[0][0]
 
-        return Dataset(dataset_id, name=title, dataset_str=dataset)
+        return Dataset(dataset_id, name=title, dataset_str=dataset_str)
 
-    def update(self, title: str, dataset: str) -> None:
+    def update(self, title: str, dataset_str: str) -> None:
         '''Update an existing dataset'''
 
         query = database.sql.SQL(
@@ -127,7 +139,7 @@ class Dataset:
         db.execute(query, {
             'title': title,
             'dataset_id': self.dataset_id,
-            'dataset': dataset.strip() or None
+            'dataset': dataset_str.strip() or None
         })
 
     def delete(self) -> None:

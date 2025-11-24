@@ -26,7 +26,7 @@ def response_query(
             'query': query.query.query,
             'type': query.data_type,
             'data': query.result_html,
-            'id': query.id,
+            'id': query.query_id,
             'rewards': [reward.to_dict() for reward in rewards],
             'badges': [badge.to_dict() for badge in badges],
             **kwargs

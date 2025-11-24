@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next';
 
-function ExerciseMask({ title, setTitle, request, setRequest, answer, setAnswer }) {
+function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolutions }) {
     const { t } = useTranslation();
 
     return (
         <>
             <div className="mb-3">
-                <label className="form-label">{t('pages.classes.exercise_mask.title')}</label>
+                <label className="form-label">{t('pages.datasets.exercise_mask.title')}</label>
                 <input
                     type="text"
                     className="form-control"
@@ -16,7 +16,7 @@ function ExerciseMask({ title, setTitle, request, setRequest, answer, setAnswer 
             </div>
 
             <div className="mb-3">
-                <label className="form-label">{t('pages.classes.exercise_mask.request')}</label>
+                <label className="form-label">{t('pages.datasets.exercise_mask.request')}</label>
                 <textarea
                     className="form-control"
                     rows="3"
@@ -26,13 +26,44 @@ function ExerciseMask({ title, setTitle, request, setRequest, answer, setAnswer 
             </div>
 
             <div className="mb-3">
-                <label className="form-label">{t('pages.classes.exercise_mask.answer_optional')}</label>
-                <textarea
-                    className="form-control"
-                    rows="3"
-                    defaultValue={answer}
-                    onInput={(e) => setAnswer(e.target.value)}
-                />
+                <label className="form-label">{t('pages.datasets.exercise_mask.answer_optional')}</label>
+
+                {solutions.map((solution, idx) => (
+                    <>
+                        <textarea
+                            className="form-control"
+                            rows="3"
+                            key={idx}
+                            defaultValue={solution}
+                            onInput={(e) => {
+                                const newSolutions = solutions.slice();
+                                newSolutions[idx] = e.target.value;
+                                setSolutions(newSolutions);
+                            }}
+                        />
+
+                        <button
+                            type="button"
+                            className="btn btn-danger mt-2"
+                            key={`remove-${idx}`}
+                            onClick={() => {
+                                const newSolutions = solutions.slice();
+                                newSolutions.splice(idx, 1);
+                                setSolutions(newSolutions);
+                            }}
+                        >
+                            {t('pages.datasets.exercise_mask.remove_answer')}
+                        </button>
+                    </>
+                ))}
+
+                <button
+                    type="button"
+                    className="btn btn-secondary mt-2"
+                    onClick={() => setSolutions([...solutions, ''])}
+                >
+                    {t('pages.datasets.exercise_mask.add_answer')}
+                </button>
             </div>
         </>
     );

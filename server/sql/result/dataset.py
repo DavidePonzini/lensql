@@ -61,8 +61,6 @@ class QueryResultDataset(QueryResult):
                 wrong_types.append(col1)
         return wrong_types
     
-    import pandas as pd
-
     def compare_results(self, other: Self) -> tuple[bool, pd.DataFrame]:
         # Count row occurrences
         vc_self = self._result.value_counts().reset_index(name='count_self')

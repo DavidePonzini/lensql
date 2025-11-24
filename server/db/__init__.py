@@ -3,7 +3,7 @@ from . import admin, users
 from dav_tools import messages
 
 
-def register_user(username: str, password: str, *, email: str | None = None, school: str, is_admin: bool = False) -> bool:
+def register_user(user: admin.User, password: str, *, email: str | None = None, school: str, is_admin: bool = False) -> bool:
     '''
     Register a new user.
 
@@ -15,13 +15,13 @@ def register_user(username: str, password: str, *, email: str | None = None, sch
         bool: True if registration is successful, False otherwise.
     '''
 
-    if not admin.auth.register_user(username, password, email=email, school=school, is_admin=is_admin):
-        messages.debug(f'Failed to register user {username}. User already exists or database error.')
+    if not user.register_account(password, email=email, school=school, is_admin=is_admin):
+        messages.debug(f'Failed to register user {user.username}. User already exists or database error.')
         return False
     
-    if not users.auth.init_database(username, password):
-        messages.debug(f'Failed to initialize database for user {username}. Deleting user.')
-        admin.auth.delete_user(username)
+    if not users.auth.init_database(user.username, password):
+        messages.debug(f'Failed to initialize database for user {user.username}. Deleting user.')
+        user.delete_account()
         return False
     
     return True

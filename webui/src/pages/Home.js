@@ -28,7 +28,7 @@ function Home() {
                         {t('pages.home.hero.description')}
                     </p>
                     <div className="mt-4">
-                        <Link to={isLoggedIn ? "/classes" : "/register"} className="btn btn-primary me-3">
+                        <Link to={isLoggedIn ? "/datasets" : "/register"} className="btn btn-primary me-3">
                             {t('pages.home.hero.cta_register')}
                         </Link>
                         <Link to="/about" className="btn btn-outline-success">

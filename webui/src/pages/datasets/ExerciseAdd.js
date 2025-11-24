@@ -13,13 +13,16 @@ function ExerciseAdd({ refresh, datasetId }) {
 
     const [exerciseTitle, setExerciseTitle] = useState('');
     const [exerciseRequest, setExerciseRequest] = useState('');
-    const [exerciseAnswer, setExerciseAnswer] = useState('');
+    const [exerciseSolutions, setExerciseSolutions] = useState([]);
 
     async function handleAddExercise() {
+        // remove empty solutions
+        const filteredSolutions = exerciseSolutions.filter(sol => sol.trim() !== '');
+
         await apiRequest('/api/exercises', 'POST', {
             'title': exerciseTitle,
             'request': exerciseRequest,
-            'solution': exerciseAnswer,
+            'solutions': JSON.stringify(filteredSolutions),
             'dataset_id': datasetId,
         });
 
@@ -29,11 +32,11 @@ function ExerciseAdd({ refresh, datasetId }) {
     return (
         <ButtonModal
             className="btn btn-success"
-            title={t('pages.classes.exercise_add.title')}
-            buttonText={t('pages.classes.exercise_add.button_text')}
+            title={t('pages.datasets.exercise_add.title')}
+            buttonText={t('pages.datasets.exercise_add.button_text')}
             footerButtons={[
                 {
-                    text: t('pages.classes.exercise_add.save'),
+                    text: t('pages.datasets.exercise_add.save'),
                     variant: 'primary',
                     onClick: handleAddExercise,
                     autoClose: true,
@@ -46,8 +49,8 @@ function ExerciseAdd({ refresh, datasetId }) {
                 setTitle={setExerciseTitle}
                 request={exerciseRequest}
                 setRequest={setExerciseRequest}
-                answer={exerciseAnswer}
-                setAnswer={setExerciseAnswer}
+                solutions={exerciseSolutions}
+                setSolutions={setExerciseSolutions}
             />
         </ButtonModal>
     );

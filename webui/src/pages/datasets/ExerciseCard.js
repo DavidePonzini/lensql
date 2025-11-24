@@ -19,40 +19,16 @@ function ExerciseCard({
     title,
     exerciseId,
     isGenerated = false,
-    isSubmitted = false,
     isSolved = false,
     isTeacher = false,
     isHidden = false,
-    onSubmit = null,
-    onUnsubmit = null,
     refresh,
     learningObjectives = []
 }) {
     const { apiRequest } = useAuth();
     const { t } = useTranslation();
 
-    const [submitted, setSubmitted] = useState(isSubmitted);
     const [hidden, setHidden] = useState(isHidden);
-
-    async function handleSubmit() {
-        await apiRequest('/api/exercises/submit', 'POST', {
-            'exercise_id': exerciseId,
-            'value': true,
-        });
-
-        setSubmitted(true);
-        if (onSubmit) onSubmit(exerciseId);
-    }
-
-    async function handleUnsubmit() {
-        await apiRequest('/api/exercises/submit', 'POST', {
-            'exercise_id': exerciseId,
-            'value': false,
-        });
-
-        setSubmitted(false);
-        if (onUnsubmit) onUnsubmit(exerciseId);
-    }
 
     async function handleHide() {
         await apiRequest('/api/exercises/hide', 'POST', {
@@ -73,7 +49,7 @@ function ExerciseCard({
     }
 
     async function handleDelete() {
-        if (!window.confirm(t('pages.classes.exercise.delete_confirm'))) {
+        if (!window.confirm(t('pages.datasets.exercise.delete_confirm'))) {
             return;
         }
 
@@ -94,8 +70,8 @@ function ExerciseCard({
             <Card.Header>
                 <h5 className="card-title">
                     {title}
-                    {hidden && <span className="badge bg-secondary ms-2">{t('pages.classes.exercise.hidden')}</span>}
-                    {isSolved && <span className="badge bg-success ms-2">{t('pages.classes.exercise.solved')}</span>}
+                    {hidden && <span className="badge bg-secondary ms-2">{t('pages.datasets.exercise.hidden')}</span>}
+                    {isSolved && <span className="badge bg-success ms-2">{t('pages.datasets.exercise.solved')}</span>}
                 </h5>
             </Card.Header>
 
@@ -106,7 +82,7 @@ function ExerciseCard({
                     {isTeacher && learningObjectives.length > 0 && (
                         <>
                             <div className='col'>
-                                <b>{t('pages.classes.exercise.objectives')}:</b>
+                                <b>{t('pages.datasets.exercise.objectives')}:</b>
                                 <div>
                                     {learningObjectives.map((o, index) => (
                                         <span
@@ -132,7 +108,7 @@ function ExerciseCard({
                     <div className='col'>
                         {isGenerated && (
                             <span className="badge bg-info mx-1 my-2">
-                                {t('pages.classes.exercise.generated')}
+                                {t('pages.datasets.exercise.generated')}
                             </span>
                         )}
                     </div>
@@ -140,83 +116,63 @@ function ExerciseCard({
             </Card.Body>
 
             <Card.Footer>
-                {submitted ? (
-                    <Button
-                        variant="outline-danger"
-                        className="me-2 mb-1"
-                        onClick={handleUnsubmit}
-                    >
-                        {t('pages.classes.exercise.unarchive')}
-                    </Button>
-                ) : (
+                <NavLink
+                    to={`/exercises/${exerciseId}`}
+                    className="btn btn-primary me-2 mb-1"
+                >
+                    {t('pages.datasets.exercise.open')}
+                </NavLink>
+
+                {isTeacher && (
                     <>
-                        <NavLink
-                            to={`/exercises/${exerciseId}`}
-                            className="btn btn-primary me-2 mb-1"
+                        <div className='vr me-2 mb-1' style={{ verticalAlign: 'middle', height: '2.5rem' }} />
+
+                        <ButtonModal
+                            className="btn btn-info me-2 mb-1"
+                            title={t('pages.datasets.exercise.analytics')}
+                            fullscreen
+                            buttonText={t('pages.datasets.exercise.analytics')}
                         >
-                            {t('pages.classes.exercise.open')}
-                        </NavLink>
+                            <LearningStatsAll exerciseId={exerciseId} isTeacher={isTeacher} />
+                        </ButtonModal>
+
+                        <ExerciseUpdate
+                            exerciseId={exerciseId}
+                            refreshExercises={refresh}
+                            className="btn btn-warning me-2 mb-1"
+                        />
+
+                        <SetLearningObjectives
+                            exerciseId={exerciseId}
+                            refreshExercises={refresh}
+                            className="btn btn-warning me-2 mb-1"
+                        />
+
+                        {hidden ? (
+                            <Button
+                                variant="secondary"
+                                className="me-2 mb-1"
+                                onClick={handleUnhide}
+                            >
+                                <i className="fa fa-eye"></i> {t('pages.datasets.exercise.show')}
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="outline-secondary"
+                                className="me-2 mb-1"
+                                onClick={handleHide}
+                            >
+                                <i className="fa fa-eye-slash"></i> {t('pages.datasets.exercise.hide')}
+                            </Button>
+                        )}
 
                         <Button
-                            variant="outline-success"
+                            variant="danger"
                             className="me-2 mb-1"
-                            onClick={handleSubmit}
+                            onClick={handleDelete}
                         >
-                            {t('pages.classes.exercise.archive')}
+                            <i className="fa fa-trash"></i> {t('pages.datasets.exercise.delete')}
                         </Button>
-
-                        {isTeacher && (
-                            <>
-                                <div className='vr me-2 mb-1' style={{ verticalAlign: 'middle', height: '2.5rem' }} />
-
-                                <ButtonModal
-                                    className="btn btn-info me-2 mb-1"
-                                    title={t('pages.classes.exercise.analytics')}
-                                    fullscreen
-                                    buttonText={t('pages.classes.exercise.analytics')}
-                                >
-                                    <LearningStatsAll exerciseId={exerciseId} isTeacher={isTeacher} />
-                                </ButtonModal>
-
-                                <ExerciseUpdate
-                                    exerciseId={exerciseId}
-                                    refreshExercises={refresh}
-                                    className="btn btn-warning me-2 mb-1"
-                                />
-
-                                <SetLearningObjectives
-                                    exerciseId={exerciseId}
-                                    refreshExercises={refresh}
-                                    className="btn btn-warning me-2 mb-1"
-                                />
-
-                                {hidden ? (
-                                    <Button
-                                        variant="secondary"
-                                        className="me-2 mb-1"
-                                        onClick={handleUnhide}
-                                    >
-                                        <i className="fa fa-eye"></i> {t('pages.classes.exercise.show')}
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="outline-secondary"
-                                        className="me-2 mb-1"
-                                        onClick={handleHide}
-                                    >
-                                        <i className="fa fa-eye-slash"></i> {t('pages.classes.exercise.hide')}
-                                    </Button>
-                                )}
-
-                                <Button
-                                    variant="danger"
-                                    className="me-2 mb-1"
-                                    onClick={handleDelete}
-                                >
-                                    <i className="fa fa-trash"></i> {t('pages.classes.exercise.delete')}
-                                </Button>
-                            </>
-                        )}
                     </>
                 )}
             </Card.Footer>

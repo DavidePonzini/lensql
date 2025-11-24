@@ -2,81 +2,118 @@ from server import db
 
 from dav_tools import messages
 
+ADMIN_USER = db.admin.User('lens')
+
 if __name__ == '__main__':
     users = [
-        ('lens', 'l', True, 'DIBRIS'),
-        ('dav', 'd', True, 'DIBRIS'),
-        ('giovanna', 'g', False, 'DIBRIS'),
-        ('barbara', 'b', False, 'DIBRIS'),
-        ('student', 's', False, 'DIBRIS'),
+        (ADMIN_USER, 'l', 'DIBRIS'),
+        (db.admin.User('dav'), 'd', 'DIBRIS'),
+        (db.admin.User('giovanna'), 'g', 'DIBRIS'),
+        (db.admin.User('barbara'), 'b', 'DIBRIS'),
+        (db.admin.User('student'), 's', 'DIBRIS'),
     ]
 
     # Create sample users
-    for user, password, is_admin, school in users:
-        if db.register_user(user, password, is_admin=is_admin, school=school):
-            messages.info(f'User {user} registered successfully')
+    messages.info('Creating users...')
+
+    for user, password, school in users:
+        if user.exists():
+            messages.warning(f'  User {user} already exists, skipping creation.')
+        elif db.register_user(user, password, school=school, is_admin=(user == ADMIN_USER)):
+            messages.success(f'  User {user} registered successfully')
+        else:
+            messages.error(f'  Failed to register user {user}')
 
     classes = [
-        ('server/setup/miedema.sql', 'Sample Class (Miedema)', [
+        ('explore.sql', '_EXPLORE', 'Explore SQL', [
+            {
+                'name': 'Explore SQL',
+                'request': 'You can write any SQL query here',
+                'solutions': [],
+                'search_path': 'public',
+            },
+        ]),
+        ('miedema.sql', '_WELCOME_MIEDEMA', 'Sample Dataset: Miedema', [
             {
                 'name': 'Exercise 1',
                 'request': 'List all IDs&names of customer living in Eindhoven.',
-                'solution': 'SELECT cID, cName FROM customer WHERE city = \'Eindhoven\';',
+                'solutions': ['SELECT cID, cName FROM customer WHERE city = \'Eindhoven\';'],
                 'search_path': 'miedema',
             },
             {
                 'name': 'Exercise 2',
                 'request': 'List all pairs of customer IDs who live on a street with the same name but in a different city.',
-                'solution': 'SELECT c1.cid AS id1, c2.cid AS id2 FROM customer c1 JOIN customer c2 ON c1.street = c2.street AND c1.city <> c2.city WHERE c1.cID < c2.cID;',
+                'solutions': ['SELECT c1.cid AS id1, c2.cid AS id2 FROM customer c1 JOIN customer c2 ON c1.street = c2.street AND c1.city <> c2.city WHERE c1.cID < c2.cID;'],
                 'search_path': 'miedema',
             },
             {
                 'name': 'Exercise 3',
                 'request': 'List all customer IDs, dates and quantities of transactions containing products named Apples.',
-                'solution': 'SELECT t.cID, t.date, t.quantity FROM transaction t JOIN product p ON t.pID = p.pID WHERE p.pName = \'Apples\';',
+                'solutions': ['SELECT t.cID, t.date, t.quantity FROM transaction t JOIN product p ON t.pID = p.pID WHERE p.pName = \'Apples\';'],
                 'search_path': 'miedema',
             },
             {
                 'name': 'Exercise 4',
                 'request': 'Find the names of all inventory items that have a higher unit price than Bananas.',
-                'solution': 'SELECT DISTINCT pname FROM product p JOIN inventory i ON i.pid = p.pid WHERE i.unit_price > ALL( SELECT i.unit_price FROM product p JOIN inventory i ON i.pid = p.pid WHERE p.pname = \'Banana\' );',
-                'solution2': 'SELECT DISTINCT pname FROM product p JOIN inventory i ON i.pid = p.pid WHERE i.unit_price > ANY( SELECT i.unit_price FROM product p JOIN inventory i ON i.pid = p.pid WHERE p.pname = \'Banana\' );',
+                'solutions': ['SELECT DISTINCT pname FROM product p JOIN inventory i ON i.pid = p.pid WHERE i.unit_price > ALL( SELECT i.unit_price FROM product p JOIN inventory i ON i.pid = p.pid WHERE p.pname = \'Banana\' );',
+                              'SELECT DISTINCT pname FROM product p JOIN inventory i ON i.pid = p.pid WHERE i.unit_price > ANY( SELECT i.unit_price FROM product p JOIN inventory i ON i.pid = p.pid WHERE p.pname = \'Banana\' );'],
                 'search_path': 'miedema',
             },
             {
                 'name': 'Exercise 5',
                 'request': 'Return a list of the number of stores per city.',
-                'solution': 'SELECT city, COUNT(sID) AS num_stores FROM store GROUP BY city;',
+                'solutions': ['SELECT city, COUNT(sID) AS num_stores FROM store GROUP BY city;'],
                 'search_path': 'miedema',
             },
             {
                 'name': 'Exercise 6',
                 'request': 'Return the stores table ordered alphabetically on city.',
-                'solution': 'SELECT * FROM store ORDER BY city;',
+                'solutions': ['SELECT * FROM store ORDER BY city;'],
                 'search_path': 'miedema',
             },
             {
                 'name': 'Exercise 7',
                 'request': 'A store-chain consists of at least two stores with the same name but different IDs. Find the names of the store-chains that on average sell product in quantities of more than 4.',
-                'solution': 'SELECT s.sName FROM store s JOIN transaction t ON s.sID = t.sID GROUP BY s.sName HAVING COUNT(DISTINCT s.sID) >= 2 AND AVG(t.quantity) > 4;',                'search_path': 'miedema',
+                'solutions': ['SELECT s.sName FROM store s JOIN transaction t ON s.sID = t.sID GROUP BY s.sName HAVING COUNT(DISTINCT s.sID) >= 2 AND AVG(t.quantity) > 4;'],
+                'search_path': 'miedema',
             }
         ]),
     ]
-    for class_file, class_name, exercises in classes:
-        with open(class_file) as f:
-            dataset = f.read()
-        class_id = db.admin.classes.create(class_name, dataset=dataset)
+    for dataset_file, dataset_id, dataset_name, exercises in classes:
+        messages.info(f'Creating dataset {dataset_name}...')
 
-        db.admin.classes.make_teacher('lens', class_id)
-        
-        for user, _, is_admin, _ in users:
-            db.admin.classes.join(user, class_id)
-            messages.info(f'User {user} enrolled in class {class_name}')
+        with open(f'server/setup/datasets/{dataset_file}') as f:
+            dataset_str = f.read()
 
-        for exercise in exercises:
-            exercise_id = db.admin.exercises.create(username='lens', class_id=class_id, title=exercise['name'], request=exercise['request'], solution=exercise['solution'], search_path=exercise['search_path'])
-            db.admin.exercises.unhide(exercise_id)
-            messages.info(f'Exercise {exercise["name"]} added to class {class_name}')
+        dataset = db.admin.Dataset(dataset_id)
+        if dataset.exists():
+            messages.warning(f'  Dataset {dataset_name} already exists, skipping creation.')
+            db_exists = True
+        else:
+            dataset = db.admin.Dataset.create(dataset_name, dataset_str=dataset_str, dataset_id=dataset_id)
+            db_exists = False
+            messages.success(f'  Dataset {dataset_name} created successfully.')
 
+        dataset.add_participant(ADMIN_USER)
+        dataset.set_teacher_status(ADMIN_USER, True)
+
+        for user in [user for user, _, _ in users if user != ADMIN_USER]:
+            dataset.add_participant(user)
+            messages.info(f'  User {user} enrolled in class {dataset_name}')
+
+        if db_exists:
+            messages.info(f'  Skipping exercise creation for class {dataset_name} as it already exists.')
+        else:
+            for exercise_data in exercises:
+                exercise = db.admin.Exercise.create(
+                    title=exercise_data['name'],
+                    user=ADMIN_USER,
+                    dataset_id=dataset.dataset_id,
+                    request=exercise_data['request'],
+                    solutions=exercise_data['solutions'],
+                    search_path=exercise_data['search_path'],
+                )
+
+                messages.success(f'  Exercise {exercise_data["name"]} added to class {dataset_name}')
 
 

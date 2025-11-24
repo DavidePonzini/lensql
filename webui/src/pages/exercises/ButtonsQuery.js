@@ -22,7 +22,7 @@ function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result
 
         try {
             const stream = await apiRequest('/api/queries/run', 'POST', {
-                'query': sqlText,
+                'query_str': sqlText,
                 'exercise_id': exerciseId,
             }, { stream: true });
 

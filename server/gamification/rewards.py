@@ -96,6 +96,6 @@ class Badges:
     }
 
     '''Join your first course'''
-    JOIN_COURSE = {
+    JOIN_DATASET = {
         1: Reward('join_course.1', coins=20)
     }

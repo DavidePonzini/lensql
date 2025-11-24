@@ -20,5 +20,8 @@ class QueryResultError(QueryResult):
         return str(self._result)
 
     @property
-    def result_text(self) -> dict:
-        return self._result.error_code
+    def result_text(self) -> str:
+        if self._result.error_code:
+            return f'Error Code: {self._result.error_code}\nMessage: {self._result}'
+        else:
+            return f'Message: {self._result}'

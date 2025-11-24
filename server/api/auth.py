@@ -18,7 +18,9 @@ def login():
     username = data['username']
     password = data['password']
 
-    if not db.admin.auth.can_login(username, password):
+    user = db.admin.User(username)
+
+    if not user.can_login(password):
         return responses.response(False, message=_('Cannot login. Please check your username and password.'))
 
     access_token = create_access_token(identity=username, expires_delta=timedelta(minutes=15))
@@ -44,10 +46,12 @@ def register():
     email = data['email']
     school = data['school']
 
-    if db.admin.auth.user_exists(username):
+    user = db.admin.User(username)
+
+    if user.exists():
         return responses.response(False, message=_('Username already exists. Please choose a different username.'))
 
-    if not db.register_user(username, password, email=email, school=school):
+    if not user.register_account(password, email=email, school=school):
         return responses.response(False, message=_('Registration failed. Please try again.'))
 
     return responses.response(True)
@@ -56,11 +60,12 @@ def register():
 @jwt_required()
 def reset_password():
     '''Reset the password for the current user.'''
-    current_user = get_jwt_identity()
+    user = db.admin.User(get_jwt_identity())
+
     data = request.get_json()
     new_password = data['new_password']
 
-    if not db.admin.auth.change_password(current_user, new_password):
+    if not user.change_password(new_password):
         return responses.response(False, message=_('Failed to reset password. Please try again.'))
 
     return responses.response(True, message=_('Password reset successfully.'))

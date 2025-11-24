@@ -1,5 +1,5 @@
 from dav_tools import database
-from typing import Any
+import json
 
 from .connection import db, SCHEMA
 from .users import User
@@ -8,11 +8,11 @@ class Exercise:
     '''Class for managing exercises'''
 
     def __init__(self, exercise_id: int, *,
-                 dataset_id: int | None = None,
+                 dataset_id: str | None = None,
                  is_hidden: bool = False,
                  title: str | None = None,
                  request: str | None = None,
-                 solution: str | None = None,
+                 solutions: list[str] | None = None,
                  search_path: str | None = None,
                  is_ai_generated: bool = False,
                  learning_objectives: list[str] | None = None
@@ -24,14 +24,14 @@ class Exercise:
         self._is_hidden = is_hidden
         self._title = title
         self._request = request
-        self._solution = solution
+        self._solutions = solutions
         self._search_path = search_path
         self._is_ai_generated = is_ai_generated
         self._learning_objectives = learning_objectives
     
     # region Properties
     @property
-    def dataset_id(self) -> int:
+    def dataset_id(self) -> str:
         '''Get the dataset ID this exercise belongs to'''
 
         if self._dataset_id is None:
@@ -75,15 +75,15 @@ class Exercise:
         return self._request
     
     @property
-    def solution(self) -> str:
-        '''Get the solution of the exercise'''
+    def solutions(self) -> list[str]:
+        '''Get the solutions of the exercise'''
 
-        if self._solution is None:
+        if self._solutions is None:
             self._load_properties()
 
-        assert self._solution is not None, "Solution should be loaded by _load_properties"
+        assert self._solutions is not None, "Solutions should be loaded by _load_properties"
 
-        return self._solution
+        return self._solutions
     
     @property
     def search_path(self) -> str:
@@ -140,7 +140,10 @@ class Exercise:
 
         query = database.sql.SQL('''
             SELECT COUNT(*)
-            FROM {schema}.exercise_solutions
+            FROM
+                {schema}.exercise_solutions es
+                JOIN {schema}.queries q ON es.id = q.id
+                JOIN {schema}.query_batches qb ON q.batch_id = qb.id
             WHERE exercise_id = {exercise_id}
             AND username = {username}
         ''').format(
@@ -218,9 +221,8 @@ class Exercise:
                 e.title,
                 e.dataset_id,
                 e.is_hidden,
-                e.title,
                 e.request,
-                e.solution,
+                e.solutions,
                 e.search_path,
                 e.is_ai_generated
             FROM
@@ -244,27 +246,27 @@ class Exercise:
         self._dataset_id = row[1]
         self._is_hidden = row[2]
         self._request = row[3]
-        self._solution = row[4]
+        self._solutions = json.loads(row[4])
         self._search_path = row[5]
         self._is_ai_generated = row[6]
 
     @staticmethod
     def create(title: str, *,
                user: User,
-               dataset_id: int,
+               dataset_id: str,
                request: str,
-               solution: str | None = None,
+               solutions: list[str] = [],
                search_path: str = 'public',
                is_ai_generated: bool = False
               ) -> 'Exercise':
-        '''Create a new exercise'''
+        '''Create a new exercise. New exercises are visible by default.'''
 
         result = db.insert(SCHEMA, 'exercises', {
             'title': title,
             'dataset_id': dataset_id,
             'is_hidden': False,
             'request': request,
-            'solution': solution,
+            'solutions': json.dumps(solutions),
             'search_path': search_path,
             'created_by': user.username,
             'is_ai_generated': is_ai_generated,
@@ -279,32 +281,32 @@ class Exercise:
                         is_hidden=False,
                         title=title,
                         request=request,
-                        solution=solution,
+                        solutions=solutions,
                         search_path=search_path,
                         is_ai_generated=is_ai_generated)
 
-    def update(self, *, title: str, request: str, solution: str | None, search_path: str = 'public') -> None:
+    def update(self, *, title: str, request: str, solutions: list[str] = [], search_path: str = 'public') -> None:
         '''Update an existing exercise'''
 
         query = database.sql.SQL('''
             UPDATE {schema}.exercises
             SET title = {title},
                 request = {request},
-                solution = {solution},
+                solutions = {solutions},
                 search_path = {search_path}
             WHERE id = {exercise_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             title=database.sql.Placeholder('title'),
             request=database.sql.Placeholder('request'),
-            solution=database.sql.Placeholder('solution'),
+            solutions=database.sql.Placeholder('solutions'),
             search_path=database.sql.Placeholder('search_path'),
             exercise_id=database.sql.Placeholder('exercise_id'),
         )
         db.execute(query, {
             'title': title,
             'request': request,
-            'solution': solution,
+            'solutions': json.dumps(solutions),
             'search_path': search_path,
             'exercise_id': self.exercise_id
         })
