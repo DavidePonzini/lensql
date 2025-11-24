@@ -62,18 +62,18 @@ class QueryBatch:
         return self._user
 
     @staticmethod
-    def log(user: User, exercise_id: int) -> 'QueryBatch':
+    def log(user: User, exercise: Exercise) -> 'QueryBatch':
         '''Log a new query batch for a user and exercise ID.'''
 
         result = db.insert(SCHEMA, 'query_batches', {
             'username': user.username,
-            'exercise_id': exercise_id,
+            'exercise_id': exercise.exercise_id,
         }, ['id'])
 
         assert result is not None and len(result) == 1 and len(result[0]) == 1, 'Failed to log query batch.'
         
         batch_id = result[0][0]
-        return QueryBatch(batch_id, user=user, exercise_id=exercise_id)
+        return QueryBatch(batch_id, user=user, exercise=exercise)
 
 class Query:
     '''Class for logging and retrieving user queries.'''

@@ -3,6 +3,7 @@ from dav_tools import database
 from .connection import db, SCHEMA
 
 from .users import User
+from .exercises import Exercise
 
 class Dataset:
     '''Dataset-related database operations'''
@@ -372,8 +373,8 @@ class Dataset:
     # endregion
 
     # region Exercises
-    def list_exercises_ids(self, user: User) -> list[int]:
-        '''Get all exercises assigned to a user in a class. Includes hidden exercises if the user is a teacher.'''
+    def list_exercises(self, user: User) -> list[Exercise]:
+        '''Get all exercises assigned to a user in a dataset. Includes hidden exercises if the user is a teacher.'''
 
         if self.has_teacher(user):
             # User is a teacher, include hidden exercises
@@ -409,5 +410,5 @@ class Dataset:
             'dataset_id': self.dataset_id
         })
 
-        return [row[0] for row in result]
+        return [Exercise(row[0], dataset_id=self.dataset_id) for row in result]
     # endregion

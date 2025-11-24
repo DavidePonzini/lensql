@@ -2,14 +2,13 @@ from dav_tools import database
 from typing import Any
 
 from .connection import db, SCHEMA
-from .datasets import Dataset
 from .users import User
 
 class Exercise:
     '''Class for managing exercises'''
 
     def __init__(self, exercise_id: int, *,
-                 dataset: Dataset | None = None,
+                 dataset_id: int | None = None,
                  is_hidden: bool = False,
                  title: str | None = None,
                  request: str | None = None,
@@ -21,7 +20,7 @@ class Exercise:
         self.exercise_id = exercise_id
 
         # Lazy properties
-        self._dataset = dataset
+        self._dataset_id = dataset_id
         self._is_hidden = is_hidden
         self._title = title
         self._request = request
@@ -32,15 +31,15 @@ class Exercise:
     
     # region Properties
     @property
-    def dataset(self) -> Dataset:
-        '''Get the dataset (class) this exercise belongs to'''
+    def dataset_id(self) -> int:
+        '''Get the dataset ID this exercise belongs to'''
 
-        if self._dataset is None:
+        if self._dataset_id is None:
             self._load_properties()
 
-        assert self._dataset is not None, "Dataset should be loaded by _load_properties"
+        assert self._dataset_id is not None, "Dataset ID should be loaded by _load_properties"
 
-        return self._dataset
+        return self._dataset_id
 
     @property
     def is_hidden(self) -> bool:
@@ -242,7 +241,7 @@ class Exercise:
 
         row = result[0]
         self._title = row[0]
-        self._dataset = Dataset(row[1])
+        self._dataset_id = row[1]
         self._is_hidden = row[2]
         self._request = row[3]
         self._solution = row[4]
@@ -252,7 +251,7 @@ class Exercise:
     @staticmethod
     def create(title: str, *,
                user: User,
-               dataset: Dataset,
+               dataset_id: int,
                request: str,
                solution: str | None = None,
                search_path: str = 'public',
@@ -262,7 +261,7 @@ class Exercise:
 
         result = db.insert(SCHEMA, 'exercises', {
             'title': title,
-            'dataset_id': dataset.dataset_id,
+            'dataset_id': dataset_id,
             'is_hidden': False,
             'request': request,
             'solution': solution,
@@ -276,7 +275,7 @@ class Exercise:
         exercise_id = int(result[0][0])
 
         return Exercise(exercise_id=exercise_id,
-                        dataset=dataset,
+                        dataset_id=dataset_id,
                         is_hidden=False,
                         title=title,
                         request=request,
