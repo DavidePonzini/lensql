@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
 import pandas as pd
 from dav_tools import messages
 from flask_babel import _
@@ -85,7 +87,7 @@ def _execute(username: str, query: str) -> tuple[QueryResultDataset | None, bool
             messages.error(f"Error rolling back connection for user {username}: {e}")
         return None, False
 
-def check(username: str, query_user: str, query_solution: str) -> CheckSolutionResult:
+def check(username: str, query_user: str, query_solutions: list[str]) -> CheckSolutionResult:
     '''
     Checks the user's solution against the exercise solution.
     If multiple queries are present, only the first one is checked.
@@ -102,7 +104,7 @@ def check(username: str, query_user: str, query_solution: str) -> CheckSolutionR
         If the exercise has no solution, a message indicating that is returned.
     '''
 
-    if not query_solution:
+    if len(query_solutions) == 0:
         message = _('No solution found for this exercise.')
         return _result_message(None, None, message)
 
@@ -112,38 +114,71 @@ def check(username: str, query_user: str, query_solution: str) -> CheckSolutionR
         message += _('Your query is not supported. Please ensure it is a valid SQL SELECT query.')
         return _result_message(False, execution_success, message)
 
-    result_solution, execution_success_solution = _execute(username, query_solution)
-    if result_solution is None:
-        message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
-        message += _('Teacher-provided solution is not supported.')
-        return _result_message(None, execution_success, message)
+    @dataclass
+    class CheckResult(ABC):
+        correct: bool | None
+        execution_success: bool | None
 
-    # ensure both results have the same columns
-    if not result_user.compare_column_names(result_solution):
-        message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
-        message += _('Your query has different columns from the solution. Cannot compare results.') + '<br/>'
-        message += _('Expected:') + f' <code>{"</code>, <code>".join([col.name for col in result_solution.columns])}</code><br/>'
-        message += _('Your query:') + f' <code>{"</code>, <code>".join([col.name for col in result_user.columns])}</code><br/>'
+        @abstractmethod
+        def to_result(self) -> CheckSolutionResult:
+            pass
 
-        return _result_message(False, execution_success, message)
+    @dataclass
+    class CheckResultMessage(CheckResult):
+        message: str
 
-    # check for wrong data types
-    wrong_types = result_user.compare_column_types(result_solution)
+        def to_result(self) -> CheckSolutionResult:
+            return _result_message(self.correct, self.execution_success, self.message)
 
-    if wrong_types:
-        message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
-        message += _('Your query has different data types from the solution. Cannot compare results.') + '<br/>'
-        message += _('Expected:') + f' <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_solution.columns])}</code><br/>'
-        message += _('Your query:') + f' <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_user.columns])}</code><br/>'
+    @dataclass
+    class CheckResultDataset(CheckResult):
+        result: pd.DataFrame
+        columns: list[Column]
 
-        return _result_message(False, execution_success, message)
+        def to_result(self) -> CheckSolutionResult:
+            return _result_dataset(self.correct, self.execution_success, self.result, self.columns)
 
-    has_same_result, comparison = result_user.compare_results(result_solution)
+    results: list[CheckResult] = []
+    for query_solution in query_solutions:
+        result_solution, execution_success_solution = _execute(username, query_solution)
+        if result_solution is None:
+            message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+            message += _('Teacher-provided solution is not supported.')
 
-    if has_same_result:
-        message = '<i class="fa fa-check text-success me-1"></i>'
-        message += _('Solution is correct.') + '<br/>'
-        return _result_message(True, execution_success, message)
-    else:
-        return _result_dataset(False, execution_success, result=comparison, columns=result_user.columns)
+            results.append(CheckResultMessage(correct=None, execution_success=execution_success_solution, message=message))
+            continue
 
+        # ensure both results have the same columns
+        if not result_user.compare_column_names(result_solution):
+            message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+            message += _('Your query has different columns from the solution. Cannot compare results.') + '<br/>'
+            message += _('Expected:') + f' <code>{"</code>, <code>".join([col.name for col in result_solution.columns])}</code><br/>'
+            message += _('Your query:') + f' <code>{"</code>, <code>".join([col.name for col in result_user.columns])}</code><br/>'
+
+            results.append(CheckResultMessage(correct=False, execution_success=execution_success, message=message))
+            continue
+
+        # check for wrong data types
+        wrong_types = result_user.compare_column_types(result_solution)
+
+        if wrong_types:
+            message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+            message += _('Your query has different data types from the solution. Cannot compare results.') + '<br/>'
+            message += _('Expected:') + f' <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_solution.columns])}</code><br/>'
+            message += _('Your query:') + f' <code>{"</code>, <code>".join([f"{col.name}<i>({get_datatype_name(col.data_type)}</i>)" for col in result_user.columns])}</code><br/>'
+
+            results.append(CheckResultMessage(correct=False, execution_success=execution_success, message=message))
+            continue
+
+        has_same_result, comparison = result_user.compare_results(result_solution)
+
+        if has_same_result:
+            message = '<i class="fa fa-check text-success me-1"></i>'
+            message += _('Solution is correct.') + '<br/>'
+            result = CheckResultMessage(correct=True, execution_success=execution_success, message=message)
+            return result.to_result()
+        else:
+            results.append(CheckResultDataset(correct=False, execution_success=execution_success, result=comparison, columns=result_user.columns))
+
+    # If none of the solutions were correct, return the first incorrect result
+    return results[0].to_result()

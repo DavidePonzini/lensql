@@ -34,7 +34,7 @@ function Exercise() {
                 datasetId={exercise.dataset_id}
                 exerciseText={exercise.request}
                 attempts={exercise.attempts}
-                hasSolution={!!exercise.solution}
+                hasSolution={exercise.solutions.length > 0}
             />
         </div>
     );

@@ -237,7 +237,7 @@ def check_solution():
             attempts=attempts,
         )
 
-    check = db.users.queries.builtin.solution.check(user.username, query_user=query_str, query_solution=exercise.solutions)
+    check = db.users.queries.builtin.solution.check(user.username, query_user=query_str, query_solutions=exercise.solutions)
 
     batch = db.admin.QueryBatch.log(
         user=user,
