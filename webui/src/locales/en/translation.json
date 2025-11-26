@@ -220,7 +220,6 @@
             "dataset_mask": {
                 "title_label": "Title",
                 "dataset_label": "Dataset (Optional)",
-                "search_path_label": "Search Path (Default: public)",
                 "tips_title": "Tips",
                 "tips": [
                     "Include the whole script into a <code>BEGIN; ... COMMIT;</code> block",
@@ -229,8 +228,7 @@
                     "Group insertions into a single <code>INSERT INTO</code> statement for each table to greatly improve performance"
                 ],
                 "title_placeholder": "Descriptive title for the dataset",
-                "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;",
-                "search_path_placeholder": "schema_name"
+                "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;"
             },
             "dataset_update": {
                 "modal_title": "Edit Dataset",
@@ -271,7 +269,8 @@
                 "add_answer": "Add Answer",
                 "remove_answer": "Remove Answer",
                 "title_placeholder": "Short, descriptive title for the exercise",
-                "request_placeholder": "What should the query do?"
+                "request_placeholder": "What should the query do?",
+                "search_path_label": "Solution Search Path"
             },
             "exercise_update": {
                 "title": "Edit Exercise",

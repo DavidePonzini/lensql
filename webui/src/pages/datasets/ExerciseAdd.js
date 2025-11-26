@@ -14,6 +14,7 @@ function ExerciseAdd({ refresh, datasetId }) {
     const [exerciseTitle, setExerciseTitle] = useState('');
     const [exerciseRequest, setExerciseRequest] = useState('');
     const [exerciseSolutions, setExerciseSolutions] = useState([]);
+    const [exerciseSearchPath, setExerciseSearchPath] = useState('');
 
     async function handleAddExercise() {
         // remove empty solutions
@@ -24,6 +25,7 @@ function ExerciseAdd({ refresh, datasetId }) {
             'request': exerciseRequest,
             'solutions': JSON.stringify(filteredSolutions),
             'dataset_id': datasetId,
+            'search_path': exerciseSearchPath,
         });
 
         refresh();
@@ -51,6 +53,8 @@ function ExerciseAdd({ refresh, datasetId }) {
                 setRequest={setExerciseRequest}
                 solutions={exerciseSolutions}
                 setSolutions={setExerciseSolutions}
+                searchPath={exerciseSearchPath}
+                setSearchPath={setExerciseSearchPath}
             />
         </ButtonModal>
     );

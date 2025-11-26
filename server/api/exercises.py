@@ -38,6 +38,7 @@ class ExerciseAPI(MethodView):
             'learning_objectives': exercise.learning_objectives,
             'is_solved': exercise.has_been_solved_by_user(user),
             'is_hidden': exercise.is_hidden,
+            'search_path': exercise.search_path,
         } for exercise in dataset.list_exercises(user)]
 
         return responses.response(True, data=result)
@@ -52,6 +53,7 @@ class ExerciseAPI(MethodView):
         title = data['title']
         request_text = data['request']
         solutions = json.loads(data['solutions'])
+        search_path = data['search_path'] or 'public'   # Handle empty string
 
         if not dataset.has_teacher(user):
             return responses.response(False, message=_('You are not authorized to add exercises to this dataset.'))
@@ -62,8 +64,7 @@ class ExerciseAPI(MethodView):
             dataset_id=dataset.dataset_id,
             request=request_text,
             solutions=solutions,
-            search_path='public',
-            is_ai_generated=False
+            search_path=search_path
         )
 
         return responses.response(True)
@@ -78,6 +79,7 @@ class ExerciseAPI(MethodView):
         title = data['title']
         request_text = data['request']
         solutions = json.loads(data['solutions'])
+        search_path = data['search_path'] or 'public'   # Handle empty string
 
         dataset = db.admin.Dataset(exercise.dataset_id)
 
@@ -88,7 +90,7 @@ class ExerciseAPI(MethodView):
             title=title,
             request=request_text,
             solutions=solutions,
-            search_path='public'
+            search_path=search_path
         )
 
         return responses.response(True)
@@ -224,6 +226,7 @@ def get_exercise(exercise_id):
         'title': exercise.title,
         'request': exercise.request,
         'attempts': exercise.count_attempts(user),
+        'search_path': exercise.search_path,
         'solutions': exercise.solutions,
     }
 

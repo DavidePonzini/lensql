@@ -13,6 +13,7 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
     const [title, setTitle] = useState('');
     const [request, setRequest] = useState('');
     const [solutions, setSolutions] = useState([]);
+    const [searchPath, setSearchPath] = useState('');
 
     async function handleEditExercise() {
         // remove empty solutions
@@ -23,6 +24,7 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
             'title': title,
             'request': request,
             'solutions': JSON.stringify(filteredSolutions),
+            'search_path': searchPath,
         });
 
         refreshExercises();
@@ -38,6 +40,7 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
         setTitle(result.data.title);
         setRequest(result.data.request);
         setSolutions(result.data.solutions);
+        setSearchPath(result.data.search_path);
     }, [exerciseId, apiRequest]);
 
     useEffect(() => {
@@ -65,6 +68,8 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
                 setRequest={setRequest}
                 solutions={solutions}
                 setSolutions={setSolutions}
+                searchPath={searchPath}
+                setSearchPath={setSearchPath}
             />
         </ButtonModal>
     );

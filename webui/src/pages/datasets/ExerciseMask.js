@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolutions }) {
+function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolutions, searchPath, setSearchPath }) {
     const { t } = useTranslation();
 
     return (
@@ -69,6 +69,20 @@ function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolu
                     </button>
                 </div>
             </div>
+
+            <div className="mb-3">
+                <label className="form-label">{t('pages.datasets.exercise_mask.search_path_label')}</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    defaultValue={searchPath}
+                    onInput={(e) => {
+                        setSearchPath(e.target.value);
+                    }}
+                    placeholder='public'
+                />
+            </div>
+
         </>
     );
 }
