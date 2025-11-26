@@ -6,6 +6,7 @@ import useGamificationData from '../../hooks/useGamificationData';
 import LevelTitle from './LevelTitle';
 
 import AlertUnderDevelopment from '../../components/AlertUnderDevelopment';
+import ChangePasswordButton from './ChangePasswordButton';
 
 function Profile() {
     const { userInfo } = useUserInfo();
@@ -21,10 +22,17 @@ function Profile() {
     return (
         <div className="container-md">
             <h1 className="display-3 mb-3">{t('pages.profile.profile.welcome', { username })}</h1>
-            <p className="lead">{t('pages.profile.profile.progress')}</p>
 
             <hr className="my-4" />
 
+            <p className="lead">{t('pages.profile.profile.settings')}</p>
+            <div className="mb-3">
+                <ChangePasswordButton />
+            </div>
+
+            <hr className="my-4" />
+
+            <p className="lead">{t('pages.profile.profile.progress')}</p>
             <section className="mb-4">
                 <h5><i className="fa fa-star me-2" />{t('pages.profile.profile.level.title')}</h5>
                 <p className="mb-1"><LevelTitle level={level} /></p>
@@ -54,8 +62,6 @@ function Profile() {
                     ))}
                 </ul>
             </section>
-
-            <hr className="my-4" />
 
             <section>
                 <h5><i className="fa fa-trophy me-2" />{t('pages.profile.profile.achievements.title')}</h5>
