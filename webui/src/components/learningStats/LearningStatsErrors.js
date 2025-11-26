@@ -76,6 +76,13 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
         { cat: 'com', name: t('errors.categories.com.name'), value: categoryCounts.com },
     ];
 
+    // Remove categories with zero count
+    for (let i = categoryData.length - 1; i >= 0; i--) {
+        if (categoryData[i].value === 0) {
+            categoryData.splice(i, 1);
+        }
+    }
+
     // ----------------------------------------------------------------------
     // PER-ERROR BAR DATA
     // ----------------------------------------------------------------------
