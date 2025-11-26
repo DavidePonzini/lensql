@@ -25,11 +25,12 @@ def get_query_stats():
     user = db.admin.User(get_jwt_identity())
 
     dataset_id = request.args.get('dataset_id', None, type=str) or None # required to handle empty string
-    # if we have a class ID, load the dataset
+    # if we have a dataset ID, load the dataset string
     exercise_id = request.args.get('exercise_id', None, type=int)
+    is_teacher = request.args.get('is_teacher', '0') == '1'
 
-    # if we have an exercise, then we have a class
-    #   (ignore class ID passed as argument, just to be safe)
+    # if we have an exercise, then we have a dataset
+    #   (ignore dataset ID passed as argument, just to be safe)
     if exercise_id is not None:
         dataset_id = db.admin.Exercise(exercise_id).dataset_id
 
@@ -40,9 +41,10 @@ def get_query_stats():
         dataset = db.admin.Dataset(dataset_id)
 
         if not dataset.has_participant(user):
-            return responses.response(False, message=_("User is not a participant in the specified class."))
+            return responses.response(False, message=_("User is not a participant in the specified dataset."))
 
-        is_teacher = dataset.has_teacher(user)
+        # ensure user is actually a teacher
+        is_teacher &= dataset.has_teacher(user)
 
         result = user.get_query_stats(
             dataset_id=dataset.dataset_id,
@@ -70,21 +72,24 @@ def get_message_stats():
 
     dataset_id = request.args.get('dataset_id', None, type=str) or None # required to handle empty string
     exercise_id = request.args.get('exercise_id', None, type=int)
+    is_teacher = request.args.get('is_teacher', '0') == '1'
 
-    # if we have an exercise, then we have a class
-    #   (ignore class ID passed as argument, just to be safe)
+    # if we have an exercise, then we have a dataset
+    #   (ignore dataset ID passed as argument, just to be safe)
     if exercise_id is not None:
         dataset_id = db.admin.Exercise(exercise_id).dataset_id
 
     if dataset_id is None:
-        # if no class ID is provided, the user is querying their own stats
+        # if no dataset ID is provided, the user is querying their own stats
         result = user.get_message_stats()
     else:
         dataset = db.admin.Dataset(dataset_id)
         if not dataset.has_participant(user):
-            return responses.response(False, message=_("User is not a participant in the specified class."))
+            return responses.response(False, message=_("User is not a participant in the specified dataset."))
 
-        is_teacher = dataset.has_teacher(user)
+        # ensure user is actually a teacher
+        is_teacher &= dataset.has_teacher(user)
+
         result = user.get_message_stats(
             dataset_id=dataset.dataset_id,
             exercise_id=exercise_id,
@@ -103,22 +108,24 @@ def get_error_stats():
 
     dataset_id = request.args.get('dataset_id', None, type=str) or None # required to handle empty string
     exercise_id = request.args.get('exercise_id', None, type=int)
+    is_teacher = request.args.get('is_teacher', '0') == '1'
 
-    # if we have an exercise, then we have a class
-    #   (ignore class ID passed as argument, just to be safe)
+    # if we have an exercise, then we have a dataset
+    #   (ignore dataset ID passed as argument, just to be safe)
     if exercise_id is not None:
         dataset_id = db.admin.Exercise(exercise_id).dataset_id
 
     if dataset_id is None:
-        # if no class ID is provided, the user is querying their own stats
+        # if no dataset ID is provided, the user is querying their own stats
         result = user.get_error_stats()
     else:
         dataset = db.admin.Dataset(dataset_id)
 
         if not dataset.has_participant(user):
-            return responses.response(False, message=_("User is not a participant in the specified class."))
+            return responses.response(False, message=_("User is not a participant in the specified dataset."))
 
-        is_teacher = dataset.has_teacher(user)
+        # Ensure user is actually a teacher
+        is_teacher &= dataset.has_teacher(user)
         
         result = user.get_error_stats(
             dataset_id=dataset.dataset_id,

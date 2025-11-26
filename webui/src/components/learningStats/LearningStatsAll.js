@@ -4,7 +4,7 @@ import LearningStatsQueries from "./LearningStatsQueries";
 import LearningStatsMessages from "./LearningStatsMessages";
 import LearningStatsErrors from "./LearningStatsErrors";
 
-function LearningStatsAll({ classId = null, exerciseId = null, isTeacher = false }) {
+function LearningStatsAll({ datasetId = null, exerciseId = null, isTeacher = false }) {
     const { t } = useTranslation();
 
     return (
@@ -12,15 +12,15 @@ function LearningStatsAll({ classId = null, exerciseId = null, isTeacher = false
             <h2 id="queries">
                 {isTeacher ? t('components.learningStats.learning.queries_teacher') : t('components.learningStats.learning.queries_student')}
             </h2>
-            <LearningStatsQueries classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
+            <LearningStatsQueries datasetId={datasetId} exerciseId={exerciseId} isTeacher={isTeacher} />
 
             <hr />
             <h2 id="errors">{t('components.learningStats.learning.errors')}</h2>
-            <LearningStatsErrors classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
+            <LearningStatsErrors datasetId={datasetId} exerciseId={exerciseId} isTeacher={isTeacher} />
 
             <hr />
             <h2 id="messages">{t('components.learningStats.learning.messages')}</h2>
-            <LearningStatsMessages classId={classId} exerciseId={exerciseId} isTeacher={isTeacher} />
+            <LearningStatsMessages datasetId={datasetId} exerciseId={exerciseId} isTeacher={isTeacher} />
         </>
     );
 }

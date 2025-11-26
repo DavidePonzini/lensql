@@ -14,7 +14,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ObservedOnce from "../ObservedOnce";
 
-function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = false }) {
+function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = false }) {
     const { t, i18n } = useTranslation();
     const locale = i18n.resolvedLanguage || 'en';
 
@@ -23,7 +23,7 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
 
     async function fetchData() {
         const response = await apiRequest(
-            `/api/users/stats/errors?dataset_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
+            `/api/users/stats/errors?dataset_id=${datasetId || ''}&exercise_id=${exerciseId || ''}&is_teacher=${isTeacher ? '1' : '0'}`,
             'GET'
         );
         setData(response.data);
@@ -273,7 +273,7 @@ function LearningStatsErrors({ classId = null, exerciseId = null, isTeacher = fa
                                 </Card.Header>
                                 <Card.Body>
                                     <ResponsiveContainer width="100%" height={40 * perErrorData.length}>
-                                        <BarChart layout="vertical" data={perErrorData}>
+                                        <BarChart layout="vertical" data={perErrorData} margin={{ left: 40, right: 60 }}>
                                             <XAxis type="number" hide />
                                             <YAxis type="category" dataKey="name" width={200} />
                                             <Tooltip content={barTooltip} />

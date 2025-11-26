@@ -19,6 +19,8 @@ function ExerciseList() {
 
     const getExercises = useCallback(async () => {
         const response = await apiRequest(`/api/exercises?dataset_id=${datasetId}`, 'GET');
+
+        // TODO: sort exercises by name
         setExercises(response.data);
     }, [datasetId, apiRequest]);
 

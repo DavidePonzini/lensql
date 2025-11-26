@@ -10,14 +10,14 @@ import Col from 'react-bootstrap/Col';
 
 import ObservedOnce from "../ObservedOnce";
 
-function LearningStatsMessages({ classId = null, exerciseId = null, isTeacher = false }) {
+function LearningStatsMessages({ datasetId = null, exerciseId = null, isTeacher = false }) {
     const { t } = useTranslation();
     const { apiRequest } = useAuth();
     const [data, setData] = useState(null);
 
     async function fetchData() {
         const response = await apiRequest(
-            `/api/users/stats/messages?dataset_id=${classId || ''}&exercise_id=${exerciseId || ''}`,
+            `/api/users/stats/messages?dataset_id=${datasetId || ''}&exercise_id=${exerciseId || ''}&is_teacher=${isTeacher ? '1' : '0'}`,
             'GET');
         setData(response.data);
     }

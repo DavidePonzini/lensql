@@ -11,7 +11,7 @@ import LearningStatsAll from '../../components/learningStats/LearningStatsAll';
 
 import DatasetUpdate from './DatasetUpdate';
 
-function DatasetCard({ title, datasetId, isTeacher = false, participants, exercises, queries, refreshDatasets }) {
+function DatasetCard({ title, datasetId, isTeacher = false, participants, exercises, queriesUser, queriesStudents, refreshDatasets }) {
     const { apiRequest, userInfo } = useAuth();
     const { t } = useTranslation();
 
@@ -60,16 +60,19 @@ function DatasetCard({ title, datasetId, isTeacher = false, participants, exerci
             <Card.Body>
                 <strong>{t('pages.datasets.dataset_card.exercises')}:</strong> {exercises}
                 <br />
-                <strong>{t('pages.datasets.dataset_card.queries')}:</strong> {queries}
+                <strong>{t('pages.datasets.dataset_card.queries_user')}:</strong> {queriesUser}
+                <br />
+                <br />
+                <strong>{t('pages.datasets.dataset_card.join_code')}:</strong> {datasetId}
 
                 {isTeacher && (
                     <>
                         <hr />
                         <span className="badge bg-success">{t('pages.datasets.dataset_card.badge_teacher')}</span>
                         <br />
-                        <strong>{t('pages.datasets.dataset_card.join_code')}:</strong> {datasetId}
-                        <br />
                         <strong>{t('pages.datasets.dataset_card.students')}:</strong> {participants}
+                        <br />
+                        <strong>{t('pages.datasets.dataset_card.queries_students')}:</strong> {queriesStudents}
                     </>
                 )}
             </Card.Body>
@@ -88,26 +91,28 @@ function DatasetCard({ title, datasetId, isTeacher = false, participants, exerci
                     title={title}
                 />
 
-                <Button
-                    variant="danger"
-                    onClick={handleLeave}
-                    className='me-2'
+                <ButtonModal
+                    className="btn btn-info me-2"
+                    title={t('pages.datasets.dataset_card.my_learning_analytics')}
+                    buttonText={t('pages.datasets.dataset_card.my_learning_analytics')}
+                    fullscreen={true}
                 >
-                    {t('pages.datasets.dataset_card.leave')}
-                </Button>
+                    <LearningStatsAll datasetId={datasetId} isTeacher={false} />
+                </ButtonModal>
+
+                {/^[a-zA-Z0-9]+$/.test(datasetId) && (
+                    <Button
+                        variant="danger"
+                        onClick={handleLeave}
+                        className='me-2'
+                    >
+                        {t('pages.datasets.dataset_card.leave')}
+                    </Button>
+                )}
 
                 {isTeacher && (
                     <>
                         <div className='vr me-2 mb-1' style={{ verticalAlign: 'middle', height: '2.5rem' }} />
-
-                        <ButtonModal
-                            className="btn btn-info me-2"
-                            title={t('pages.datasets.dataset_card.learning_analytics')}
-                            buttonText={t('pages.datasets.dataset_card.learning_analytics')}
-                            fullscreen={true}
-                        >
-                            <LearningStatsAll datasetId={datasetId} isTeacher={isTeacher} />
-                        </ButtonModal>
 
                         <DatasetUpdate
                             datasetId={datasetId}
@@ -115,6 +120,16 @@ function DatasetCard({ title, datasetId, isTeacher = false, participants, exerci
                             refresh={refreshDatasets}
                             className="btn btn-warning me-2"
                         />
+
+                        <ButtonModal
+                            className="btn btn-info me-2"
+                            title={t('pages.datasets.dataset_card.student_learning_analytics')}
+                            buttonText={t('pages.datasets.dataset_card.student_learning_analytics')}
+                            fullscreen={true}
+                        >
+                            <LearningStatsAll datasetId={datasetId} isTeacher={true} />
+                        </ButtonModal>
+
 
                         <ButtonModal
                             className="btn btn-warning me-2"

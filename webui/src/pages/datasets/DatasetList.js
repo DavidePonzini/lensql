@@ -35,6 +35,8 @@ function DatasetList() {
 
     const getDatasets = useCallback(async () => {
         const response = await apiRequest('/api/datasets', 'GET');
+
+        // TODO: sort datasets by id
         setDatasets(response.data);
     }, [apiRequest]);
 
@@ -58,24 +60,25 @@ function DatasetList() {
                         isTeacher={cl.is_teacher}
                         participants={cl.participants}
                         exercises={cl.exercises}
-                        queries={cl.queries}
+                        queriesUser={cl.queries_user}
+                        queriesStudents={cl.queries_students}
                         refreshDatasets={getDatasets}
                     />
                 ))}
             </CardList>
 
+            <hr />
             <p>{t('pages.datasets.dataset_list.new_dataset_suggestion')}</p>
 
-            <hr />
+            <DatasetAdd
+                refresh={getDatasets}
+                className="btn btn-success me-2 mb-2"
+            />
+
             <Button variant="primary" onClick={handleJoinDataset} className="me-2 mb-2">
                 <i className="fa fa-plus me-1"></i>
                 {t('pages.datasets.dataset_list.join')}
             </Button>
-
-            <DatasetAdd
-                refresh={getDatasets}
-                className="btn btn-secondary me-2 mb-2"
-            />
         </div>
     );
 }

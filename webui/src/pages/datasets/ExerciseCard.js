@@ -129,9 +129,9 @@ function ExerciseCard({
 
                         <ButtonModal
                             className="btn btn-info me-2 mb-1"
-                            title={t('pages.datasets.exercise.analytics')}
+                            title={t('pages.datasets.exercise.student_analytics')}
                             fullscreen
-                            buttonText={t('pages.datasets.exercise.analytics')}
+                            buttonText={t('pages.datasets.exercise.student_analytics')}
                         >
                             <LearningStatsAll exerciseId={exerciseId} isTeacher={isTeacher} />
                         </ButtonModal>

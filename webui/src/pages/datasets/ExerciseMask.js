@@ -12,6 +12,7 @@ function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolu
                     className="form-control"
                     defaultValue={title}
                     onInput={(e) => setTitle(e.target.value)}
+                    placeholder={t('pages.datasets.exercise_mask.title_placeholder')}
                 />
             </div>
 
@@ -22,6 +23,7 @@ function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolu
                     rows="3"
                     defaultValue={request}
                     onInput={(e) => setRequest(e.target.value)}
+                    placeholder={t('pages.datasets.exercise_mask.request_placeholder')}
                 />
             </div>
 
@@ -29,7 +31,7 @@ function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolu
                 <label className="form-label">{t('pages.datasets.exercise_mask.answer_optional')}</label>
 
                 {solutions.map((solution, idx) => (
-                    <>
+                    <div>
                         <textarea
                             className="form-control"
                             rows="3"
@@ -44,7 +46,7 @@ function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolu
 
                         <button
                             type="button"
-                            className="btn btn-danger mt-2"
+                            className="btn btn-danger my-2"
                             key={`remove-${idx}`}
                             onClick={() => {
                                 const newSolutions = solutions.slice();
@@ -54,16 +56,18 @@ function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolu
                         >
                             {t('pages.datasets.exercise_mask.remove_answer')}
                         </button>
-                    </>
+                    </div>
                 ))}
 
-                <button
-                    type="button"
-                    className="btn btn-secondary mt-2"
-                    onClick={() => setSolutions([...solutions, ''])}
-                >
-                    {t('pages.datasets.exercise_mask.add_answer')}
-                </button>
+                <div>
+                    <button
+                        type="button"
+                        className="btn btn-success mt-2"
+                        onClick={() => setSolutions([...solutions, ''])}
+                    >
+                        {t('pages.datasets.exercise_mask.add_answer')}
+                    </button>
+                </div>
             </div>
         </>
     );

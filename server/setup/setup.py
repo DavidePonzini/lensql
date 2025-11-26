@@ -33,7 +33,7 @@ if __name__ == '__main__':
                 'search_path': 'public',
             },
         ]),
-        ('miedema.sql', '_WELCOME_MIEDEMA', 'Sample Dataset: Miedema', [
+        ('miedema.sql', 'WELCOME_MIEDEMA', 'Sample Dataset: Miedema', [
             {
                 'name': 'Exercise 1',
                 'request': 'List all IDs&names of customer living in Eindhoven.',

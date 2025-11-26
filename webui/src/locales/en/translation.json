@@ -197,14 +197,16 @@
             },
             "dataset_card": {
                 "exercises": "Exercises",
-                "queries": "Queries executed",
+                "queries_user": "Queries executed",
+                "queries_students": "Queries executed by students",
                 "badge_teacher": "Teacher",
                 "join_code": "Join Code",
                 "students": "Students",
                 "open": "Open",
                 "leave": "Leave",
                 "confirm_leave": "Are you sure you want to leave this dataset?",
-                "learning_analytics": "Learning Analytics",
+                "my_learning_analytics": "My Learning Analytics",
+                "student_learning_analytics": "Students' Learning Analytics",
                 "set_teachers": "Set Teachers",
                 "participants": "Participants"
             },
@@ -218,13 +220,17 @@
             "dataset_mask": {
                 "title_label": "Title",
                 "dataset_label": "Dataset (Optional)",
+                "search_path_label": "Search Path (Default: public)",
                 "tips_title": "Tips",
                 "tips": [
                     "Include the whole script into a <code>BEGIN; ... COMMIT;</code> block",
                     "Begin the script with <code>DROP SCHEMA IF EXISTS schema_name CASCADE;</code>",
                     "Use a unique <code>search_path</code> for each dataset",
                     "Group insertions into a single <code>INSERT INTO</code> statement for each table to greatly improve performance"
-                ]
+                ],
+                "title_placeholder": "Descriptive title for the dataset",
+                "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;",
+                "search_path_placeholder": "schema_name"
             },
             "dataset_update": {
                 "modal_title": "Edit Dataset",
@@ -244,7 +250,7 @@
                 "archive": "Archive",
                 "unarchive": "Unarchive",
                 "open": "Open",
-                "analytics": "Learning Analytics",
+                "student_analytics": "Students' Learning Analytics",
                 "edit": "Edit",
                 "objectives_set": "Set Objectives",
                 "hide": "Hide",
@@ -261,7 +267,11 @@
             "exercise_mask": {
                 "title": "Title",
                 "request": "Request",
-                "answer_optional": "Answer (Optional)"
+                "answer_optional": "Answer (Optional)",
+                "add_answer": "Add Answer",
+                "remove_answer": "Remove Answer",
+                "title_placeholder": "Short, descriptive title for the exercise",
+                "request_placeholder": "What should the query do?"
             },
             "exercise_update": {
                 "title": "Edit Exercise",

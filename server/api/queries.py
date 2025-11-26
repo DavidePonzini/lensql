@@ -41,16 +41,22 @@ def run_query():
     # At this point, the batch has not been logged yet
     if excercise.count_query_batches(user) == 0:
         own_exercises_with_at_least_one_own_query = user.count_own_exercises_with_at_least_one_own_query()
-        if own_exercises_with_at_least_one_own_query in gamification.rewards.Badges.CREATE_EXERCISES:
-            badges.append(gamification.rewards.Badges.CREATE_EXERCISES[own_exercises_with_at_least_one_own_query])
+        for k, v in gamification.rewards.Badges.CREATE_EXERCISES.items():
+            if own_exercises_with_at_least_one_own_query >= k:
+                if not user.has_badge(v.reason):
+                    badges.append(v)
 
     # Gamification: query execution
     if db.admin.Query.is_new(query_str, user):
         rewards.append(gamification.rewards.Actions.Query.UNIQUE_RUN)
     
         unique_queries_count = user.count_unique_queries()
-        if unique_queries_count in gamification.rewards.Badges.QUERIES_UNIQUE:
-            badges.append(gamification.rewards.Badges.QUERIES_UNIQUE[unique_queries_count])
+
+        for k, v in gamification.rewards.Badges.QUERIES_UNIQUE.items():
+            if unique_queries_count >= k:
+                if not user.has_badge(v.reason):
+                    badges.append(v)
+
     else:
         rewards.append(gamification.rewards.Actions.Query.RUN)
 
@@ -62,8 +68,11 @@ def run_query():
 
     # Gamification: daily usage
     days_active = user.count_days_active()
-    if days_active in gamification.rewards.Badges.DAILY_USAGE:
-        badges.append(gamification.rewards.Badges.DAILY_USAGE[days_active])
+
+    for k,v in gamification.rewards.Badges.DAILY_USAGE.items():
+        if days_active >= k:
+            if not user.has_badge(v.reason):
+                badges.append(v)
 
     user.add_rewards(rewards=rewards, badges=badges)
     exercise_solutions = excercise.solutions
@@ -275,8 +284,11 @@ def check_solution():
 
             # Gamification: check Exercise Solved badge
             solved_count = user.count_exercises_solved()
-            if solved_count in gamification.rewards.Badges.EXERCISE_SOLUTIONS:
-                badges.append(gamification.rewards.Badges.EXERCISE_SOLUTIONS[solved_count])
+
+            for k,v in gamification.rewards.Badges.EXERCISE_SOLUTIONS.items():
+                if solved_count >= k:
+                    if not user.has_badge(v.reason):
+                        badges.append(v)
         else:
             rewards.append(gamification.rewards.Actions.Exercise.REPEATED)
 

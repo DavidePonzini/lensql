@@ -19,6 +19,9 @@ class User:
     def __init__(self, username: str):
         self.username = username
 
+        # Lazy properties
+        self._badges: list[tuple[str, int]] | None = None
+
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, User):
             return False
@@ -171,6 +174,35 @@ class User:
     # endregion
 
     # region Badges
+    def has_badge(self, badge: str, rank: int = 1) -> bool:
+        '''Check if the user has a specific badge'''
+
+        if self._badges is None:
+            query = database.sql.SQL(
+                '''
+                    SELECT
+                        badge,
+                        rank
+                    FROM {schema}.badges
+                    WHERE
+                        username = {username}
+                        AND rank = {rank}
+                '''
+            ).format(
+                schema=database.sql.Identifier(SCHEMA),
+                username=database.sql.Placeholder('username'),
+                rank=database.sql.Placeholder('rank')
+            )
+
+            result = db.execute_and_fetch(query, {
+                'username': self.username,
+                'rank': rank
+            })
+
+            self._badges = [(row[0], row[1]) for row in result]
+        
+        return (badge, rank) in self._badges
+
     def count_days_active(self) -> int:
         '''Get the amount of days a user has been active in LensQL'''
 
@@ -195,7 +227,8 @@ class User:
     def count_all_datasets_joined(self) -> int:
         '''Get the amount of datasets a user has joined'''
 
-        query = database.sql.SQL('''
+        query = database.sql.SQL(
+        '''
             SELECT
                 COUNT(*)
             FROM
@@ -203,6 +236,7 @@ class User:
             WHERE
                 username = {username}
                 AND is_teacher = FALSE
+                AND dataset_id ~ '^[[:alnum:]]+$';      -- Don't count special datasets
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username')
@@ -237,8 +271,11 @@ class User:
 
         return result[0][0] if result else 0
 
-    def add_badge(self, badge: str, rank: int = 1) -> None:
+    def _add_badge(self, badge: str, rank: int = 1) -> bool:
         '''Add a badge to a user'''
+
+        if self.has_badge(badge, rank):
+            return False
 
         query = database.sql.SQL('''
             INSERT INTO {schema}.badges (username, badge, rank)
@@ -256,6 +293,11 @@ class User:
             'badge': badge,
             'rank': rank
         })
+
+        if self._badges is not None:
+            self._badges.append((badge, rank))
+
+        return True
 
     def count_feedbacks(self) -> int:
         '''Get the amount of feedbacks provided by a user'''
@@ -360,12 +402,14 @@ class User:
 
         query = database.sql.SQL('''
             SELECT
-                COUNT(DISTINCT exercise_id)
+                COUNT(DISTINCT qb.exercise_id)
             FROM
-                {schema}.exercise_solutions
+                {schema}.exercise_solutions es
+                JOIN {schema}.queries q ON q.id = es.id
+                JOIN {schema}.query_batches qb ON qb.id = q.batch_id
             WHERE
-                username = {username}
-                AND is_correct = TRUE
+                qb.username = {username}
+                AND es.is_correct = TRUE
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username')
@@ -404,13 +448,13 @@ class User:
         '''Add rewards to a user'''
 
         for badge in badges:
-            self.add_badge(badge.reason)
+            self._add_badge(badge.reason)
 
-        reward = gamification.Reward('')
+        total_reward = gamification.Reward('')
         for r in rewards + badges:
-            reward += r
+            total_reward += r
 
-        if reward.is_empty():
+        if total_reward.is_empty():
             return
 
         query = database.sql.SQL('''
@@ -429,8 +473,8 @@ class User:
         )
 
         db.execute(query, {
-            'coins': reward.coins,
-            'experience': reward.experience,
+            'coins': total_reward.coins,
+            'experience': total_reward.experience,
             'username': self.username
         })
     
@@ -479,17 +523,18 @@ class User:
 
     # region Stats
 
-    #########################################################################################################################################
-    # USER STATS                                                                                                                            #
-    # class | exercise  | teacher   | result                                                                                                #
-    # ------|-----------|-----------|------------------------------------------------------------------------------------------------------ #
-    # ❌    | ❌        | ❌/✅     | stats for single user                                                                                 #
-    # ❌    | ✅        | ❌/✅     | N/A (should not happen, if we have an exercise, we have a class) -> fallback to stats for single user #
-    # ✅    | ❌        | ❌        | class stats for single student                                                                        #
-    # ✅    | ❌        | ✅        | class stats for ALL students                                                                          #
-    # ✅    | ✅        | ❌        | exercise stats for single student                                                                     #
-    # ✅    | ✅        | ✅        | exercise stats for ALL students                                                                       #
-    ########################################################################################################################################
+    #######################################################################
+    #                           USER STATS                                #
+    # ------------------------------------------------------------------- #
+    # dataset | exercise  | teacher   | result                            #
+    # --------|-----------|-----------|---------------------------------- #
+    # ❌      | ❌        | any       | stats for single user             #
+    # ❌      | ✅        | any       | shouldn't happen (fallback to {}) #
+    # ✅      | ❌        | ❌        | class stats for single student    #
+    # ✅      | ❌        | ✅        | class stats for ALL students      #
+    # ✅      | ✅        | ❌        | exercise stats for single student #
+    # ✅      | ✅        | ✅        | exercise stats for ALL students   #
+    #######################################################################
 
     def get_query_stats(self, *, dataset_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
         '''
@@ -508,10 +553,17 @@ class User:
 
         if dataset_id is None:
             # Global stats
-            query = database.sql.SQL('''
-                SELECT query_type, queries, queries_d, queries_success
-                FROM {schema}.v_stats_queries_by_user
-                WHERE username = {username}
+            query = database.sql.SQL(
+            '''
+                SELECT
+                    query_type,
+                    queries,
+                    queries_d,
+                    queries_success
+                FROM
+                    {schema}.v_stats_queries_by_user
+                WHERE
+                    username = {username}
             ''').format(
                 schema=database.sql.Identifier(SCHEMA),
                 username=database.sql.Placeholder('username')
@@ -521,11 +573,20 @@ class User:
         elif exercise_id is None:
             if is_teacher:
                 # Class-wide stats for teacher (excluding other teachers)
-                query = database.sql.SQL('''
-                    SELECT query_type, SUM(queries), SUM(queries_d), SUM(queries_success)
-                    FROM {schema}.v_stats_queries_by_exercise
-                    WHERE dataset_id = {dataset_id}
-                    GROUP BY query_type
+                query = database.sql.SQL(
+                '''
+                    SELECT
+                        query_type,
+                        SUM(queries),
+                        SUM(queries_d),
+                        SUM(queries_success)
+                    FROM
+                        {schema}.v_stats_queries_by_exercise
+                    WHERE
+                        dataset_id = {dataset_id}
+                        AND is_teacher = FALSE
+                    GROUP BY
+                        query_type
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     dataset_id=database.sql.Placeholder('dataset_id')
@@ -533,10 +594,18 @@ class User:
                 params = {'dataset_id': dataset_id}
             else:
                 # Class stats for student
-                query = database.sql.SQL('''
-                    SELECT query_type, queries, queries_d, queries_success
-                    FROM {schema}.v_stats_queries_by_exercise
-                    WHERE dataset_id = {dataset_id} AND username = {username}
+                query = database.sql.SQL(
+                '''
+                    SELECT
+                        query_type,
+                        queries,
+                        queries_d,
+                        queries_success
+                    FROM
+                        {schema}.v_stats_queries_by_exercise
+                    WHERE
+                        dataset_id = {dataset_id}
+                        AND username = {username}
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     dataset_id=database.sql.Placeholder('dataset_id'),
@@ -547,11 +616,20 @@ class User:
         else:
             if is_teacher:
                 # Exercise stats for all students
-                query = database.sql.SQL('''
-                    SELECT query_type, SUM(queries), SUM(queries_d), SUM(queries_success)
-                    FROM {schema}.v_stats_queries_by_exercise
-                    WHERE exercise_id = {exercise_id}
-                    GROUP BY query_type
+                query = database.sql.SQL(
+                '''
+                    SELECT
+                        query_type,
+                        SUM(queries),
+                        SUM(queries_d),
+                        SUM(queries_success)
+                    FROM
+                        {schema}.v_stats_queries_by_exercise
+                    WHERE
+                        exercise_id = {exercise_id}
+                        AND is_teacher = FALSE
+                    GROUP BY
+                        query_type
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     exercise_id=database.sql.Placeholder('exercise_id')
@@ -559,10 +637,18 @@ class User:
                 params = {'exercise_id': exercise_id}
             else:
                 # Exercise stats for a student
-                query = database.sql.SQL('''
-                    SELECT query_type, queries, queries_d, queries_success
-                    FROM {schema}.v_stats_queries_by_exercise
-                    WHERE exercise_id = {exercise_id} AND username = {username}
+                query = database.sql.SQL(
+                '''
+                    SELECT
+                        query_type,
+                        queries,
+                        queries_d,
+                        queries_success
+                    FROM
+                        {schema}.v_stats_queries_by_exercise
+                    WHERE
+                        exercise_id = {exercise_id}
+                        AND username = {username}
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     exercise_id=database.sql.Placeholder('exercise_id'),
@@ -581,9 +667,9 @@ class User:
             'query_types': [
                 {
                     'type': row[0],
-                    'count': row[1],
-                    'count_d': row[2],
-                    'success': row[3]
+                    'count': int(row[1]),
+                    'count_d': int(row[2]),
+                    'success': int(row[3])
                 } for row in result
             ],
         }
@@ -596,10 +682,17 @@ class User:
 
         if dataset_id is None:
             # Global stats
-            query = database.sql.SQL('''
-                SELECT messages, messages_select, messages_success, messages_feedback
-                FROM {schema}.v_stats_messages_by_user
-                WHERE username = {username}
+            query = database.sql.SQL(
+            '''
+                SELECT
+                    messages,
+                    messages_select,
+                    messages_success,
+                    messages_feedback
+                FROM
+                    {schema}.v_stats_messages_by_user
+                WHERE
+                    username = {username}
             ''').format(
                 schema=database.sql.Identifier(SCHEMA),
                 username=database.sql.Placeholder('username')
@@ -608,9 +701,15 @@ class User:
 
         elif exercise_id is None:
             if is_teacher:
-                query = database.sql.SQL('''
-                    SELECT SUM(messages), SUM(messages_select), SUM(messages_success), SUM(messages_feedback)
-                    FROM {schema}.v_stats_messages_by_exercise
+                query = database.sql.SQL(
+                '''
+                    SELECT
+                        SUM(messages),
+                        SUM(messages_select),
+                        SUM(messages_success),
+                        SUM(messages_feedback)
+                    FROM
+                    {schema}.v_stats_messages_by_exercise
                     WHERE dataset_id = {dataset_id}
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
@@ -618,10 +717,18 @@ class User:
                 )
                 params = {'dataset_id': dataset_id}
             else:
-                query = database.sql.SQL('''
-                    SELECT SUM(messages), SUM(messages_select), SUM(messages_success), SUM(messages_feedback)
-                    FROM {schema}.v_stats_messages_by_exercise
-                    WHERE dataset_id = {dataset_id} AND username = {username}
+                query = database.sql.SQL(
+                '''
+                    SELECT
+                        SUM(messages),
+                        SUM(messages_select),
+                        SUM(messages_success),
+                        SUM(messages_feedback)
+                    FROM
+                        {schema}.v_stats_messages_by_exercise
+                    WHERE
+                        dataset_id = {dataset_id}
+                        AND username = {username}
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     dataset_id=database.sql.Placeholder('dataset_id'),
@@ -631,20 +738,35 @@ class User:
 
         else:
             if is_teacher:
-                query = database.sql.SQL('''
-                    SELECT SUM(messages), SUM(messages_select), SUM(messages_success), SUM(messages_feedback)
-                    FROM {schema}.v_stats_messages_by_exercise
-                    WHERE exercise_id = {exercise_id}
+                query = database.sql.SQL(
+                '''
+                    SELECT
+                        SUM(messages),
+                        SUM(messages_select),
+                        SUM(messages_success),
+                        SUM(messages_feedback)
+                    FROM
+                        {schema}.v_stats_messages_by_exercise
+                    WHERE
+                        exercise_id = {exercise_id}
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     exercise_id=database.sql.Placeholder('exercise_id')
                 )
                 params = {'exercise_id': exercise_id}
             else:
-                query = database.sql.SQL('''
-                    SELECT messages, messages_select, messages_success, messages_feedback
-                    FROM {schema}.v_stats_messages_by_exercise
-                    WHERE exercise_id = {exercise_id} AND username = {username}
+                query = database.sql.SQL(
+                '''
+                    SELECT
+                        messages,
+                        messages_select,
+                        messages_success,
+                        messages_feedback
+                    FROM
+                        {schema}.v_stats_messages_by_exercise
+                    WHERE
+                        exercise_id = {exercise_id}
+                        AND username = {username}
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     exercise_id=database.sql.Placeholder('exercise_id'),
@@ -665,10 +787,10 @@ class User:
         result = result[0]
 
         return {
-            'messages': result[0] or 0,
-            'messages_select': result[1] or 0,
-            'messages_success': result[2] or 0,
-            'messages_feedback': result[3] or 0,
+            'messages': int(result[0] or 0),
+            'messages_select': int(result[1] or 0),
+            'messages_success': int(result[2] or 0),
+            'messages_feedback': int(result[3] or 0),
         }
 
     def get_error_stats(self, *, dataset_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
@@ -683,13 +805,11 @@ class User:
                 '''
                     SELECT
                         error_id,
-                        COUNT(DISTINCT he.query_id)
+                        SUM(occurrences) AS occurrences
                     FROM
-                        {schema}.has_error he
-                        JOIN {schema}.queries q ON q.id = he.query_id
-                        JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                        {schema}.v_stats_errors_by_user
                     WHERE
-                        qb.username = {username}
+                        username = {username}
                     GROUP BY
                         error_id
                 '''
@@ -705,18 +825,15 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
-                            he.error_id,
-                            COUNT(DISTINCT he.query_id)
+                            error_id,
+                            SUM(occurrences) AS occurrences
                         FROM
-                            {schema}.has_error he
-                            JOIN {schema}.queries q ON q.id = he.query_id
-                            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
-                            JOIN {schema}.class_members cm ON cm.username = qb.username
+                            {schema}.v_stats_errors_by_exercise
                         WHERE
-                            cm.dataset_id = {dataset_id}
-                            AND cm.is_teacher = FALSE
+                            dataset_id = {dataset_id}
+                            AND is_teacher = FALSE
                         GROUP BY
-                            he.error_id
+                            error_id
                     '''
                 ).format(
                     schema=database.sql.Identifier(SCHEMA),
@@ -728,18 +845,15 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
-                            he.error_id,
-                            COUNT(DISTINCT he.query_id)
+                            error_id,
+                            SUM(occurrences) AS occurrences
                         FROM
-                            {schema}.has_error he
-                            JOIN {schema}.queries q ON q.id = he.query_id
-                            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
-                            JOIN {schema}.class_members cm ON cm.username = qb.username
+                            {schema}.v_stats_errors_by_exercise
                         WHERE
-                            cm.dataset_id = {dataset_id}
-                            AND qb.username = {username}
+                            dataset_id = {dataset_id}
+                            AND username = {username}
                         GROUP BY
-                            he.error_id
+                            error_id
                     '''
                 ).format(
                     schema=database.sql.Identifier(SCHEMA),
@@ -754,18 +868,15 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
-                            he.error_id,
-                            COUNT(DISTINCT he.query_id)
+                            error_id,
+                            SUM(occurrences) AS occurrences
                         FROM
-                            {schema}.has_error he
-                            JOIN {schema}.queries q ON q.id = he.query_id
-                            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
-                            JOIN {schema}.class_members cm ON cm.username = qb.username
+                            {schema}.v_stats_errors_by_exercise
                         WHERE
-                            q.exercise_id = {exercise_id}
-                            AND cm.is_teacher = FALSE
+                            exercise_id = {exercise_id}
+                            AND is_teacher = FALSE
                         GROUP BY
-                            he.error_id
+                            error_id
                     '''
                 ).format(
                     schema=database.sql.Identifier(SCHEMA),
@@ -777,17 +888,15 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
-                            he.error_id,
-                            COUNT(DISTINCT he.query_id)
+                            error_id,
+                            SUM(occurrences) AS occurrences
                         FROM
-                            {schema}.has_error he
-                            JOIN {schema}.queries q ON q.id = he.query_id
-                            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                            {schema}.v_stats_errors_by_exercise
                         WHERE
-                            q.exercise_id = {exercise_id}
-                            AND qb.username = {username}
+                            exercise_id = {exercise_id}
+                            AND username = {username}
                         GROUP BY
-                            he.error_id
+                            error_id
                     '''
                 ).format(
                     schema=database.sql.Identifier(SCHEMA),
@@ -803,7 +912,7 @@ class User:
             'errors': [
                 {
                     'error_id': row[0],
-                    'count': row[1],                
+                    'count': int(row[1]),                
                 } for row in result
             ],
             'timeline': timeline,
@@ -820,17 +929,13 @@ class User:
             query = database.sql.SQL(
                 '''
                     SELECT
-                        DATE(q.ts) AS day,
-                        he.error_id,
-                        COUNT(DISTINCT he.query_id)
+                        day,
+                        error_id,
+                        occurrences
                     FROM
-                        {schema}.has_error he
-                        JOIN {schema}.queries q ON q.id = he.query_id
-                        JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                        {schema}.v_stats_error_timeline_by_user
                     WHERE
-                        qb.username = {username}
-                    GROUP BY
-                        day, he.error_id
+                        username = {username}
                     ORDER BY
                         day ASC
                 '''
@@ -841,23 +946,20 @@ class User:
             params = {'username': self.username}
         elif exercise_id is None:
             if is_teacher:
-                # Class-wide stats for teacher (excluding other teachers)
+                # Dataset-wide stats for teacher (excluding other teachers)
                 query = database.sql.SQL(
                     '''
                         SELECT
-                            DATE(q.ts) AS day,
-                            he.error_id,
-                            COUNT(DISTINCT he.query_id)
+                            day,
+                            error_id,
+                            SUM(occurrences) AS occurrences
                         FROM
-                            {schema}.has_error he
-                            JOIN {schema}.queries q ON q.id = he.query_id
-                            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
-                            JOIN {schema}.class_members cm ON cm.username = qb.username
+                            {schema}.v_stats_error_timeline_by_exercise
                         WHERE
-                            cm.dataset_id = {dataset_id}
-                            AND cm.is_teacher = FALSE
+                            dataset_id = {dataset_id}
+                            AND is_teacher = FALSE
                         GROUP BY
-                            day, he.error_id
+                            day, error_id
                         ORDER BY
                             day ASC
                     '''
@@ -867,23 +969,20 @@ class User:
                 )
                 params = {'dataset_id': dataset_id}
             else:
-                # Class stats for student
+                # Dataset stats for student
                 query = database.sql.SQL(
                     '''
                         SELECT
-                            DATE(q.ts) AS day,
-                            he.error_id,
-                            COUNT(DISTINCT he.query_id)
+                            day,
+                            error_id,
+                            SUM(occurrences) AS occurrences 
                         FROM
-                            {schema}.has_error he
-                            JOIN {schema}.queries q ON q.id = he.query_id
-                            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
-                            JOIN {schema}.class_members cm ON cm.username = qb.username
+                            {schema}.v_stats_error_timeline_by_exercise
                         WHERE
-                            cm.dataset_id = {dataset_id}
-                            AND qb.username = {username}
+                            dataset_id = {dataset_id}
+                            AND username = {username}
                         GROUP BY
-                            day, he.error_id
+                            day, error_id
                         ORDER BY
                             day ASC
                     '''
@@ -899,19 +998,16 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
-                            DATE(q.ts) AS day,
-                            he.error_id,
-                            COUNT(DISTINCT he.query_id)
+                            day,
+                            error_id,
+                            SUM(occurrences) AS occurrences
                         FROM
-                            {schema}.has_error he
-                            JOIN {schema}.queries q ON q.id = he.query_id
-                            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
-                            JOIN {schema}.class_members cm ON cm.username = qb.username
+                            {schema}.v_stats_error_timeline_by_exercise
                         WHERE
-                            q.exercise_id = {exercise_id}
-                            AND cm.is_teacher = FALSE
+                            exercise_id = {exercise_id}
+                            AND is_teacher = FALSE
                         GROUP BY
-                            day, he.error_id
+                            day, error_id
                         ORDER BY
                             day ASC
                     '''
@@ -925,18 +1021,16 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
-                            DATE(q.ts) AS day,
-                            he.error_id,
-                            COUNT(DISTINCT he.query_id)
+                            day,
+                            error_id,
+                            SUM(occurrences) AS occurrences
                         FROM
-                            {schema}.has_error he
-                            JOIN {schema}.queries q ON q.id = he.query_id
-                            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                            {schema}.v_stats_error_timeline_by_exercise
                         WHERE
-                            q.exercise_id = {exercise_id}
-                            AND qb.username = {username}
+                            exercise_id = {exercise_id}
+                            AND username = {username}
                         GROUP BY
-                            day, he.error_id
+                            day, error_id
                         ORDER BY
                             day ASC
                     '''
@@ -952,8 +1046,8 @@ class User:
         return [
             {
                 'date': row[0],
-                'error_id': row[1],
-                'count': row[2],
+                'error_id': int(row[1]),
+                'count': int(row[2]),
             } for row in result
         ]            
     # endregion
@@ -970,64 +1064,23 @@ class User:
             - is_teacher: Whether the user is a teacher in the dataset
             - participants: The number of participants in the dataset
             - exercises: The number of exercises in the dataset
-            - queries: The number of queries run by the user (or all students if the user is a teacher)
+            - queries_user: The number of queries run by the user
+            - queries_students: The number of queries run by students (0 if the user is not a teacher)
         
         '''
 
         query = database.sql.SQL(
         '''
             SELECT
-                d.id,
-                d.name,
-                dm.is_teacher,
-
-                -- total number of students in the dataset
-                (
-                    SELECT COUNT(*)
-                    FROM {schema}.dataset_members dm2
-                    WHERE
-                        dm2.dataset_id = d.id
-                        AND dm2.is_teacher = FALSE
-                        AND dm2.is_active = TRUE
-                ) AS participants,
-
-                -- total number of exercises in the dataset
-                (
-                    SELECT COUNT(*)
-                    FROM {schema}.exercises e2
-                    WHERE
-                        e2.dataset_id = d.id
-                        AND (dm.is_teacher OR NOT e2.is_hidden)
-                ) AS exercises,
-
-                -- count of queries:
-                -- if the user is a teacher → count queries from students only
-                -- else → only count user's own queries
-                COUNT(q.*) FILTER (
-                    WHERE
-                        qb.username IS NOT NULL
-                        AND (
-                            NOT dm.is_teacher AND qb.username = dm.username
-                            OR dm.is_teacher AND qb.username IN (
-                                SELECT username
-                                FROM {schema}.dataset_members
-                                WHERE dataset_id = d.id AND is_teacher = FALSE
-                            )
-                        )
-                ) AS queries
-
-            FROM {schema}.datasets d
-            JOIN {schema}.dataset_members dm ON dm.dataset_id = d.id
-
-            LEFT JOIN {schema}.exercises e ON e.dataset_id = d.id
-            LEFT JOIN {schema}.query_batches qb ON qb.exercise_id = e.id
-            LEFT JOIN {schema}.queries q ON q.batch_id = qb.id
-
-            WHERE dm.username = {username}
-            AND dm.is_active = TRUE
-
-            GROUP BY d.id, d.name, dm.is_teacher, dm.joined_ts
-            ORDER BY dm.joined_ts DESC, d.name;
+                id,
+                name,
+                is_teacher,
+                participants,
+                exercises,
+                queries_user,
+                queries_students
+            FROM {schema}.v_dataset_list
+            WHERE username = {username}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username')
@@ -1040,9 +1093,10 @@ class User:
         return [{
             'dataset_id': row[0],
             'title': row[1],
-            'is_teacher': row[2],
-            'participants': row[3],
-            'exercises': row[4],
-            'queries': row[5]
+            'is_teacher': bool(row[2]),
+            'participants': int(row[3]),
+            'exercises': int(row[4]),
+            'queries_user': int(row[5]),
+            'queries_students': int(row[6])
         } for row in result]
     # endregion

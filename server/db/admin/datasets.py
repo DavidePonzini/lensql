@@ -73,8 +73,8 @@ class Dataset:
     
     @property
     def is_special(self) -> bool:
-        '''Check if the dataset is special (ID starts with a special character)'''
-        return not self.dataset_id[0].isalnum()
+        '''Check if the dataset is special (ID contains a special character)'''
+        return not self.dataset_id.isalnum()
     # endregion
 
     # region CRUD
