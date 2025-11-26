@@ -104,7 +104,7 @@ class User:
             'school': school,
             'is_admin': is_admin,
         })
-        
+
         return True
 
     def delete_account(self) -> None:
