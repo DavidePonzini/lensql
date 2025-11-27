@@ -36,8 +36,18 @@ function DatasetList() {
     const getDatasets = useCallback(async () => {
         const response = await apiRequest('/api/datasets', 'GET');
 
-        // TODO: sort datasets by id
-        setDatasets(response.data);
+        const sortedDatasets = (response.data ?? []).slice().sort((a, b) => {
+            const aSpecial = !/^[a-zA-Z0-9]+$/i.test(a.dataset_id);
+            const bSpecial = !/^[a-zA-Z0-9]+$/i.test(b.dataset_id);
+
+            if (aSpecial !== bSpecial) {
+                return aSpecial ? -1 : 1;
+            }
+
+            return (a.dataset_id.toLowerCase() > b.dataset_id.toLowerCase()) - (a.dataset_id.toLowerCase() < b.dataset_id.toLowerCase());
+        });
+
+        setDatasets(sortedDatasets);
     }, [apiRequest]);
 
     useEffect(() => {

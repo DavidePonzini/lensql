@@ -20,8 +20,12 @@ function ExerciseList() {
     const getExercises = useCallback(async () => {
         const response = await apiRequest(`/api/exercises?dataset_id=${datasetId}`, 'GET');
 
-        // TODO: sort exercises by name
-        setExercises(response.data);
+        const sortedExercises = (response.data ?? []).slice().sort((a, b) => {
+            return (a.exercise_id > b.exercise_id) - (a.exercise_id < b.exercise_id);
+        });
+
+
+        setExercises(sortedExercises);
     }, [datasetId, apiRequest]);
 
     useEffect(() => {
