@@ -27,9 +27,9 @@ function Profile() {
 
             <h2>{t('pages.profile.profile.settings')}</h2>
             <div className="mb-3">
-                <a className='btn btn-primary' href='#change-password' role='button' data-bs-toggle='collapse' aria-expanded='false' aria-controls='change-password'>
+                <button className='btn btn-primary' type='button' data-bs-toggle='collapse' data-bs-target='#change-password' aria-expanded='false' aria-controls='change-password'>
                     {t('pages.profile.profile.change_password.title')}
-                </a>
+                </button>
 
                 <div id="change-password" className="collapse mt-3" style={{maxWidth: 500}}>
                     <ChangePassword />
