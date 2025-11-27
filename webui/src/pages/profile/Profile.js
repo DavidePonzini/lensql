@@ -6,7 +6,7 @@ import useGamificationData from '../../hooks/useGamificationData';
 import LevelTitle from './LevelTitle';
 
 import AlertUnderDevelopment from '../../components/AlertUnderDevelopment';
-import ChangePasswordButton from './ChangePasswordButton';
+import ChangePassword from './ChangePassword';
 
 function Profile() {
     const { userInfo } = useUserInfo();
@@ -25,14 +25,38 @@ function Profile() {
 
             <hr className="my-4" />
 
-            <p className="lead">{t('pages.profile.profile.settings')}</p>
+            <h2>{t('pages.profile.profile.settings')}</h2>
             <div className="mb-3">
-                <ChangePasswordButton />
+                <a className='btn btn-primary' href='#change-password' role='button' data-bs-toggle='collapse' aria-expanded='false' aria-controls='change-password'>
+                    {t('pages.profile.profile.change_password.title')}
+                </a>
+
+                <div id="change-password" className="collapse mt-3" style={{maxWidth: 500}}>
+                    <ChangePassword />
+                </div>
             </div>
 
             <hr className="my-4" />
 
-            <p className="lead">{t('pages.profile.profile.progress')}</p>
+            <h2>{t('pages.profile.profile.progress')}</h2>
+            {/*
+                TODO: make this part visually similar to learning stats
+            
+                |----------------------------------------------------------|
+                |           |               | How to earn more EXP         | 
+                |   LEVEL   | EXP Pie Chart | - ...                        |
+                |     5     |               | - ...                        | 
+                |----------------------------------------------------------|
+                |   <i>     | How to earn more Coins                       | 
+                |  Coins    | - ...                                        | 
+                |   7       | - ...                                        | 
+                |----------------------------------------------------------|
+                | Achievements                                             |
+                | X | X | X                                                |
+                | X | X | X                                                |
+                | X | X | X                                                |
+                |----------------------------------------------------------|
+            */}
             <section className="mb-4">
                 <h5><i className="fa fa-star me-2" />{t('pages.profile.profile.level.title')}</h5>
                 <p className="mb-1"><LevelTitle level={level} /></p>

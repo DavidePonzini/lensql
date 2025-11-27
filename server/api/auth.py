@@ -63,7 +63,11 @@ def reset_password():
     user = db.admin.User(get_jwt_identity())
 
     data = request.get_json()
+    old_password = data['old_password']
     new_password = data['new_password']
+
+    if not user.can_login(old_password):
+        return responses.response(False, message=_('Old password is incorrect.'))
 
     if not user.change_password(new_password):
         return responses.response(False, message=_('Failed to reset password. Please try again.'))

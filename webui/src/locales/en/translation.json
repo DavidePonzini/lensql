@@ -291,7 +291,7 @@
             },
             "profile": {
                 "welcome": "Welcome back, {{username}}!",
-                "progress": "Here's a look at your progress",
+                "progress": "Your Progess",
                 "level": {
                     "title": "Current Level",
                     "exp": "EXP: {{xp}} / {{xpToNext}}",
@@ -305,6 +305,19 @@
                 "achievements": {
                     "title": "Achievements",
                     "text": "You've earned the following achievements:"
+                },
+                "settings": "Settings",
+                "change_password": {
+                    "title": "Change Password",
+                    "current_password_label": "Current Password",
+                    "new_password_label": "New Password",
+                    "confirm_new_password_label": "Confirm New Password",
+                    "submit_button": "Update Password",
+                    "current_required": "Please enter your current password.",
+                    "confirm_required": "Please confirm your new password.",
+                    "password_mismatch_alert": "The passwords do not match.",
+                    "success_alert": "Your password has been updated successfully!",
+                    "error_generic": "An unexpected error occurred while updating your password."
                 }
             }
         },
