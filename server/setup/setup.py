@@ -21,7 +21,14 @@ if __name__ == '__main__':
             'file': 'explore.sql',
             'id': '_EXPLORE',
             'name': 'Explore SQL',
-            'exercises': []
+            'exercises': [
+                {
+                    'name': 'Explore SQL',
+                    'request': 'You can write any SQL query here',
+                    'solutions': [],
+                    'search_path': 'public',
+                }
+            ]
         },
         {
             'file': 'miedema.sql',
@@ -106,7 +113,7 @@ if __name__ == '__main__':
                     search_path=exercise_data['search_path'],
                 )
 
-                messages.success(f'  Exercise {exercise_data["name"]} added to dataset {dataset_name}')
+                messages.success(f'  Exercise {exercise_data["name"]} added to dataset {ds["name"]} successfully.')
     # endregion
 
     # region Default users

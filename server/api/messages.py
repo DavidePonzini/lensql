@@ -15,8 +15,11 @@ def _get_usage_badges(user: db.admin.User) -> list[gamification.Reward]:
     badges = []
 
     help_usage_count = user.count_help_usage()
-    if help_usage_count in gamification.rewards.Badges.HELP_USAGE:
-        badges.append(gamification.rewards.Badges.HELP_USAGE[help_usage_count])
+
+    for k, v in gamification.rewards.Badges.HELP_USAGE.value.items():
+        if k <= help_usage_count:
+            if not user.has_badge(v.reason):
+                badges.append(v)
 
     return badges
 
@@ -39,8 +42,10 @@ def feedback():
     rewards.append(gamification.rewards.Actions.Messages.FEEDBACK)
     feedback_count = user.count_feedbacks()
 
-    if feedback_count in gamification.rewards.Badges.FEEDBACK:
-        badges.append(gamification.rewards.Badges.FEEDBACK[feedback_count])
+    for k  , v in gamification.rewards.Badges.FEEDBACK.value.items():
+        if k <= feedback_count:
+            if not user.has_badge(v.reason):
+                badges.append(v)
 
     user.add_rewards(rewards=rewards, badges=badges)
 

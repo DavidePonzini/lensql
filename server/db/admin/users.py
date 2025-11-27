@@ -1,7 +1,8 @@
 from typing import Any
 from dav_tools import database
 from .connection import db, SCHEMA
-from server import gamification
+from ... import gamification
+from ...gamification.rewards import Badges
 
 import bcrypt
 
@@ -20,7 +21,7 @@ class User:
         self.username = username
 
         # Lazy properties
-        self._badges: list[tuple[str, int]] | None = None
+        self._badges: list[str] | None = None
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, User):
@@ -174,34 +175,109 @@ class User:
     # endregion
 
     # region Badges
-    def has_badge(self, badge: str, rank: int = 1) -> bool:
+    def get_badges(self) -> dict[str, dict[str, Any]]:
+        '''Return badges grouped by their prefix (name.split('.')[0]).'''
+
+        query = database.sql.SQL(
+            '''
+                SELECT badge
+                FROM {schema}.badges
+                WHERE username = {username}
+            '''
+        ).format(
+            schema=database.sql.Identifier(SCHEMA),
+            username=database.sql.Placeholder('username'),
+        )
+
+        result = db.execute_and_fetch(query, {
+            'username': self.username,
+        })
+
+        badge_names = [row[0] for row in result]
+
+
+        info = self.get_info()
+
+        current_level_up = gamification.XP(info['xp']).level
+        current_queries_unique = self.count_unique_queries()
+        current_daily_usage = self.count_days_active()
+
+        current_exercise_solutions = self.count_exercises_solved()
+        current_create_exercises = self.count_own_exercises_with_at_least_one_own_query()
+        current_join_dataset = self.count_all_datasets_joined()
+
+        current_help_usage = self.count_help_usage()
+        current_feedbacks = self.count_feedbacks()
+
+        result = {
+            Badges.LEVEL_UP.name.lower(): {
+                'rank': len([b for b in badge_names if b.startswith('level_up.')]),
+                'current': current_level_up,
+                'next': min([threshold for threshold in Badges.LEVEL_UP.value.keys() if threshold > current_level_up] or [current_level_up]),
+            },
+            Badges.QUERIES_UNIQUE.name.lower(): {
+                'rank': len([b for b in badge_names if b.startswith('queries_unique.')]),
+                'current': current_queries_unique,
+                'next': min([threshold for threshold in Badges.QUERIES_UNIQUE.value.keys() if threshold > current_queries_unique] or [current_queries_unique]),
+            },
+            Badges.DAILY_USAGE.name.lower(): {
+                'rank': len([b for b in badge_names if b.startswith('daily_usage.')]),
+                'current': current_daily_usage,
+                'next': min([threshold for threshold in Badges.DAILY_USAGE.value.keys() if threshold > current_daily_usage] or [current_daily_usage]),
+            },
+            Badges.EXERCISE_SOLUTIONS.name.lower(): {
+                'rank': len([b for b in badge_names if b.startswith('exercise_solutions.')]),
+                'current': current_exercise_solutions,
+                'next': min([threshold for threshold in Badges.EXERCISE_SOLUTIONS.value.keys() if threshold > current_exercise_solutions] or [current_exercise_solutions]),
+            },
+            Badges.CREATE_EXERCISES.name.lower(): {
+                'rank': len([b for b in badge_names if b.startswith('create_exercises.')]),
+                'current': current_create_exercises,
+                'next': min([threshold for threshold in Badges.CREATE_EXERCISES.value.keys() if threshold > current_create_exercises] or [current_create_exercises]),
+            },
+            Badges.JOIN_DATASET.name.lower(): {
+                'rank': len([b for b in badge_names if b.startswith('join_datasets.')]),
+                'current': current_join_dataset,
+                'next': min([threshold for threshold in Badges.JOIN_DATASET.value.keys() if threshold > current_join_dataset] or [current_join_dataset]),
+            },
+            Badges.HELP_USAGE.name.lower(): {
+                'rank': len([b for b in badge_names if b.startswith('help_usage.')]),
+                'current': current_help_usage,
+                'next': min([threshold for threshold in Badges.HELP_USAGE.value.keys() if threshold > current_help_usage] or [current_help_usage]),
+            },
+            Badges.FEEDBACK.name.lower(): {
+                'rank': len([b for b in badge_names if b.startswith('feedback.')]),
+                'current': current_feedbacks,
+                'next': min([threshold for threshold in Badges.FEEDBACK.value.keys() if threshold > current_feedbacks] or [current_feedbacks]),
+            },
+        }
+
+        return result
+
+    def has_badge(self, badge: str) -> bool:
         '''Check if the user has a specific badge'''
 
         if self._badges is None:
             query = database.sql.SQL(
                 '''
                     SELECT
-                        badge,
-                        rank
+                        badge
                     FROM {schema}.badges
                     WHERE
                         username = {username}
-                        AND rank = {rank}
                 '''
             ).format(
                 schema=database.sql.Identifier(SCHEMA),
                 username=database.sql.Placeholder('username'),
-                rank=database.sql.Placeholder('rank')
             )
 
             result = db.execute_and_fetch(query, {
                 'username': self.username,
-                'rank': rank
             })
 
-            self._badges = [(row[0], row[1]) for row in result]
+            self._badges = [row[0] for row in result]
         
-        return (badge, rank) in self._badges
+        return badge in self._badges
 
     def count_days_active(self) -> int:
         '''Get the amount of days a user has been active in LensQL'''
@@ -271,31 +347,29 @@ class User:
 
         return result[0][0] if result else 0
 
-    def _add_badge(self, badge: str, rank: int = 1) -> bool:
+    def _add_badge(self, badge: str) -> bool:
         '''Add a badge to a user'''
 
-        if self.has_badge(badge, rank):
+        if self.has_badge(badge):
             return False
 
         query = database.sql.SQL('''
-            INSERT INTO {schema}.badges (username, badge, rank)
-            VALUES ({username}, {badge}, {rank})
-            ON CONFLICT (username, badge, rank) DO NOTHING
+            INSERT INTO {schema}.badges (username, badge)
+            VALUES ({username}, {badge})
+            ON CONFLICT (username, badge) DO NOTHING
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username'),
             badge=database.sql.Placeholder('badge'),
-            rank=database.sql.Placeholder('rank')
         )
 
         db.execute(query, {
             'username': self.username,
             'badge': badge,
-            'rank': rank
         })
 
         if self._badges is not None:
-            self._badges.append((badge, rank))
+            self._badges.append(badge)
 
         return True
 

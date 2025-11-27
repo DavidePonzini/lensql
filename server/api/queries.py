@@ -41,7 +41,7 @@ def run_query():
     # At this point, the batch has not been logged yet
     if excercise.count_query_batches(user) == 0:
         own_exercises_with_at_least_one_own_query = user.count_own_exercises_with_at_least_one_own_query()
-        for k, v in gamification.rewards.Badges.CREATE_EXERCISES.items():
+        for k, v in gamification.rewards.Badges.CREATE_EXERCISES.value.items():
             if own_exercises_with_at_least_one_own_query >= k:
                 if not user.has_badge(v.reason):
                     badges.append(v)
@@ -50,9 +50,9 @@ def run_query():
     if db.admin.Query.is_new(query_str, user):
         rewards.append(gamification.rewards.Actions.Query.UNIQUE_RUN)
     
-        unique_queries_count = user.count_unique_queries()
+        unique_queries_count = user.count_unique_queries() + 1  # +1 because we haven't logged this one yet
 
-        for k, v in gamification.rewards.Badges.QUERIES_UNIQUE.items():
+        for k, v in gamification.rewards.Badges.QUERIES_UNIQUE.value.items():
             if unique_queries_count >= k:
                 if not user.has_badge(v.reason):
                     badges.append(v)
@@ -69,7 +69,7 @@ def run_query():
     # Gamification: daily usage
     days_active = user.count_days_active()
 
-    for k,v in gamification.rewards.Badges.DAILY_USAGE.items():
+    for k,v in gamification.rewards.Badges.DAILY_USAGE.value.items():
         if days_active >= k:
             if not user.has_badge(v.reason):
                 badges.append(v)
@@ -285,7 +285,7 @@ def check_solution():
             # Gamification: check Exercise Solved badge
             solved_count = user.count_exercises_solved()
 
-            for k,v in gamification.rewards.Badges.EXERCISE_SOLUTIONS.items():
+            for k,v in gamification.rewards.Badges.EXERCISE_SOLUTIONS.value.items():
                 if solved_count >= k:
                     if not user.has_badge(v.reason):
                         badges.append(v)

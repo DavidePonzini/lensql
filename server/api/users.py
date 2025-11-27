@@ -19,6 +19,18 @@ def get_user_info():
     
     return responses.response(True, **result)
 
+@bp.route('/badges', methods=['GET'])
+@jwt_required()
+def get_user_badges():
+    user = db.admin.User(get_jwt_identity())
+
+    result = user.get_badges()
+
+    if result is None:
+        return responses.response(False)
+    
+    return responses.response(True, data=result)
+
 @bp.route('/stats/queries', methods=['GET'])
 @jwt_required()
 def get_query_stats():

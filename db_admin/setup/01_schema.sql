@@ -59,11 +59,10 @@ CREATE TABLE users (
 
 CREATE TABLE badges (
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if badges exist
-    badge VARCHAR(255) NOT NULL,
-    rank INTEGER NOT NULL,
+    badge VARCHAR(255) NOT NULL,        -- e.g. 'name.level' (in this way we can keep ts of each level achieved)
     ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
-    PRIMARY KEY (username, badge, rank)
+    PRIMARY KEY (username, badge)
 );
 
 CREATE TABLE user_unique_queries (

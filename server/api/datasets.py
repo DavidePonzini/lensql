@@ -98,7 +98,7 @@ def join_dataset():
     badges = []
 
     joined_datasets = user.count_all_datasets_joined()
-    for k,v in gamification.rewards.Badges.JOIN_DATASET.items():
+    for k,v in gamification.rewards.Badges.JOIN_DATASET.value.items():
         if k <= joined_datasets:
             if not user.has_badge(v.reason):
                 badges.append(v)

@@ -1,3 +1,5 @@
+from enum import Enum
+
 from .reward import Reward
 
 class Actions:
@@ -33,7 +35,7 @@ class Actions:
 
         FEEDBACK = Reward('Provided feedback', experience=5, coins=10)
 
-class Badges:
+class Badges(Enum):
     '''Badges are special rewards that are given for reaching certain milestones. They can only be earned once.'''
     # NOTE: make sure the names here match the ones in `webui/src/locales/*/translations.json` > `gamification.badges`
 

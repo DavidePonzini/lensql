@@ -5,8 +5,8 @@ import useGamificationData from '../../hooks/useGamificationData';
 
 import LevelTitle from './LevelTitle';
 
-import AlertUnderDevelopment from '../../components/AlertUnderDevelopment';
 import ChangePassword from './ChangePassword';
+import Badges from './Badges';
 
 function Profile() {
     const { userInfo } = useUserInfo();
@@ -94,7 +94,7 @@ function Profile() {
             <section>
                 <h5><i className="fa fa-trophy me-2" />{t('pages.profile.profile.achievements.title')}</h5>
                 <p>{t('pages.profile.profile.achievements.text')}</p>
-                <AlertUnderDevelopment />
+                <Badges />
             </section>
         </div>
     );
