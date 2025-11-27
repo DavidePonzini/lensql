@@ -5,25 +5,17 @@ from dav_tools import messages
 ADMIN_USER = db.admin.User('lens')
 
 if __name__ == '__main__':
-    users = [
-        (ADMIN_USER, 'l', 'DIBRIS'),
-        (db.admin.User('dav'), 'd', 'DIBRIS'),
-        (db.admin.User('giovanna'), 'g', 'DIBRIS'),
-        (db.admin.User('barbara'), 'b', 'DIBRIS'),
-        (db.admin.User('student'), 's', 'DIBRIS'),
-    ]
 
-    # Create sample users
-    messages.info('Creating users...')
+    # region Admin user
+    if ADMIN_USER.exists():
+        messages.warning(f'Admin user {ADMIN_USER} already exists, skipping creation.')
+    elif db.register_user(ADMIN_USER, 'l', school='ADMIN', is_admin=True):
+        messages.success(f'Admin user {ADMIN_USER} registered successfully')
+    else:
+        messages.critical_error(f'Failed to register admin user {ADMIN_USER}')
+    # endregion
 
-    for user, password, school in users:
-        if user.exists():
-            messages.warning(f'  User {user} already exists, skipping creation.')
-        elif db.register_user(user, password, school=school, is_admin=(user == ADMIN_USER)):
-            messages.success(f'  User {user} registered successfully')
-        else:
-            messages.error(f'  Failed to register user {user}')
-
+    # region Default datasets
     datasets = [
         {
             'file': 'explore.sql',
@@ -100,10 +92,7 @@ if __name__ == '__main__':
         dataset.add_participant(ADMIN_USER)
         dataset.set_teacher_status(ADMIN_USER, True)
 
-        for user in [user for user, _, _ in users if user != ADMIN_USER]:
-            dataset.add_participant(user)
-            messages.info(f'  User {user} enrolled in class {ds["name"]}')
-
+        # Create exercises if dataset was just created
         if db_exists:
             messages.info(f'  Skipping exercise creation for class {ds["name"]} as it already exists.')
         else:
@@ -117,4 +106,33 @@ if __name__ == '__main__':
                     search_path=exercise_data['search_path'],
                 )
 
-                messages.success(f'  Exercise {exercise_data["name"]} added to class {ds["name"]}')
+                messages.success(f'  Exercise {exercise_data["name"]} added to dataset {dataset_name}')
+    # endregion
+
+    # region Default users
+    users = [
+        (db.admin.User('dav'), 'd', 'DIBRIS'),
+        (db.admin.User('giovanna'), 'g', 'DIBRIS'),
+        (db.admin.User('barbara'), 'b', 'DIBRIS'),
+        (db.admin.User('student'), 's', 'DIBRIS'),
+    ]
+
+    # Create sample users
+    messages.info('Creating users...')
+
+    for user, password, school in users:
+        if user.exists():
+            messages.warning(f'  User {user} already exists, skipping creation.')
+        elif db.register_user(user, password, school=school, datasets=[
+            db.admin.Dataset('_EXPLORE'),
+            db.admin.Dataset('WELCOME_MIEDEMA'),
+        ]):
+            messages.success(f'  User {user} registered successfully')
+        else:
+            messages.error(f'  Failed to register user {user}')
+    # endregion
+
+        
+            
+
+
