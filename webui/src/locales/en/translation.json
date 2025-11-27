@@ -291,6 +291,7 @@
             "profile": {
                 "welcome": "Welcome back, {{username}}!",
                 "progress": "Your Progess",
+                "contact_support": "Contact Support",
                 "level": {
                     "title": "Current Level",
                     "exp": "EXP: {{xp}} / {{xpToNext}}",

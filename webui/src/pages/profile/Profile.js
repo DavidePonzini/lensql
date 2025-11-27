@@ -31,6 +31,10 @@ function Profile() {
                     {t('pages.profile.profile.change_password.title')}
                 </button>
 
+                <a href="mailto:davide.ponzini@edu.unige.it?subject=[LENSQL] Support Request" className="btn btn-warning ms-2">
+                    {t('pages.profile.profile.contact_support')}
+                </a>
+
                 <div id="change-password" className="collapse mt-3" style={{ maxWidth: 500 }}>
                     <ChangePassword />
                 </div>
