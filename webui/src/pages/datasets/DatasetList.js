@@ -86,7 +86,7 @@ function DatasetList() {
             />
 
             <Button variant="primary" onClick={handleJoinDataset} className="me-2 mb-2">
-                <i className="fa fa-plus me-1"></i>
+                <i className="fa fa-arrow-right-to-bracket me-1"></i>
                 {t('pages.datasets.dataset_list.join')}
             </Button>
         </div>

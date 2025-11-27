@@ -120,6 +120,12 @@ function Navbar() {
                                         <i className="fa-solid fa-database"></i> {t('components.navbar.nav.datasets')}
                                     </NavLink>
                                 </li>
+
+                                <li className="nav-item">
+                                    <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/datasets/_EXPLORE" end>
+                                        <i className="fa-solid fa-magnifying-glass-arrow-right"></i> {t('components.navbar.nav.explore_sql')}
+                                    </NavLink>
+                                </li>
                             </>
                         )}
 
@@ -137,4 +143,4 @@ function Navbar() {
     );
 }
 
-export default Navbar;
+export default Navbar; 
