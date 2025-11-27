@@ -46,9 +46,6 @@ function DatasetAdd({ refresh, className }) {
                 setTitle={setTitle}
                 dataset={dataset}
                 setDataset={setDataset}
-                // TODO: add searchPath state
-                searchPath=""
-                setSearchPath={(v) => {}}
             />
         </ButtonModal>
     );
