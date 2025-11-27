@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { useCallback } from 'react';
@@ -6,10 +5,7 @@ import useAuth from '../../hooks/useAuth';
 
 import AchievementBadge from '../../components/AchievementBadge';
 
-
-
 function Badges() {
-    const { t } = useTranslation();
     const { apiRequest } = useAuth();
 
     const [badges, setBadges] = useState({});

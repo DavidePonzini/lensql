@@ -56,7 +56,22 @@ function DatasetList() {
 
     return (
         <div className="container-md">
-            <h1>{t('pages.datasets.dataset_list.title')}</h1>
+            <h1 className=''>{t('pages.datasets.dataset_list.title')}</h1>
+            <div className='mt-4'>
+
+                <DatasetAdd
+                    refresh={getDatasets}
+                    className="btn btn-success me-2 mb-2"
+                />
+
+                <Button variant="primary" onClick={handleJoinDataset} className="me-2 mb-2">
+                    <i className="fa fa-arrow-right-to-bracket me-1"></i>
+                    {t('pages.datasets.dataset_list.join')}
+                </Button>
+            </div>
+
+            <hr />
+
             <CardList>
                 {datasets.length === 0 && (
                     <p>{t('pages.datasets.dataset_list.empty')}</p>
@@ -76,19 +91,6 @@ function DatasetList() {
                     />
                 ))}
             </CardList>
-
-            <hr />
-            <p>{t('pages.datasets.dataset_list.new_dataset_suggestion')}</p>
-
-            <DatasetAdd
-                refresh={getDatasets}
-                className="btn btn-success me-2 mb-2"
-            />
-
-            <Button variant="primary" onClick={handleJoinDataset} className="me-2 mb-2">
-                <i className="fa fa-arrow-right-to-bracket me-1"></i>
-                {t('pages.datasets.dataset_list.join')}
-            </Button>
         </div>
     );
 }

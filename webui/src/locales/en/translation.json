@@ -213,7 +213,6 @@
             "dataset_list": {
                 "title": "My Datasets",
                 "empty": "Nothing here. Join a dataset to see exercises.",
-                "new_dataset_suggestion": "If you want to run a query which hasn't been assigned to you by the teacher, please create a new dataset.",
                 "join": "Join Dataset",
                 "join_prompt": "Enter dataset join code:"
             },
