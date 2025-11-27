@@ -31,7 +31,7 @@ function Profile() {
                     {t('pages.profile.profile.change_password.title')}
                 </button>
 
-                <div id="change-password" className="collapse mt-3" style={{maxWidth: 500}}>
+                <div id="change-password" className="collapse mt-3" style={{ maxWidth: 500 }}>
                     <ChangePassword />
                 </div>
             </div>
@@ -39,52 +39,52 @@ function Profile() {
             <hr className="my-4" />
 
             <h2>{t('pages.profile.profile.progress')}</h2>
-            {/*
-                TODO: make this part visually similar to learning stats
-            
-                |----------------------------------------------------------|
-                |           |               | How to earn more EXP         | 
-                |   LEVEL   | EXP Pie Chart | - ...                        |
-                |     5     |               | - ...                        | 
-                |----------------------------------------------------------|
-                |   <i>     | How to earn more Coins                       | 
-                |  Coins    | - ...                                        | 
-                |   7       | - ...                                        | 
-                |----------------------------------------------------------|
-                | Achievements                                             |
-                | X | X | X                                                |
-                | X | X | X                                                |
-                | X | X | X                                                |
-                |----------------------------------------------------------|
-            */}
             <section className="mb-4">
-                <h5><i className="fa fa-star me-2" />{t('pages.profile.profile.level.title')}</h5>
-                <p className="mb-1"><LevelTitle level={level} /></p>
-                <p>
-                    <i className="fa fa-diamond me-2" />
-                    {t('pages.profile.profile.level.exp', { xp, xpToNext })}
-                </p>
-                <small className="text-muted">{t('pages.profile.profile.level.tip')}</small>
-                <ul className="mt-2">
-                    {expActions.map((a, i) => (
-                        <li key={i}>
-                            {a.label}: <strong className={a.positive ? 'text-success' : 'text-danger'}>{a.value}</strong>
-                        </li>
-                    ))}
-                </ul>
-            </section>
+                <div className='row'>
+                    <div className='col-md-6'>
+                        <h5><i className="fa fa-star me-2" />{t('pages.profile.profile.level.title')}</h5>
+                        <p className="mb-1"><LevelTitle level={level} /></p>
+                        <p>
+                            <i className="fa fa-diamond me-2" />
+                            {t('pages.profile.profile.level.exp', { xp, xpToNext })}
+                        </p>
 
-            <section>
-                <h5><i className="fa fa-coins me-2" />{t('pages.profile.profile.coins.title')}</h5>
-                <p>{t('pages.profile.profile.coins.available', { coins })}</p>
-                <small className="text-muted">{t('pages.profile.profile.coins.tip')}</small>
-                <ul className="mt-2">
-                    {coinActions.map((a, i) => (
-                        <li key={i}>
-                            {a.label}: <strong className={a.positive ? 'text-success' : 'text-danger'}>{a.value}</strong>
-                        </li>
-                    ))}
-                </ul>
+                        <button className="btn btn-sm btn-outline-secondary mb-2" type='button' data-bs-toggle='collapse' data-bs-target='#exp-actions' aria-expanded='false' aria-controls='exp-actions'>
+                            {t('pages.profile.profile.level.earn_exp')}
+                        </button>
+
+                        <div id="exp-actions" className="collapse">
+                            <small className="text-muted">{t('pages.profile.profile.level.tip')}</small>
+                            <ul className="mt-2">
+                                {expActions.map((a, i) => (
+                                    <li key={i}>
+                                        {a.label}: <strong className={a.positive ? 'text-success' : 'text-danger'}>{a.value}</strong>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className='col-md-6'>
+                        <h5><i className="fa fa-coins me-2" />{t('pages.profile.profile.coins.title')}</h5>
+                        <p>{t('pages.profile.profile.coins.available', { coins })}</p>
+
+                        <button className="btn btn-sm btn-outline-secondary mb-2" type='button' data-bs-toggle='collapse' data-bs-target='#coin-actions' aria-expanded='false' aria-controls='coin-actions'>
+                            {t('pages.profile.profile.coins.earn_coins')}
+                        </button>
+
+                        <div id="coin-actions" className="collapse">
+                            <small className="text-muted">{t('pages.profile.profile.coins.tip')}</small>
+                            <ul className="mt-2">
+                                {coinActions.map((a, i) => (
+                                    <li key={i}>
+                                        {a.label}: <strong className={a.positive ? 'text-success' : 'text-danger'}>{a.value}</strong>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section>

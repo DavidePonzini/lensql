@@ -294,12 +294,14 @@
                 "level": {
                     "title": "Current Level",
                     "exp": "EXP: {{xp}} / {{xpToNext}}",
-                    "tip": "Earn more EXP by learning SQL:"
+                    "tip": "Earn more EXP by learning SQL:",
+                    "earn_exp": "How to earn EXP"
                 },
                 "coins": {
                     "title": "LensCoins",
                     "available": "{{coins}} coins available",
-                    "tip": "Use LensCoins to interact with Lens:"
+                    "tip": "Use LensCoins to interact with Lens:",
+                    "earn_coins": "How to earn LensCoins"
                 },
                 "achievements": {
                     "title": "Achievements",
