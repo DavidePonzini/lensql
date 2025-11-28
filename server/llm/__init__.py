@@ -1,4 +1,5 @@
 from . import tools, prompts, format, chatgpt
+from sql_error_categorizer import DetectedError
 
 def explain_error_message(username: str, code: str, exception: str) -> str:
     message = chatgpt.Message()
@@ -44,11 +45,11 @@ def provide_error_example(username: str, code: str, exception: str) -> str:
 
     return str(answer)
 
-def fix_query(username: str, code: str, exception: str) -> str:
+def fix_query(username: str, code: str, exception: str, errors: list[DetectedError]) -> str:
     message = chatgpt.Message()
 
     message.add_message_system(prompts.get_system_instructions())
-    message.add_message_user(prompts.fix_query(code, exception))
+    message.add_message_user(prompts.fix_query(code, exception, errors=errors))
     answer = chatgpt.generate_answer(message,
         json_format=format.MessageFormat,
         tools=[

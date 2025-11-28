@@ -13,12 +13,12 @@ if not api_key:
 
 client = OpenAI(api_key=api_key)
 
-def generate_answer(message: Message, *, json_format: BaseModel, tools: list[Tool] = [], username: str, **kwargs) -> BaseModel:
+def generate_answer(message: Message, *, json_format: type[BaseModel], tools: list[Tool] = [], username: str, **kwargs) -> BaseModel:
     '''
     Generate an answer from the LLM using the provided message and tools.
     '''
 
-    # message.print_chat()
+    message.print_chat()
 
     schema = json_format.model_json_schema()
     schema['additionalProperties'] = False      # Required for strict validation

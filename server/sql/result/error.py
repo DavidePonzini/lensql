@@ -22,6 +22,6 @@ class QueryResultError(QueryResult):
     @property
     def result_text(self) -> str:
         if self._result.error_code:
-            return f'Error Code: {self._result.error_code}\nMessage: {self._result}'
+            return f'Message: {self._result}\nError Code: {self._result.error_code}'
         else:
             return f'Message: {self._result}'

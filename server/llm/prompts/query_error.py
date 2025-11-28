@@ -1,4 +1,5 @@
 from server.sql import SQLCode
+from sql_error_categorizer import DetectedError, SqlErrors
 from . import util
 
 def explain_error(code: str, exception: str, *, sql_language='PostgreSQL'):
@@ -22,12 +23,12 @@ Non è necessario che tu corregga la query, voglio solo capire cosa sta andando 
         'en': '''
 The error <b>{exception}</b> means that EXPLANATION.
 <br><br>
-This usually occurs when REASON.
+This is occurring because REASON.
 ''',
         'it': '''
 L'errore <b>{exception}</b> significa che SPIEGAZIONE.
 <br><br>
-Questo di solito si verifica quando RAGIONE.
+Questo si verifica perché RAGIONE.
 ''',
     }
 
@@ -109,12 +110,14 @@ Non è necessario che tu corregga la query, voglio solo identificare la parte pr
 
     template = {
         'en': '''
-Let's look at the query and see which part of it is likely to have caused the error.
-<pre class="code m">WHOLE QUERY, WITH THE PART THAT CAUSES THE ERROR IN BOLD RED</pre>
+Let's look at the query... I see, the error is caused by this part here.
+<pre class="code m">ONLY THE PART OF THE QUERY CAUSING THE ERROR</pre>
+You might want to check if THIS PART is correct.
 ''',
         'it': '''
-Diamo un'occhiata alla query e vediamo quale parte di essa ha probabilmente causato l'errore.
-<pre class="code m">QUERY COMPLETA, CON LA PARTE CHE CAUSA L'ERRORE IN GRASSETTO ROSSO</pre>
+Diamo un'occhiata alla query... Capisco, l'errore è causato da questa parte qui.
+<pre class="code m">SOLO LA PARTE DELLA QUERY CHE CAUSA L'ERRORE</pre>
+Potresti voler controllare se QUESTA PARTE è corretta.
 ''',
     }
 
@@ -133,9 +136,55 @@ Diamo un'occhiata alla query e vediamo quale parte di essa ha probabilmente caus
 {util.get_localized(template)}
 '''
 
-def fix_query(code: str, exception: str, *, sql_language='PostgreSQL'):
+def fix_query(code: str, exception: str, *, sql_language='PostgreSQL', errors: list[DetectedError]=[]):
     query = SQLCode(code)
     query = query.strip_comments()
+
+    error_hints = []
+    for error in errors:
+        if error.error in (
+            SqlErrors.SYN_1_OMITTING_CORRELATION_NAMES,
+            SqlErrors.SYN_2_AMBIGUOUS_COLUMN,
+            SqlErrors.SYN_3_AMBIGUOUS_FUNCTION,
+            SqlErrors.SYN_4_UNDEFINED_COLUMN,
+            SqlErrors.SYN_5_UNDEFINED_FUNCTION,
+            SqlErrors.SYN_6_UNDEFINED_PARAMETER,
+            SqlErrors.SYN_7_UNDEFINED_OBJECT,
+            SqlErrors.SYN_8_INVALID_SCHEMA_NAME,
+            SqlErrors.SYN_9_MISSPELLINGS,
+            SqlErrors.SYN_10_SYNONYMS,
+            SqlErrors.SYN_11_OMITTING_QUOTES_AROUND_CHARACTER_DATA,
+            SqlErrors.SYN_12_FAILURE_TO_SPECIFY_COLUMN_NAME_TWICE,
+            SqlErrors.SYN_13_DATA_TYPE_MISMATCH,
+            SqlErrors.SYN_14_USING_AGGREGATE_FUNCTION_OUTSIDE_SELECT_OR_HAVING,
+            SqlErrors.SYN_15_AGGREGATE_FUNCTIONS_CANNOT_BE_NESTED,
+            SqlErrors.SYN_16_EXTRANEOUS_OR_OMITTED_GROUPING_COLUMN,
+            SqlErrors.SYN_17_HAVING_WITHOUT_GROUP_BY,
+            SqlErrors.SYN_18_CONFUSING_FUNCTION_WITH_FUNCTION_PARAMETER,
+            SqlErrors.SYN_19_USING_WHERE_TWICE,
+            SqlErrors.SYN_20_OMITTING_THE_FROM_CLAUSE,
+            SqlErrors.SYN_21_COMPARISON_WITH_NULL,
+            SqlErrors.SYN_22_OMITTING_THE_SEMICOLON,
+            SqlErrors.SYN_23_DATE_TIME_FIELD_OVERFLOW,
+            SqlErrors.SYN_24_DUPLICATE_CLAUSE,
+            SqlErrors.SYN_25_USING_AN_UNDEFINED_CORRELATION_NAME,
+            SqlErrors.SYN_26_TOO_MANY_COLUMNS_IN_SUBQUERY,
+            SqlErrors.SYN_27_CONFUSING_TABLE_NAMES_WITH_COLUMN_NAMES,
+            SqlErrors.SYN_28_RESTRICTION_IN_SELECT_CLAUSE,
+            SqlErrors.SYN_29_PROJECTION_IN_WHERE_CLAUSE,
+            SqlErrors.SYN_30_CONFUSING_THE_ORDER_OF_KEYWORDS,
+            SqlErrors.SYN_31_CONFUSING_THE_LOGIC_OF_KEYWORDS,
+            SqlErrors.SYN_32_CONFUSING_THE_SYNTAX_OF_KEYWORDS,
+            SqlErrors.SYN_33_OMITTING_COMMAS,
+            SqlErrors.SYN_34_CURLY_SQUARE_OR_UNMATCHED_BRACKETS,
+            SqlErrors.SYN_35_IS_WHERE_NOT_APPLICABLE,
+            SqlErrors.SYN_36_NONSTANDARD_KEYWORDS_OR_STANDARD_KEYWORDS_IN_WRONG_CONTEXT,
+            SqlErrors.SYN_37_NONSTANDARD_OPERATORS,
+            SqlErrors.SYN_38_ADDITIONAL_SEMICOLON,
+        ):
+            error_hints.append(f'- {str(error)}')
+
+    error_hints_str = '\n'.join(error_hints)
 
     request = {
         'en': f'''
@@ -156,12 +205,14 @@ To fix your query, you could try changing:
 <pre class="code m">ORIGINAL QUERY PART</pre>
 to:
 <pre class="code m">FIXED QUERY PART</pre>
+In this way, EXPLANATION OF THE FIX.
 ''',
         'it': '''
 Per correggere la tua query, potresti provare a cambiare:
 <pre class="code m">PARTE ORIGINALE DELLA QUERY</pre>
 in:
 <pre class="code m">PARTE CORRETTA DELLA QUERY</pre>
+In questo modo, SPIEGAZIONE DELLA CORREZIONE.
 ''',
     }
 
@@ -169,6 +220,9 @@ in:
 {util.get_localized(request)}
 
 {util.get_localized(util.RESPONSE_FORMAT)}
+
+{util.get_localized(util.SECTION_DETECTED_ERRORS) if error_hints else ''}
+{error_hints_str if error_hints else ''}
 
 {util.get_localized(util.SECTION_QUERY).format(sql_language=sql_language)}
 {query}

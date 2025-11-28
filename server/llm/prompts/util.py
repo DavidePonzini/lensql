@@ -27,6 +27,11 @@ SECTION_ERROR = {
     'it': '-- Errore --',
 }
 
+SECTION_DETECTED_ERRORS = {
+    'en': '-- Detected Errors --',
+    'it': '-- Errori Rilevati --',
+}
+
 RESPONSE_FORMAT = {
     'en': '''
 Format the response as follows:

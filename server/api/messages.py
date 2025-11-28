@@ -159,9 +159,9 @@ def fix_query():
 
     if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
-
+    
     exception = query.result
-    answer_str = llm.fix_query(user.username, query.sql_string, exception)
+    answer_str = llm.fix_query(user.username, query.sql_string, exception, query.errors)
 
     answer = db.admin.Message.log(
         answer=answer_str,
