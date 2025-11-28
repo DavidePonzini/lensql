@@ -630,16 +630,4 @@ DATA_TYPES = {
     13562:  'user_mapping_options',
     13566:  '_user_mappings',
     13567:  'user_mappings',
-    16477:  '_professori',
-    16478:  'professori',
-    16484:  '_corsidilaurea',
-    16485:  'corsidilaurea',
-    16491:  '_corsi',
-    16492:  'corsi',
-    16509:  '_studenti',
-    16510:  'studenti',
-    16526:  '_esami',
-    16527:  'esami',
-    16542:  '_pianidistudio',
-    16543:  'pianidistudio'
 }
