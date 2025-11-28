@@ -1,8 +1,8 @@
 from dav_tools import database
-from .connection import db, SCHEMA
-from sql_error_categorizer import DetectedError
+from sql_error_categorizer import DetectedError, SqlErrors
 from sql_error_categorizer.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
 
+from .connection import db, SCHEMA
 from .users import User
 from .exercises import Exercise
 
@@ -82,7 +82,8 @@ class Query:
                  sql_string: str | None = None,
                  search_path: str | None = None,
                  query_batch: QueryBatch | None = None,
-                 result: str | None = None
+                 result: str | None = None,
+                 errors: list[DetectedError] | None = None
                 ) -> None:
         self.query_id = query_id
 
@@ -91,6 +92,7 @@ class Query:
         self._search_path = search_path
         self._query_batch = query_batch
         self._result = result
+        self._errors = errors
 
     # region Properties
     @property
@@ -167,6 +169,31 @@ class Query:
         return self._search_path
 
     @property
+    def errors(self) -> list[DetectedError]:
+        '''Get the list of detected errors associated with this query.'''
+
+        if self._errors is None:
+            query = database.sql.SQL('''
+                SELECT error_id, details
+                FROM {schema}.has_error
+                WHERE query_id = {query_id}
+            ''').format(
+                schema=database.sql.Identifier(SCHEMA),
+                query_id=database.sql.Placeholder('query_id')
+            )
+            result = db.execute_and_fetch(query, {
+                'query_id': self.query_id
+            })
+            self._errors = [
+                DetectedError(
+                    error=SqlErrors(row[0]),
+                    data=row[1]
+                ) for row in result
+            ]
+
+        return self._errors
+
+    @property
     def result(self) -> str:
         '''Get the result string associated with this query.'''
 
@@ -241,6 +268,8 @@ class Query:
 
     def log_errors(self, errors: list[DetectedError]) -> None:
         '''Log errors for a given query'''
+
+        self._errors = errors
 
         for error in errors:
             db.insert(SCHEMA, 'has_error', {

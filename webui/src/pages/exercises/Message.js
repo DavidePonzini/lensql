@@ -54,7 +54,7 @@ function Message({ children, text, messageId = null }) {
 
                         {
                             !sessionStorage.getItem('hasProvidedFeedback') && (
-                                <span className="text-muted">
+                                <span className="text-primary">
                                     {t('pages.exercises.message.feedback_invite')}
                                     <i className="fa fa-arrow-right mx-1" />
                                 </span>

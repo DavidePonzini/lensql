@@ -8,6 +8,7 @@ function useGamificationData() {
 
         HELP_SUCCESS_DESCRIBE: -1,
         HELP_SUCCESS_EXPLAIN: -3,
+        HELP_SUCCESS_CHECK_ERRORS: -10,
 
         HELP_ERROR_EXPLAIN: -1,
         HELP_ERROR_EXAMPLE: -3,

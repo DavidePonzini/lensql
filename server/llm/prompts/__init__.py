@@ -1,10 +1,7 @@
 from flask_babel import get_locale
 
 from .query_error import explain_error, locate_error_cause, provide_error_example, fix_query
-from .query_result import describe_my_query, explain_my_query
-
-from .query_error import explain_error, locate_error_cause, provide_error_example, fix_query
-from .query_result import describe_my_query, explain_my_query
+from .query_result import describe_my_query, explain_my_query, check_errors
 
 _SYSTEM_INSTRUCTIONS = {
     'en': '''

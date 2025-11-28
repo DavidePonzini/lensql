@@ -7,6 +7,7 @@ from server import db, llm, gamification
 from .util import responses
 from server.gamification import NOT_ENOUGH_COINS_MESSAGE
 
+
 bp = Blueprint('message', __name__)
 
 def _get_usage_badges(user: db.admin.User) -> list[gamification.Reward]:
@@ -221,6 +222,35 @@ def explain_my_query():
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
     answer_str = llm.explain_my_query(user.username, query.sql_string)
+    answer = db.admin.Message.log(
+        answer=answer_str,
+        button=request.path,
+        query=query,
+        msg_idx=msg_idx
+    )
+
+    rewards = [cost]
+    badges = _get_usage_badges(user)
+
+    user.add_rewards(rewards=rewards, badges=badges)
+
+    return responses.response(answer=answer_str, id=answer.message_id, rewards=rewards, badges=badges)
+
+@bp.route('/success/check-errors', methods=['POST'])
+@jwt_required()
+def check_errors():
+    user = db.admin.User(get_jwt_identity())
+
+    data = request.get_json()
+    query = db.admin.Query(data['query_id'])
+    msg_idx = int(data['msg_idx'])
+
+    cost = gamification.rewards.Actions.Messages.HELP_SUCCESS_CHECK_ERRORS
+
+    if not user.can_afford(cost):
+        return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
+
+    answer_str = llm.check_errors(user.username, query.sql_string, errors=query.errors)
     answer = db.admin.Message.log(
         answer=answer_str,
         button=request.path,

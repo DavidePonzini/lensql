@@ -27,6 +27,7 @@ class Actions:
     class Messages:
         HELP_SUCCESS_DESCRIBE = Reward('Interacted with Lens', experience=5, coins=-1)
         HELP_SUCCESS_EXPLAIN = Reward('Interacted with Lens', experience=5, coins=-3)
+        HELP_SUCCESS_CHECK_ERRORS = Reward('Interacted with Lens', experience=5, coins=-10)
 
         HELP_ERROR_EXPLAIN = Reward('Interacted with Lens', experience=5, coins=-1)
         HELP_ERROR_EXAMPLE = Reward('Interacted with Lens', experience=5, coins=-3)

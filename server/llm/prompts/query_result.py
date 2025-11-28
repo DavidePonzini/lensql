@@ -1,6 +1,8 @@
 from server.sql import SQLCode
 from . import util
 
+from sql_error_categorizer import DetectedError
+
 def describe_my_query(code: str, *, sql_language='PostgreSQL'):
     query = SQLCode(code)
     query = query.strip_comments()
@@ -113,6 +115,7 @@ Inoltre, so che la query è stata formulata deliberatamente in questo modo, quin
     # keep only the clauses present in the query
     clauses = [clause for clause in clauses if query.has_clause(clause['sql'])]
 
+
     # templates for each clause present in the query
     clauses_template_values = []
     for clause in clauses:
@@ -146,6 +149,61 @@ Ecco una spiegazione dettagliata della tua query:
 {util.get_localized(request)}
 
 {util.get_localized(util.RESPONSE_FORMAT)}
+
+{util.get_localized(util.SECTION_QUERY).format(sql_language=sql_language)}
+{query}
+
+{util.get_localized(util.SECTION_TEMPLATE)}
+{util.get_localized(template)}
+'''
+
+def check_errors(code: str, *, sql_language='PostgreSQL', errors: list[DetectedError]=[]):
+    query = SQLCode(code)
+    query = query.strip_comments()
+
+    request = {
+        'en': f'''
+Hi Lens! I'm wondering if my query has any mistakes or errors.
+Could you please review the following {sql_language} query and provide a pedagogical student-oriented explanation to let me know if there are any issues with it.
+If you find any mistakes, please explain what they are but don't fix them—I just want to understand if there are any problems.
+I know that the query managed to execute successfully, but I want to make sure there are no hidden issues.
+You'll be provided with a list of detected errors to help you in your analysis.
+Don't use the error names in your explanation, just a description of the problem for each error.
+''',
+        'it': f'''
+Ciao Lens! Mi chiedo se la mia query abbia degli errori o degli sbagli.
+Potresti esaminare la seguente query {sql_language} e farmi sapere se ci sono dei problemi?
+Se trovi degli errori, spiegami quali sono ma non correggerli—voglio solo capire se ci sono dei problemi.
+So che la query è stata eseguita con successo, ma voglio assicurarmi che non ci siano problemi nascosti.
+Ti verrà fornita una lista di errori rilevati per aiutarti nella tua analisi.
+Non usare i nomi degli errori nella tua spiegazione, solo una descrizione del problema per ogni errore.
+''',
+    }
+
+    template = {
+        'en': '''
+After reviewing your query, I found the following issues:
+<ul>
+<li>ERROR LIST ITEMS WITH EXPLANATIONS </li>
+</ul>
+''',
+        'it': '''
+Dopo aver esaminato la tua query, ho trovato i seguenti problemi:
+<ul>
+<li>ELEMENTI DELLA LISTA DEGLI ERRORI CON SPIEGAZIONI</li>
+</ul>
+''',
+    }
+
+    errors_str = '\n'.join([f'- {str(error)}' for error in errors])
+
+    return f'''
+{util.get_localized(request)}
+
+{util.get_localized(util.RESPONSE_FORMAT)}
+
+{util.get_localized(util.SECTION_DETECTED_ERRORS)}
+{errors_str}
 
 {util.get_localized(util.SECTION_QUERY).format(sql_language=sql_language)}
 {query}

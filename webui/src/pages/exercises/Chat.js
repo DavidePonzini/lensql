@@ -29,6 +29,7 @@ function Chat({ queryId, success }) {
 
     const buttonSuccessDescribeLocked = false;
     const buttonSuccessExplainLocked = false;
+    const buttonSuccessCheckErrorsLocked = false;
     const buttonErrorExplainLocked = false;
     const buttonErrorExampleLocked = false;
     const buttonErrorLocateLocked = false;
@@ -82,6 +83,23 @@ function Chat({ queryId, success }) {
         startThinking();
 
         const data = await apiRequest('/api/messages/success/explain', 'POST', {
+            query_id: queryId,
+            msg_idx: getLastMessageIdx(),
+        });
+
+        stopThinking();
+        addMessage(data.answer, true, false, data.id);
+        focusOnLastUserMessage();
+        addFollowupPrompt();
+        setRewards(data.rewards || []);
+        setBadges(data.badges || []);
+    }
+
+    async function handleCheckErrors() {
+        addMessage(t('pages.exercises.chat.prompts.check_errors'), false);
+        startThinking();
+
+        const data = await apiRequest('/api/messages/success/check-errors', 'POST', {
             query_id: queryId,
             msg_idx: getLastMessageIdx(),
         });
@@ -201,6 +219,16 @@ function Chat({ queryId, success }) {
                                     >
                                         {t('pages.exercises.chat.buttons.explain')}
                                     </ButtonAction>
+
+                                    <ButtonAction
+                                        onClick={handleCheckErrors}
+                                        className="me-2 mb-1"
+                                        variant="warning"
+                                        cost={-Coins.HELP_SUCCESS_CHECK_ERRORS}
+                                        locked={buttonSuccessCheckErrorsLocked}
+                                    >
+                                        {t('pages.exercises.chat.buttons.check_errors')}
+                                    </ButtonAction>
                                 </>
                             ) : (
                                 <>
@@ -237,7 +265,7 @@ function Chat({ queryId, success }) {
                                     <ButtonAction
                                         onClick={handleSuggestFix}
                                         className="me-2 mb-1"
-                                        variant="primary"
+                                        variant="warning"
                                         cost={-Coins.HELP_ERROR_FIX}
                                         locked={buttonErrorFixLocked}
                                     >
