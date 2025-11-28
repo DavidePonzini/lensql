@@ -96,10 +96,10 @@ function Chat({ queryId, success }) {
     }
 
     async function handleCheckErrors() {
-        addMessage(t('pages.exercises.chat.prompts.check_errors'), false);
+        addMessage(t('pages.exercises.chat.prompts.detect_errors'), false);
         startThinking();
 
-        const data = await apiRequest('/api/messages/success/check-errors', 'POST', {
+        const data = await apiRequest('/api/messages/success/detect-errors', 'POST', {
             query_id: queryId,
             msg_idx: getLastMessageIdx(),
         });
@@ -227,7 +227,7 @@ function Chat({ queryId, success }) {
                                         cost={-Coins.HELP_SUCCESS_CHECK_ERRORS}
                                         locked={buttonSuccessCheckErrorsLocked}
                                     >
-                                        {t('pages.exercises.chat.buttons.check_errors')}
+                                        {t('pages.exercises.chat.buttons.detect_errors')}
                                     </ButtonAction>
                                 </>
                             ) : (

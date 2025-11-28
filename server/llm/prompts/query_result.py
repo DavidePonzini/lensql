@@ -157,7 +157,7 @@ Ecco una spiegazione dettagliata della tua query:
 {util.get_localized(template)}
 '''
 
-def check_errors(code: str, *, sql_language='PostgreSQL', errors: list[DetectedError]=[]):
+def detect_errors(code: str, *, sql_language='PostgreSQL', errors: list[DetectedError]=[]):
     query = SQLCode(code)
     query = query.strip_comments()
 

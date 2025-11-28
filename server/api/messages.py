@@ -236,9 +236,9 @@ def explain_my_query():
 
     return responses.response(answer=answer_str, id=answer.message_id, rewards=rewards, badges=badges)
 
-@bp.route('/success/check-errors', methods=['POST'])
+@bp.route('/success/detect-errors', methods=['POST'])
 @jwt_required()
-def check_errors():
+def detect_errors():
     user = db.admin.User(get_jwt_identity())
 
     data = request.get_json()
@@ -250,7 +250,7 @@ def check_errors():
     if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
-    answer_str = llm.check_errors(user.username, query.sql_string, errors=query.errors)
+    answer_str = llm.detect_errors(user.username, query.sql_string, errors=query.errors)
     answer = db.admin.Message.log(
         answer=answer_str,
         button=request.path,

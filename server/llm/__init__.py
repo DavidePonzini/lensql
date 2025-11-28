@@ -94,11 +94,11 @@ def explain_my_query(username: str, code: str) -> str:
 
     return str(answer)
 
-def check_errors(username: str, code: str, errors: list[DetectedError]) -> str:
+def detect_errors(username: str, code: str, errors: list[DetectedError]) -> str:
     message = chatgpt.Message()
     
     message.add_message_system(prompts.get_system_instructions())
-    message.add_message_user(prompts.check_errors(code, errors=errors))
+    message.add_message_user(prompts.detect_errors(code, errors=errors))
     answer = chatgpt.generate_answer(message,
         json_format=format.MessageFormat,
         tools=[
