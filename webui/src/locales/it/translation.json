@@ -107,10 +107,6 @@
                 "timeline_subtitle": {
                     "student": "Guarda se stai commettendo meno errori man mano che progredisci.",
                     "teacher": "Guarda se i tuoi studenti stanno commettendo meno errori man mano che progrediscono."
-                },
-                "timeline_body": {
-                    "student": "In fase di sviluppo! Questa sezione mostrerà una linea temporale degli errori, aiutandoti a monitorare i tuoi progressi.",
-                    "teacher": "In fase di sviluppo! Questa sezione mostrerà una linea temporale degli errori degli studenti, aiutandoti a monitorare i loro progressi."
                 }
             },
             "messages": {
@@ -204,7 +200,8 @@
                 "open": "Apri",
                 "leave": "Lascia",
                 "confirm_leave": "Sei sicuro di voler abbandonare questo dataset?",
-                "learning_analytics": "Statistiche di Apprendimento",
+                "my_learning_analytics": "Le mie statistiche di apprendimento",
+                "student_learning_analytics": "Statistiche di apprendimento degli studenti",
                 "set_teachers": "Imposta Docenti",
                 "participants": "Partecipanti"
             },
@@ -224,7 +221,9 @@
                     "Inizia lo script con <code>DROP SCHEMA IF EXISTS schema_name CASCADE;</code>",
                     "Usa un <code>search_path</code> unico per ogni dataset",
                     "Raggruppa le inserzioni in un unico comando <code>INSERT INTO</code> per ogni tabella per migliorare le prestazioni"
-                ]
+                ],
+                "title_placeholder": "Titolo descrittivo del dataset",
+                "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;"
             },
             "dataset_update": {
                 "modal_title": "Modifica Dataset",
@@ -261,7 +260,12 @@
             "exercise_mask": {
                 "title": "Titolo",
                 "request": "Richiesta",
-                "answer_optional": "Risposta (facoltativa)"
+                "answer_optional": "Risposta (facoltativa)",
+                "add_answer": "Aggiungi risposta",
+                "remove_answer": "Rimuovi risposta",
+                "title_placeholder": "Titolo breve e descrittivo per l'esercizio",
+                "request_placeholder": "Cosa dovrebbe fare la query?",
+                "search_path_label": "Percorso di ricerca della soluzione"
             },
             "exercise_update": {
                 "title": "Modifica esercizio",
@@ -282,19 +286,35 @@
             "profile": {
                 "welcome": "Bentornato, {{username}}!",
                 "progress": "Ecco una panoramica dei tuoi progressi",
+                "contact_support": "Contatta il supporto",
                 "level": {
                     "title": "Livello Attuale",
                     "exp": "EXP: {{xp}} / {{xpToNext}}",
-                    "tip": "Ottieni più EXP studiando SQL:"
+                    "tip": "Ottieni più EXP studiando SQL:",
+                    "earn_exp": "Come guadagnare EXP"
                 },
                 "coins": {
                     "title": "LensCoins",
                     "available": "{{coins}} monete disponibili",
-                    "tip": "Usa i LensCoins per interagire con Lens:"
+                    "tip": "Usa i LensCoins per interagire con Lens:",
+                    "earn_coins": "Come guadagnare LensCoins"
                 },
                 "achievements": {
                     "title": "Obiettivi",
                     "text": "Hai ottenuto i seguenti obiettivi:"
+                },
+                "settings": "Impostazioni",
+                "change_password": {
+                    "title": "Cambia Password",
+                    "current_password_label": "Password Attuale",
+                    "new_password_label": "Nuova Password",
+                    "confirm_new_password_label": "Conferma Nuova Password",
+                    "submit_button": "Aggiorna Password",
+                    "current_required": "Inserisci la tua password attuale.",
+                    "confirm_required": "Conferma la tua nuova password.",
+                    "password_mismatch_alert": "Le password non corrispondono.",
+                    "success_alert": "La tua password è stata aggiornata con successo!",
+                    "error_generic": "Si è verificato un errore imprevisto durante l'aggiornamento della password."
                 }
             }
         },
@@ -408,20 +428,22 @@
                 "followup_prompt": "Vuoi chiedere qualcos'altro?",
                 "thinking": "Lens sta pensando...",
                 "buttons": {
-                    "describe": "Descrivi query",
-                    "explain": "Spiega query",
-                    "explain_error": "Spiega errore",
-                    "example": "Mostra esempio",
-                    "locate": "Dove guardare",
-                    "fix": "Suggerisci correzione"
+                    "describe": "Cosa fa la mia query?",
+                    "explain": "Cosa fa la mia query in dettaglio?",
+                    "explain_error": "Cosa significa questo errore?",
+                    "example": "Cosa può causare questo errore?",
+                    "locate": "Dove si trova il problema nella mia query?",
+                    "fix": "Come posso correggere questo errore?",
+                    "detect_errors": "La mia query ha degli errori?"
                 },
                 "prompts": {
-                    "describe": "Descrivi cosa fa la mia query",
-                    "explain": "Spiega cosa fa ogni clausola della mia query",
-                    "explain_error": "Spiega cosa significa questo errore",
-                    "example": "Mostra un esempio semplificato che può causare questo problema",
-                    "locate": "Mostrami quale parte della query causa questo errore",
-                    "fix": "Suggerisci una correzione per questo errore"
+                    "describe": "Cosa fa la mia query? Fornisci un riassunto conciso del suo comportamento.",
+                    "explain": "Cosa fa la mia query in dettaglio? Spiega cosa fa ogni clausola della mia query.",
+                    "explain_error": "Cosa significa questo errore? Spiega il messaggio di errore in termini semplici.",
+                    "example": "Cosa può causare questo errore? Fornisci una query di esempio semplificata che potrebbe portare a questo errore.",
+                    "locate": "Dove si trova il problema nella mia query? Mostrami quale parte della query sta causando questo errore.",
+                    "fix": "Come posso correggere questo errore? Suggerisci una possibile correzione per questo errore.",
+                    "detect_errors": "La mia query ha degli errori? Analizza la mia query e identifica eventuali problemi."
                 }
             }
         },
@@ -449,7 +471,7 @@
                     "🧑‍🏫 Gli insegnanti creano esercizi, se vogliono, mirati a errori comuni",
                     "🎓 Gli studenti risolvono query con l’aiuto di Lens — niente risposte dirette, solo guida interattiva",
                     "📊 Il sistema analizza ogni query per rilevare errori e tracciare i progressi",
-                    "🛠️ Gli esercizi vengono generati automaticamente per colmare lacune specifiche",
+                    "🛠️ Esercizi personalizzati vengono generati automaticamente per colmare lacune specifiche",
                     "📈 Dashboard interattive mostrano come evolve la comprensione nel tempo"
                 ],
                 "cta_research": "Guarda la ricerca alla base"
@@ -602,55 +624,106 @@
                 "label": "Chiedi aiuto a Lens",
                 "xp": "",
                 "coins": "da -1 a -10 monete"
-            }
+            },
+            "_variable_amounts": "Quantità variabili"
         },
         "badges": {
+            "locked": "Bloccato",
+            "rank": "Grado {{rank}}",
             "create_exercises": {
-                "1": "Hai creato il tuo primo esercizio ed eseguito una query",
-                "5": "Hai creato 5 esercizi ed eseguito una query in ognuno",
-                "10": "Hai creato 10 esercizi ed eseguito una query in ognuno"
+                "name": "Creatore di Esercizi",
+                "description": "Crea esercizi ed esegui query in essi",
+                "next": "Esercizi per il prossimo grado",
+                "next_locked": "Esercizi per sbloccare",
+                "levels": {
+                    "1": "Creato il tuo primo esercizio ed eseguito una query in esso",
+                    "5": "Creato 5 esercizi ed eseguito una query in ciascuno di essi",
+                    "10": "Creato 10 esercizi ed eseguito una query in ciascuno di essi"
+                }
             },
             "feedback": {
-                "1": "Hai lasciato il tuo primo feedback",
-                "10": "Hai lasciato 10 feedback",
-                "50": "Hai lasciato 50 feedback"
+                "name": "Fornitore di Feedback",
+                "description": "Fornisci feedback sull'aiuto di Lens",
+                "next": "Feedback per il prossimo grado",
+                "next_locked": "Feedback per sbloccare",
+                "levels": {
+                    "1": "Fornito il tuo primo feedback",
+                    "10": "Fornito feedback 10 volte",
+                    "50": "Fornito feedback 50 volte"
+                }
             },
             "queries_unique": {
-                "1": "Hai eseguito la tua prima query",
-                "10": "Hai eseguito 10 query diverse",
-                "50": "Hai eseguito 50 query diverse",
-                "100": "Hai eseguito 100 query diverse",
-                "500": "Hai eseguito 500 query diverse",
-                "1000": "Hai eseguito 1000 query diverse",
-                "2500": "Hai eseguito 2500 query diverse",
-                "5000": "Hai eseguito 5000 query diverse",
-                "10000": "Hai eseguito 10000 query diverse"
+                "name": "Interrogatore Curioso",
+                "description": "Prova query diverse",
+                "next": "Query uniche per il prossimo grado",
+                "next_locked": "Query uniche per sbloccare",
+                "levels": {
+                    "1": "Eseguita la tua prima query",
+                    "10": "Eseguite 10 query diverse",
+                    "50": "Eseguite 50 query diverse",
+                    "100": "Eseguite 100 query diverse",
+                    "500": "Eseguite 500 query diverse",
+                    "1000": "Eseguite 1000 query diverse",
+                    "2500": "Eseguite 2500 query diverse",
+                    "5000": "Eseguite 5000 query diverse",
+                    "10000": "Eseguite 10000 query diverse"
+                }
             },
             "exercise_solutions": {
-                "1": "Hai risolto il tuo primo esercizio",
-                "5": "Hai risolto 5 esercizi",
-                "10": "Hai risolto 10 esercizi"
+                "name": "Risolutore di Esercizi",
+                "description": "Risolvi esercizi",
+                "next": "Esercizi risolti per il prossimo grado",
+                "next_locked": "Esercizi risolti per sbloccare",
+                "levels": {
+                    "1": "Risolto il tuo primo esercizio",
+                    "5": "Risolti 5 esercizi",
+                    "10": "Risolti 10 esercizi"
+                }
             },
             "help_usage": {
-                "1": "Hai interagito con Lens per la prima volta",
-                "10": "Hai interagito con Lens 10 volte",
-                "50": "Hai interagito con Lens 50 volte",
-                "100": "Hai interagito con Lens 100 volte",
-                "500": "Hai interagito con Lens 500 volte",
-                "1000": "Hai interagito con Lens 1000 volte"
+                "name": "Conversatore con Lens",
+                "description": "Interagisci con Lens",
+                "next": "Interazioni per il prossimo grado",
+                "next_locked": "Interazioni per sbloccare",
+                "levels": {
+                    "1": "Interagito con Lens per la prima volta",
+                    "10": "Interagito con Lens 10 volte",
+                    "50": "Interagito con Lens 50 volte",
+                    "100": "Interagito con Lens 100 volte",
+                    "500": "Interagito con Lens 500 volte",
+                    "1000": "Interagito con Lens 1000 volte"
+                }
             },
             "daily_usage": {
-                "5": "Hai eseguito una query in 5 giorni diversi",
-                "14": "Hai eseguito una query in 14 giorni diversi",
-                "30": "Hai eseguito una query in 30 giorni diversi"
+                "name": "Apprendista Quotidiano",
+                "description": "Esegui una query in giorni diversi",
+                "next": "Giorni di attività per il prossimo grado",
+                "next_locked": "Giorni di attività per sbloccare",
+                "levels": {
+                    "5": "Esegui una query in 5 giorni diversi",
+                    "14": "Esegui una query in 14 giorni diversi",
+                    "30": "Esegui una query in 30 giorni diversi"
+                }
             },
             "level_up": {
-                "3": "Hai raggiunto il livello 3",
-                "5": "Hai raggiunto il livello 5",
-                "10": "Hai raggiunto il livello 10"
+                "name": "Salitore di Livelli",
+                "description": "Salita di livello",
+                "next": "Livelli per il prossimo grado",
+                "next_locked": "Livelli per sbloccare",
+                "levels": {
+                    "3": "Raggiunto il livello 3",
+                    "5": "Raggiunto il livello 5",
+                    "10": "Raggiunto il livello 10"
+                }
             },
             "join_dataset": {
-                "1": "Ti sei unito al tuo primo Dataset"
+                "name": "Esploratore di Dataset",
+                "description": "Unisciti ai dataset",
+                "next": "Dataset uniti per il prossimo grado",
+                "next_locked": "Dataset uniti per sbloccare",
+                "levels": {
+                    "1": "Unito al tuo primo dataset"
+                }
             }
         },
         "levels": {

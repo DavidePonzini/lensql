@@ -107,10 +107,6 @@
                 "timeline_subtitle": {
                     "student": "See whether you're making fewer mistakes as you progress.",
                     "teacher": "See whether your students are making fewer mistakes as they progress."
-                },
-                "timeline_body": {
-                    "student": "Under development! This section will show a timeline of your errors, helping you track your progress.",
-                    "teacher": "Under development! This section will show a timeline of your students' errors, helping you track their progress."
                 }
             },
             "messages": {
@@ -432,20 +428,22 @@
                 "followup_prompt": "Would you like to ask something else?",
                 "thinking": "Lens is thinking...",
                 "buttons": {
-                    "describe": "Describe query",
-                    "explain": "Explain query",
-                    "explain_error": "Explain error",
-                    "example": "Show example",
-                    "locate": "Where to look",
-                    "fix": "Suggest fix"
+                    "describe": "What does my query do?",
+                    "explain": "What does my query do in detail?",
+                    "explain_error": "What does this error mean?",
+                    "example": "What can cause this error?",
+                    "locate": "Where is the problem in my query?",
+                    "fix": "How can I fix this error?",
+                    "detect_errors": "Does my query have any errors?"
                 },
                 "prompts": {
-                    "describe": "Describe what my query does",
-                    "explain": "Explain what each clause in my query is doing",
-                    "explain_error": "Explain what this error means",
-                    "example": "Show a simplified example that can cause this problem",
-                    "locate": "Show me which query part is causing this error",
-                    "fix": "Suggest a fix for this error"
+                    "describe": "What does my query do? Provide a concise summary of its behavior.",
+                    "explain": "What does my query do in detail? Explain what each clause in my query is doing.",
+                    "explain_error": "What does this error mean? Explain the error message in simple terms.",
+                    "example": "What can cause this error? Provide a simplified example query that could lead to this error.",
+                    "locate": "Where is the problem in my query? Show me which query part is causing this error.",
+                    "fix": "How can I fix this error? Suggest a possible correction for this error.",
+                    "detect_errors": "Does my query have any errors? Analyze my query and identify any potential issues."
                 }
             }
         },
@@ -634,7 +632,7 @@
             "rank": "Rank {{rank}}",
             "create_exercises": {
                 "name": "Exercise Creator",
-                "description": "Earned by creating exercises and running queries in them",
+                "description": "Create exercises and run queries in them",
                 "next": "Exercises to next rank",
                 "next_locked": "Exercises to unlock",
                 "levels": {
@@ -645,7 +643,7 @@
             },
             "feedback": {
                 "name": "Feedback Provider",
-                "description": "Earned by providing feedback on Lens' help",
+                "description": "Provide feedback on Lens' help",
                 "next": "Feedbacks to next rank",
                 "next_locked": "Feedbacks to unlock",
                 "levels": {
@@ -656,7 +654,7 @@
             },
             "queries_unique": {
                 "name": "Curious Querier",
-                "description": "Earned by trying different queries",
+                "description": "Try different queries",
                 "next": "Unique queries to next rank",
                 "next_locked": "Unique queries to unlock",
                 "levels": {
@@ -673,7 +671,7 @@
             },
             "exercise_solutions": {
                 "name": "Exercise Solver",
-                "description": "Earned by solving exercises",
+                "description": "Solve exercises",
                 "next": "Exercises solved to next rank",
                 "next_locked": "Exercises solved to unlock",
                 "levels": {
@@ -684,7 +682,7 @@
             },
             "help_usage": {
                 "name": "Lens Conversationalist",
-                "description": "Earned by interacting with Lens",
+                "description": "Interact with Lens",
                 "next": "Interactions to next rank",
                 "next_locked": "Interactions to unlock",
                 "levels": {
@@ -698,7 +696,7 @@
             },
             "daily_usage": {
                 "name": "Daily Learner",
-                "description": "Earned by running a query in different days",
+                "description": "Run a query in different days",
                 "next": "Days of activity to next rank",
                 "next_locked": "Days of activity to unlock",
                 "levels": {
@@ -709,7 +707,7 @@
             },
             "level_up": {
                 "name": "Level Up",
-                "description": "Earned by leveling up",
+                "description": "Level up",
                 "next": "Levels to next rank",
                 "next_locked": "Levels to unlock",
                 "levels": {
@@ -719,12 +717,12 @@
                 }
             },
             "join_dataset": {
-                "name": "Newcomer",
-                "description": "Earned by joining Datasets",
+                "name": "Dataset Explorer",
+                "description": "Join Datasets",
                 "next": "Datasets joined to next rank",
                 "next_locked": "Datasets joined to unlock",
                 "levels": {
-                    "1": "Joined your first course"
+                    "1": "Joined your first dataset"
                 }
             }
         },
