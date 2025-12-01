@@ -52,7 +52,7 @@ msgstr "Il dataset non esiste."
 
 #: server/api/datasets.py:122
 msgid "This is a special dataset and cannot be left."
-msgstr ""
+msgstr "Questo è un dataset speciale e non può essere abbandonato"
 
 #: server/api/datasets.py:127
 msgid ""
@@ -72,7 +72,7 @@ msgstr "Non puoi assegnarti come insegnante di questo dataset."
 
 #: server/api/exercises.py:26
 msgid "Dataset ID is required."
-msgstr ""
+msgstr "ID dataset richiesto"
 
 #: server/api/exercises.py:31 server/api/exercises.py:135
 #: server/api/exercises.py:222
@@ -107,7 +107,7 @@ msgstr ""
 
 #: server/api/messages.py:255
 msgid "Congratulations, I couldn't find any errors in your query!"
-msgstr ""
+msgstr "Congratulazioni, non ho trovato alcun errore nella tua query!"
 
 #: server/api/users.py:56 server/api/users.py:100 server/api/users.py:137
 msgid "User is not a participant in the specified dataset."
