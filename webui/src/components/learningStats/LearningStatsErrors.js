@@ -116,7 +116,8 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
     const timelineData = Object.values(timelineMap)
         .map(row => {
             const total = row.syn + row.sem + row.log + row.com;
-            if (total === 0) return row;
+            if (total === 0)
+                return row;
 
             return {
                 ...row,
@@ -136,25 +137,71 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
     // TOOLTIP FUNCTIONS
     // ----------------------------------------------------------------------
     const pieTooltip = ({ payload }) => {
-        if (!payload || !payload.length) return null;
+        if (!payload || !payload.length)
+            return null;
+
         const { name, value, payload: p } = payload[0];
+        const color = CATEGORY_COLOR[p.cat];
+
         return (
             <div style={{ background: '#fff', border: '1px solid #ccc', padding: '5px 10px' }}>
-                <strong>{name}</strong><br />
+                <strong style={{ color }}>{name}</strong><br />
                 {CATEGORY_DESC[p.cat]}<br />
-                {value} errors
+                {t('components.learningStats.errors.count_label', { count: value })}
             </div>
         );
     };
 
     const barTooltip = ({ payload }) => {
-        if (!payload || !payload.length) return null;
+        if (!payload || !payload.length)
+            return null;
+
         const { payload: row } = payload[0];
+
         return (
-            <div style={{ background: '#fff', border: '1px solid #ccc', padding: '5px 10px' }}>
-                <strong>{row.name}</strong><br />
-                {t(`errors.errors.${row.id}.description`)}<br />
-                {row.count} errors
+            <div style={{
+                background: '#fff',
+                border: '1px solid #ddd',
+                padding: '12px 16px',
+                borderRadius: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                maxWidth: '600px'
+            }}>
+                <h4 style={{ fontWeight: 600 }}>{row.name}</h4>
+                <span>{t(`errors.errors.${row.id}.description`)}</span>
+                <br />
+                <span>{t(`components.learningStats.errors.count_label`, { count: row.count })}</span>
+
+                <hr style={{ opacity: 0.15 }} />
+
+                <h5 className='mt-2 text-danger'>
+                    {t('components.learningStats.errors.example_label')}
+                </h5>
+                <pre style={{
+                    background: '#f8f9fa',
+                    padding: '8px 10px',
+                    borderLeft: '3px solid #dc3545',
+                    borderRadius: '3px'
+                }}>
+                    {t(`errors.errors.${row.id}.example`)}
+                </pre>
+
+                <h5 className='mt-3 text-info'>
+                    {t('components.learningStats.errors.explanation_label')}
+                </h5>
+                <i>{t(`errors.errors.${row.id}.explanation`)}</i>
+
+                <h5 className='mt-3 text-success'>
+                    {t('components.learningStats.errors.correction_label')}
+                </h5>
+                <pre style={{
+                    background: '#f8f9fa',
+                    padding: '8px 10px',
+                    borderLeft: '3px solid #28a745',
+                    borderRadius: '3px'
+                }}>
+                    {t(`errors.errors.${row.id}.correction`)}
+                </pre>
             </div>
         );
     };
