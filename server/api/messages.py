@@ -7,6 +7,7 @@ from server import db, llm, gamification
 from .util import responses
 from server.gamification import NOT_ENOUGH_COINS_MESSAGE
 
+from flask_babel import _
 
 bp = Blueprint('message', __name__)
 
@@ -249,6 +250,9 @@ def detect_errors():
 
     if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
+    
+    if not query.errors:
+        return responses.response(answer=_("Congratulations, I couldn't find any errors in your query!"))
 
     answer_str = llm.detect_errors(user.username, query.sql_string, errors=query.errors)
     answer = db.admin.Message.log(

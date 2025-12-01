@@ -95,6 +95,8 @@ def explain_my_query(username: str, code: str) -> str:
     return str(answer)
 
 def detect_errors(username: str, code: str, errors: list[DetectedError]) -> str:
+    assert len(errors) > 0, "No errors to detect"
+
     message = chatgpt.Message()
     
     message.add_message_system(prompts.get_system_instructions())

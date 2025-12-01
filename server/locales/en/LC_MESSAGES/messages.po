@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-30 13:08+0200\n"
+"POT-Creation-Date: 2025-12-01 11:34+0100\n"
 "PO-Revision-Date: 2025-07-29 15:17+0200\n"
 "Last-Translator: Davide Ponzini <davide.ponzini@edu.unige.it>\n"
 "Language: en\n"
@@ -18,99 +18,116 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: server/api/auth.py:22
+#: server/api/auth.py:24
 msgid "Cannot login. Please check your username and password."
 msgstr "Cannot login. Please check your username and password."
 
-#: server/api/auth.py:48
+#: server/api/auth.py:52
 msgid "Username already exists. Please choose a different username."
 msgstr "Username already exists. Please choose a different username."
 
-#: server/api/auth.py:51
+#: server/api/auth.py:60
 msgid "Registration failed. Please try again."
 msgstr "Registration failed. Please try again."
 
-#: server/api/auth.py:64
+#: server/api/auth.py:75
+msgid "Old password is incorrect."
+msgstr "Old password is incorrect."
+
+#: server/api/auth.py:78
 msgid "Failed to reset password. Please try again."
 msgstr "Failed to reset password. Please try again."
 
-#: server/api/auth.py:66
+#: server/api/auth.py:80
 msgid "Password reset successfully."
 msgstr "Password reset successfully."
 
-#: server/api/classes.py:68
-msgid "You do not have access to this class."
-msgstr "You do not have access to this class."
+#: server/api/datasets.py:53
+msgid "You are not authorized to modify this dataset."
+msgstr "You are not authorized to modify this dataset."
 
-#: server/api/classes.py:83
-msgid "Class does not exist."
-msgstr "Class does not exist."
-
-#: server/api/classes.py:106
-msgid ""
-"You cannot leave this class, as you are a teacher and it has data "
-"associated with it."
-msgstr ""
-"You cannot leave this class, as you are a teacher and it has data "
-"associated with it."
-
-#: server/api/classes.py:130 server/api/classes.py:150
-msgid "You are not a teacher of this class."
-msgstr "You are not a teacher of this class."
-
-#: server/api/classes.py:133
-msgid "You cannot set yourself as a teacher of this class."
-msgstr "You cannot set yourself as a teacher of this class."
-
-#: server/api/datasets.py:21
+#: server/api/datasets.py:74 server/api/datasets.py:186
 msgid "You do not have access to this dataset."
 msgstr "You do not have access to this dataset."
 
-#: server/api/exercises.py:25
-msgid "You are not a participant of this class."
-msgstr "You are not a participant of this class."
+#: server/api/datasets.py:95
+msgid "Dataset does not exist."
+msgstr "Dataset does not exist."
 
-#: server/api/exercises.py:82
-msgid "Cannot delete exercise. There are queries associated with it."
-msgstr "Cannot delete exercise. There are queries associated with it."
+#: server/api/datasets.py:122
+msgid "This is a special dataset and cannot be left."
+msgstr "This is a special dataset and cannot be left."
 
-#: server/api/exercises.py:112
-msgid "You are not authorized to set learning objectives for this exercise."
-msgstr "You are not authorized to set learning objectives for this exercise."
+#: server/api/datasets.py:127
+msgid ""
+"You cannot leave this dataset, as you are a teacher and it has data "
+"associated with it."
+msgstr ""
+"You cannot leave this dataset, as you are a teacher and it has data "
+"associated with it."
 
-#: server/api/exercises.py:143
+#: server/api/datasets.py:153 server/api/datasets.py:171
+msgid "You are not a teacher of this dataset."
+msgstr "You are not a teacher of this dataset."
+
+#: server/api/datasets.py:156
+msgid "You cannot set yourself as a teacher of this dataset."
+msgstr "You cannot set yourself as a teacher of this dataset."
+
+#: server/api/exercises.py:26
+msgid "Dataset ID is required."
+msgstr ""
+
+#: server/api/exercises.py:31 server/api/exercises.py:135
+#: server/api/exercises.py:222
+msgid "You are not a participant of this dataset."
+msgstr "You are not a participant of this dataset."
+
+#: server/api/exercises.py:59
+msgid "You are not authorized to add exercises to this dataset."
+msgstr "You are not authorized to add exercises to this dataset."
+
+#: server/api/exercises.py:87 server/api/exercises.py:179
 msgid "You are not authorized to edit this exercise."
 msgstr "You are not authorized to edit this exercise."
 
-#: server/api/exercises.py:187
-msgid "Exercise not found."
-msgstr "Exercise not found."
+#: server/api/exercises.py:108
+msgid "You are not authorized to delete this exercise."
+msgstr "You are not authorized to delete this exercise."
 
-#: server/api/exercises.py:203
-msgid "Failed to submit exercise."
-msgstr "Failed to submit exercise."
+#: server/api/exercises.py:113
+msgid "Cannot delete exercise. There are queries associated with it."
+msgstr "Cannot delete exercise. There are queries associated with it."
 
-#: server/api/exercises.py:207
-msgid "Failed to unsubmit exercise."
-msgstr "Failed to unsubmit exercise."
+#: server/api/exercises.py:130
+msgid "Exercise ID is required."
+msgstr "Exercise ID is required."
 
-#: server/api/users.py:38 server/api/users.py:79
-msgid "User is not a participant in the specified class."
-msgstr "User is not a participant in the specified class."
+#: server/api/exercises.py:153
+msgid "You are not authorized to set learning objectives for this exercise."
+msgstr "You are not authorized to set learning objectives for this exercise."
 
-#: server/db/users/queries/builtin/solution.py:106
+#: server/api/messages.py:255
+msgid "Congratulations, I couldn't find any errors in your query!"
+msgstr ""
+
+#: server/api/users.py:56 server/api/users.py:100 server/api/users.py:137
+msgid "User is not a participant in the specified dataset."
+msgstr "User is not a participant in the specified dataset."
+
+#: server/db/users/queries/builtin/solution.py:108
 msgid "No solution found for this exercise."
 msgstr "No solution found for this exercise."
 
-#: server/db/users/queries/builtin/solution.py:112
+#: server/db/users/queries/builtin/solution.py:114
 msgid "Your query is not supported. Please ensure it is a valid SQL SELECT query."
 msgstr "Your query is not supported. Please ensure it is a valid SQL SELECT query."
 
-#: server/db/users/queries/builtin/solution.py:118
+#: server/db/users/queries/builtin/solution.py:146
 msgid "Teacher-provided solution is not supported."
 msgstr "Teacher-provided solution is not supported."
 
-#: server/db/users/queries/builtin/solution.py:124
+#: server/db/users/queries/builtin/solution.py:154
 msgid ""
 "Your query has different columns from the solution. Cannot compare "
 "results."
@@ -118,17 +135,17 @@ msgstr ""
 "Your query has different columns from the solution. Cannot compare "
 "results."
 
-#: server/db/users/queries/builtin/solution.py:125
-#: server/db/users/queries/builtin/solution.py:136
+#: server/db/users/queries/builtin/solution.py:155
+#: server/db/users/queries/builtin/solution.py:167
 msgid "Expected:"
 msgstr "Expected:"
 
-#: server/db/users/queries/builtin/solution.py:126
-#: server/db/users/queries/builtin/solution.py:137
+#: server/db/users/queries/builtin/solution.py:156
+#: server/db/users/queries/builtin/solution.py:168
 msgid "Your query:"
 msgstr "Your query:"
 
-#: server/db/users/queries/builtin/solution.py:135
+#: server/db/users/queries/builtin/solution.py:166
 msgid ""
 "Your query has different data types from the solution. Cannot compare "
 "results."
@@ -136,7 +153,7 @@ msgstr ""
 "Your query has different data types from the solution. Cannot compare "
 "results."
 
-#: server/db/users/queries/builtin/solution.py:145
+#: server/db/users/queries/builtin/solution.py:177
 msgid "Solution is correct."
 msgstr "Solution is correct."
 
@@ -148,11 +165,12 @@ msgstr ""
 "You don't have enough coins to use this feature. Check the Profile page "
 "to learn how to earn more."
 
-#: server/sql/result/dataset.py:88
+#: server/sql/result/dataset.py:86
 msgid "Your query"
 msgstr "Your query"
 
-#: server/sql/result/dataset.py:89
+#: server/sql/result/dataset.py:87
 msgid "Solution"
 msgstr "Soluzione"
+
 

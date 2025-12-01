@@ -16,7 +16,7 @@ class ExerciseAPI(MethodView):
     decorators = [jwt_required()]
 
     def get(self):
-        '''List exercises for a class.'''
+        '''List exercises for a dataset.'''
 
         user = db.admin.User(get_jwt_identity())
         
@@ -28,7 +28,7 @@ class ExerciseAPI(MethodView):
         dataset = db.admin.Dataset(dataset_id)
 
         if not dataset.has_participant(user):
-            return responses.response(False, message=_('You are not a participant of this class.'))
+            return responses.response(False, message=_('You are not a participant of this dataset.'))
 
         result = [{
             'exercise_id': exercise.exercise_id,
@@ -132,7 +132,7 @@ class LearningObjectivesAPI(MethodView):
 
         dataset = db.admin.Dataset(exercise.dataset_id)
         if not dataset.has_participant(user):
-            return responses.response(False, message=_('You are not a participant of this class.'))
+            return responses.response(False, message=_('You are not a participant of this dataset.'))
 
         objectives = exercise.learning_objectives
 
@@ -219,7 +219,7 @@ def get_exercise(exercise_id):
 
     dataset = db.admin.Dataset(exercise.dataset_id)
     if not dataset.has_participant(user):
-        return responses.response(False, message=_('You are not a participant of this class.'))
+        return responses.response(False, message=_('You are not a participant of this dataset.'))
 
     result = {
         'dataset_id': exercise.dataset_id,
