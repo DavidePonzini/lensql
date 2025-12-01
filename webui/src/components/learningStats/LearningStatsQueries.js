@@ -38,12 +38,14 @@ function LearningStatsQueries({ datasetId = null, exerciseId = null, isTeacher =
         { name: t('components.learningStats.queries.fail'), value: queriesTotalSelect - queriesSuccessSelect },
     ];
 
-    const queryTypesData = data?.query_types.map(({ type, count, success }) => ({
-        type,
-        success,
-        fail: count - success,
-        total: count,
-    }));
+    const queryTypesData = data?.query_types
+        .map(({ type, count, success }) => ({
+            type,
+            success,
+            fail: count - success,
+            total: count,
+        }))
+        .sort((a, b) => b.total - a.total);
 
     const queryTypesTootlipFormatter = (value, name) => {
         const label = t(`components.learningStats.queries.${name}`) || name;
