@@ -107,7 +107,11 @@
                 "timeline_subtitle": {
                     "student": "Guarda se stai commettendo meno errori man mano che progredisci.",
                     "teacher": "Guarda se i tuoi studenti stanno commettendo meno errori man mano che progrediscono."
-                }
+                },
+                "count_label": "{{count}} errori",
+                "example_label": "Esempio",
+                "correction_label": "Correzione",
+                "explanation_label": "Spiegazione"
             },
             "messages": {
                 "empty": {
