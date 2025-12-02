@@ -32,7 +32,7 @@ if __name__ == '__main__':
         },
         {
             'file': 'miedema.sql',
-            'id': 'WELCOME_MIEDEMA',
+            'id': '_WELCOME_MIEDEMA',
             'name': 'Sample Dataset: Miedema',
             'exercises': [
                 {
