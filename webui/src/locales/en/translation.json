@@ -15,7 +15,8 @@
                 "loading": "Loading...",
                 "unknown": "Unknown",
                 "username_tooltip": "Your username",
-                "admin_tooltip": "Admin"
+                "admin_tooltip": "Admin",
+                "teacher_tooltip": "Teacher"
             },
             "language": {
                 "label": "Language",

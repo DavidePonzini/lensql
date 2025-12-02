@@ -22,6 +22,10 @@ class User:
 
         # Lazy properties
         self._badges: list[str] | None = None
+        self._is_admin: bool | None = None
+        self._is_teacher: bool | None = None
+        self._xp: int | None = None
+        self._coins: int | None = None
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, User):
@@ -34,6 +38,78 @@ class User:
     def __str__(self) -> str:
         return self.username
 
+    # region Properties
+    def _load_properties(self) -> None:
+        '''Retrieve using a single query all relevant user info'''
+
+        query = database.sql.SQL(
+            '''
+            SELECT
+                u.is_teacher,
+                u.is_admin,
+                u.experience,
+                u.coins
+            FROM
+                {schema}.users u
+            WHERE
+                u.username = {username}
+            '''
+        ).format(
+            schema=database.sql.Identifier(SCHEMA),
+            username=database.sql.Placeholder('username')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'username': self.username
+        })
+
+        if len(result) == 0:
+            return
+        
+        row = result[0]
+
+        self._is_teacher = row[0]
+        self._is_admin = row[1]
+        self._xp = row[2]
+        self._coins = row[3]
+
+    @property
+    def is_admin(self) -> bool:
+        '''Check if the user is an admin'''
+
+        if self._is_admin is None:
+            self._load_properties()
+        
+        return self._is_admin is True
+
+    @property
+    def is_teacher(self) -> bool:
+        '''Check if the user is a teacher'''
+
+        if self._is_teacher is None:
+            self._load_properties()
+        
+        return self._is_teacher is True
+
+    @property
+    def experience(self) -> int:
+        '''Get the experience points of the user'''
+
+        if self._xp is None:
+            self._load_properties()
+        
+        return self._xp or 0
+
+    @property
+    def coins(self) -> int:
+        '''Get the coins of the user'''
+
+        if self._coins is None:
+            self._load_properties()
+        
+        return self._coins or 0
+    # endregion
+
     # region Auth
     def exists(self) -> bool:
         '''Check if the user exists in the database'''
@@ -42,7 +118,6 @@ class User:
             SELECT 1
             FROM {schema}.users
             WHERE username = {username}
-                AND is_active = TRUE
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username')
@@ -54,31 +129,13 @@ class User:
 
         return len(result) > 0
 
-    def is_admin(self) -> bool:
-        '''Check if the user is an admin'''
-
-        query = database.sql.SQL('''
-            SELECT
-                is_admin
-            FROM
-                {schema}.users
-            WHERE
-                username = {username}
-        ''').format(
-            schema=database.sql.Identifier(SCHEMA),
-            username=database.sql.Placeholder('username')
-        )
-
-        result = db.execute_and_fetch(query, {
-            'username': self.username
-        })
-
-        if len(result) == 0:
-            return False
-        
-        return result[0][0]
-
-    def register_account(self, password: str, *, school: str, email: str | None = None, is_admin: bool = False) -> bool:
+    def register_account(self,
+                         password: str,
+                         *,
+                         school: str,
+                         is_teacher: bool = False,
+                         is_admin: bool = False
+        ) -> bool:
         '''Register a new user'''
 
         if self.exists():
@@ -87,26 +144,44 @@ class User:
         hashed_password = _hash_password(password)
 
         query = database.sql.SQL('''
-            INSERT INTO {schema}.users(username, password_hash, email, school, is_admin)
-            VALUES ({username}, {password_hash}, {email}, {school}, {is_admin})
+            INSERT INTO {schema}.users(username, password_hash, school, is_teacher, is_admin)
+            VALUES ({username}, {password_hash}, {school}, {is_teacher}, {is_admin})
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username'),
             password_hash=database.sql.Placeholder('password_hash'),
-            email=database.sql.Placeholder('email'),
             school=database.sql.Placeholder('school'),
+            is_teacher=database.sql.Placeholder('is_teacher'),
             is_admin=database.sql.Placeholder('is_admin')
         )
 
         db.execute(query, {
             'username': self.username,
             'password_hash': hashed_password,
-            'email': email,
             'school': school,
+            'is_teacher': is_teacher,
             'is_admin': is_admin,
         })
 
         return True
+
+    def set_teacher_status(self, is_teacher: bool) -> None:
+        '''Set the teacher status for a user'''
+
+        query = database.sql.SQL('''
+            UPDATE {schema}.users
+            SET is_teacher = {is_teacher}
+            WHERE username = {username}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            is_teacher=database.sql.Placeholder('is_teacher'),
+            username=database.sql.Placeholder('username')
+        )
+
+        db.execute(query, {
+            'is_teacher': is_teacher,
+            'username': self.username
+        })
 
     def delete_account(self) -> None:
         '''Delete a user'''
@@ -196,7 +271,7 @@ class User:
         badge_names = [row[0] for row in result]
 
 
-        info = self.get_info()
+        info = self._load_properties()
 
         current_level_up = gamification.XP(info['xp']).level
         current_queries_unique = self.count_unique_queries()
@@ -427,50 +502,6 @@ class User:
         coins = self.get_coins()
         return coins >= abs(cost.coins)
 
-    def get_info(self) -> dict:
-        '''
-            Retrieve using a single query all relevant user info
-        
-            Returns a dictionary with keys:
-            - username
-            - is_admin
-            - xp
-            - coins
-        '''
-
-        query = database.sql.SQL(
-            '''
-            SELECT
-                u.username,
-                u.is_admin,
-                u.experience,
-                u.coins
-            FROM
-                {schema}.users u
-            WHERE
-                u.username = {username}
-            '''
-        ).format(
-            schema=database.sql.Identifier(SCHEMA),
-            username=database.sql.Placeholder('username')
-        )
-
-        result = db.execute_and_fetch(query, {
-            'username': self.username
-        })
-
-        if len(result) == 0:
-            return {}
-        
-        result = result[0]
-
-        return {
-            'username': result[0],
-            'is_admin': result[1],
-            'xp': result[2],
-            'coins': result[3],
-        }
-
     def count_exercises_solved(self) -> int:
         '''Get the amount of exercises solved by the user'''
 
@@ -551,6 +582,11 @@ class User:
             'experience': total_reward.experience,
             'username': self.username
         })
+
+        if self._coins is not None:
+            self._coins += total_reward.coins
+        if self._xp is not None:
+            self._xp += total_reward.experience
     
     def count_own_exercises_with_at_least_one_own_query(self) -> int:
         '''Get the count of exercises created by a user that have at least one execution by the same user'''
@@ -621,6 +657,10 @@ class User:
             - exercise_id: The ID of the exercise to get stats for (optional). If provided, will return stats only for the exercise.
             - is_teacher: Whether the user is a teacher. If True, will return stats for all students in the class or exercise, else will return stats only for the current user.
         '''
+
+        # Prevent students from accessing teacher stats, even if the teacher flag is set
+        if not self.is_teacher:
+            is_teacher = False
 
         if dataset_id is None and exercise_id is not None:
             return {}  # fallback case
@@ -751,6 +791,10 @@ class User:
     def get_message_stats(self, *, dataset_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
         '''Get statistics about chat interactions for a user'''
 
+        # Prevent students from accessing teacher stats, even if the teacher flag is set
+        if not self.is_teacher:
+            is_teacher = False
+
         if dataset_id is None and exercise_id is not None:
             return {}  # fallback case
 
@@ -869,6 +913,10 @@ class User:
 
     def get_error_stats(self, *, dataset_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
         '''Get statistics about errors for a user'''
+
+        # Prevent students from accessing teacher stats, even if the teacher flag is set
+        if not self.is_teacher:
+            is_teacher = False
 
         if dataset_id is None and exercise_id is not None:
             return {}  # fallback case
@@ -994,6 +1042,10 @@ class User:
 
     def get_error_timeline(self, *, dataset_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> list[dict]:
         '''Get a timeline of errors for a user'''
+
+        # Prevent students from accessing teacher stats, even if the teacher flag is set
+        if not self.is_teacher:
+            is_teacher = False
 
         if dataset_id is None and exercise_id is not None:
             return []  # fallback case

@@ -47,6 +47,10 @@ function Navbar() {
                                     <span>{loadingUserInfo ? t('components.navbar.nav.loading') : userInfo?.username || t('components.navbar.nav.unknown')}</span>
                                 </span>
 
+                                {userInfo?.isTeacher && (
+                                    <i className="fa fa-chalkboard-teacher text-primary mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.teacher_tooltip')}></i>
+                                )}
+
                                 {userInfo?.isAdmin && (
                                     <i className="fa fa-shield-alt text-danger mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.admin_tooltip')}></i>
                                 )}

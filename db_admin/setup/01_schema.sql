@@ -51,6 +51,7 @@ CREATE TABLE users (
     email VARCHAR(255) DEFAULT NULL,
     school VARCHAR(255) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,  -- allows to deactivate users without deleting them
+    is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     registration_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     experience INTEGER NOT NULL DEFAULT 0,

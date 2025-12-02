@@ -12,10 +12,16 @@ bp = Blueprint('user', __name__)
 def get_user_info():
     user = db.admin.User(get_jwt_identity())
 
-    result = user.get_info()
-
-    if result is None:
+    if not user.exists():
         return responses.response(False)
+
+    result = {
+        'username': user.username,
+        'is_teacher': user.is_teacher,
+        'is_admin': user.is_admin,
+        'xp': user.experience,
+        'coins': user.coins,
+    }
     
     return responses.response(True, **result)
 
@@ -149,3 +155,17 @@ def get_error_stats():
         return responses.response(False)
     
     return responses.response(True, data=result)
+
+@bp.route('/set-teacher', methods=['POST'])
+@jwt_required()
+def set_teacher_status():
+    '''Set the teacher status for the current user.'''
+    user = db.admin.User(get_jwt_identity())
+
+    data = request.get_json()
+    is_teacher = data['is_teacher']
+
+    if not user.set_teacher_status(is_teacher):
+        return responses.response(False, message=_('Failed to update teacher status.'))
+
+    return responses.response(True)

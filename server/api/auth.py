@@ -43,8 +43,8 @@ def register():
     data = request.get_json()
     username = data['username']
     password = data['password']
-    email = data['email']
     school = data['school']
+    is_teacher = data['is_teacher']
 
     user = db.admin.User(username)
 
@@ -56,7 +56,7 @@ def register():
         db.admin.Dataset('_WELCOME_MIEDEMA'),
     ]
 
-    if not db.register_user(user, password, email=email, school=school, datasets=default_datasets):
+    if not db.register_user(user, password, school=school, is_teacher=is_teacher, datasets=default_datasets):
         return responses.response(False, message=_('Registration failed. Please try again.'))
 
     return responses.response(True)

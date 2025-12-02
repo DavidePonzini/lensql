@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
+import { useState } from 'react';
+import useAuth from '../../hooks/useAuth';
 import useUserInfo from '../../hooks/useUserInfo';
 import useGamificationData from '../../hooks/useGamificationData';
 
@@ -9,6 +11,7 @@ import ChangePassword from './ChangePassword';
 import Badges from './Badges';
 
 function Profile() {
+    const { apiRequest } = useAuth();
     const { userInfo } = useUserInfo();
     const { expActions, coinActions } = useGamificationData();
     const { t } = useTranslation();
@@ -18,6 +21,7 @@ function Profile() {
     const xpToNext = userInfo?.xpToNextLevel || 0;
     const coins = userInfo?.coins || 0;
     const level = userInfo?.level || 0;
+    const [isTeacher, setIsTeacher] = useState(userInfo?.is_teacher || false);
 
     return (
         <div className="container-md">
@@ -38,6 +42,8 @@ function Profile() {
                 <div id="change-password" className="collapse mt-3" style={{ maxWidth: 500 }}>
                     <ChangePassword />
                 </div>
+
+                {/* TODO: add a set/unset teacher status button, make it work with current API */}
             </div>
 
             <hr className="my-4" />

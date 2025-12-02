@@ -21,6 +21,7 @@ function UserInfoProvider({ children }) {
 
             setUserInfo({
                 username: data.username,
+                isTeacher: data.is_teacher,
                 isAdmin: data.is_admin,
                 coins: data.coins,
                 xpTotal: data.xp,

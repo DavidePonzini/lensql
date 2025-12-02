@@ -15,7 +15,8 @@
                 "loading": "Caricamento...",
                 "unknown": "Sconosciuto",
                 "username_tooltip": "Il tuo nome utente",
-                "admin_tooltip": "Amministratore"
+                "admin_tooltip": "Amministratore",
+                "teacher_tooltip": "Docente"
             },
             "language": {
                 "label": "Lingua",

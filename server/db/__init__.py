@@ -3,15 +3,22 @@ from . import admin, users
 from dav_tools import messages
 
 
-def register_user(user: admin.User, password: str, *, email: str | None = None, school: str, is_admin: bool = False, datasets: list[admin.Dataset] = []) -> bool:
+def register_user(user: admin.User,
+                  password: str,
+                  *,
+                  school: str,
+                  is_teacher: bool = False,
+                  is_admin: bool = False,
+                  datasets: list[admin.Dataset] = []
+    ) -> bool:
     '''
     Register a new user.
 
     Args:
         username (str): The username of the new user.
         password (str): The password for the new user.
-        email (str | None): The email of the new user.
         school (str): The school of the new user.
+        is_teacher (bool): Whether the new user is a teacher.
         is_admin (bool): Whether the new user is an admin.
         datasets (list[admin.Dataset]): List of datasets to add the user to.
 
@@ -19,7 +26,7 @@ def register_user(user: admin.User, password: str, *, email: str | None = None, 
         bool: True if registration is successful, False otherwise.
     '''
 
-    if not user.register_account(password, email=email, school=school, is_admin=is_admin):
+    if not user.register_account(password, school=school, is_teacher=is_teacher, is_admin=is_admin):
         messages.debug(f'Failed to register user {user.username}. User already exists or database error.')
         return False
     
