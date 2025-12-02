@@ -34,7 +34,7 @@ class DatasetsAPI(MethodView):
 
         dataset = db.admin.Dataset.create(title=title, dataset_str=dataset_str)
         dataset.add_participant(user)
-        dataset.set_teacher_status(user, True)
+        dataset.set_owner_status(user, True)
 
         return responses.response(True)
 
@@ -49,7 +49,7 @@ class DatasetsAPI(MethodView):
         dataset_str = data['dataset']
 
         dataset = db.admin.Dataset(dataset_id)
-        if not dataset.has_teacher(user):
+        if not dataset.has_owner(user):
             return responses.response(False, message=_('You are not authorized to modify this dataset.'))
 
         dataset.update(title=title, dataset_str=dataset_str)
@@ -124,38 +124,38 @@ def leave_dataset():
     if dataset.remove_participant(user):
         return responses.response(True)
     else:
-        return responses.response(False, message=_('You cannot leave this dataset, as you are a teacher and it has data associated with it.'))
+        return responses.response(False, message=_('You cannot leave this dataset, as you are an owner and it has data associated with it.'))
 
 
-@bp.route('/is-teacher/<dataset_id>', methods=['GET'])
+@bp.route('/is-owner/<dataset_id>', methods=['GET'])
 @jwt_required()
-def is_teacher(dataset_id):
-    '''Check if the user is a teacher of a dataset.'''
+def is_owner(dataset_id):
+    '''Check if the user is an owner of a dataset.'''
     user = db.admin.User(get_jwt_identity())
     dataset = db.admin.Dataset(dataset_id)
 
-    result = dataset.has_teacher(user)
+    result = dataset.has_owner(user)
 
-    return responses.response(True, is_teacher=result)
+    return responses.response(True, is_owner=result)
 
-@bp.route('/set-teacher', methods=['POST'])
+@bp.route('/set-owner', methods=['POST'])
 @jwt_required()
-def set_teacher():
-    '''Set a user as a teacher of a dataset.'''
+def set_owner():
+    '''Set a user as an owner of a dataset.'''
     user = db.admin.User(get_jwt_identity())
 
     data = request.get_json()
     dataset = db.admin.Dataset(data['dataset_id'])
-    teacher = db.admin.User(data['username'])
+    owner = db.admin.User(data['username'])
     value = data['value']
 
-    if not dataset.has_teacher(user):
-        return responses.response(False, message=_('You are not a teacher of this dataset.'))
+    if not dataset.has_owner(user):
+        return responses.response(False, message=_('You are not an owner of this dataset.'))
 
-    if user == teacher:
-        return responses.response(False, message=_('You cannot set yourself as a teacher of this dataset.'))
+    if user == owner:
+        return responses.response(False, message=_('You cannot set yourself as an owner of this dataset.'))
 
-    dataset.set_teacher_status(teacher, value)
+    dataset.set_owner_status(owner, value)
 
     return responses.response(True)
 
@@ -167,8 +167,8 @@ def get_members(dataset_id):
     user = db.admin.User(get_jwt_identity())
     dataset = db.admin.Dataset(dataset_id)
 
-    if not dataset.has_teacher(user):
-        return responses.response(False, message=_('You are not a teacher of this dataset.'))
+    if not dataset.has_owner(user):
+        return responses.response(False, message=_('You are not an owner of this dataset.'))
 
     members = dataset.get_members()
 

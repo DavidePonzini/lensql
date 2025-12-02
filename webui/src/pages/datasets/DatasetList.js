@@ -57,8 +57,8 @@ function DatasetList() {
     return (
         <div className="container-md">
             <h1 className=''>{t('pages.datasets.dataset_list.title')}</h1>
+            
             <div className='mt-4'>
-
                 <DatasetAdd
                     refresh={getDatasets}
                     className="btn btn-success me-2 mb-2"
@@ -82,7 +82,7 @@ function DatasetList() {
                         key={cl.dataset_id}
                         title={cl.title}
                         datasetId={cl.dataset_id}
-                        isTeacher={cl.is_teacher}
+                        isOwner={cl.is_owner}
                         participants={cl.participants}
                         exercises={cl.exercises}
                         queriesUser={cl.queries_user}

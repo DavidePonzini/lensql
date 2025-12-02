@@ -14,7 +14,7 @@ function ExerciseList() {
     const { apiRequest } = useAuth();
     const { t } = useTranslation();
 
-    const [isTeacher, setIsTeacher] = useState(false);
+    const [isOwner, setIsOwner] = useState(false);
     const [exercises, setExercises] = useState([]);
 
     const getExercises = useCallback(async () => {
@@ -33,17 +33,29 @@ function ExerciseList() {
     }, [getExercises]);
 
     useEffect(() => {
-        async function checkIfTeacher() {
-            const response = await apiRequest(`/api/datasets/is-teacher/${datasetId}`, 'GET');
-            setIsTeacher(response.is_teacher);
+        async function checkIfOwner() {
+            const response = await apiRequest(`/api/datasets/is-owner/${datasetId}`, 'GET');
+            setIsOwner(response.is_owner);
         }
 
-        checkIfTeacher();
+        checkIfOwner();
     }, [datasetId, apiRequest]);
 
     return (
         <div className="container-md">
             <h1>{t('pages.datasets.exercise_list.title')}</h1>
+
+            {isOwner && (
+                <div className="mt-4">
+                    <ExerciseAdd
+                        refresh={getExercises}
+                        datasetId={datasetId}
+                    />
+
+                    <hr />
+                </div>
+            )}
+
             <CardList>
                 {exercises.length === 0 && (
                     <p className="no-assignments">{t('pages.datasets.exercise_list.none')}</p>
@@ -56,7 +68,7 @@ function ExerciseList() {
                         isGenerated={exercise.is_ai_generated}
                         isSolved={exercise.is_solved}
                         isHidden={exercise.is_hidden}
-                        isTeacher={isTeacher}
+                        isOwner={isOwner}
                         title={exercise.title}
                         refresh={getExercises}
                         learningObjectives={exercise.learning_objectives}
@@ -65,16 +77,6 @@ function ExerciseList() {
                     </ExerciseCard>
                 ))}
             </CardList>
-
-            {isTeacher && (
-                <>
-                    <hr />
-                    <ExerciseAdd
-                        refresh={getExercises}
-                        datasetId={datasetId}
-                    />
-                </>
-            )}
         </div>
     );
 }

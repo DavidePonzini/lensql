@@ -3,6 +3,7 @@ import { Button, Card } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
 import useAuth from '../../hooks/useAuth';
+import useUserInfo from '../../hooks/useUserInfo';
 
 import ItemAssignmentList from '../../components/ItemAssignmentList';
 import ButtonModal from '../../components/buttons/ButtonModal';
@@ -11,16 +12,19 @@ import LearningStatsAll from '../../components/learningStats/LearningStatsAll';
 
 import DatasetUpdate from './DatasetUpdate';
 
-function DatasetCard({ title, datasetId, isTeacher = false, participants, exercises, queriesUser, queriesStudents, refreshDatasets }) {
-    const { apiRequest, userInfo } = useAuth();
+function DatasetCard({ title, datasetId, isOwner = false, participants, exercises, queriesUser, queriesStudents, refreshDatasets }) {
+    const { apiRequest } = useAuth();
+    const { userInfo } = useUserInfo();
     const { t } = useTranslation();
+
+    const isTeacher = userInfo?.isTeacher || false;
 
     async function getMembers() {
         const response = await apiRequest(`/api/datasets/members/${datasetId}`, 'GET');
         return response.members.map(member => ({
             id: member.username,
             label: member.username,
-            isAssigned: member.is_teacher,
+            isAssigned: member.is_owner,
         }));
     }
 
@@ -41,8 +45,8 @@ function DatasetCard({ title, datasetId, isTeacher = false, participants, exerci
         refreshDatasets();
     }
 
-    async function makeTeacher(id, value) {
-        await apiRequest('/api/datasets/set-teacher', 'POST', {
+    async function makeOwner(id, value) {
+        await apiRequest('/api/datasets/set-owner', 'POST', {
             'dataset_id': datasetId,
             'username': id,
             'value': value,
@@ -65,7 +69,7 @@ function DatasetCard({ title, datasetId, isTeacher = false, participants, exerci
                 <br />
                 <strong>{t('pages.datasets.dataset_card.join_code')}:</strong> {datasetId}
 
-                {isTeacher && (
+                {isOwner && isTeacher && (
                     <>
                         <hr />
                         <span className="badge bg-success">{t('pages.datasets.dataset_card.badge_teacher')}</span>
@@ -110,9 +114,20 @@ function DatasetCard({ title, datasetId, isTeacher = false, participants, exerci
                     </Button>
                 )}
 
-                {isTeacher && (
+                {isOwner && (
                     <>
                         <div className='vr me-2 mb-1' style={{ verticalAlign: 'middle', height: '2.5rem' }} />
+
+                        {isTeacher && (
+                            <ButtonModal
+                                className="btn btn-info me-2"
+                                title={t('pages.datasets.dataset_card.student_learning_analytics')}
+                                buttonText={t('pages.datasets.dataset_card.student_learning_analytics')}
+                                fullscreen={true}
+                            >
+                                <LearningStatsAll datasetId={datasetId} isTeacher={true} />
+                            </ButtonModal>
+                        )}
 
                         <DatasetUpdate
                             datasetId={datasetId}
@@ -122,23 +137,13 @@ function DatasetCard({ title, datasetId, isTeacher = false, participants, exerci
                         />
 
                         <ButtonModal
-                            className="btn btn-info me-2"
-                            title={t('pages.datasets.dataset_card.student_learning_analytics')}
-                            buttonText={t('pages.datasets.dataset_card.student_learning_analytics')}
-                            fullscreen={true}
-                        >
-                            <LearningStatsAll datasetId={datasetId} isTeacher={true} />
-                        </ButtonModal>
-
-
-                        <ButtonModal
                             className="btn btn-warning me-2"
-                            title={t('pages.datasets.dataset_card.set_teachers')}
-                            buttonText={t('pages.datasets.dataset_card.set_teachers')}
+                            title={t('pages.datasets.dataset_card.set_owners')}
+                            buttonText={t('pages.datasets.dataset_card.set_owners')}
                         >
                             <ItemAssignmentList
                                 fetchItems={getMembers}
-                                assignAction={makeTeacher}
+                                assignAction={makeOwner}
                                 title={t('pages.datasets.dataset_card.participants')}
                                 disabledItems={[userInfo?.username]}
                             />

@@ -386,7 +386,7 @@ class User:
                 {schema}.dataset_members
             WHERE
                 username = {username}
-                AND is_teacher = FALSE
+                AND is_owner = FALSE
                 AND dataset_id ~ '^[[:alnum:]]+$';      -- Don't count special datasets
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
@@ -698,7 +698,7 @@ class User:
                         {schema}.v_stats_queries_by_exercise
                     WHERE
                         dataset_id = {dataset_id}
-                        AND is_teacher = FALSE
+                        AND is_owner = FALSE
                     GROUP BY
                         query_type
                 ''').format(
@@ -741,7 +741,7 @@ class User:
                         {schema}.v_stats_queries_by_exercise
                     WHERE
                         exercise_id = {exercise_id}
-                        AND is_teacher = FALSE
+                        AND is_owner = FALSE
                     GROUP BY
                         query_type
                 ''').format(
@@ -953,7 +953,7 @@ class User:
                             {schema}.v_stats_errors_by_exercise
                         WHERE
                             dataset_id = {dataset_id}
-                            AND is_teacher = FALSE
+                            AND is_owner = FALSE
                         GROUP BY
                             error_id
                     '''
@@ -996,7 +996,7 @@ class User:
                             {schema}.v_stats_errors_by_exercise
                         WHERE
                             exercise_id = {exercise_id}
-                            AND is_teacher = FALSE
+                            AND is_owner = FALSE
                         GROUP BY
                             error_id
                     '''
@@ -1083,7 +1083,7 @@ class User:
                             {schema}.v_stats_error_timeline_by_exercise
                         WHERE
                             dataset_id = {dataset_id}
-                            AND is_teacher = FALSE
+                            AND is_owner = FALSE
                         GROUP BY
                             day, error_id
                         ORDER BY
@@ -1131,7 +1131,7 @@ class User:
                             {schema}.v_stats_error_timeline_by_exercise
                         WHERE
                             exercise_id = {exercise_id}
-                            AND is_teacher = FALSE
+                            AND is_owner = FALSE
                         GROUP BY
                             day, error_id
                         ORDER BY
@@ -1200,7 +1200,7 @@ class User:
             SELECT
                 id,
                 name,
-                is_teacher,
+                is_owner,
                 participants,
                 exercises,
                 queries_user,
@@ -1219,7 +1219,7 @@ class User:
         return [{
             'dataset_id': row[0],
             'title': row[1],
-            'is_teacher': bool(row[2]),
+            'is_owner': bool(row[2]),
             'participants': int(row[3]),
             'exercises': int(row[4]),
             'queries_user': int(row[5]),

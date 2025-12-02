@@ -8,7 +8,7 @@ SELECT
     dm.dataset_id,
     qb.exercise_id,
     qb.username,
-    dm.is_teacher,
+    dm.is_owner,
     q.query_type,
     COUNT(*) AS queries,
     COUNT(DISTINCT q.query) AS queries_d,
@@ -24,7 +24,7 @@ GROUP BY
     dm.dataset_id,
     qb.exercise_id,
     qb.username,
-    dm.is_teacher,
+    dm.is_owner,
     q.query_type;
 
 -- CREATE INDEX ON v_stats_queries_by_exercise(dataset_id);
@@ -55,7 +55,7 @@ SELECT
     dm.dataset_id,
     qb.exercise_id,
     qb.username,
-    dm.is_teacher,
+    dm.is_owner,
     COUNT(m.button) AS messages,
     SUM(CASE WHEN q.query_type = 'SELECT' THEN 1 ELSE 0 END) AS messages_select,
     SUM(CASE WHEN q.success THEN 1 ELSE 0 END) AS messages_success,
@@ -70,7 +70,7 @@ GROUP BY
     dm.dataset_id,
     qb.exercise_id,
     qb.username,
-    dm.is_teacher;
+    dm.is_owner;
 
 -- CREATE INDEX ON v_stats_messages_by_exercise(dataset_id);
 -- CREATE INDEX ON v_stats_messages_by_exercise(exercise_id);
@@ -97,7 +97,7 @@ SELECT
     dm.dataset_id,
     qb.exercise_id,
     qb.username,
-    dm.is_teacher,
+    dm.is_owner,
     he.error_id,
     COUNT(DISTINCT q.id) AS occurrences
 FROM
@@ -110,7 +110,7 @@ GROUP BY
     dm.dataset_id,
     qb.exercise_id,
     qb.username,
-    dm.is_teacher,
+    dm.is_owner,
     he.error_id;
 
 CREATE VIEW v_stats_errors_by_user AS
@@ -132,7 +132,7 @@ SELECT
     dm.dataset_id,
     qb.exercise_id,
     qb.username,
-    dm.is_teacher,
+    dm.is_owner,
     DATE(q.ts) AS day,
     he.error_id,
     COUNT(DISTINCT he.query_id) AS occurrences
@@ -147,7 +147,7 @@ GROUP BY
     dm.dataset_id,
     qb.exercise_id,
     qb.username,
-    dm.is_teacher,
+    dm.is_owner,
     he.error_id;
 
 CREATE VIEW v_stats_error_timeline_by_user AS

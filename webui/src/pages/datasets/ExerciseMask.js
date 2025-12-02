@@ -1,7 +1,11 @@
 import { useTranslation } from 'react-i18next';
+import useUserInfo from '../../hooks/useUserInfo';
 
 function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolutions, searchPath, setSearchPath }) {
+    const { userInfo } = useUserInfo();
     const { t } = useTranslation();
+
+    const isTeacher = userInfo?.isTeacher || false;
 
     return (
         <>
@@ -26,63 +30,65 @@ function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolu
                     placeholder={t('pages.datasets.exercise_mask.request_placeholder')}
                 />
             </div>
+            {isTeacher && (
+                <>
+                    <div className="mb-3">
+                        <label className="form-label">{t('pages.datasets.exercise_mask.answer_optional')}</label>
 
-            <div className="mb-3">
-                <label className="form-label">{t('pages.datasets.exercise_mask.answer_optional')}</label>
+                        {solutions.map((solution, idx) => (
+                            <div>
+                                <textarea
+                                    className="form-control"
+                                    rows="3"
+                                    key={idx}
+                                    defaultValue={solution}
+                                    onInput={(e) => {
+                                        const newSolutions = solutions.slice();
+                                        newSolutions[idx] = e.target.value;
+                                        setSolutions(newSolutions);
+                                    }}
+                                />
 
-                {solutions.map((solution, idx) => (
-                    <div>
-                        <textarea
-                            className="form-control"
-                            rows="3"
-                            key={idx}
-                            defaultValue={solution}
-                            onInput={(e) => {
-                                const newSolutions = solutions.slice();
-                                newSolutions[idx] = e.target.value;
-                                setSolutions(newSolutions);
-                            }}
-                        />
+                                <button
+                                    type="button"
+                                    className="btn btn-danger my-2"
+                                    key={`remove-${idx}`}
+                                    onClick={() => {
+                                        const newSolutions = solutions.slice();
+                                        newSolutions.splice(idx, 1);
+                                        setSolutions(newSolutions);
+                                    }}
+                                >
+                                    {t('pages.datasets.exercise_mask.remove_answer')}
+                                </button>
+                            </div>
+                        ))}
 
-                        <button
-                            type="button"
-                            className="btn btn-danger my-2"
-                            key={`remove-${idx}`}
-                            onClick={() => {
-                                const newSolutions = solutions.slice();
-                                newSolutions.splice(idx, 1);
-                                setSolutions(newSolutions);
-                            }}
-                        >
-                            {t('pages.datasets.exercise_mask.remove_answer')}
-                        </button>
+                        <div>
+                            <button
+                                type="button"
+                                className="btn btn-success mt-2"
+                                onClick={() => setSolutions([...solutions, ''])}
+                            >
+                                {t('pages.datasets.exercise_mask.add_answer')}
+                            </button>
+                        </div>
                     </div>
-                ))}
 
-                <div>
-                    <button
-                        type="button"
-                        className="btn btn-success mt-2"
-                        onClick={() => setSolutions([...solutions, ''])}
-                    >
-                        {t('pages.datasets.exercise_mask.add_answer')}
-                    </button>
-                </div>
-            </div>
-
-            <div className="mb-3">
-                <label className="form-label">{t('pages.datasets.exercise_mask.search_path_label')}</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    defaultValue={searchPath}
-                    onInput={(e) => {
-                        setSearchPath(e.target.value);
-                    }}
-                    placeholder='public'
-                />
-            </div>
-
+                    <div className="mb-3">
+                        <label className="form-label">{t('pages.datasets.exercise_mask.search_path_label')}</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            defaultValue={searchPath}
+                            onInput={(e) => {
+                                setSearchPath(e.target.value);
+                            }}
+                            placeholder='public'
+                        />
+                    </div>
+                </>
+            )}
         </>
     );
 }

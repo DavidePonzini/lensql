@@ -55,7 +55,7 @@ class ExerciseAPI(MethodView):
         solutions = json.loads(data['solutions'])
         search_path = data['search_path'] or 'public'   # Handle empty string
 
-        if not dataset.has_teacher(user):
+        if not dataset.has_owner(user):
             return responses.response(False, message=_('You are not authorized to add exercises to this dataset.'))
 
         db.admin.Exercise.create(
@@ -83,7 +83,7 @@ class ExerciseAPI(MethodView):
 
         dataset = db.admin.Dataset(exercise.dataset_id)
 
-        if not dataset.has_teacher(user):
+        if not dataset.has_owner(user):
             return responses.response(False, message=_('You are not authorized to edit this exercise.'))
 
         exercise.update(
@@ -104,7 +104,7 @@ class ExerciseAPI(MethodView):
         exercise = db.admin.Exercise(int(data['exercise_id']))
         dataset = db.admin.Dataset(exercise.dataset_id)
 
-        if not dataset.has_teacher(user):
+        if not dataset.has_owner(user):
             return responses.response(False, message=_('You are not authorized to delete this exercise.'))
         
         success = exercise.delete()
@@ -149,7 +149,7 @@ class LearningObjectivesAPI(MethodView):
         value = data['value']
 
         dataset = db.admin.Dataset(exercise.dataset_id)
-        if not dataset.has_teacher(user):
+        if not dataset.has_owner(user):
             return responses.response(False, message=_('You are not authorized to set learning objectives for this exercise.'))
         
         exercise.set_learning_objective(
@@ -175,7 +175,7 @@ def hide_exercise():
     value = data['value']
 
     dataset = db.admin.Dataset(exercise.dataset_id)
-    if not dataset.has_teacher(user):
+    if not dataset.has_owner(user):
         return responses.response(False, message=_('You are not authorized to edit this exercise.'))
 
     exercise.set_hidden(value)
@@ -229,9 +229,5 @@ def get_exercise(exercise_id):
         'search_path': exercise.search_path,
         'solutions': exercise.solutions,
     }
-
-    import dav_tools
-
-    dav_tools.messages.debug(f'Exercise get result: {result}')
 
     return responses.response(True, data=result)

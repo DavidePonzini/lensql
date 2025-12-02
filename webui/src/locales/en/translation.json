@@ -208,7 +208,7 @@
                 "confirm_leave": "Are you sure you want to leave this dataset?",
                 "my_learning_analytics": "My Learning Analytics",
                 "student_learning_analytics": "Students' Learning Analytics",
-                "set_teachers": "Set Teachers",
+                "set_owners": "Set Owners",
                 "participants": "Participants"
             },
             "dataset_list": {
@@ -375,13 +375,11 @@
             "passwordSpecial": "Password must contain at least one special character.",
             "show": "Show password",
             "hide": "Hide password",
-            "email": "Email (Optional)",
-            "emailPlaceholder": "Email",
-            "emailRequired": "Please enter an email address.",
-            "emailInvalid": "Please enter a valid email address.",
             "school": "School",
             "schoolPlaceholder": "School",
             "schoolRequired": "Please enter your school.",
+            "registerAsTeacher": "I am a Teacher",
+            "registerAsTeacherInfo": "Teachers can see learning stats for their students and have additional options available when creating datasets and exercises. This option can be changed anytime from the profile page.",
             "errorServer": "Could not connect to the server.",
             "errorGeneric": "Registration failed"
         },

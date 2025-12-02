@@ -83,7 +83,7 @@ CREATE TABLE dataset_members (
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,
     dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- dataset can only be deleted if no members are present
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
+    is_owner BOOLEAN NOT NULL DEFAULT FALSE,
     joined_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (username, dataset_id)

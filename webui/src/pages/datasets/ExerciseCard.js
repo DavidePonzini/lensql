@@ -6,6 +6,7 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
 import useAuth from '../../hooks/useAuth';
+import useUserInfo from '../../hooks/useUserInfo';
 
 import ButtonModal from '../../components/buttons/ButtonModal';
 import LearningStatsAll from '../../components/learningStats/LearningStatsAll';
@@ -20,13 +21,16 @@ function ExerciseCard({
     exerciseId,
     isGenerated = false,
     isSolved = false,
-    isTeacher = false,
+    isOwner = false,
     isHidden = false,
     refresh,
     learningObjectives = []
 }) {
     const { apiRequest } = useAuth();
+    const { userInfo } = useUserInfo();
     const { t } = useTranslation();
+    
+    const isTeacher = userInfo?.isTeacher || false;
 
     const [hidden, setHidden] = useState(isHidden);
 
@@ -79,7 +83,7 @@ function ExerciseCard({
                 <Card.Text>{children}</Card.Text>
 
                 <div className='row my-2'>
-                    {isTeacher && learningObjectives.length > 0 && (
+                    {isOwner && learningObjectives.length > 0 && (
                         <>
                             <div className='col'>
                                 <b>{t('pages.datasets.exercise.objectives')}:</b>
@@ -123,48 +127,52 @@ function ExerciseCard({
                     {t('pages.datasets.exercise.open')}
                 </NavLink>
 
-                {isTeacher && (
+                {isOwner && (
                     <>
                         <div className='vr me-2 mb-1' style={{ verticalAlign: 'middle', height: '2.5rem' }} />
 
-                        <ButtonModal
-                            className="btn btn-info me-2 mb-1"
-                            title={t('pages.datasets.exercise.student_analytics')}
-                            fullscreen
-                            buttonText={t('pages.datasets.exercise.student_analytics')}
-                        >
-                            <LearningStatsAll exerciseId={exerciseId} isTeacher={isTeacher} />
-                        </ButtonModal>
+                        {isTeacher && (
+                            <>
+                                <ButtonModal
+                                    className="btn btn-info me-2 mb-1"
+                                    title={t('pages.datasets.exercise.student_analytics')}
+                                    fullscreen
+                                    buttonText={t('pages.datasets.exercise.student_analytics')}
+                                >
+                                    <LearningStatsAll exerciseId={exerciseId} isTeacher={true} />
+                                </ButtonModal>
+
+                                <SetLearningObjectives
+                                    exerciseId={exerciseId}
+                                    refreshExercises={refresh}
+                                    className="btn btn-warning me-2 mb-1"
+                                />
+
+                                {hidden ? (
+                                    <Button
+                                        variant="secondary"
+                                        className="me-2 mb-1"
+                                        onClick={handleUnhide}
+                                    >
+                                        <i className="fa fa-eye"></i> {t('pages.datasets.exercise.show')}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="outline-secondary"
+                                        className="me-2 mb-1"
+                                        onClick={handleHide}
+                                    >
+                                        <i className="fa fa-eye-slash"></i> {t('pages.datasets.exercise.hide')}
+                                    </Button>
+                                )}
+                            </>
+                        )}
 
                         <ExerciseUpdate
                             exerciseId={exerciseId}
                             refreshExercises={refresh}
                             className="btn btn-warning me-2 mb-1"
                         />
-
-                        <SetLearningObjectives
-                            exerciseId={exerciseId}
-                            refreshExercises={refresh}
-                            className="btn btn-warning me-2 mb-1"
-                        />
-
-                        {hidden ? (
-                            <Button
-                                variant="secondary"
-                                className="me-2 mb-1"
-                                onClick={handleUnhide}
-                            >
-                                <i className="fa fa-eye"></i> {t('pages.datasets.exercise.show')}
-                            </Button>
-                        ) : (
-                            <Button
-                                variant="outline-secondary"
-                                className="me-2 mb-1"
-                                onClick={handleHide}
-                            >
-                                <i className="fa fa-eye-slash"></i> {t('pages.datasets.exercise.hide')}
-                            </Button>
-                        )}
 
                         <Button
                             variant="danger"

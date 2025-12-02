@@ -160,13 +160,13 @@ class Dataset:
     # endregion
 
     # region Membership
-    def has_teacher(self, user: User) -> bool:
-        '''Check if a user is a teacher of a class'''
+    def has_owner(self, user: User) -> bool:
+        '''Check if a user is an owner of a dataset'''
 
         query = database.sql.SQL(
         '''
             SELECT
-                is_teacher
+                is_owner
             FROM
                 {schema}.dataset_members
             WHERE
@@ -214,8 +214,8 @@ class Dataset:
 
         query = database.sql.SQL(
         '''
-            INSERT INTO {schema}.dataset_members (username, dataset_id, is_teacher)
-                VALUES ({username}, {dataset_id}, FALSE)
+            INSERT INTO {schema}.dataset_members (username, dataset_id)
+                VALUES ({username}, {dataset_id})
             ON CONFLICT (username, dataset_id) DO UPDATE
                 SET is_active = TRUE
                 WHERE dataset_members.username = {username} AND dataset_members.dataset_id = {dataset_id}
@@ -233,7 +233,7 @@ class Dataset:
     def can_remove_participant(self, user: User) -> bool:
         '''Check if a user can leave a dataset. User cannot leave if they are a teacher and the dataset has at least one exercise, one student or one query assigned to it.'''
 
-        if not self.has_teacher(user):
+        if not self.has_owner(user):
             return True
 
         # Check if there are any exercises assigned to the class
@@ -261,7 +261,7 @@ class Dataset:
             FROM {schema}.dataset_members
             WHERE
                 dataset_id = {dataset_id}
-                AND is_teacher = FALSE
+                AND is_owner = FALSE
                 AND is_active = TRUE
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
@@ -322,29 +322,29 @@ class Dataset:
 
         return True
     
-    def set_teacher_status(self, user: User, is_teacher: bool) -> None:
-        '''Set a user's teacher status in a class'''
+    def set_owner_status(self, user: User, is_owner: bool) -> None:
+        '''Set a user's owner status in a class'''
 
         if not self.has_participant(user):
-            raise ValueError(f'User {user.username} is not a participant of class {self.dataset_id}')
+            raise ValueError(f'User {user.username} is not a participant of dataset {self.dataset_id}')
         
         query = database.sql.SQL(
         '''
             UPDATE {schema}.dataset_members
-            SET is_teacher = {is_teacher}
+            SET is_owner = {is_owner}
             WHERE
                 username = {username}
                 AND dataset_id = {dataset_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            is_teacher=database.sql.Placeholder('is_teacher'),
+            is_owner=database.sql.Placeholder('is_owner'),
             username=database.sql.Placeholder('username'),
             dataset_id=database.sql.Placeholder('dataset_id')
         )
 
         db.execute(query, {
             'username': user.username,
-            'is_teacher': is_teacher,
+            'is_owner': is_owner,
             'dataset_id': self.dataset_id
         })
 
@@ -355,14 +355,14 @@ class Dataset:
             Returns:
             A list of members with the following fields:
             - username: The username of the member
-            - is_teacher: Whether the member is a teacher
+            - is_owner: Whether the member is an owner
         '''
 
         query = database.sql.SQL(
         '''
             SELECT
                 dm.username,
-                dm.is_teacher
+                dm.is_owner
             FROM
                 {schema}.dataset_members dm
             WHERE
@@ -380,7 +380,7 @@ class Dataset:
 
         return [{
             'username': row[0],
-            'is_teacher': row[1]
+            'is_owner': row[1]
         } for row in result]
     # endregion
 
@@ -388,7 +388,7 @@ class Dataset:
     def list_exercises(self, user: User) -> list[Exercise]:
         '''Get all exercises assigned to a user in a dataset. Includes hidden exercises if the user is a teacher.'''
 
-        if self.has_teacher(user):
+        if self.has_owner(user):
             # User is a teacher, include hidden exercises
             query = database.sql.SQL(
             '''

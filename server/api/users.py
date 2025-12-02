@@ -61,8 +61,8 @@ def get_query_stats():
         if not dataset.has_participant(user):
             return responses.response(False, message=_("User is not a participant in the specified dataset."))
 
-        # ensure user is actually a teacher
-        is_teacher &= dataset.has_teacher(user)
+        # ensure user owns the dataset if querying as teacher
+        is_teacher &= dataset.has_owner(user)
 
         result = user.get_query_stats(
             dataset_id=dataset.dataset_id,
@@ -105,8 +105,8 @@ def get_message_stats():
         if not dataset.has_participant(user):
             return responses.response(False, message=_("User is not a participant in the specified dataset."))
 
-        # ensure user is actually a teacher
-        is_teacher &= dataset.has_teacher(user)
+        # ensure user owns the dataset if querying as teacher
+        is_teacher &= dataset.has_owner(user)
 
         result = user.get_message_stats(
             dataset_id=dataset.dataset_id,
@@ -142,8 +142,8 @@ def get_error_stats():
         if not dataset.has_participant(user):
             return responses.response(False, message=_("User is not a participant in the specified dataset."))
 
-        # Ensure user is actually a teacher
-        is_teacher &= dataset.has_teacher(user)
+        # ensure user owns the dataset if querying as teacher
+        is_teacher &= dataset.has_owner(user)
         
         result = user.get_error_stats(
             dataset_id=dataset.dataset_id,

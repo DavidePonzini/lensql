@@ -16,13 +16,11 @@ function Register() {
     const [passwordError, setPasswordError] = useState('');
     const [isPasswordValid, setIsPasswordValid] = useState(false);
 
-    const [emailInput, setEmailInput] = useState('');
-    const [emailError, setEmailError] = useState('');
-    const [isEmailValid, setIsEmailValid] = useState(false);
-
     const [schoolInput, setSchoolInput] = useState('');
     const [schoolError, setSchoolError] = useState('');
     const [isSchoolValid, setIsSchoolValid] = useState(false);
+
+    const [isTeacherInput, setIsTeacherInput] = useState(false);
 
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -60,23 +58,6 @@ function Register() {
         }
     }
 
-    function checkEmail(email) {
-        setEmailInput(email);
-        if (!email) return valid(); // Optional
-        if (!email.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
-            setIsEmailValid(false);
-            setEmailError(t('pages.register.emailInvalid'));
-            return false;
-        }
-        return valid();
-
-        function valid() {
-            setIsEmailValid(true);
-            setEmailError('');
-            return true;
-        }
-    }
-
     function checkSchool(school) {
         setSchoolInput(school);
         if (!school) {
@@ -102,8 +83,8 @@ function Register() {
                 body: JSON.stringify({
                     username: usernameInput,
                     password: passwordInput,
-                    email: emailInput,
                     school: schoolInput,
+                    is_teacher: isTeacherInput,
                 })
             });
 
@@ -203,22 +184,6 @@ function Register() {
                                     </div>
                                 </div>
 
-                                {/* Email */}
-                                <div className="form-outline mb-4">
-                                    <label className="form-label" htmlFor="register-email">
-                                        {t('pages.register.email')}
-                                    </label>
-                                    <input
-                                        type="email"
-                                        id="register-email"
-                                        className={`form-control form-control-lg ${emailError ? 'is-invalid' : ''}`}
-                                        placeholder={t('pages.register.emailPlaceholder')}
-                                        value={emailInput}
-                                        onInput={(e) => checkEmail(e.target.value)}
-                                    />
-                                    {emailError && <div className="invalid-feedback">{emailError}</div>}
-                                </div>
-
                                 {/* School */}
                                 <div className="form-outline mb-4">
                                     <label className="form-label" htmlFor="register-school">
@@ -235,13 +200,33 @@ function Register() {
                                     {schoolError && <div className="invalid-feedback">{schoolError}</div>}
                                 </div>
 
+                                {/* Teacher Checkbox */}
+                                <div className="form-check mb-4">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="register-teacher"
+                                        checked={isTeacherInput}
+                                        onChange={(e) => setIsTeacherInput(e.target.checked)}
+                                    />
+                                    <label className="form-check-label" htmlFor="register-teacher">
+                                        {t('pages.register.registerAsTeacher')}
+                                        <i
+                                            className="fas text-info fa-info-circle ms-1"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="right"
+                                            title={t('pages.register.registerAsTeacherInfo')}
+                                        />
+                                    </label>
+                                </div>
+
                                 {/* Submit */}
                                 <div className="pt-1 mb-4">
                                     <button
                                         className="btn btn-primary btn-lg btn-block w-100"
                                         type="submit"
                                         disabled={
-                                            !isUsernameValid || !isPasswordValid || !isEmailValid || !isSchoolValid
+                                            !isUsernameValid || !isPasswordValid || !isSchoolValid
                                         }
                                     >
                                         {t('pages.register.submit')}
