@@ -936,7 +936,7 @@
                 "name": "Synonyms",
                 "description": "The query uses synonyms or alternative names for tables or columns that do not exist.",
                 "example": "SELECT * FROM pupils;",
-                "explanation": "The table pupils does not exist in the database. It appears to be a synonym for 'students', which is the correct table name.",
+                "explanation": "The table pupils does not exist in the database. It is a synonym for 'students', which is the correct table name.",
                 "correction": "SELECT * FROM students;"
             },
             "11": {
