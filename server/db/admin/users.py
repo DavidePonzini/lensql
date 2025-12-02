@@ -92,7 +92,7 @@ class User:
         return self._is_teacher is True
 
     @property
-    def experience(self) -> int:
+    def xp(self) -> int:
         '''Get the experience points of the user'''
 
         if self._xp is None:
@@ -273,7 +273,7 @@ class User:
 
         info = self._load_properties()
 
-        current_level_up = gamification.XP(info['xp']).level
+        current_level_up = gamification.XP(self.xp).level
         current_queries_unique = self.count_unique_queries()
         current_daily_usage = self.count_days_active()
 

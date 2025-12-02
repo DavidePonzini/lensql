@@ -320,6 +320,10 @@
                     "password_mismatch_alert": "The passwords do not match.",
                     "success_alert": "Your password has been updated successfully!",
                     "error_generic": "An unexpected error occurred while updating your password."
+                },
+                "teacher_mode": {
+                    "enable": "Enable Teacher Mode",
+                    "disable": "Disable Teacher Mode"
                 }
             }
         },

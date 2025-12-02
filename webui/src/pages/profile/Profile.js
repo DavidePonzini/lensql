@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 
-import { useState } from 'react';
 import useAuth from '../../hooks/useAuth';
 import useUserInfo from '../../hooks/useUserInfo';
 import useGamificationData from '../../hooks/useGamificationData';
@@ -12,7 +11,7 @@ import Badges from './Badges';
 
 function Profile() {
     const { apiRequest } = useAuth();
-    const { userInfo } = useUserInfo();
+    const { userInfo, setTeacherStatus } = useUserInfo();
     const { expActions, coinActions } = useGamificationData();
     const { t } = useTranslation();
 
@@ -21,7 +20,18 @@ function Profile() {
     const xpToNext = userInfo?.xpToNextLevel || 0;
     const coins = userInfo?.coins || 0;
     const level = userInfo?.level || 0;
-    const [isTeacher, setIsTeacher] = useState(userInfo?.is_teacher || false);
+    const isTeacher = userInfo?.isTeacher || false;
+
+    async function toggleTeacherMode() {
+        const newValue = !isTeacher;
+        const response = await apiRequest('/api/users/set-teacher', 'POST', {
+            is_teacher: newValue,
+        });
+
+        if (response.success) {
+            setTeacherStatus(newValue);
+        }
+    }
 
     return (
         <div className="container-md">
@@ -31,19 +41,26 @@ function Profile() {
 
             <h2>{t('pages.profile.profile.settings')}</h2>
             <div className="mb-3">
-                <button className='btn btn-primary' type='button' data-bs-toggle='collapse' data-bs-target='#change-password' aria-expanded='false' aria-controls='change-password'>
-                    {t('pages.profile.profile.change_password.title')}
-                </button>
+                <div className="row mb-2">
+                    <div className="col-sm-3">
+                        <button className='btn btn-primary' type='button' data-bs-toggle='collapse' data-bs-target='#change-password' aria-expanded='false' aria-controls='change-password'>
+                            {t('pages.profile.profile.change_password.title')}
+                        </button>
 
-                <a href="mailto:davide.ponzini@edu.unige.it?subject=[LENSQL] Support Request" className="btn btn-warning ms-2">
-                    {t('pages.profile.profile.contact_support')}
-                </a>
+                        <button className={`btn ${isTeacher ? 'btn-outline-secondary' : 'btn-outline-primary'} mt-2`} onClick={toggleTeacherMode}>
+                            {isTeacher ? t('pages.profile.profile.teacher_mode.disable') : t('pages.profile.profile.teacher_mode.enable')}
+                        </button>
 
-                <div id="change-password" className="collapse mt-3" style={{ maxWidth: 500 }}>
-                    <ChangePassword />
+                        <a href="mailto:davide.ponzini@edu.unige.it?subject=[LENSQL] Support Request" className="btn btn-warning mt-2">
+                            {t('pages.profile.profile.contact_support')}
+                        </a>
+                    </div>
+                    <div className="col-sm-9">
+                        <div id="change-password" className="collapse">
+                            <ChangePassword />
+                        </div>
+                    </div>
                 </div>
-
-                {/* TODO: add a set/unset teacher status button, make it work with current API */}
             </div>
 
             <hr className="my-4" />
@@ -102,7 +119,7 @@ function Profile() {
                 <p>{t('pages.profile.profile.achievements.text')}</p>
                 <Badges />
             </section>
-        </div>
+        </div >
     );
 }
 

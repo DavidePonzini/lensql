@@ -139,7 +139,7 @@ function ChangePassword() {
     // Render
     // -----------------------------------------------------
     return (
-        <div className="card p-4 mt-4">
+        <div className="card p-4">
             <h4 className="mb-3">
                 {t('pages.profile.profile.change_password.title')}
             </h4>

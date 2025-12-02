@@ -19,7 +19,7 @@ def get_user_info():
         'username': user.username,
         'is_teacher': user.is_teacher,
         'is_admin': user.is_admin,
-        'xp': user.experience,
+        'xp': user.xp,
         'coins': user.coins,
     }
     
@@ -165,7 +165,6 @@ def set_teacher_status():
     data = request.get_json()
     is_teacher = data['is_teacher']
 
-    if not user.set_teacher_status(is_teacher):
-        return responses.response(False, message=_('Failed to update teacher status.'))
-
+    user.set_teacher_status(is_teacher)
+    
     return responses.response(True)

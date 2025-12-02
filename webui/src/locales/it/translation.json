@@ -320,6 +320,10 @@
                     "password_mismatch_alert": "Le password non corrispondono.",
                     "success_alert": "La tua password è stata aggiornata con successo!",
                     "error_generic": "Si è verificato un errore imprevisto durante l'aggiornamento della password."
+                },
+                "teacher_mode": {
+                    "enable": "Abilita Modalità Docente",
+                    "disable": "Disabilita Modalità Docente"
                 }
             }
         },

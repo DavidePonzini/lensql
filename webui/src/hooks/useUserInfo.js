@@ -53,6 +53,17 @@ function UserInfoProvider({ children }) {
         });
     }, [getXpStats]);
 
+    const setTeacherStatus = useCallback((isTeacher) => {
+        setUserInfo(prev => {
+            if (!prev) return null;
+
+            return {
+                ...prev,
+                isTeacher,
+            };
+        });
+    }, []);
+
     const logoutUser = useCallback(() => {
         setUserInfo(null);
         logout();
@@ -69,7 +80,8 @@ function UserInfoProvider({ children }) {
         loadUserInfo,
         incrementStats,
         logout: logoutUser,
-    }), [userInfo, loadUserInfo, incrementStats, logoutUser]);
+        setTeacherStatus,
+    }), [userInfo, loadUserInfo, incrementStats, logoutUser, setTeacherStatus]);
 
     return (
         <UserInfoContext.Provider value={value}>{children}</UserInfoContext.Provider>
