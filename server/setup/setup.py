@@ -97,7 +97,7 @@ if __name__ == '__main__':
             messages.success(f'  Dataset {ds["name"]} created successfully.')
 
         dataset.add_participant(ADMIN_USER)
-        dataset.set_teacher_status(ADMIN_USER, True)
+        dataset.set_owner_status(ADMIN_USER, True)
 
         # Create exercises if dataset was just created
         if db_exists:
