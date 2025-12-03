@@ -104,7 +104,10 @@ function LearningStatsQueries({ datasetId = null, exerciseId = null, isTeacher =
                                                         <Cell fill="#198754" />
                                                         <Cell fill="#dc3545" />
                                                     </Pie>
-                                                    <Tooltip formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]} />
+                                                    <Tooltip
+                                                        formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]}
+                                                        wrapperStyle={{ zIndex: 1000 }}
+                                                    />
                                                     <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
                                                         {queriesTotalSelect === 0 ?
                                                             0 :
@@ -131,7 +134,10 @@ function LearningStatsQueries({ datasetId = null, exerciseId = null, isTeacher =
                                                         <Cell fill="#198754" />
                                                         <Cell fill="#dc3545" />
                                                     </Pie>
-                                                    <Tooltip formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]} />
+                                                    <Tooltip
+                                                        formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]}
+                                                        wrapperStyle={{ zIndex: 1000 }}
+                                                    />
                                                     <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
                                                         {queriesTotal === 0 ?
                                                             0 :
@@ -166,7 +172,10 @@ function LearningStatsQueries({ datasetId = null, exerciseId = null, isTeacher =
                                             <BarChart layout="vertical" data={queryTypesData} margin={{ left: 40, right: 60 }}>
                                                 <XAxis type="number" hide />
                                                 <YAxis dataKey="type" type="category" />
-                                                <Tooltip formatter={queryTypesTootlipFormatter} />
+                                                <Tooltip
+                                                    formatter={queryTypesTootlipFormatter}
+                                                    wrapperStyle={{ zIndex: 1000 }}
+                                                />
                                                 <Bar dataKey="success" stackId="a" fill="#198754" />
                                                 <Bar dataKey="fail" stackId="a" fill="#dc3545">
                                                     <LabelList dataKey="total" position="right" fill="#000" />

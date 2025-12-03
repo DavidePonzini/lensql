@@ -88,7 +88,10 @@ function LearningStatsMessages({ datasetId = null, exerciseId = null, isTeacher 
                                                         <Cell fill="#0d6efd" />
                                                         <Cell fill="#ffc107" />
                                                     </Pie>
-                                                    <Tooltip formatter={(value, name) => [value === 1 ? `${value} time` : `${value} times`, name]} />
+                                                    <Tooltip
+                                                        formatter={(value, name) => [value === 1 ? `${value} time` : `${value} times`, name]}
+                                                        wrapperStyle={{ zIndex: 1000 }}
+                                                    />
                                                 </PieChart>
                                             </ResponsiveContainer>
                                         </div>
@@ -133,7 +136,10 @@ function LearningStatsMessages({ datasetId = null, exerciseId = null, isTeacher 
                                             <Cell fill='#20c997' />
                                             <Cell fill='#f8f9fa' />
                                         </Pie>
-                                        <Tooltip formatter={(value, name) => [value === 1 ? `${value} time` : `${value} times`, name]} />
+                                        <Tooltip
+                                            formatter={(value, name) => [value === 1 ? `${value} time` : `${value} times`, name]}
+                                            wrapperStyle={{ zIndex: 1000 }}
+                                        />
                                         <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
                                             {(messagesFeedbackRate * 100).toFixed(0)}%
                                         </text>

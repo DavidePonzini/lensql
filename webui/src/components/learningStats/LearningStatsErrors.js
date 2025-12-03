@@ -227,7 +227,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                                 <Card.Body>
                                     <ResponsiveContainer width="100%" height={250}>
                                         <PieChart>
-                                            <Tooltip content={pieTooltip} />
+                                            <Tooltip content={pieTooltip} wrapperStyle={{ zIndex: 1000 }}/>
                                             <Pie
                                                 data={categoryData}
                                                 dataKey="value"
@@ -272,12 +272,13 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                                                     const ORDER = { com: 1, log: 2, sem: 3, syn: 4 };
                                                     return ORDER[entry.dataKey];
                                                 }}
+                                                wrapperStyle={{ zIndex: 1000 }}
                                             />
 
                                             <Legend formatter={(v) => t(`errors.categories.${v}.name`)} />
 
                                             <Area
-                                                type="monotone"
+                                                type="linear"
                                                 dataKey="syn"
                                                 stackId="1"
                                                 stroke={CATEGORY_COLOR.syn}
@@ -285,7 +286,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                                                 fillOpacity={0.35}
                                             />
                                             <Area
-                                                type="monotone"
+                                                type="linear"
                                                 dataKey="sem"
                                                 stackId="1"
                                                 stroke={CATEGORY_COLOR.sem}
@@ -293,7 +294,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                                                 fillOpacity={0.35}
                                             />
                                             <Area
-                                                type="monotone"
+                                                type="linear"
                                                 dataKey="log"
                                                 stackId="1"
                                                 stroke={CATEGORY_COLOR.log}
@@ -301,7 +302,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                                                 fillOpacity={0.35}
                                             />
                                             <Area
-                                                type="monotone"
+                                                type="linear"
                                                 dataKey="com"
                                                 stackId="1"
                                                 stroke={CATEGORY_COLOR.com}
@@ -330,7 +331,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                                         <BarChart layout="vertical" data={perErrorData} margin={{ left: 40, right: 60 }}>
                                             <XAxis type="number" hide />
                                             <YAxis type="category" dataKey="name" width={200} />
-                                            <Tooltip content={barTooltip} />
+                                            <Tooltip content={barTooltip} wrapperStyle={{ zIndex: 1000 }} />
                                             <Bar
                                                 dataKey="count"
                                                 isAnimationActive={false}
