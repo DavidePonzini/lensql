@@ -122,7 +122,7 @@ def run_query():
                     detectors=DETECTORS,
                     debug=True
                 )
-                print(flush=True)
+                print(flush=True)   # Ensure all debug output is flushed
 
                 query.log_errors(errors)
 

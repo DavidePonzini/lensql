@@ -11,7 +11,7 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade dev prod stop setup psql psql_users active_users dump clean locales_extract locales_compile
+.PHONY: $(VENV)_upgrade dev prod stop setup psql psql_users active_users dump clean locales_extract locales_compile recategorize_errors
 
 dev: stop locales_compile
 	docker compose --profile dev up --build
@@ -24,6 +24,9 @@ stop:
 
 setup:
 	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/setup/setup.py
+
+recategorize_errors:
+	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/recategorize_errors.py
 
 psql:
 	docker exec -it $(COMPOSE_PROJECT_NAME)_db_admin psql -U postgres

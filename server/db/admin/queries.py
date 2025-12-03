@@ -327,6 +327,61 @@ class Query:
                 'columns': column.columns,
             })
 
+    def get_context(self) -> tuple[list[CatalogColumnInfo], list[CatalogUniqueConstraintInfo]]:
+        '''Get context for a query.'''
+
+        # Get columns
+        column_query = database.sql.SQL('''
+            SELECT schema_name, table_name, column_name, column_type,
+                   numeric_precision, numeric_scale, is_nullable,
+                   foreign_key_schema, foreign_key_table, foreign_key_column
+            FROM {schema}.query_context_columns
+            WHERE query_id = {query_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            query_id=database.sql.Placeholder('query_id')
+        )
+        column_results = db.execute_and_fetch(column_query, {
+            'query_id': self.query_id
+        })
+        columns = [
+            CatalogColumnInfo(
+                schema_name=row[0],
+                table_name=row[1],
+                column_name=row[2],
+                column_type=row[3],
+                numeric_precision=row[4],
+                numeric_scale=row[5],
+                is_nullable=row[6],
+                foreign_key_schema=row[7],
+                foreign_key_table=row[8],
+                foreign_key_column=row[9],
+            ) for row in column_results
+        ]
+
+        # Get unique constraints
+        unique_query = database.sql.SQL('''
+            SELECT schema_name, table_name, constraint_type, columns
+            FROM {schema}.query_context_columns_unique
+            WHERE query_id = {query_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            query_id=database.sql.Placeholder('query_id')
+        )
+        unique_results = db.execute_and_fetch(unique_query, {
+            'query_id': self.query_id
+        })
+        unique_columns = [
+            CatalogUniqueConstraintInfo(
+                schema_name=row[0],
+                table_name=row[1],
+                constraint_type=row[2],
+                columns=str(row[3]),
+            ) for row in unique_results
+        ]
+
+        return columns, unique_columns
+
     def log_solution_attempt(self, is_correct: bool) -> None:
         '''Log a solution attempt for an exercise'''
 
