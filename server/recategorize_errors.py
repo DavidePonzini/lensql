@@ -1,4 +1,4 @@
-from dav_tools import database, messages
+from dav_tools import database
 from sql_error_categorizer import build_catalog, get_errors, detectors, DetectedError
 
 from server.db.admin import Query
