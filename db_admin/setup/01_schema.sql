@@ -48,7 +48,6 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 CREATE TABLE users (
     username VARCHAR(255) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
-    email VARCHAR(255) DEFAULT NULL,
     school VARCHAR(255) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,  -- allows to deactivate users without deleting them
     is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
