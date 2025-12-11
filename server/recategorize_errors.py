@@ -4,6 +4,8 @@ from sql_error_categorizer import build_catalog, get_errors, detectors, Detected
 from server.db.admin import Query
 from server.db.admin.connection import db, SCHEMA
 
+from tqdm import tqdm
+
 
 DETECTORS = [
     detectors.SyntaxErrorDetector,
@@ -61,11 +63,9 @@ def list_queries() -> list[Query]:
 
 
 if __name__ == '__main__':
-    for query in list_queries():
+    for query in tqdm(list_queries(), ncols=80):
         old_errors = query.errors
         errors = detect_errors(query)
 
         delete_existing_errors(query)
         query.log_errors(errors)
-
-        messages.info(f'Recategorized errors for query {query.query_id}: {len(old_errors)} -> {len(errors)}')

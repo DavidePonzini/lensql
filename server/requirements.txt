@@ -13,3 +13,4 @@ gunicorn
 pyarrow
 openai
 pydantic
+tqdm
