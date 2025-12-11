@@ -828,7 +828,9 @@ class User:
                         SUM(messages_feedback)
                     FROM
                     {schema}.v_stats_messages_by_exercise
-                    WHERE dataset_id = {dataset_id}
+                    WHERE
+                        dataset_id = {dataset_id}
+                        AND is_owner = FALSE
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     dataset_id=database.sql.Placeholder('dataset_id')
@@ -867,6 +869,7 @@ class User:
                         {schema}.v_stats_messages_by_exercise
                     WHERE
                         exercise_id = {exercise_id}
+                        AND is_owner = FALSE
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     exercise_id=database.sql.Placeholder('exercise_id')
