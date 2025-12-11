@@ -1,4 +1,4 @@
-from dav_tools import database
+from dav_tools import database, messages
 from sql_error_categorizer import build_catalog, get_errors, detectors, DetectedError
 
 from server.db.admin import Query
@@ -63,9 +63,18 @@ def list_queries() -> list[Query]:
 
 
 if __name__ == '__main__':
+    old_count = 0
+    new_count = 0
+
     for query in tqdm(list_queries(), ncols=80):
         old_errors = query.errors
         errors = detect_errors(query)
 
+        old_count += len(old_errors)
+        new_count += len(errors)
+
         delete_existing_errors(query)
         query.log_errors(errors)
+
+    messages.info(f'Detected {old_count} -> {new_count} errors total.')
+    
