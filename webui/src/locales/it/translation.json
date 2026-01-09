@@ -432,7 +432,6 @@
             },
             "chat": {
                 "initial_prompt": "Vuoi chiedermi qualcosa su questo risultato?",
-                "followup_prompt": "Vuoi chiedere qualcos'altro?",
                 "thinking": "Lens sta pensando...",
                 "buttons": {
                     "describe": "Cosa fa la mia query?",

@@ -39,10 +39,6 @@ function Chat({ queryId, success }) {
         setMessages(prev => [...prev, { text, isFromAssistant, isThinking, messageId }]);
     }
 
-    function addFollowupPrompt() {
-        addMessage(t('pages.exercises.chat.followup_prompt'), true);
-    }
-
     function removeLastMessage() {
         setMessages(prev => prev.slice(0, -1));
     }
