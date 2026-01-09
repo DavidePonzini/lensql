@@ -69,7 +69,6 @@ function Chat({ queryId, success }) {
         stopThinking();
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
-        addFollowupPrompt();
         setRewards(data.rewards || []);
         setBadges(data.badges || []);
     }
@@ -86,7 +85,6 @@ function Chat({ queryId, success }) {
         stopThinking();
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
-        addFollowupPrompt();
         setRewards(data.rewards || []);
         setBadges(data.badges || []);
     }
@@ -103,7 +101,6 @@ function Chat({ queryId, success }) {
         stopThinking();
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
-        addFollowupPrompt();
         setRewards(data.rewards || []);
         setBadges(data.badges || []);
     }
@@ -120,7 +117,6 @@ function Chat({ queryId, success }) {
         stopThinking();
         focusOnLastUserMessage();
         addMessage(data.answer, true, false, data.id);
-        addFollowupPrompt();
         setRewards(data.rewards || []);
         setBadges(data.badges || []);
     }
@@ -137,7 +133,6 @@ function Chat({ queryId, success }) {
         stopThinking();
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
-        addFollowupPrompt();
         setRewards(data.rewards || []);
         setBadges(data.badges || []);
     }
@@ -154,7 +149,6 @@ function Chat({ queryId, success }) {
         stopThinking();
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
-        addFollowupPrompt();
         setRewards(data.rewards || []);
         setBadges(data.badges || []);
     }
@@ -171,7 +165,6 @@ function Chat({ queryId, success }) {
         stopThinking();
         addMessage(data.answer, true, false, data.id);
         focusOnLastUserMessage();
-        addFollowupPrompt();
         setRewards(data.rewards || []);
         setBadges(data.badges || []);
     }
