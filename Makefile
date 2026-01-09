@@ -4,6 +4,7 @@ VENV=./venv
 REQUIREMENTS_SERVER=server/requirements.txt
 
 COMPOSE_PROJECT_NAME=$(subst .,,$(notdir $(patsubst %/,%,$(CURDIR))))
+PORT=3001
 
 ifeq ($(OS),Windows_NT)
 	VENV_BIN=$(VENV)/Scripts
@@ -14,10 +15,10 @@ endif
 .PHONY: $(VENV)_upgrade dev prod stop setup psql psql_users active_users dump clean locales_extract locales_compile recategorize_errors
 
 dev: stop locales_compile
-	docker compose --profile dev up --build
+	export PORT=$(PORT) && docker compose --profile dev up --build
 
 prod: stop locales_compile
-	docker compose --profile prod up -d --build
+	export PORT=$(PORT) && docker compose --profile prod up -d --build
 
 stop:
 	docker compose --profile dev --profile prod down
