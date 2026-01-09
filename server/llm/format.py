@@ -3,19 +3,15 @@ from pydantic import BaseModel
 class MessageFormat(BaseModel):
     introduction: str
     response: str
-    motivational_message: str
 
     def __str__(self) -> str:
         introduction = text_to_html(self.introduction)
         response = text_to_html(self.response, replace_newlines=False)
-        motivational_message = text_to_html(self.motivational_message)
 
         return f'''
             <div>{introduction}</div>
             <br>
             <div>{response}</div>
-            <br>
-            <i>{motivational_message}</i>
         '''
         
 
@@ -25,7 +21,6 @@ class MessageFormatWithCode(MessageFormat):
     def __str__(self) -> str:
         introduction = text_to_html(self.introduction)
         response = text_to_html(self.response, replace_newlines=False)
-        motivational_message = text_to_html(self.motivational_message)
         
         code = text_to_html(self.code, replace_newlines=False)
         if code.startswith('<pre class="code m">'):
@@ -36,8 +31,6 @@ class MessageFormatWithCode(MessageFormat):
             <br>
             <div>{response}</div>
             <pre class="code m">{code}</pre>
-            <br>
-            <i>{motivational_message}</i>
             <br>
         '''
 
