@@ -132,7 +132,7 @@ if __name__ == '__main__':
             messages.warning(f'  User {user} already exists, skipping creation.')
         elif db.register_user(user, password, school=school, datasets=[
             db.admin.Dataset('_EXPLORE'),
-            db.admin.Dataset('WELCOME_MIEDEMA'),
+            db.admin.Dataset('_WELCOME_MIEDEMA'),
         ]):
             messages.success(f'  User {user} registered successfully')
         else:
