@@ -125,13 +125,19 @@ function Navbar() {
                                     </NavLink>
                                 </li>
 
-                                <li className="nav-item">
+                                {/* <li className="nav-item">
                                     <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/datasets/_EXPLORE" end>
                                         <i className="fa-solid fa-magnifying-glass-arrow-right"></i> {t('components.navbar.nav.explore_sql')}
                                     </NavLink>
-                                </li>
+                                </li> */}
                             </>
                         )}
+
+                        <li className="nav-item">
+                            <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/howto" end>
+                                <i className="fa-solid fa-book"></i> {t('components.navbar.nav.howto')}
+                            </NavLink>
+                        </li>
 
                         {userInfo?.isAdmin && (
                             <li className="nav-item">

@@ -19,6 +19,7 @@ import ExerciseList from './datasets/ExerciseList';
 import DatasetList from './datasets/DatasetList';
 import Exercise from './exercises/Exercise';
 import Admin from './admin/Admin';
+import Tutorial from './Tutorial';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -39,6 +40,7 @@ function App() {
                         <Route path="/">
                             <Route index element={<Home />} />
                             <Route path="about" element={<About />} />
+                            <Route path="howto" element={<Tutorial />} />
 
                             {isLoggedIn ? (
                                 <>
