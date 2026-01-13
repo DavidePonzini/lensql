@@ -89,6 +89,14 @@ CREATE TABLE dataset_members (
     PRIMARY KEY (username, dataset_id)
 );
 
+
+CREATE TABLE errors (
+    id INTEGER PRIMARY KEY,
+    category VARCHAR(255) NOT NULL,
+    subcategory VARCHAR(255) NOT NULL,
+    error VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
     dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of dataset if exercises are assigned
@@ -99,7 +107,8 @@ CREATE TABLE exercises (
     search_path TEXT NOT NULL DEFAULT 'public',
     created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if exercises are assigned
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-    difficulty INTEGER DEFAULT NULL
+    generation_difficulty INTEGER DEFAULT NULL,
+    generation_error INTEGER DEFAULT NULL REFERENCES errors(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE learning_objectives (
@@ -162,14 +171,7 @@ CREATE TABLE query_context_columns_unique (
     constraint_type VARCHAR(32) NOT NULL,
     columns TEXT[] NOT NULL
 );
-    
 
-CREATE TABLE errors (
-    id INTEGER PRIMARY KEY,
-    category VARCHAR(255) NOT NULL,
-    subcategory VARCHAR(255) NOT NULL,
-    error VARCHAR(255) NOT NULL
-);
 
 CREATE TABLE has_error(
     id SERIAL PRIMARY KEY,

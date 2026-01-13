@@ -223,7 +223,7 @@ class Exercise:
                 e.request,
                 e.solutions,
                 e.search_path,
-                e.difficulty
+                e.generation_difficulty
             FROM
                 {schema}.exercises e
             WHERE
@@ -256,7 +256,8 @@ class Exercise:
                request: str,
                solutions: list[str] = [],
                search_path: str = 'public',
-               difficulty: int | None = None
+               difficulty: int | None = None,
+               error: int | None = None
               ) -> 'Exercise':
         '''Create a new exercise. New exercises are visible by default.'''
 
@@ -268,7 +269,8 @@ class Exercise:
             'solutions': json.dumps(solutions),
             'search_path': search_path,
             'created_by': user.username,
-            'difficulty': difficulty
+            'generation_difficulty': difficulty,
+            'generation_error': error
         }, ['id'])
 
         assert result is not None and len(result) == 1, "Insert should return the new exercise ID"

@@ -48,7 +48,8 @@ def generate_assignment(
             request=exercise_data.request,
             solutions=exercise_data.solutions,
             search_path=schema_name,
-            difficulty=exercise_data.difficulty.value
+            difficulty=exercise_data.difficulty.value,
+            error=exercise_data.error.value
         )
 
     # Add the specified user as participant
