@@ -36,6 +36,7 @@ class ExerciseAPI(MethodView):
             'request': exercise.request,
             'is_ai_generated': exercise.is_ai_generated,
             'learning_objectives': exercise.learning_objectives,
+            'has_solution': len(exercise.solutions) > 0,
             'is_solved': exercise.has_been_solved_by_user(user),
             'is_hidden': exercise.is_hidden,
             'search_path': exercise.search_path,

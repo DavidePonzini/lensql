@@ -23,13 +23,14 @@ function ExerciseCard({
     isSolved = false,
     isOwner = false,
     isHidden = false,
+    hasSolution = false,
     refresh,
     learningObjectives = []
 }) {
     const { apiRequest } = useAuth();
     const { userInfo } = useUserInfo();
     const { t } = useTranslation();
-    
+
     const isTeacher = userInfo?.isTeacher || false;
 
     const [hidden, setHidden] = useState(isHidden);
@@ -72,15 +73,15 @@ function ExerciseCard({
     return (
         // Border color indicates unsolved exercise
         // Opacity is reduced for solved exercises (only applies to non-owners)
-        <Card className={`my-2 ${isSolved ? isOwner ? '' : 'opacity-50' : 'border border-3 border-warning'}`}>
+        <Card className={`my-2 ${!hasSolution ? '' : isSolved ? isOwner ? '' : 'opacity-50' : 'border border-3 border-warning'}`}>
             <Card.Header>
                 <h5 className='card-title'>
                     {title}
                     {hidden && <span className="badge bg-secondary ms-2">{t('pages.datasets.exercise.hidden')}</span>}
-                    {isSolved ?
-                    <span className="badge bg-success ms-2">{t('pages.datasets.exercise.solved')}</span> : 
-                    <span className="badge bg-warning ms-2">{t('pages.datasets.exercise.todo')}</span>
-                    }
+                    {hasSolution && (isSolved ?
+                        <span className="badge bg-success ms-2">{t('pages.datasets.exercise.solved')}</span> :
+                        <span className="badge bg-warning ms-2">{t('pages.datasets.exercise.todo')}</span>
+                    )}
                 </h5>
             </Card.Header>
 

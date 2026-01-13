@@ -69,6 +69,7 @@ function ExerciseList() {
                         isSolved={exercise.is_solved}
                         isHidden={exercise.is_hidden}
                         isOwner={isOwner}
+                        hasSolution={exercise.has_solution}
                         title={exercise.title}
                         refresh={getExercises}
                         learningObjectives={exercise.learning_objectives}
