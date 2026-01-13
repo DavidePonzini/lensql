@@ -12,7 +12,7 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade dev prod stop setup psql psql_users active_users dump clean locales_extract locales_compile recategorize_errors
+.PHONY: $(VENV)_upgrade dev prod stop setup psql psql_users active_users dump clean locales_extract locales_compile recategorize_errors ipython
 
 dev: stop locales_compile
 	export PORT=$(PORT) && docker compose --profile dev up --build
@@ -28,6 +28,9 @@ setup:
 
 recategorize_errors:
 	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/recategorize_errors.py
+
+ipython: $(VENV)
+	docker exec -it $(COMPOSE_PROJECT_NAME)_server ipython
 
 psql:
 	docker exec -it $(COMPOSE_PROJECT_NAME)_db_admin psql -U postgres

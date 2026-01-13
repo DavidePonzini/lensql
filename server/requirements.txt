@@ -1,6 +1,6 @@
 dav_tools==0.4.19
 sql-error-categorizer>=0.1.9
-sql-assignment-generator>=0.0.3
+sql-assignment-generator>=0.0.4
 Flask>=3.1.0
 Flask_Cors>=5.0.0
 flask_babel
@@ -14,3 +14,4 @@ pyarrow
 openai
 pydantic
 tqdm
+ipython
