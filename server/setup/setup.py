@@ -35,7 +35,7 @@ if __name__ == '__main__':
             'file': 'miedema.sql',
             'id': '_WELCOME_MIEDEMA',
             'name': 'Sample Dataset: Miedema',
-            'description': 'A sample dataset containing customer, product, transaction, store, and inventory information for practice exercises.',
+            'description': 'A sample dataset for practicing queries.',
             'exercises': [
                 {
                     'name': 'Exercise 1',
