@@ -30,9 +30,10 @@ class DatasetsAPI(MethodView):
     
         data = request.get_json()
         title = data['title']
+        description = data['description']
         dataset_str = data['dataset']
 
-        dataset = db.admin.Dataset.create(title=title, dataset_str=dataset_str)
+        dataset = db.admin.Dataset.create(title=title, description=description, dataset_str=dataset_str)
         dataset.add_participant(user)
         dataset.set_owner_status(user, True)
 
@@ -46,13 +47,14 @@ class DatasetsAPI(MethodView):
         data = request.get_json()
         dataset_id = data['dataset_id']
         title = data['title']
+        description = data['description']
         dataset_str = data['dataset']
 
         dataset = db.admin.Dataset(dataset_id)
         if not dataset.has_owner(user):
             return responses.response(False, message=_('You are not authorized to modify this dataset.'))
 
-        dataset.update(title=title, dataset_str=dataset_str)
+        dataset.update(title=title, description=description, dataset_str=dataset_str)
 
         return responses.response(True)
 
@@ -75,6 +77,7 @@ def get_dataset(dataset_id):
 
     result = {
         'title': dataset.name,
+        'description': dataset.description,
         'dataset_str': dataset.dataset_str,
     }
 

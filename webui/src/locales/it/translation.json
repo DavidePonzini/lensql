@@ -220,6 +220,7 @@
             },
             "dataset_mask": {
                 "title_label": "Titolo",
+                "description_label": "Descrizione (Opzionale)",
                 "dataset_label": "Dataset (Opzionale)",
                 "tips_title": "Suggerimenti",
                 "tips": [
@@ -229,6 +230,7 @@
                     "Raggruppa le inserzioni in un unico comando <code>INSERT INTO</code> per ogni tabella per migliorare le prestazioni"
                 ],
                 "title_placeholder": "Titolo descrittivo del dataset",
+                "description_placeholder": "Breve descrizione dello scopo del dataset",
                 "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;"
             },
             "dataset_update": {

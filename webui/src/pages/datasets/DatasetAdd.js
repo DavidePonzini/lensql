@@ -10,11 +10,13 @@ function DatasetAdd({ refresh, className }) {
     const { apiRequest } = useAuth();
     const { t } = useTranslation();
     const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
     const [dataset, setDataset] = useState('');
 
     async function handleAdd() {
         await apiRequest('/api/datasets', 'POST', {
             'title': title,
+            'description': description,
             'dataset': dataset,
         });
 
@@ -44,6 +46,8 @@ function DatasetAdd({ refresh, className }) {
             <DatasetMask
                 title={title}
                 setTitle={setTitle}
+                description={description}
+                setDescription={setDescription}
                 dataset={dataset}
                 setDataset={setDataset}
             />

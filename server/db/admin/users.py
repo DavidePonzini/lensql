@@ -1190,6 +1190,7 @@ class User:
             A list of datasets with the following fields:
             - dataset_id: The ID of the dataset
             - title: The name of the dataset
+            - description: The description of the dataset
             - is_teacher: Whether the user is a teacher in the dataset
             - participants: The number of participants in the dataset
             - exercises: The number of exercises in the dataset
@@ -1203,6 +1204,7 @@ class User:
             SELECT
                 id,
                 name,
+                description,
                 is_owner,
                 participants,
                 exercises,
@@ -1222,10 +1224,11 @@ class User:
         return [{
             'dataset_id': row[0],
             'title': row[1],
-            'is_owner': bool(row[2]),
-            'participants': int(row[3]),
-            'exercises': int(row[4]),
-            'queries_user': int(row[5]),
-            'queries_students': int(row[6])
+            'description': row[2],
+            'is_owner': bool(row[3]),
+            'participants': int(row[4]),
+            'exercises': int(row[5]),
+            'queries_user': int(row[6]),
+            'queries_students': int(row[7])
         } for row in result]
     # endregion

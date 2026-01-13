@@ -21,6 +21,7 @@ if __name__ == '__main__':
             'file': 'explore.sql',
             'id': '_EXPLORE',
             'name': 'Explore SQL',
+            'description': 'Sandbox environment to explore SQL queries without restrictions.',
             'exercises': [
                 {
                     'name': 'Explore SQL',
@@ -34,6 +35,7 @@ if __name__ == '__main__':
             'file': 'miedema.sql',
             'id': '_WELCOME_MIEDEMA',
             'name': 'Sample Dataset: Miedema',
+            'description': 'A sample dataset containing customer, product, transaction, store, and inventory information for practice exercises.',
             'exercises': [
                 {
                     'name': 'Exercise 1',
@@ -92,7 +94,12 @@ if __name__ == '__main__':
             messages.warning(f'  Dataset {ds["name"]} already exists, skipping creation.')
             db_exists = True
         else:
-            dataset = db.admin.Dataset.create(ds["name"], dataset_str=dataset_str, dataset_id=ds["id"])
+            dataset = db.admin.Dataset.create(
+                title=ds["name"],
+                description=ds["description"],
+                dataset_str=dataset_str,
+                dataset_id=ds["id"]
+            )
             db_exists = False
             messages.success(f'  Dataset {ds["name"]} created successfully.')
 

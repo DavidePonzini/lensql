@@ -81,6 +81,7 @@ function DatasetList() {
                     <DatasetCard
                         key={cl.dataset_id}
                         title={cl.title}
+                        description={cl.description}
                         datasetId={cl.dataset_id}
                         isOwner={cl.is_owner}
                         participants={cl.participants}

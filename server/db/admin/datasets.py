@@ -10,12 +10,14 @@ class Dataset:
 
     def __init__(self, dataset_id: str, *,
                  name: str | None = None,
+                 description: str | None = None,
                  dataset_str: str | None = None
                 ) -> None:
         self.dataset_id = dataset_id
 
         # Lazy properties
         self._name = name
+        self._description = description
         self._dataset_str = dataset_str
 
     # region Properties
@@ -44,6 +46,32 @@ class Dataset:
             self._name = result[0][0]
         
         return self._name
+    
+    @property
+    def description(self) -> str:
+        '''Get the description of the dataset'''
+
+        if self._description is None:
+            query = database.sql.SQL(
+            '''
+                SELECT description
+                FROM {schema}.datasets
+                WHERE id = {dataset_id}
+            ''').format(
+                schema=database.sql.Identifier(SCHEMA),
+                dataset_id=database.sql.Placeholder('dataset_id')
+            )
+
+            result = db.execute_and_fetch(query, {
+                'dataset_id': self.dataset_id
+            })
+
+            if len(result) == 0:
+                raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
+
+            self._description = result[0][0]
+        
+        return self._description
     
     @property
     def dataset_str(self) -> str:
@@ -98,18 +126,20 @@ class Dataset:
         return result[0][0] > 0
 
     @staticmethod
-    def create(title: str, dataset_str: str, *, dataset_id: str | None = None) -> 'Dataset':
+    def create(title: str, description: str, dataset_str: str, *, dataset_id: str | None = None) -> 'Dataset':
         '''Create a new dataset, optionally with a specified ID'''
 
         if dataset_id is not None:
             result = db.insert(SCHEMA, 'datasets', {
                 'id': dataset_id,
                 'name': title,
+                'description': description,
                 'dataset': dataset_str.strip() or None
             }, ['id'])
         else:
             result = db.insert(SCHEMA, 'datasets', {
                 'name': title,
+                'description': description,
                 'dataset': dataset_str.strip() or None
             }, ['id'])
 
@@ -117,9 +147,9 @@ class Dataset:
 
         dataset_id = result[0][0]
 
-        return Dataset(dataset_id, name=title, dataset_str=dataset_str)
+        return Dataset(dataset_id, name=title, description=description, dataset_str=dataset_str)
 
-    def update(self, title: str, dataset_str: str) -> None:
+    def update(self, title: str, description: str, dataset_str: str) -> None:
         '''Update an existing dataset'''
 
         query = database.sql.SQL(
@@ -127,17 +157,20 @@ class Dataset:
             UPDATE {schema}.datasets
             SET
                 name = {title},
+                description = {description},
                 dataset = {dataset}
             WHERE id = {dataset_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             title=database.sql.Placeholder('title'),
+            description=database.sql.Placeholder('description'),
             dataset_id=database.sql.Placeholder('dataset_id'),
             dataset=database.sql.Placeholder('dataset')
         )
 
         db.execute(query, {
             'title': title,
+            'description': description,
             'dataset_id': self.dataset_id,
             'dataset': dataset_str.strip() or None
         })

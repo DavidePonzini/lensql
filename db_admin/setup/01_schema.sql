@@ -75,6 +75,7 @@ CREATE TABLE user_unique_queries (
 CREATE TABLE datasets (
     id TEXT PRIMARY KEY DEFAULT generate_alphanumeric_id(8),
     name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
     dataset TEXT DEFAULT NULL
 );
 

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-function DatasetMask({ title, setTitle, dataset, setDataset }) {
+function DatasetMask({ title, setTitle, description, setDescription, dataset, setDataset }) {
     const { t } = useTranslation();
 
     const tips = t('pages.datasets.dataset_mask.tips', { returnObjects: true });
@@ -15,6 +15,16 @@ function DatasetMask({ title, setTitle, dataset, setDataset }) {
                     defaultValue={title}
                     onInput={(e) => setTitle(e.target.value)}
                     placeholder={t('pages.datasets.dataset_mask.title_placeholder')}
+                />
+            </div>
+            <div className="mb-3">
+                <label className="form-label">{t('pages.datasets.dataset_mask.description_label')}</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    defaultValue={description}
+                    onInput={(e) => setDescription(e.target.value)}
+                    placeholder={t('pages.datasets.dataset_mask.description_placeholder')}
                 />
             </div>
             <div className="mb-3">

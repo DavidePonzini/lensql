@@ -12,12 +12,14 @@ function DatasetUpdate({ datasetId, refresh, className }) {
     const { t } = useTranslation();
 
     const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
     const [dataset, setDataset] = useState('');
 
     async function handleEditDataset() {
         await apiRequest('/api/datasets', 'PUT', {
             'dataset_id': datasetId,
             'title': title,
+            'description': description,
             'dataset': dataset,
         });
 
@@ -29,6 +31,7 @@ function DatasetUpdate({ datasetId, refresh, className }) {
 
         const result = await apiRequest(`/api/datasets/get/${datasetId}`, 'GET');
         setTitle(result.data.title);
+        setDescription(result.data.description);
         setDataset(result.data.dataset_str);
     }, [datasetId, apiRequest]);
 
@@ -54,6 +57,8 @@ function DatasetUpdate({ datasetId, refresh, className }) {
             <DatasetMask
                 title={title}
                 setTitle={setTitle}
+                description={description}
+                setDescription={setDescription}
                 dataset={dataset}
                 setDataset={setDataset}
             />

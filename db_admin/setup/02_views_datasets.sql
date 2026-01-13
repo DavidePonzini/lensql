@@ -7,6 +7,7 @@ SELECT
     dm.username,
     d.id,
     d.name,
+    d.description,
     dm.is_owner,
 
     -- total number of students in the dataset
@@ -57,6 +58,6 @@ LEFT JOIN queries q ON q.batch_id = qb.id
 
 WHERE dm.is_active = TRUE
 
-GROUP BY dm.username, d.id, d.name, dm.is_owner, dm.joined_ts;
+GROUP BY dm.username, d.id, d.name, d.description, dm.is_owner, dm.joined_ts;
 
 COMMIT;

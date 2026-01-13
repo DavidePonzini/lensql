@@ -12,7 +12,7 @@ import LearningStatsAll from '../../components/learningStats/LearningStatsAll';
 
 import DatasetUpdate from './DatasetUpdate';
 
-function DatasetCard({ title, datasetId, isOwner = false, participants, exercises, queriesUser, queriesStudents, refreshDatasets }) {
+function DatasetCard({ title, description, datasetId, isOwner = false, participants, exercises, queriesUser, queriesStudents, refreshDatasets }) {
     const { apiRequest } = useAuth();
     const { userInfo } = useUserInfo();
     const { t } = useTranslation();
@@ -59,6 +59,7 @@ function DatasetCard({ title, datasetId, isOwner = false, participants, exercise
         <Card className="my-2">
             <Card.Header>
                 <h5 className="card-title">{title}</h5>
+                <h6 className="card-subtitle text-muted">{description}</h6>
             </Card.Header>
 
             <Card.Body>
