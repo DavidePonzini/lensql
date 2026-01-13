@@ -99,7 +99,7 @@ CREATE TABLE exercises (
     search_path TEXT NOT NULL DEFAULT 'public',
     created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if exercises are assigned
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-    is_ai_generated BOOLEAN NOT NULL DEFAULT FALSE
+    difficulty INTEGER DEFAULT NULL
 );
 
 CREATE TABLE learning_objectives (
