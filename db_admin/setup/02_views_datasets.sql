@@ -9,6 +9,7 @@ SELECT
     d.name,
     d.description,
     dm.is_owner,
+    dm.joined_ts,
 
     -- total number of students in the dataset
     (

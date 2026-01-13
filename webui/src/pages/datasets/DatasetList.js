@@ -40,11 +40,20 @@ function DatasetList() {
             const aSpecial = !/^[a-zA-Z0-9]+$/i.test(a.dataset_id);
             const bSpecial = !/^[a-zA-Z0-9]+$/i.test(b.dataset_id);
 
+            // Special datasets are sorted by dataset_id
+            if (aSpecial && bSpecial) {
+                return (a.dataset_id > b.dataset_id) - (a.dataset_id < b.dataset_id);
+            }
+
+            // Special datasets come before regular datasets
             if (aSpecial !== bSpecial) {
                 return aSpecial ? -1 : 1;
             }
 
-            return (a.dataset_id.toLowerCase() > b.dataset_id.toLowerCase()) - (a.dataset_id.toLowerCase() < b.dataset_id.toLowerCase());
+            // Regular datasets are sorted by date, newest first
+            const dateA = new Date(a.joined_ts);
+            const dateB = new Date(b.joined_ts);
+            return dateB - dateA;
         });
 
         setDatasets(sortedDatasets);

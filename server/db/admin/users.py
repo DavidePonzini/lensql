@@ -1191,6 +1191,7 @@ class User:
             - dataset_id: The ID of the dataset
             - title: The name of the dataset
             - description: The description of the dataset
+            - joined_ts: The timestamp when the user joined the dataset
             - is_teacher: Whether the user is a teacher in the dataset
             - participants: The number of participants in the dataset
             - exercises: The number of exercises in the dataset
@@ -1206,6 +1207,7 @@ class User:
                 name,
                 description,
                 is_owner,
+                joined_ts,
                 participants,
                 exercises,
                 queries_user,
@@ -1226,9 +1228,10 @@ class User:
             'title': row[1],
             'description': row[2],
             'is_owner': bool(row[3]),
-            'participants': int(row[4]),
-            'exercises': int(row[5]),
-            'queries_user': int(row[6]),
-            'queries_students': int(row[7])
+            'joined_ts': row[4],
+            'participants': int(row[5]),
+            'exercises': int(row[6]),
+            'queries_user': int(row[7]),
+            'queries_students': int(row[8])
         } for row in result]
     # endregion
