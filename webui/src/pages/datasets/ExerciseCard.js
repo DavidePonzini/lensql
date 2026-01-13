@@ -70,12 +70,17 @@ function ExerciseCard({
     }
 
     return (
-        <Card className="my-2">
+        // Border color indicates unsolved exercise
+        // Opacity is reduced for solved exercises (only applies to non-owners)
+        <Card className={`my-2 ${isSolved ? isOwner ? '' : 'opacity-50' : 'border border-3 border-warning'}`}>
             <Card.Header>
-                <h5 className="card-title">
+                <h5 className='card-title'>
                     {title}
                     {hidden && <span className="badge bg-secondary ms-2">{t('pages.datasets.exercise.hidden')}</span>}
-                    {isSolved && <span className="badge bg-success ms-2">{t('pages.datasets.exercise.solved')}</span>}
+                    {isSolved ?
+                    <span className="badge bg-success ms-2">{t('pages.datasets.exercise.solved')}</span> : 
+                    <span className="badge bg-warning ms-2">{t('pages.datasets.exercise.todo')}</span>
+                    }
                 </h5>
             </Card.Header>
 
@@ -122,7 +127,7 @@ function ExerciseCard({
             <Card.Footer>
                 <NavLink
                     to={`/exercises/${exerciseId}`}
-                    className="btn btn-primary me-2 mb-1"
+                    className={`btn me-2 mb-1 ${isSolved && !isOwner ? 'btn-outline-primary' : 'btn-primary'}`}
                 >
                     {t('pages.datasets.exercise.open')}
                 </NavLink>

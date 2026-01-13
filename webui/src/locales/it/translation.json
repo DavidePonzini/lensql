@@ -201,6 +201,8 @@
                 "exercises": "Esercizi",
                 "queries": "Query eseguite",
                 "badge_teacher": "Docente",
+                "badge_new": "Nuovo!",
+                "badge_special": "Dataset Speciale",
                 "join_code": "Codice di iscrizione",
                 "students": "Studenti",
                 "open": "Apri",
@@ -246,6 +248,7 @@
             "exercise": {
                 "hidden": "Nascosto",
                 "solved": "Risolto",
+                "todo": "Da Fare",
                 "generated": "Generato dall'IA",
                 "objectives": "Obiettivi di Apprendimento",
                 "archive": "Archivia",

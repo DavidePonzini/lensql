@@ -19,6 +19,9 @@ function DatasetCard({ title, description, datasetId, isOwner = false, participa
 
     const isTeacher = userInfo?.isTeacher || false;
 
+    const isNew = queriesUser === 0;
+    const isSpecial = !/^[a-zA-Z0-9]+$/i.test(datasetId);
+
     async function getMembers() {
         const response = await apiRequest(`/api/datasets/members/${datasetId}`, 'GET');
         return response.members.map(member => ({
@@ -56,9 +59,20 @@ function DatasetCard({ title, description, datasetId, isOwner = false, participa
     }
 
     return (
-        <Card className="my-2">
+        <Card className={`my-2 ${isNew ? 'border border-3 border-success' : ''}`}>
             <Card.Header>
-                <h5 className="card-title">{title}</h5>
+                <h5 className="card-title">
+                    {title}
+                    {isNew && (
+                        <span className="badge bg-success ms-2">{t('pages.datasets.dataset_card.badge_new')}</span>
+                    )}
+                    {isSpecial && (
+                        <span className="badge bg-secondary ms-2">
+                            <i className="fa fa-thumbtack me-1"></i>
+                            {t('pages.datasets.dataset_card.badge_special')}
+                        </span>
+                    )}
+                </h5>
                 <h6 className="card-subtitle text-muted">{description}</h6>
             </Card.Header>
 
@@ -105,7 +119,7 @@ function DatasetCard({ title, description, datasetId, isOwner = false, participa
                     <LearningStatsAll datasetId={datasetId} isTeacher={false} />
                 </ButtonModal>
 
-                {/^[a-zA-Z0-9]+$/.test(datasetId) && (
+                {!isSpecial && (
                     <Button
                         variant="danger"
                         onClick={handleLeave}

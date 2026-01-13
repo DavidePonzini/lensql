@@ -202,6 +202,8 @@
                 "queries_user": "Queries executed",
                 "queries_students": "Queries executed by students",
                 "badge_teacher": "Teacher",
+                "badge_new": "New!",
+                "badge_special": "Special Dataset",
                 "join_code": "Join Code",
                 "students": "Students",
                 "open": "Open",
@@ -246,6 +248,7 @@
             "exercise": {
                 "hidden": "Hidden",
                 "solved": "Solved",
+                "todo": "To Do",
                 "generated": "AI Generated",
                 "objectives": "Learning Objectives",
                 "archive": "Archive",
