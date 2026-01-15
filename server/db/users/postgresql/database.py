@@ -1,6 +1,8 @@
-from ..database import Database
+from .data_types import DATA_TYPES
 from .connection import PostgresqlConnection
 from .queries import PostgresqlBuiltinQueries, PostgresqlMetadataQueries
+from ..database import Database
+
 from psycopg2 import sql
 import dav_tools
 
@@ -9,6 +11,8 @@ class PostgresqlDatabase(Database):
 
     Database.builtin_queries = PostgresqlBuiltinQueries
     Database.metadata_queries = PostgresqlMetadataQueries
+
+    Database.data_types = DATA_TYPES
 
     def _get_connection(self, username: str, autocommit: bool = True) -> PostgresqlConnection:
         return PostgresqlConnection(dbname=self.dbname, username=username, autocommit=autocommit)

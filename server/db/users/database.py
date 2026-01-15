@@ -1,7 +1,10 @@
-from .connection import DatabaseConnection
-from .queries import BuiltinQueries, MetadataQueries 
+from dataclasses import dataclass
 
-from server.sql import SQLCode, QueryResult, SQLException, QueryResultError
+from .connection import DatabaseConnection
+from .queries import BuiltinQueries, MetadataQueries
+from .solution import CheckSolutionResult, result_dataset, result_message
+
+from server.sql import SQLCode, QueryResult, SQLException, QueryResultError, Column
 
 from abc import ABC, abstractmethod
 import threading
@@ -10,6 +13,8 @@ import datetime
 import os
 import dav_tools
 from typing import Iterable
+import pandas as pd
+from flask_babel import _
 from sql_error_categorizer.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
 
 MAX_CONNECTION_AGE = datetime.timedelta(hours=float(os.getenv('MAX_CONNECTION_HOURS', '4')))
@@ -28,6 +33,9 @@ class Database(ABC):
     '''Class containing raw SQL queries for built-in operations.'''
     metadata_queries: type[MetadataQueries]
     '''Class containing raw SQL queries for metadata operations.'''
+
+    data_types: dict[int, str] = {}
+    '''Mapping of data type codes to their names.'''
 
     def __init__(self, dbname: str):
         self.dbname = dbname
@@ -90,6 +98,11 @@ class Database(ABC):
     def exists(self) -> bool:
         '''Checks if the database exists.'''
         pass
+
+    def get_datatype_name(self, data_type_code: int) -> str:
+        '''Returns the name of the data type for the given type code, or the code itself if not found.'''
+        return self.data_types.get(data_type_code, f'id={data_type_code}')
+        
     
     # region Connections
     @abstractmethod
@@ -232,3 +245,98 @@ class Database(ABC):
             for row in result
         ]
     # endregion
+
+    # region Solution Checking
+    def check_query_solution(self, query_user: str, query_solutions: list[str]) -> CheckSolutionResult:
+        '''
+        Checks the user's solution against the exercise solution.
+        If multiple queries are present, only the first one is checked.
+        If the exercise has no solution, a message is returned.
+        Args:
+            query_user (str): The SQL query submitted by the user.
+            query_solutions (list[str]): The list of SQL solutions for the exercise.
+
+        Returns:
+            tuple: A tuple containing a boolean indicating if the solution is correct and a QueryResult object.
+            If the solution is correct, the QueryResult object contains a success message.
+            If the solution is incorrect, the QueryResult object contains the comparison of results.
+            If the exercise has no solution, a message indicating that is returned.
+        '''
+        if len(query_solutions) == 0:
+            message = _('No solution found for this exercise.')
+            return result_message(None, None, message)
+
+        result_user, execution_success = _execute(username, query_user)
+        if result_user is None:
+            message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+            message += _('Your query is not supported. Please ensure it is a valid SQL SELECT query.')
+            return result_message(False, execution_success, message)
+
+        @dataclass
+        class CheckResult(ABC):
+            correct: bool | None
+            execution_success: bool | None
+
+            @abstractmethod
+            def to_result(self) -> CheckSolutionResult:
+                pass
+
+        @dataclass
+        class CheckResultMessage(CheckResult):
+            message: str
+
+            def to_result(self) -> CheckSolutionResult:
+                return result_message(self.correct, self.execution_success, self.message)
+
+        @dataclass
+        class CheckResultDataset(CheckResult):
+            result: pd.DataFrame
+            columns: list[Column]
+
+            def to_result(self) -> CheckSolutionResult:
+                return result_dataset(self.correct, self.execution_success, self.result, self.columns)
+
+        results: list[CheckResult] = []
+        for query_solution in query_solutions:
+            result_solution, execution_success_solution = _execute(username, query_solution)
+            if result_solution is None:
+                message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+                message += _('Teacher-provided solution is not supported.')
+
+                results.append(CheckResultMessage(correct=None, execution_success=execution_success_solution, message=message))
+                continue
+
+            # ensure both results have the same columns
+            if not result_user.compare_column_names(result_solution):
+                message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+                message += _('Your query has different columns from the solution. Cannot compare results.') + '<br/>'
+                message += _('Expected:') + f' <code>{"</code>, <code>".join([col.name for col in result_solution.columns])}</code><br/>'
+                message += _('Your query:') + f' <code>{"</code>, <code>".join([col.name for col in result_user.columns])}</code><br/>'
+
+                results.append(CheckResultMessage(correct=False, execution_success=execution_success, message=message))
+                continue
+
+            # check for wrong data types
+            wrong_types = result_user.compare_column_types(result_solution)
+
+            if wrong_types:
+                message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
+                message += _('Your query has different data types from the solution. Cannot compare results.') + '<br/>'
+                message += _('Expected:') + f' <code>{"</code>, <code>".join([f"{col.name}<i>({self.get_datatype_name(col.data_type)}</i>)" for col in result_solution.columns])}</code><br/>'
+                message += _('Your query:') + f' <code>{"</code>, <code>".join([f"{col.name}<i>({self.get_datatype_name(col.data_type)}</i>)" for col in result_user.columns])}</code><br/>'
+
+                results.append(CheckResultMessage(correct=False, execution_success=execution_success, message=message))
+                continue
+
+            has_same_result, comparison = result_user.compare_results(result_solution)
+
+            if has_same_result:
+                message = '<i class="fa fa-check text-success me-1"></i>'
+                message += _('Solution is correct.') + '<br/>'
+                result = CheckResultMessage(correct=True, execution_success=execution_success, message=message)
+                return result.to_result()
+            else:
+                results.append(CheckResultDataset(correct=False, execution_success=execution_success, result=comparison, columns=result_user.columns))
+
+        # If none of the solutions were correct, return the first incorrect result
+        return results[0].to_result()

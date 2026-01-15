@@ -1,17 +1,5 @@
 # Values taken from `select oid, typname from pg_type order by 1;`
 
-def get_datatype_name(code: int) -> str:
-    """
-    Get the name of the error code.
-    
-    Args:
-        code (int): The error code.
-    
-    Returns:
-        str: The name of the error code, or the code itself if not found.
-    """
-    return DATA_TYPES.get(code, f'id={code}')
-
 DATA_TYPES = {
     16:     'bool',
     17:     'bytea',
