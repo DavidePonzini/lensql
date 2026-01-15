@@ -1,10 +1,14 @@
 from ..database import Database
 from .connection import PostgresqlConnection
+from .queries import PostgresqlBuiltinQueries, PostgresqlMetadataQueries
 from psycopg2 import sql
 import dav_tools
 
 class PostgresqlDatabase(Database):
-    admin_username = 'postgres'
+    Database.admin_username = 'postgres'
+
+    Database.builtin_queries = PostgresqlBuiltinQueries
+    Database.metadata_queries = PostgresqlMetadataQueries
 
     def _get_connection(self, username: str, autocommit: bool = True) -> PostgresqlConnection:
         return PostgresqlConnection(dbname=self.dbname, username=username, autocommit=autocommit)
@@ -25,7 +29,7 @@ class PostgresqlDatabase(Database):
                 return cur.fetchone() is not None
 
     def init(self, password: str) -> bool:
-        if self.dbname == PostgresqlDatabase.admin_username:
+        if self.dbname == self.admin_username:
             dav_tools.messages.error('Cannot initialize admin database.')
             return False
 

@@ -1,4 +1,4 @@
-from ..database_connection import DatabaseConnection
+from ..connection import DatabaseConnection
 import psycopg2
 import os
 import dav_tools
@@ -6,6 +6,7 @@ from server.sql import SQLCode, QueryResult, QueryResultDataset, QueryResultMess
 import pandas as pd
 from typing import Iterable
 from .exception import PostgresqlException
+from typing import Any
 
 HOST        =       os.getenv('USER_DB_HOST_POSTGRES', 'localhost')
 PORT        =   int(os.getenv('USER_DB_PORT_POSTGRES', '5432'))
@@ -68,3 +69,11 @@ class PostgresqlConnection(DatabaseConnection):
                     notices=self.notices)
             except psycopg2.Error as e:
                 raise PostgresqlException(e) from e
+            
+    def execute_sql_unsafe(self, statement: str) -> list[tuple[Any, ...]]:
+        with self.cursor() as cur:
+            cur.execute(statement)
+
+            self.update_last_operation_ts()
+
+            return cur.fetchall()

@@ -1,38 +1,51 @@
+from .connection import DatabaseConnection
+from .queries import BuiltinQueries, MetadataQueries 
+
+from server.sql import SQLCode, QueryResult, SQLException, QueryResultError
+
 from abc import ABC, abstractmethod
-from .database_connection import DatabaseConnection
 import threading
 import time
 import datetime
 import os
 import dav_tools
-from server.sql import SQLCode, QueryResult, SQLException, QueryResultError
 from typing import Iterable
+from sql_error_categorizer.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
 
 MAX_CONNECTION_AGE = datetime.timedelta(hours=float(os.getenv('MAX_CONNECTION_HOURS', '4')))
 CLEANUP_INTERVAL_SECONDS = int(os.getenv('CLEANUP_INTERVAL_SECONDS', '60'))
 
 class Database(ABC):
     connections: dict[str, DatabaseConnection] = {}
-    conn_lock = threading.Lock()
-    admin_username = ''
+    '''Pool of active connections. Keyed by dbname (which always matches the username).'''
+    conn_lock: threading.Lock = threading.Lock()
+    '''Lock for accessing the connections pool.'''
+    
+    admin_username: str = ''
+    '''Username of the admin user for this database type.'''
+
+    builtin_queries: type[BuiltinQueries]
+    '''Class containing raw SQL queries for built-in operations.'''
+    metadata_queries: type[MetadataQueries]
+    '''Class containing raw SQL queries for metadata operations.'''
 
     def __init__(self, dbname: str):
         self.dbname = dbname
 
     # region SQL Execution
-    def execute_sql(self, username: str, query_str: str, strip_comments: bool = True) -> Iterable[QueryResult]:
+    def execute_sql(self, query_str: str, strip_comments: bool = True, *, builtin_name: str | None = None) -> Iterable[QueryResult]:
         '''
         Executes the given SQL queries and returns the results.
         The queries will be separated into individual statements.
 
         Parameters:
-            username (str): The username of the database user.
             query_str (str): The SQL query string to execute. The query string can contain multiple SQL statements separated by semicolons.
+            strip_comments (bool): Whether to strip comments from the SQL code before execution. Default is True.
         Returns:
             Iterable[QueryResult]: An iterable of QueryResult objects.
         '''
+
         for statement in SQLCode(query_str).split():
-        
             # NOTE: do not `strip_comments` from the SQL code for very large queries
             #   as it takes the server too much time to parse the SQL code,
             #   causing a timeout error in the client.
@@ -41,9 +54,16 @@ class Database(ABC):
 
             conn = None
             try:
-                conn = self.connect(username)
+                conn = self.connect()
 
-                yield from conn.execute_sql(statement)
+                # run each query
+                for result in conn.execute_sql(statement):
+                    # if a builtin query name is provided, replace its SQL with its shorter name
+                    if builtin_name is not None:
+                        result.query = SQLCode(builtin_name, builtin=True)
+                    
+                    yield result
+
                 conn.update_last_operation_ts()
             except SQLException as e:
                 if conn is None:
@@ -52,14 +72,13 @@ class Database(ABC):
                 try:
                     conn.rollback()
                     conn.update_last_operation_ts()
-                except Exception as e2: # catch all to avoid handling each DB exception separately
-                    dav_tools.messages.error(f"Error rolling back connection for user {username}: {e2}")
+                except Exception as e2:     # catch all to avoid handling each DB exception separately
+                    dav_tools.messages.error(f'Error rolling back connection for db "{self.dbname}": {e2}')
                 
                 yield QueryResultError(
                     exception=e,
-                    query=statement,
+                    query=statement if builtin_name is None else SQLCode(builtin_name, builtin=True),
                     notices=conn.notices)
-    
     # endregion
 
     @abstractmethod
@@ -78,17 +97,17 @@ class Database(ABC):
         '''Gets a connection for the specified user.'''
         pass
 
-    def connect(self, username: str, autocommit: bool = True) -> DatabaseConnection:
+    def connect(self, autocommit: bool = True) -> DatabaseConnection:
         '''Connects to the database as the specified user.'''
         
-        if username in self.connections:
-            conn = self.connections[username]
+        if self.dbname in self.connections:
+            conn = self.connections[self.dbname]
             conn.clear_notices()
             return conn
         
         with self.conn_lock:
-            conn = self._get_connection(username, autocommit=autocommit)
-            self.connections[username] = conn
+            conn = self._get_connection(self.dbname, autocommit=autocommit)
+            self.connections[self.dbname] = conn
             return conn
 
     def connect_as_admin(self, autocommit: bool = True) -> DatabaseConnection:
@@ -132,4 +151,84 @@ class Database(ABC):
         '''
         cleanup_thread = threading.Thread(target=Database._connection_cleanup_thread, daemon=True)
         cleanup_thread.start()
+    # endregion
+
+    # region Builtin Queries
+    def builtin_show_search_path(self) -> Iterable[QueryResult]:
+        '''Shows the search path for the database.'''
+
+        yield from self.execute_sql(self.builtin_queries.show_search_path(), builtin_name='SHOW_SEARCH_PATH')
+
+    def builtin_list_users(self) -> Iterable[QueryResult]:
+        '''Lists all users in the database.'''
+
+        yield from self.execute_sql(self.builtin_queries.list_users(), builtin_name='LIST_USERS')
+
+    def builtin_list_schemas(self) -> Iterable[QueryResult]:
+        '''Lists all schemas in the database.'''
+        
+        yield from self.execute_sql(self.builtin_queries.list_schemas(), builtin_name='LIST_SCHEMAS')
+
+    def builtin_list_tables(self) -> Iterable[QueryResult]:
+        '''Lists tables in the current search_path.'''
+
+        yield from self.execute_sql(self.builtin_queries.list_tables(), builtin_name='LIST_TABLES')
+
+    def builtin_list_all_tables(self) -> Iterable[QueryResult]:
+        '''Lists all tables in the database.'''
+
+        yield from self.execute_sql(self.builtin_queries.list_all_tables(), builtin_name='LIST_ALL_TABLES')
+
+    def builtin_list_constraints(self) -> Iterable[QueryResult]:
+        '''Lists all constraints in the database.'''
+
+        yield from self.execute_sql(self.builtin_queries.list_constraints(), builtin_name='LIST_CONSTRAINTS')
+    # endregion
+
+    # region Metadata Queries
+    def get_search_path(self) -> str:
+        '''Returns the current search path for the user.'''
+
+        with self.connect() as conn:
+            result = conn.execute_sql_unsafe(self.metadata_queries.get_search_path())
+
+        return result[0][0]
+
+    def get_columns(self) -> list[CatalogColumnInfo]:
+        '''Lists all tables'''
+
+        with self.connect() as conn:
+            result = conn.execute_sql_unsafe(self.metadata_queries.get_columns())
+
+        return [
+            CatalogColumnInfo(
+                schema_name=row[0],
+                table_name=row[1],
+                column_name=row[2],
+                column_type=row[3],
+                numeric_precision=row[4],
+                numeric_scale=row[5],
+                is_nullable=row[6],
+                foreign_key_schema=row[7],
+                foreign_key_table=row[8],
+                foreign_key_column=row[9],
+            )
+            for row in result
+        ]
+
+    def get_unique_columns(self) -> list[CatalogUniqueConstraintInfo]:
+        '''Lists unique columns.'''
+
+        with self.connect() as conn:
+            result = conn.execute_sql_unsafe(self.metadata_queries.get_unique_columns())
+
+        return [
+            CatalogUniqueConstraintInfo(
+                schema_name=row[0],
+                table_name=row[1],
+                constraint_type=row[2],
+                columns=row[3]
+            )
+            for row in result
+        ]
     # endregion

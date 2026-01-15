@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import datetime
 from server.sql import SQLCode, SQLException, QueryResult, QueryResultDataset, QueryResultError, QueryResultMessage, Column
-
+from typing import Any
 
 from typing import Iterable
 
@@ -15,6 +15,11 @@ class DatabaseConnection(ABC):
     @abstractmethod
     def execute_sql(self, statement: SQLCode) -> Iterable[QueryResult]:
         '''Executes the given SQLCode statement and yields QueryResult objects.'''
+        pass
+
+    @abstractmethod
+    def execute_sql_unsafe(self, statement: str) -> list[tuple[Any, ...]]:
+        '''Executes the given SQL statement and returns the raw results as a list of tuples.'''
         pass
 
     @abstractmethod

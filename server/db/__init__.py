@@ -32,7 +32,7 @@ def register_user(user: admin.User,
     # Register on user DB (PostgreSQL)
     if not users.PostgresqlDatabase(user.username).init(password):
         dav_tools.messages.error(f'Failed to initialize database for user {user.username}. Deleting user.')
-    
+
     # Register on user DB (MySQL)
     # TODO
     
