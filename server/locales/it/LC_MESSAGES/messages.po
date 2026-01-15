@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-01 11:34+0100\n"
+"POT-Creation-Date: 2026-01-15 10:51+0100\n"
 "PO-Revision-Date: 2025-07-29 15:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: it\n"
@@ -38,78 +38,87 @@ msgstr "Impossibile reimpostare la password. Riprova."
 msgid "Password reset successfully."
 msgstr "Password reimpostata con successo."
 
-#: server/api/datasets.py:53
+#: server/api/datasets.py:55
 msgid "You are not authorized to modify this dataset."
 msgstr "Non sei autorizzato a modificare questo dataset."
 
-#: server/api/datasets.py:74 server/api/datasets.py:186
+#: server/api/datasets.py:76 server/api/datasets.py:189
 msgid "You do not have access to this dataset."
 msgstr "Non hai accesso a questo dataset."
 
-#: server/api/datasets.py:95
+#: server/api/datasets.py:98
 msgid "Dataset does not exist."
 msgstr "Il dataset non esiste."
 
-#: server/api/datasets.py:122
+#: server/api/datasets.py:125
 msgid "This is a special dataset and cannot be left."
 msgstr "Questo è un dataset speciale e non può essere abbandonato"
 
-#: server/api/datasets.py:127
+#: server/api/datasets.py:130
 msgid ""
-"You cannot leave this dataset, as you are a teacher and it has data "
+"You cannot leave this dataset, as you are an owner and it has data "
 "associated with it."
 msgstr ""
-"Non puoi abbandonare questo dataset perché sei un insegnante e contiene "
+"Non puoi abbandonare questo dataset perché sei un proprietario e contiene "
 "dei dati associati."
 
-#: server/api/datasets.py:153 server/api/datasets.py:171
-msgid "You are not a teacher of this dataset."
-msgstr "Non sei un insegnante di questo dataset."
+#: server/api/datasets.py:156 server/api/datasets.py:174
+msgid "You are not an owner of this dataset."
+msgstr "Non sei un proprietario di questo dataset."
 
-#: server/api/datasets.py:156
-msgid "You cannot set yourself as a teacher of this dataset."
-msgstr "Non puoi assegnarti come insegnante di questo dataset."
+#: server/api/datasets.py:159
+msgid "You cannot set yourself as an owner of this dataset."
+msgstr "Non puoi assegnarti come proprietario di questo dataset."
 
 #: server/api/exercises.py:26
 msgid "Dataset ID is required."
 msgstr "ID dataset richiesto"
 
-#: server/api/exercises.py:31 server/api/exercises.py:135
-#: server/api/exercises.py:222
+#: server/api/exercises.py:31 server/api/exercises.py:136
+#: server/api/exercises.py:223
 msgid "You are not a participant of this dataset."
 msgstr "Non sei un partecipante di questo dataset."
 
-#: server/api/exercises.py:59
+#: server/api/exercises.py:60
 msgid "You are not authorized to add exercises to this dataset."
 msgstr "Non sei autorizzato ad aggiungere esercizi a questo dataset."
 
-#: server/api/exercises.py:87 server/api/exercises.py:179
+#: server/api/exercises.py:88 server/api/exercises.py:180
 msgid "You are not authorized to edit this exercise."
 msgstr "Non sei autorizzato a modificare questo esercizio."
 
-#: server/api/exercises.py:108
+#: server/api/exercises.py:109
 msgid "You are not authorized to delete this exercise."
 msgstr "Non sei autorizzato a cancellare questo esercizio."
 
-#: server/api/exercises.py:113
+#: server/api/exercises.py:114
 msgid "Cannot delete exercise. There are queries associated with it."
 msgstr "Impossibile eliminare l'esercizio. Ci sono query associate."
 
-#: server/api/exercises.py:130
+#: server/api/exercises.py:131
 msgid "Exercise ID is required."
 msgstr "ID esercizio richiesto."
 
-#: server/api/exercises.py:153
+#: server/api/exercises.py:154
 msgid "You are not authorized to set learning objectives for this exercise."
 msgstr ""
 "Non sei autorizzato a impostare gli obiettivi didattici per questo "
 "esercizio."
 
-#: server/api/messages.py:255
+#: server/api/messages.py:63 server/api/messages.py:98
+#: server/api/messages.py:132 server/api/messages.py:166
+#: server/api/messages.py:200 server/api/messages.py:232
+#: server/api/messages.py:264
+msgid ""
+"AI features are disabled for your account. Please contact support if you "
+"believe this is an error."
+msgstr "Le funzionalità di intelligenza artificiale sono disattivate per il tuo account. Contatta l’assistenza se ritieni che si tratti di un errore."
+
+#: server/api/messages.py:276
 msgid "Congratulations, I couldn't find any errors in your query!"
 msgstr "Congratulazioni, non ho trovato alcun errore nella tua query!"
 
-#: server/api/users.py:56 server/api/users.py:100 server/api/users.py:137
+#: server/api/users.py:62 server/api/users.py:106 server/api/users.py:143
 msgid "User is not a participant in the specified dataset."
 msgstr "L'utente non è un partecipante del dataset specificato."
 
