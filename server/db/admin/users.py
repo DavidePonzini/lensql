@@ -108,6 +108,31 @@ class User:
             self._load_properties()
         
         return self._coins or 0
+    
+    @property
+    def can_use_ai(self) -> bool:
+        '''Check if the user can use AI features'''
+
+        query = database.sql.SQL('''
+            SELECT
+                can_use_ai
+            FROM
+                {schema}.users
+            WHERE
+                username = {username}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            username=database.sql.Placeholder('username')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'username': self.username
+        })
+
+        if len(result) == 0:
+            return False
+        
+        return result[0][0] is True
     # endregion
 
     # region Auth

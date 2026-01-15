@@ -59,6 +59,9 @@ def feedback():
 def explain_error_message():
     user = db.admin.User(get_jwt_identity())
 
+    if not user.can_use_ai:
+        return responses.response(answer=_('AI features are disabled for your account. Please contact support if you believe this is an error.'))
+
     data = request.get_json()
 
     query = db.admin.Query(data['query_id'])
@@ -91,6 +94,9 @@ def explain_error_message():
 def locate_error_cause():
     user = db.admin.User(get_jwt_identity())
 
+    if not user.can_use_ai:
+        return responses.response(answer=_('AI features are disabled for your account. Please contact support if you believe this is an error.'))
+
     data = request.get_json()
     query = db.admin.Query(data['query_id'])
     msg_idx = int(data['msg_idx'])
@@ -121,6 +127,9 @@ def locate_error_cause():
 @jwt_required()
 def provide_error_example():
     user = db.admin.User(get_jwt_identity())
+
+    if not user.can_use_ai:
+        return responses.response(answer=_('AI features are disabled for your account. Please contact support if you believe this is an error.'))
 
     data = request.get_json()
     query = db.admin.Query(data['query_id'])
@@ -153,6 +162,9 @@ def provide_error_example():
 def fix_query():
     user = db.admin.User(get_jwt_identity())
 
+    if not user.can_use_ai:
+        return responses.response(answer=_('AI features are disabled for your account. Please contact support if you believe this is an error.'))
+
     data = request.get_json()
     query = db.admin.Query(data['query_id'])
     msg_idx = int(data['msg_idx'])
@@ -184,6 +196,9 @@ def fix_query():
 def describe_my_query():
     user = db.admin.User(get_jwt_identity())
 
+    if not user.can_use_ai:
+        return responses.response(answer=_('AI features are disabled for your account. Please contact support if you believe this is an error.'))
+
     data = request.get_json()
     query = db.admin.Query(data['query_id'])
     msg_idx = int(data['msg_idx'])
@@ -213,6 +228,9 @@ def describe_my_query():
 def explain_my_query():
     user = db.admin.User(get_jwt_identity())
 
+    if not user.can_use_ai:
+        return responses.response(answer=_('AI features are disabled for your account. Please contact support if you believe this is an error.'))
+
     data = request.get_json()
     query = db.admin.Query(data['query_id'])
     msg_idx = int(data['msg_idx'])
@@ -241,6 +259,9 @@ def explain_my_query():
 @jwt_required()
 def detect_errors():
     user = db.admin.User(get_jwt_identity())
+
+    if not user.can_use_ai:
+        return responses.response(answer=_('AI features are disabled for your account. Please contact support if you believe this is an error.'))
 
     data = request.get_json()
     query = db.admin.Query(data['query_id'])
