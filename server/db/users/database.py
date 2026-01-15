@@ -19,6 +19,7 @@ class Database(ABC):
     def __init__(self, dbname: str):
         self.dbname = dbname
 
+    # region SQL Execution
     def execute_sql(self, username: str, query_str: str, strip_comments: bool = True) -> Iterable[QueryResult]:
         '''
         Executes the given SQL queries and returns the results.
@@ -42,7 +43,7 @@ class Database(ABC):
             try:
                 conn = self.connect(username)
 
-                yield from conn.execute_sql(statement.query)
+                yield from conn.execute_sql(statement)
                 conn.update_last_operation_ts()
             except SQLException as e:
                 if conn is None:
@@ -58,6 +59,8 @@ class Database(ABC):
                     exception=e,
                     query=statement,
                     notices=conn.notices)
+    
+    # endregion
 
     @abstractmethod
     def init(self, password: str) -> bool:
@@ -69,6 +72,7 @@ class Database(ABC):
         '''Checks if the database exists.'''
         pass
     
+    # region Connections
     @abstractmethod
     def _get_connection(self, username: str, autocommit: bool = True) -> DatabaseConnection:
         '''Gets a connection for the specified user.'''
@@ -93,6 +97,7 @@ class Database(ABC):
             This connection is not added to the connection pool.
         '''
         return self._get_connection(self.admin_username, autocommit=autocommit)
+    # endregion
 
     # region Cleanup
     @staticmethod
