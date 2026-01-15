@@ -1,7 +1,7 @@
-from server import create_app, start_cleanup_thread
+from server import create_app, start_cleanup_threads
 
 
-start_cleanup_thread()
+start_cleanup_threads()
 
 app = create_app()
 

@@ -1,7 +1,6 @@
 from . import admin, users
 
-from dav_tools import messages
-
+import dav_tools
 
 def register_user(user: admin.User,
                   password: str,
@@ -26,14 +25,16 @@ def register_user(user: admin.User,
         bool: True if registration is successful, False otherwise.
     '''
 
+    # Register on admin DB
     if not user.register_account(password, school=school, is_teacher=is_teacher, is_admin=is_admin):
-        messages.debug(f'Failed to register user {user.username}. User already exists or database error.')
-        return False
+        dav_tools.messages.error(f'User "{user.username}" already exists.')
     
-    if not users.auth.init_database(user.username, password):
-        messages.debug(f'Failed to initialize database for user {user.username}. Deleting user.')
-        user.delete_account()
-        return False
+    # Register on user DB (PostgreSQL)
+    if not users.PostgresqlDatabase(user.username).init(password):
+        dav_tools.messages.error(f'Failed to initialize database for user {user.username}. Deleting user.')
+    
+    # Register on user DB (MySQL)
+    # TODO
     
     for dataset in datasets:
         dataset.add_participant(user)

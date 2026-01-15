@@ -1,15 +1,20 @@
-import psycopg2 as pg
+from abc import ABC
 
-class SQLException:
-    def __init__(self, exception: pg.Error):
+class SQLException(Exception, ABC):
+    '''Custom exception for SQL errors in the database.'''
+    def __init__(
+            self,
+            exception,
+            name,
+            error_code,
+            description: str,
+            traceback: list[str]
+        ):
         self.exception = exception
-
-        self.name = type(self.exception).__name__
-        self.error_code = self.exception.pgcode
-
-        message = str(self.exception.args[0]) if self.exception.args else ''
-        self.description = message.splitlines()[0]
-        self.traceback = message.splitlines()[1:]
+        self.name = name
+        self.error_code = error_code
+        self.description = description
+        self.traceback = traceback
     
     def __str__(self):
         return f'{self.name}: {self.description}'
