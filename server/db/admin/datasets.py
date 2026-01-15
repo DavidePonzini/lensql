@@ -126,7 +126,7 @@ class Dataset:
         return result[0][0] > 0
 
     @staticmethod
-    def create(title: str, description: str, dataset_str: str, *, dataset_id: str | None = None) -> 'Dataset':
+    def create(title: str, description: str, dataset_str: str, *, domain: str | None = None, dataset_id: str | None = None) -> 'Dataset':
         '''Create a new dataset, optionally with a specified ID'''
 
         if dataset_id is not None:
@@ -134,13 +134,15 @@ class Dataset:
                 'id': dataset_id,
                 'name': title,
                 'description': description,
-                'dataset': dataset_str.strip() or None
+                'dataset': dataset_str.strip() or None,
+                'domain': domain
             }, ['id'])
         else:
             result = db.insert(SCHEMA, 'datasets', {
                 'name': title,
                 'description': description,
-                'dataset': dataset_str.strip() or None
+                'dataset': dataset_str.strip() or None,
+                'domain': domain
             }, ['id'])
 
         assert result is not None and len(result) > 0, 'Failed to create dataset'

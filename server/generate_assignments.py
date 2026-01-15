@@ -32,7 +32,8 @@ def generate_assignment(
     dataset = Dataset.create(
         title=TITLE,
         description=random.choice(SUBTITLES),
-        dataset_str=assignment.dataset.to_sql(schema_name)
+        dataset_str=assignment.dataset.to_sql(schema_name),
+        domain=domain
     )
 
     # Add admin user as participant and set as owner
