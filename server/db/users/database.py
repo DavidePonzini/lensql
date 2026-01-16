@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
+from server.sql.result.dataset import QueryResultDataset
+
 from .connection import DatabaseConnection
 from .queries import BuiltinQueries, MetadataQueries
-from .solution import CheckSolutionResult, result_dataset, result_message
+from .solution import CheckExecutionStatus, result_dataset, result_message, CheckResult, CheckResultMessage, CheckResultDataset
 
 from server.sql import SQLCode, QueryResult, SQLException, QueryResultError, Column
 
@@ -39,6 +41,10 @@ class Database(ABC):
 
     def __init__(self, dbname: str):
         self.dbname = dbname
+
+    def get_datatype_name(self, data_type_code: int) -> str:
+        '''Returns the name of the data type for the given type code, or the code itself if not found.'''
+        return self.data_types.get(data_type_code, f'id={data_type_code}')
 
     # region SQL Execution
     def execute_sql(self, query_str: str, strip_comments: bool = True, *, builtin_name: str | None = None) -> Iterable[QueryResult]:
@@ -89,6 +95,7 @@ class Database(ABC):
                     notices=conn.notices)
     # endregion
 
+    # region Database Creation
     @abstractmethod
     def init(self, password: str) -> bool:
         '''Initializes the database.'''
@@ -98,11 +105,7 @@ class Database(ABC):
     def exists(self) -> bool:
         '''Checks if the database exists.'''
         pass
-
-    def get_datatype_name(self, data_type_code: int) -> str:
-        '''Returns the name of the data type for the given type code, or the code itself if not found.'''
-        return self.data_types.get(data_type_code, f'id={data_type_code}')
-        
+    # endregion        
     
     # region Connections
     @abstractmethod
@@ -247,7 +250,53 @@ class Database(ABC):
     # endregion
 
     # region Solution Checking
-    def check_query_solution(self, query_user: str, query_solutions: list[str]) -> CheckSolutionResult:
+    def _execute_solution_check(self, query: str) -> tuple[QueryResultDataset | None, bool | None]:
+        '''
+            Execute the first statement of the query and return the result.
+
+            Returns:
+                QueryResultDataset: The result of the query execution.
+                bool: True if the query was executed successfully, False otherwise. None if the query was not executed (e.g. not a SELECT query).
+        '''
+
+        statements = SQLCode(query).split()
+
+        # Only execute the first statement
+        statement = next(iter(statements), None)
+        if statement is None:
+            return None, None
+
+        # Only SELECT queries are supported
+        if statement.query_type != 'SELECT':
+            return None, None
+        
+        conn = None
+        try:
+            conn = self.connect()
+
+            results = conn.execute_sql(statement)
+            dataset = next(iter(results), None)
+
+            # If the query does not return a dataset, we don't need it
+            if not isinstance(dataset, QueryResultDataset):
+                return None, False
+
+            conn.update_last_operation_ts()
+            return dataset, True
+        except SQLException:
+            # Connection was not opened, nothing to rollback
+            if conn is None:
+                return None, False
+            
+            try:
+                conn.rollback()
+                conn.update_last_operation_ts()
+            except Exception as e2:     # catch all to avoid handling each DB exception separately
+                dav_tools.messages.error(f'Error rolling back connection for db "{self.dbname}": {e2}')
+            
+            return None, False
+
+    def check_query_solution(self, query_user: str, query_solutions: list[str]) -> CheckExecutionStatus:
         '''
         Checks the user's solution against the exercise solution.
         If multiple queries are present, only the first one is checked.
@@ -266,39 +315,16 @@ class Database(ABC):
             message = _('No solution found for this exercise.')
             return result_message(None, None, message)
 
-        result_user, execution_success = _execute(username, query_user)
+        result_user, execution_success = self._execute_solution_check(query_user)
         if result_user is None:
             message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
             message += _('Your query is not supported. Please ensure it is a valid SQL SELECT query.')
             return result_message(False, execution_success, message)
 
-        @dataclass
-        class CheckResult(ABC):
-            correct: bool | None
-            execution_success: bool | None
-
-            @abstractmethod
-            def to_result(self) -> CheckSolutionResult:
-                pass
-
-        @dataclass
-        class CheckResultMessage(CheckResult):
-            message: str
-
-            def to_result(self) -> CheckSolutionResult:
-                return result_message(self.correct, self.execution_success, self.message)
-
-        @dataclass
-        class CheckResultDataset(CheckResult):
-            result: pd.DataFrame
-            columns: list[Column]
-
-            def to_result(self) -> CheckSolutionResult:
-                return result_dataset(self.correct, self.execution_success, self.result, self.columns)
-
         results: list[CheckResult] = []
         for query_solution in query_solutions:
-            result_solution, execution_success_solution = _execute(username, query_solution)
+            result_solution, execution_success_solution = self._execute_solution_check(query_solution)
+
             if result_solution is None:
                 message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
                 message += _('Teacher-provided solution is not supported.')
