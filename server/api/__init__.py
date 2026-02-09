@@ -40,10 +40,9 @@ def create_app() -> Flask:
     app.register_blueprint(queries.bp, url_prefix='/queries')
     app.register_blueprint(users.bp, url_prefix='/users')
 
-    # Run cleanup thread
+    # Run cleanup threads for user databases
     if os.getenv('GUNICORN_WORKER_ID', '0') == '0':
-        db.users.start_cleanup_thread()
-
+        db.users.start_cleanup_threads()
 
     return app
 

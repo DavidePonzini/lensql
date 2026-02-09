@@ -37,15 +37,18 @@ services:
     restart: unless-stopped
     depends_on:
       - db_admin
-      - db_users
+      - db_users_postgres
+      - db_users_mysql
     environment:
       - DB_HOST=db_admin
       - DB_PORT=5432
       - DB_USERNAME=postgres
       - DB_PASSWORD=password
       - DB_NAME=postgres
-      - USER_DB_HOST=db_users
-      - USER_DB_PORT=5432
+      - USER_DB_HOST_POSTGRES=db_users_postgres
+      - USER_DB_PORT_POSTGRES=5432
+      - USER_DB_HOST_MYSQL=db_users_mysql
+      - USER_DB_PORT_MYSQL=3306
       - MAX_CONNECTION_HOURS=4
       - CLEANUP_INTERVAL_SECONDS=3600
       - MAX_CONTENT_LENGTH=20971520
@@ -59,18 +62,27 @@ services:
     environment:
       POSTGRES_PASSWORD: password
     volumes:
-      - pgdata_admin:/var/lib/postgresql/data
+      - db_admin_pgdata:/var/lib/postgresql/data
 
-  db_users:
+  db_users_postgres:
     image: postgres:latest
     command: -c 'max_connections=500'
-    container_name: ${COMPOSE_PROJECT_NAME}_db_users
+    container_name: ${COMPOSE_PROJECT_NAME}_db_users_postgres
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - pgdata_users:/var/lib/postgresql/data
+      - db_users_pgdata:/var/lib/postgresql/data
+
+  db_users_mysql:
+    image: mysql:latest
+    container_name: ${COMPOSE_PROJECT_NAME}_db_users_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - db_users_mysql_data:/var/lib/mysql
 
   docs_api:
     image: docker.swagger.io/swaggerapi/swagger-ui
@@ -85,7 +97,9 @@ services:
       - dev
 
 volumes:
-  pgdata_admin:
-    name: ${COMPOSE_PROJECT_NAME}_pgdata_admin
-  pgdata_users:
-    name: ${COMPOSE_PROJECT_NAME}_pgdata_users
+  db_admin_pgdata:
+    name: ${COMPOSE_PROJECT_NAME}_db_admin_pgdata
+  db_users_pgdata:
+    name: ${COMPOSE_PROJECT_NAME}_db_users_pgdata
+  db_users_mysql_data:
+    name: ${COMPOSE_PROJECT_NAME}_db_users_mysql_data

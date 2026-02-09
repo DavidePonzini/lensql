@@ -47,7 +47,7 @@ class Database(ABC):
         return self.data_types.get(data_type_code, f'id={data_type_code}')
 
     # region SQL Execution
-    def execute_sql(self, query_str: str, strip_comments: bool = True, *, builtin_name: str | None = None) -> Iterable[QueryResult]:
+    def execute_sql(self, query_str: str, *, strip_comments: bool = True, builtin_name: str | None = None) -> Iterable[QueryResult]:
         '''
         Executes the given SQL queries and returns the results.
         The queries will be separated into individual statements.
@@ -205,16 +205,14 @@ class Database(ABC):
     def get_search_path(self) -> str:
         '''Returns the current search path for the user.'''
 
-        with self.connect() as conn:
-            result = conn.execute_sql_unsafe(self.metadata_queries.get_search_path())
+        result = self.connect().execute_sql_unsafe(self.metadata_queries.get_search_path())
 
         return result[0][0]
 
     def get_columns(self) -> list[CatalogColumnInfo]:
         '''Lists all tables'''
 
-        with self.connect() as conn:
-            result = conn.execute_sql_unsafe(self.metadata_queries.get_columns())
+        result = self.connect().execute_sql_unsafe(self.metadata_queries.get_columns())
 
         return [
             CatalogColumnInfo(
@@ -235,8 +233,7 @@ class Database(ABC):
     def get_unique_columns(self) -> list[CatalogUniqueConstraintInfo]:
         '''Lists unique columns.'''
 
-        with self.connect() as conn:
-            result = conn.execute_sql_unsafe(self.metadata_queries.get_unique_columns())
+        result = self.connect().execute_sql_unsafe(self.metadata_queries.get_unique_columns())
 
         return [
             CatalogUniqueConstraintInfo(

@@ -96,31 +96,9 @@ class PostgresqlMetadataQueries(MetadataQueries):
 
     @staticmethod
     def get_columns() -> str:
-        '''Lists all tables'''
+        '''Lists all tables and their columns.'''
         return '''
-            SELECT
-                kcu.table_schema AS schema_name,
-                kcu.table_name,
-                tc.constraint_type,
-                array_agg(kcu.column_name ORDER BY kcu.ordinal_position) AS columns
-            FROM information_schema.table_constraints tc
-            JOIN information_schema.key_column_usage kcu
-            ON tc.constraint_name = kcu.constraint_name
-            AND tc.constraint_schema = kcu.constraint_schema
-            WHERE tc.constraint_type IN ('UNIQUE', 'PRIMARY KEY')
-            AND kcu.table_schema NOT IN ('pg_catalog', 'information_schema')
-            GROUP BY
-                kcu.table_schema,
-                kcu.table_name,
-                kcu.constraint_name,
-                tc.constraint_type;
-        '''
-
-    @staticmethod
-    def get_unique_columns() -> str:
-        '''Lists unique columns.'''
-        return '''
-            SELECT
+                        SELECT
                 cols.table_schema AS schema_name,
                 cols.table_name,
                 cols.column_name,
@@ -153,4 +131,26 @@ class PostgresqlMetadataQueries(MetadataQueries):
                 AND fk.column_name = cols.column_name
 
             WHERE cols.table_schema NOT IN ('pg_catalog', 'information_schema')
+        '''
+
+    @staticmethod
+    def get_unique_columns() -> str:
+        '''Lists unique columns.'''
+        return '''
+        SELECT
+                kcu.table_schema AS schema_name,
+                kcu.table_name,
+                tc.constraint_type,
+                array_agg(kcu.column_name ORDER BY kcu.ordinal_position) AS columns
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu
+            ON tc.constraint_name = kcu.constraint_name
+            AND tc.constraint_schema = kcu.constraint_schema
+            WHERE tc.constraint_type IN ('UNIQUE', 'PRIMARY KEY')
+            AND kcu.table_schema NOT IN ('pg_catalog', 'information_schema')
+            GROUP BY
+                kcu.table_schema,
+                kcu.table_name,
+                kcu.constraint_name,
+                tc.constraint_type;
         '''

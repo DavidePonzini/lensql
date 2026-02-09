@@ -1,4 +1,5 @@
 from .postgresql import PostgresqlDatabase
+import os
 
 def start_cleanup_threads():
     '''Starts cleanup threads for all database backends.'''

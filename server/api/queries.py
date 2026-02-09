@@ -9,6 +9,7 @@ from server import db, gamification
 from server.sql.code import SQLCode
 from server.sql.result import QueryResultMessage, QueryResult
 from .util import responses
+from server.db.users.solution import NAME as SOLUTION_NAME
 
 
 DETECTORS = [
@@ -84,8 +85,12 @@ def run_query():
             'badges': [badge.to_dict() for badge in badges],
         }) + '\n'  # Important: one JSON object per line
 
-        for query_result in db.users.queries.execute(username=user.username, query_str=query_str):
-            search_path = db.users.queries.metadata.get_search_path(user.username)
+        database = db.users.PostgresqlDatabase(user.username)
+        import dav_tools
+        for query_result in database.execute_sql(query_str=query_str):
+            dav_tools.messages.debug(f'executed query: {query_str}')
+            search_path = database.get_search_path()
+            dav_tools.messages.debug(f'current search path: {search_path}')
 
             query = db.admin.Query.log(
                 query_batch=batch,
@@ -98,8 +103,11 @@ def run_query():
             )
             query_result.query_id = query.query_id
 
-            context_columns = db.users.queries.metadata.get_columns(user.username)
-            context_unique_columns = db.users.queries.metadata.get_unique_columns(user.username)
+            dav_tools.messages.debug(f'context columns')
+            context_columns = database.get_columns()
+            dav_tools.messages.debug(f'context columns: {context_columns}')
+            context_unique_columns = database.get_unique_columns()
+            dav_tools.messages.debug(f'context unique columns: {context_unique_columns}')
 
             # Log context and errors for SELECT queries
             if query_result.query.query_type == 'SELECT':
@@ -170,7 +178,9 @@ def show_search_path():
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.show_search_path(user.username)
+    database = db.users.PostgresqlDatabase(user.username)
+    result = database.builtin_show_search_path()
+    result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
@@ -182,7 +192,9 @@ def list_schemas():
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.list_schemas(user.username)
+    database = db.users.PostgresqlDatabase(user.username)
+    result = database.builtin_list_schemas()
+    result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
@@ -195,7 +207,9 @@ def list_tables():
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.list_tables(user.username)
+    database = db.users.PostgresqlDatabase(user.username)
+    result = database.builtin_list_tables()
+    result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
@@ -208,7 +222,9 @@ def list_all_tables():
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.list_all_tables(user.username)
+    database = db.users.PostgresqlDatabase(user.username)
+    result = database.builtin_list_all_tables()
+    result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
@@ -221,7 +237,9 @@ def list_constraints():
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
     
-    result = db.users.queries.builtin.list_constraints(user.username)
+    database = db.users.PostgresqlDatabase(user.username)
+    result = database.builtin_list_constraints()
+    result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
 
     return responses.response_query(result, is_builtin=True)
@@ -241,12 +259,13 @@ def check_solution():
 
     if coins + cost.coins < 0:
         return responses.response_query(
-            QueryResultMessage(gamification.NOT_ENOUGH_COINS_MESSAGE, query=SQLCode(db.users.queries.builtin.solution.NAME, builtin=True)),
+            QueryResultMessage(gamification.NOT_ENOUGH_COINS_MESSAGE, query=SQLCode(SOLUTION_NAME, builtin=True)),
             is_builtin=True,
             attempts=attempts,
         )
 
-    check = db.users.queries.builtin.solution.check(user.username, query_user=query_str, query_solutions=exercise.solutions)
+    database = db.users.PostgresqlDatabase(user.username)
+    check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions)
 
     batch = db.admin.QueryBatch.log(
         user=user,
@@ -264,8 +283,8 @@ def check_solution():
     )
 
     query.log_context(
-        columns=db.users.queries.metadata.get_columns(user.username),
-        unique_columns=db.users.queries.metadata.get_unique_columns(user.username)
+        columns=database.get_columns(),
+        unique_columns=database.get_unique_columns()
     )
 
     already_solved = exercise.has_been_solved_by_user(user)

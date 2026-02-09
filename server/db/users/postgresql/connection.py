@@ -25,6 +25,8 @@ class PostgresqlConnection(DatabaseConnection):
         self.connection.autocommit = autocommit
 
     def close(self) -> None:
+        super().close()
+
         try:
             self.connection.close()
         except Exception as e:
@@ -34,9 +36,13 @@ class PostgresqlConnection(DatabaseConnection):
         return self.connection.cursor()
     
     def rollback(self) -> None:
+        super().rollback()
+
         self.connection.rollback()
 
     def commit(self) -> None:
+        super().commit()
+
         self.connection.commit()
 
     @property
@@ -44,9 +50,13 @@ class PostgresqlConnection(DatabaseConnection):
         return self.connection.notices
     
     def clear_notices(self) -> None:
+        super().clear_notices()
+
         self.connection.notices.clear()
 
     def execute_sql(self, statement: SQLCode) -> Iterable[QueryResult]:
+        super().execute_sql(statement)
+
         with self.cursor() as cur:
             try:
                 cur.execute(statement.query)
@@ -71,6 +81,8 @@ class PostgresqlConnection(DatabaseConnection):
                 raise PostgresqlException(e) from e
             
     def execute_sql_unsafe(self, statement: str) -> list[tuple[Any, ...]]:
+        super().execute_sql_unsafe(statement)
+
         with self.cursor() as cur:
             cur.execute(statement)
 

@@ -5,6 +5,9 @@ from typing import Any
 
 from typing import Iterable
 
+
+import dav_tools
+
 class DatabaseConnection(ABC):
     def __init__(self, dbname: str, username: str, autocommit: bool = True):
         self.dbname = dbname
@@ -15,6 +18,8 @@ class DatabaseConnection(ABC):
     @abstractmethod
     def execute_sql(self, statement: SQLCode) -> Iterable[QueryResult]:
         '''Executes the given SQLCode statement and yields QueryResult objects.'''
+        dav_tools.messages.debug(f'{id(self)} Executing SQL for user {self.username} on database {self.dbname}: {statement}')
+
         pass
 
     @abstractmethod
@@ -41,6 +46,7 @@ class DatabaseConnection(ABC):
         self.last_operation_ts = datetime.datetime.now()
 
     def __enter__(self):
+        dav_tools.messages.debug(f'{id(self)} Opened connection for user {self.username} to database {self.dbname}')
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -48,7 +54,9 @@ class DatabaseConnection(ABC):
             self.rollback()
         else:
             self.commit()
+
         self.close()
+        dav_tools.messages.debug(f'{id(self)} Closed connection for user {self.username} to database {self.dbname}')
 
     @property
     def time_since_last_operation(self) -> datetime.timedelta:

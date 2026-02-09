@@ -15,3 +15,5 @@ openai
 pydantic
 tqdm
 ipython
+psycopg2
+mysql-connector-python
