@@ -1,6 +1,6 @@
 from dav_tools import database
 from sql_error_categorizer import DetectedError, SqlErrors
-from sql_error_categorizer.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
+from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
 
 from .connection import db, SCHEMA
 from .users import User

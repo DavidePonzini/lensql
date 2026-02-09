@@ -17,7 +17,7 @@ import dav_tools
 from typing import Iterable
 import pandas as pd
 from flask_babel import _
-from sql_error_categorizer.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
+from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
 
 MAX_CONNECTION_AGE = datetime.timedelta(hours=float(os.getenv('MAX_CONNECTION_HOURS', '4')))
 CLEANUP_INTERVAL_SECONDS = int(os.getenv('CLEANUP_INTERVAL_SECONDS', '60'))
