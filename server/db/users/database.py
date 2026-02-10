@@ -205,14 +205,14 @@ class Database(ABC):
     def get_search_path(self) -> str:
         '''Returns the current search path for the user.'''
 
-        result = self.connect().execute_sql_unsafe(self.metadata_queries.get_search_path())
+        result = self.connect().execute_sql_raw(self.metadata_queries.get_search_path())
 
         return result[0][0]
 
     def get_columns(self) -> list[CatalogColumnInfo]:
         '''Lists all tables'''
 
-        result = self.connect().execute_sql_unsafe(self.metadata_queries.get_columns())
+        result = self.connect().execute_sql_raw(self.metadata_queries.get_columns())
 
         return [
             CatalogColumnInfo(
@@ -233,7 +233,7 @@ class Database(ABC):
     def get_unique_columns(self) -> list[CatalogUniqueConstraintInfo]:
         '''Lists unique columns.'''
 
-        result = self.connect().execute_sql_unsafe(self.metadata_queries.get_unique_columns())
+        result = self.connect().execute_sql_raw(self.metadata_queries.get_unique_columns())
 
         return [
             CatalogUniqueConstraintInfo(
@@ -247,9 +247,13 @@ class Database(ABC):
     # endregion
 
     # region Solution Checking
-    def _execute_solution_check(self, query: str) -> tuple[QueryResultDataset | None, bool | None]:
+    def _execute_solution_check(self, query: str, *, search_path: str | None = None) -> tuple[QueryResultDataset | None, bool | None]:
         '''
             Execute the first statement of the query and return the result.
+
+            Args:
+                query (str): The SQL query to execute.
+                search_path (str | None): Optional search path to set for the connection before executing the query. If None, the current search path is used.
 
             Returns:
                 QueryResultDataset: The result of the query execution.
@@ -271,8 +275,18 @@ class Database(ABC):
         try:
             conn = self.connect()
 
-            results = conn.execute_sql(statement)
-            dataset = next(iter(results), None)
+            if search_path is not None:
+                # Set the search path for the connection, and reset it back to the original after executing the query
+                current_search_path = self.get_search_path()
+                conn.execute_sql_raw(f'SET search_path TO {search_path};')
+
+                results = conn.execute_sql(statement)
+                dataset = next(iter(results), None) # iterator needs to be exhausted here, before resetting search path
+
+                conn.execute_sql_raw(f'SET search_path TO {current_search_path};')
+            else:
+                results = conn.execute_sql(statement)
+                dataset = next(iter(results), None)
 
             # If the query does not return a dataset, we don't need it
             if not isinstance(dataset, QueryResultDataset):
@@ -293,7 +307,7 @@ class Database(ABC):
             
             return None, False
 
-    def check_query_solution(self, query_user: str, query_solutions: list[str]) -> CheckExecutionStatus:
+    def check_query_solution(self, query_user: str, query_solutions: list[str], solution_search_path: str) -> CheckExecutionStatus:
         '''
         Checks the user's solution against the exercise solution.
         If multiple queries are present, only the first one is checked.
@@ -320,7 +334,7 @@ class Database(ABC):
 
         results: list[CheckResult] = []
         for query_solution in query_solutions:
-            result_solution, execution_success_solution = self._execute_solution_check(query_solution)
+            result_solution, execution_success_solution = self._execute_solution_check(query_solution, search_path=solution_search_path)
 
             if result_solution is None:
                 message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'

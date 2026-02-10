@@ -60,6 +60,8 @@ class PostgresqlConnection(DatabaseConnection):
         with self.cursor() as cur:
             try:
                 cur.execute(statement.query)
+
+                self.update_last_operation_ts()
                 
                 if cur.description:     # Check if the query has a result set
                     rows = cur.fetchall()
@@ -80,12 +82,14 @@ class PostgresqlConnection(DatabaseConnection):
             except psycopg2.Error as e:
                 raise PostgresqlException(e) from e
             
-    def execute_sql_unsafe(self, statement: str) -> list[tuple[Any, ...]]:
-        super().execute_sql_unsafe(statement)
+    def execute_sql_raw(self, statement: str) -> list[tuple[Any, ...]]:
+        super().execute_sql_raw(statement)
 
         with self.cursor() as cur:
             cur.execute(statement)
 
             self.update_last_operation_ts()
 
-            return cur.fetchall()
+            if cur.description:     # Check if the query has a result set
+                return cur.fetchall()
+            return []

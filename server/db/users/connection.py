@@ -23,7 +23,7 @@ class DatabaseConnection(ABC):
         pass
 
     @abstractmethod
-    def execute_sql_unsafe(self, statement: str) -> list[tuple[Any, ...]]:
+    def execute_sql_raw(self, statement: str) -> list[tuple[Any, ...]]:
         '''Executes the given SQL statement and returns the raw results as a list of tuples.'''
         pass
 

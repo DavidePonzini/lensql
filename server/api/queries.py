@@ -265,7 +265,7 @@ def check_solution():
         )
 
     database = db.users.PostgresqlDatabase(user.username)
-    check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions)
+    check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions, solution_search_path=exercise.search_path)
 
     batch = db.admin.QueryBatch.log(
         user=user,
