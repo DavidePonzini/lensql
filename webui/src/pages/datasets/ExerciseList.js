@@ -23,7 +23,7 @@ function ExerciseList() {
         const response = await apiRequest(`/api/exercises?dataset_id=${datasetId}`, 'GET');
 
         const sortedExercises = (response.data ?? []).slice().sort((a, b) => {
-            return (a.exercise_id > b.exercise_id) - (a.exercise_id < b.exercise_id);
+            return (a.title > b.title) - (a.title < b.title);
         });
 
 
