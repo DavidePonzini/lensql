@@ -32,6 +32,9 @@ function Home() {
                         <Link to={isLoggedIn ? "/datasets" : "/register"} className="btn btn-primary me-3">
                             {t('pages.home.hero.cta_register')}
                         </Link>
+                        <Link to="/howto" className="btn btn-outline-secondary me-3">
+                            {t('pages.home.hero.cta_howto')}
+                        </Link>
                         <Link to="/about" className="btn btn-outline-success">
                             {t('pages.home.hero.cta_about')}
                         </Link>
@@ -201,6 +204,9 @@ function Home() {
                     <div className="d-flex justify-content-center gap-3 mt-4">
                         <Link to="/register" className="btn btn-lg btn-primary">
                             {t('pages.home.cta.register')}
+                        </Link>
+                        <Link to="/howto" className="btn btn-lg btn-outline-secondary">
+                            {t('pages.home.cta.howto')}
                         </Link>
                         <Link to="/about" className="btn btn-lg btn-outline-success">
                             {t('pages.home.cta.about')}

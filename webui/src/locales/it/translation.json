@@ -468,7 +468,8 @@
                 "subtitle": "Scopri SQL. Impara dagli errori. Cresci con Lens.",
                 "description": "LensQL è una piattaforma di apprendimento SQL potenziata dall'IA che trasforma gli errori degli studenti in momenti di apprendimento personalizzati e interattivi.",
                 "cta_register": "Crea o Unisciti a un Dataset",
-                "cta_about": "Come Funziona LensQL"
+                "cta_howto": "Come Usare LensQL",
+                "cta_about": "Scopri di più su LensQL"
             },
             "what_is": {
                 "title": "Cos'è LensQL?",
@@ -594,6 +595,7 @@
             "cta": {
                 "title": "💡 Imparare SQL non inizia dalle risposte. Inizia dagli errori.",
                 "register": "Crea il Tuo Account",
+                "howto": "Come Usare LensQL",
                 "about": "Scopri di più"
             }
         }
