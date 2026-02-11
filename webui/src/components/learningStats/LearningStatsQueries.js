@@ -22,17 +22,17 @@ function LearningStatsQueries({ datasetId = null, exerciseId = null, isTeacher =
         setData(response.data);
     }
 
-    const queriesTotal = data?.queries || 0;
-    const queriesUnique = data?.queries_d || 0;
-    const queriesSuccess = data?.queries_success || 0;
+    const queriesTotal = +(data?.queries) || 0;
+    const queriesUnique = +(data?.queries_d) || 0;
+    const queriesSuccess = +(data?.queries_success) || 0;
 
     const querySuccessDataAll = [
         { name: t('components.learningStats.queries.success'), value: queriesSuccess },
         { name: t('components.learningStats.queries.fail'), value: queriesTotal - queriesSuccess },
     ];
 
-    const queriesTotalSelect = data?.queries_select || 0;
-    const queriesSuccessSelect = data?.queries_success_select || 0;
+    const queriesTotalSelect = +(data?.queries_select) || 0;
+    const queriesSuccessSelect = +(data?.queries_success_select) || 0;
     const querySuccessDataSelect = [
         { name: t('components.learningStats.queries.success'), value: queriesSuccessSelect },
         { name: t('components.learningStats.queries.fail'), value: queriesTotalSelect - queriesSuccessSelect },
