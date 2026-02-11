@@ -15,12 +15,13 @@ class Exercise:
                  solutions: list[str] | None = None,
                  search_path: str | None = None,
                  difficulty: int | None = None,
-                 learning_objectives: list[str] | None = None
+                 learning_objectives: list[str] | None = None,
+                 all_properties_loaded: bool = False
                 ) -> None:
         self.exercise_id = exercise_id
 
         # Lazy properties
-        self._properties_loaded = False
+        self._properties_loaded = all_properties_loaded
         self._dataset_id = dataset_id
         self._is_hidden = is_hidden
         self._title = title

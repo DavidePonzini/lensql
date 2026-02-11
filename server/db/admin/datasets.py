@@ -428,7 +428,13 @@ class Dataset:
             query = database.sql.SQL(
             '''
                 SELECT
-                    e.id
+                    e.id,
+                    e.title,
+                    e.is_hidden,
+                    e.request,
+                    e.solutions,
+                    e.search_path,
+                    e.generation_difficulty
                 FROM
                     {schema}.exercises e
                 WHERE
@@ -442,7 +448,13 @@ class Dataset:
             query = database.sql.SQL(
             '''
                 SELECT
-                    e.id
+                    e.id,
+                    e.title,
+                    e.is_hidden,
+                    e.request,
+                    e.solutions,
+                    e.search_path,
+                    e.generation_difficulty
                 FROM
                     {schema}.exercises e
                 WHERE
@@ -457,5 +469,17 @@ class Dataset:
             'dataset_id': self.dataset_id
         })
 
-        return [Exercise(row[0], dataset_id=self.dataset_id) for row in result]
+        return [
+            Exercise(
+                exercise_id=row[0],
+                dataset_id=self.dataset_id,
+                title=row[1],
+                is_hidden=row[2],
+                request=row[3],
+                solutions=row[4],
+                search_path=row[5],
+                difficulty=row[6],
+                all_properties_loaded=True
+            ) for row in result
+        ]
     # endregion
