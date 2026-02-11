@@ -21,6 +21,14 @@ services:
     depends_on:
       - webui
       - server
+  nginx_maintenance:
+    image: davideponzini/maintenance
+    container_name: ${COMPOSE_PROJECT_NAME}_nginx_maintenance
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3001}:80"
+    profiles:
+      - maintenance
 
   webui:
     build: ./webui
@@ -84,17 +92,17 @@ services:
     volumes:
       - db_users_mysql_data:/var/lib/mysql
 
-  docs_api:
-    image: docker.swagger.io/swaggerapi/swagger-ui
-    container_name: ${COMPOSE_PROJECT_NAME}_docs_api
-    restart: unless-stopped
-    environment:
-      - SWAGGER_JSON=/docs/api.yaml
-      - SUPPORTED_SUBMIT_METHODS=[]
-    volumes:
-      - ./docs/swaggerui:/docs
-    profiles:
-      - dev
+  # docs_api:
+  #   image: docker.swagger.io/swaggerapi/swagger-ui
+  #   container_name: ${COMPOSE_PROJECT_NAME}_docs_api
+  #   restart: unless-stopped
+  #   environment:
+  #     - SWAGGER_JSON=/docs/api.yaml
+  #     - SUPPORTED_SUBMIT_METHODS=[]
+  #   volumes:
+  #     - ./docs/swaggerui:/docs
+  #   profiles:
+  #     - dev
 
 volumes:
   db_admin_pgdata:

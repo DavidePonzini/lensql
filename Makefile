@@ -21,7 +21,14 @@ prod: stop locales_compile
 	export PORT=$(PORT) && docker compose --profile prod up -d --build
 
 stop:
-	docker compose --profile dev --profile prod down
+	docker compose --profile dev --profile prod --profile maintenance down
+
+maintenance:
+	docker compose down nginx_prod nginx_dev
+	docker compose up -d nginx_maintenance
+
+maintenance_stop:
+	docker compose down nginx_maintenance
 
 setup:
 	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/setup/setup.py
