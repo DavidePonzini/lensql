@@ -218,7 +218,8 @@
                 "empty": "Nessun dataset trovato. Unisciti a un dataset o creane uno nuovo.",
                 "new_dataset_suggestion": "Se vuoi eseguire una query non assegnata da un docente, crea un nuovo dataset.",
                 "join": "Unisciti a un dataset",
-                "join_prompt": "Inserisci il codice del dataset:"
+                "join_prompt": "Inserisci il codice del dataset:",
+                "loading": "Caricamento..."
             },
             "dataset_mask": {
                 "title_label": "Titolo",
@@ -266,7 +267,8 @@
                 "title": "Esercizi",
                 "none": "Nessun esercizio",
                 "archived": "Archiviati",
-                "archived_none": "Nessun esercizio archiviato"
+                "archived_none": "Nessun esercizio archiviato",
+                "loading": "Caricamento..."
             },
             "exercise_mask": {
                 "title": "Titolo",

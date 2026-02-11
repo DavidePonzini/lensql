@@ -14,6 +14,7 @@ function DatasetList() {
     const { t } = useTranslation();
 
     const [datasets, setDatasets] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     async function handleJoinDataset() {
         const joinCode = prompt(t('pages.datasets.dataset_list.join_prompt'));
@@ -34,6 +35,7 @@ function DatasetList() {
     }
 
     const getDatasets = useCallback(async () => {
+        setLoading(true);
         const response = await apiRequest('/api/datasets', 'GET');
 
         const sortedDatasets = (response.data ?? []).slice().sort((a, b) => {
@@ -57,6 +59,7 @@ function DatasetList() {
         });
 
         setDatasets(sortedDatasets);
+        setLoading(false);
     }, [apiRequest]);
 
     useEffect(() => {
@@ -82,8 +85,12 @@ function DatasetList() {
             <hr />
 
             <CardList>
-                {datasets.length === 0 && (
+                {datasets.length === 0 && !loading && (
                     <p>{t('pages.datasets.dataset_list.empty')}</p>
+                )}
+
+                {loading && (
+                    <p className="loading">{t('pages.datasets.dataset_list.loading')}</p>
                 )}
 
                 {datasets.map((cl) => (

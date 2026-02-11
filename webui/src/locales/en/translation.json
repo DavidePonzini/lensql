@@ -218,7 +218,8 @@
                 "title": "My Datasets",
                 "empty": "Nothing here. Join a dataset to see exercises.",
                 "join": "Join Dataset",
-                "join_prompt": "Enter dataset join code:"
+                "join_prompt": "Enter dataset join code:",
+                "loading": "Loading..."
             },
             "dataset_mask": {
                 "title_label": "Title",
@@ -266,7 +267,8 @@
                 "title": "Exercises",
                 "none": "No exercises",
                 "archived": "Archived",
-                "archived_none": "No archived exercises"
+                "archived_none": "No archived exercises",
+                "loading": "Loading..."
             },
             "exercise_mask": {
                 "title": "Title",

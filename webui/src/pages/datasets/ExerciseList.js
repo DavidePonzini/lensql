@@ -16,8 +16,10 @@ function ExerciseList() {
 
     const [isOwner, setIsOwner] = useState(false);
     const [exercises, setExercises] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const getExercises = useCallback(async () => {
+        setLoading(true);
         const response = await apiRequest(`/api/exercises?dataset_id=${datasetId}`, 'GET');
 
         const sortedExercises = (response.data ?? []).slice().sort((a, b) => {
@@ -26,6 +28,7 @@ function ExerciseList() {
 
 
         setExercises(sortedExercises);
+        setLoading(false);
     }, [datasetId, apiRequest]);
 
     useEffect(() => {
@@ -57,8 +60,12 @@ function ExerciseList() {
             )}
 
             <CardList>
-                {exercises.length === 0 && (
+                {exercises.length === 0 && !loading && (
                     <p className="no-assignments">{t('pages.datasets.exercise_list.none')}</p>
+                )}
+
+                {loading && (
+                    <p className="loading">{t('pages.datasets.exercise_list.loading')}</p>
                 )}
 
                 {exercises.map((exercise) => (
