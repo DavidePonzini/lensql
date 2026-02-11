@@ -43,7 +43,11 @@ function ButtonShowDataset({ datasetId, footerButtons, className = 'btn btn-seco
             {isLoading ? (
                 <p>{t('components.buttons.dataset.loading')}</p>
             ) : (
-                <pre className="code" style={{ userSelect: 'none', maxHeight: '70vh', overflow: 'auto' }}>
+                <pre className="code" style={{
+                    // userSelect: 'none',
+                    maxHeight: '70vh',
+                    overflow: 'auto'
+                }}>
                     {dataset}
                 </pre>
             )}
