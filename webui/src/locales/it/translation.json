@@ -425,7 +425,8 @@
                 "loading": "Caricamento..."
             },
             "message": {
-                "feedback_invite": "Puoi guadagnare LensCoins fornendo feedback su questo messaggio"
+                "feedback_invite": "Puoi guadagnare LensCoins fornendo feedback su questo messaggio",
+                "ai_generated_disclaimer": "Questo messaggio è stato generato dall'IA e potrebbe non essere sempre accurato."
             },
             "messageBox": {
                 "assistant_name": "Lens",

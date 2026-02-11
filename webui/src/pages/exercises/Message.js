@@ -45,42 +45,48 @@ function Message({ children, text, messageId = null }) {
 
             {
                 messageId && (
-                    <div className="message-feedback">
-                        <BubbleStatsChange
-                            rewards={rewards}
-                            setRewards={setRewards}
-                            isAlert={false}
-                        />
+                    <>
+                        <small className="text-muted mt-2 mb-0">
+                            <i className='fa fa-info-circle'></i> {t('pages.exercises.message.ai_generated_disclaimer')}
+                        </small>
 
-                        {
-                            !sessionStorage.getItem('hasProvidedFeedback') && (
-                                <span className="text-primary">
-                                    {t('pages.exercises.message.feedback_invite')}
-                                    <i className="fa fa-arrow-right mx-1" />
-                                </span>
-                            )
-                        }
+                        <div className="message-feedback">
+                            <BubbleStatsChange
+                                rewards={rewards}
+                                setRewards={setRewards}
+                                isAlert={false}
+                            />
 
-                        <span
-                            className={`feedback feedback-up ${feedback !== null ? 'disabled' : ''} ${feedback === true ? 'selected' : ''}`}
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="bottom"
-                            data-bs-title="Helpful"
-                            onClick={() => handleSendFeedback(true)}
-                        >
-                            <i className={`${feedback === true ? 'fas' : 'far'} fa-thumbs-up`} />
-                        </span>
+                            {
+                                !sessionStorage.getItem('hasProvidedFeedback') && (
+                                    <span className="text-primary">
+                                        {t('pages.exercises.message.feedback_invite')}
+                                        <i className="fa fa-arrow-right mx-1" />
+                                    </span>
+                                )
+                            }
 
-                        <span
-                            className={`feedback feedback-down ${feedback !== null ? 'disabled' : ''} ${feedback === false ? 'selected' : ''}`}
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="bottom"
-                            data-bs-title="Not helpful"
-                            onClick={() => handleSendFeedback(false)}
-                        >
-                            <i className={`${feedback === false ? 'fas' : 'far'} fa-thumbs-down`} />
-                        </span>
-                    </div>
+                            <span
+                                className={`feedback feedback-up ${feedback !== null ? 'disabled' : ''} ${feedback === true ? 'selected' : ''}`}
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="bottom"
+                                data-bs-title="Helpful"
+                                onClick={() => handleSendFeedback(true)}
+                            >
+                                <i className={`${feedback === true ? 'fas' : 'far'} fa-thumbs-up`} />
+                            </span>
+
+                            <span
+                                className={`feedback feedback-down ${feedback !== null ? 'disabled' : ''} ${feedback === false ? 'selected' : ''}`}
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="bottom"
+                                data-bs-title="Not helpful"
+                                onClick={() => handleSendFeedback(false)}
+                            >
+                                <i className={`${feedback === false ? 'fas' : 'far'} fa-thumbs-down`} />
+                            </span>
+                        </div>
+                    </>
                 )
             }
 
