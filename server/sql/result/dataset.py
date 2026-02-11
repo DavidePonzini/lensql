@@ -26,13 +26,21 @@ class QueryResultDataset(QueryResult):
     def result_html(self) -> str:
         result = self._result.replace({None: 'NULL'})
 
+        rows = len(result)
+        cols = len(result.columns)
+
         result = result.to_html(
             classes='table table-bordered table-hover table-responsive',
-            show_dimensions=True,
+            show_dimensions=False,
             border=0
         )
         result = result.replace('<thead>', '<thead class="table-dark">').replace('<tbody>', '<tbody class="table-group-divider">')
-        return result
+        
+        row_str = _("row") if rows == 1 else _("rows")
+        col_str = _("column") if cols == 1 else _("columns")
+        dimensions = f'<p><i>{rows} {row_str} × {cols} {col_str}</i></p>'
+
+        return f'{dimensions}\n{result}'
     
     @property
     def result_text(self) -> str:

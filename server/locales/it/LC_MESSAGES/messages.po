@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-15 10:51+0100\n"
+"POT-Creation-Date: 2026-02-11 12:36+0100\n"
 "PO-Revision-Date: 2025-07-29 15:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: it\n"
@@ -59,8 +59,8 @@ msgid ""
 "You cannot leave this dataset, as you are an owner and it has data "
 "associated with it."
 msgstr ""
-"Non puoi abbandonare questo dataset perché sei un proprietario e contiene "
-"dei dati associati."
+"Non puoi abbandonare questo dataset perché sei un proprietario e contiene"
+" dei dati associati."
 
 #: server/api/datasets.py:156 server/api/datasets.py:174
 msgid "You are not an owner of this dataset."
@@ -75,7 +75,7 @@ msgid "Dataset ID is required."
 msgstr "ID dataset richiesto"
 
 #: server/api/exercises.py:31 server/api/exercises.py:136
-#: server/api/exercises.py:223
+#: server/api/exercises.py:224
 msgid "You are not a participant of this dataset."
 msgstr "Non sei un partecipante di questo dataset."
 
@@ -112,7 +112,9 @@ msgstr ""
 msgid ""
 "AI features are disabled for your account. Please contact support if you "
 "believe this is an error."
-msgstr "Le funzionalità di intelligenza artificiale sono disattivate per il tuo account. Contatta l’assistenza se ritieni che si tratti di un errore."
+msgstr ""
+"Le funzionalità di intelligenza artificiale sono disattivate per il tuo "
+"account. Contatta l’assistenza se ritieni che si tratti di un errore."
 
 #: server/api/messages.py:276
 msgid "Congratulations, I couldn't find any errors in your query!"
@@ -122,21 +124,21 @@ msgstr "Congratulazioni, non ho trovato alcun errore nella tua query!"
 msgid "User is not a participant in the specified dataset."
 msgstr "L'utente non è un partecipante del dataset specificato."
 
-#: server/db/users/queries/builtin/solution.py:108
+#: server/db/users/database.py:326
 msgid "No solution found for this exercise."
 msgstr "Nessuna soluzione trovata per questo esercizio."
 
-#: server/db/users/queries/builtin/solution.py:114
+#: server/db/users/database.py:332
 msgid "Your query is not supported. Please ensure it is a valid SQL SELECT query."
 msgstr ""
 "La tua query non è supportata. Assicurati che sia una query SQL SELECT "
 "valida."
 
-#: server/db/users/queries/builtin/solution.py:146
+#: server/db/users/database.py:341
 msgid "Teacher-provided solution is not supported."
 msgstr "La soluzione fornita dall'insegnante non è supportata."
 
-#: server/db/users/queries/builtin/solution.py:154
+#: server/db/users/database.py:349
 msgid ""
 "Your query has different columns from the solution. Cannot compare "
 "results."
@@ -144,17 +146,15 @@ msgstr ""
 "La tua query ha colonne diverse rispetto alla soluzione. Impossibile "
 "confrontare i risultati."
 
-#: server/db/users/queries/builtin/solution.py:155
-#: server/db/users/queries/builtin/solution.py:167
+#: server/db/users/database.py:350 server/db/users/database.py:362
 msgid "Expected:"
 msgstr "Atteso:"
 
-#: server/db/users/queries/builtin/solution.py:156
-#: server/db/users/queries/builtin/solution.py:168
+#: server/db/users/database.py:351 server/db/users/database.py:363
 msgid "Your query:"
 msgstr "La tua query:"
 
-#: server/db/users/queries/builtin/solution.py:166
+#: server/db/users/database.py:361
 msgid ""
 "Your query has different data types from the solution. Cannot compare "
 "results."
@@ -162,7 +162,7 @@ msgstr ""
 "La tua query ha tipi di dati diversi rispetto alla soluzione. Impossibile"
 " confrontare i risultati."
 
-#: server/db/users/queries/builtin/solution.py:177
+#: server/db/users/database.py:372
 msgid "Solution is correct."
 msgstr "La soluzione è corretta."
 
@@ -174,11 +174,27 @@ msgstr ""
 "Non hai abbastanza monete per usare questa funzione. Consulta la pagina "
 "del profilo per scoprire come guadagnarne di più."
 
-#: server/sql/result/dataset.py:86
+#: server/sql/result/dataset.py:39
+msgid "row"
+msgstr "riga"
+
+#: server/sql/result/dataset.py:39
+msgid "rows"
+msgstr "righe"
+
+#: server/sql/result/dataset.py:39
+msgid "column"
+msgstr "colonna"
+
+#: server/sql/result/dataset.py:39
+msgid "columns"
+msgstr "colonne"
+
+#: server/sql/result/dataset.py:92
 msgid "Your query"
 msgstr "La tua query"
 
-#: server/sql/result/dataset.py:87
+#: server/sql/result/dataset.py:93
 msgid "Solution"
 msgstr "Soluzione"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-15 10:51+0100\n"
+"POT-Creation-Date: 2026-02-11 12:36+0100\n"
 "PO-Revision-Date: 2025-07-29 15:17+0200\n"
 "Last-Translator: Davide Ponzini <davide.ponzini@edu.unige.it>\n"
 "Language: en\n"
@@ -79,7 +79,7 @@ msgid "Dataset ID is required."
 msgstr "Dataset ID is required."
 
 #: server/api/exercises.py:31 server/api/exercises.py:136
-#: server/api/exercises.py:223
+#: server/api/exercises.py:224
 msgid "You are not a participant of this dataset."
 msgstr "You are not a participant of this dataset."
 
@@ -126,19 +126,19 @@ msgstr "Congratulations, I couldn't find any errors in your query!"
 msgid "User is not a participant in the specified dataset."
 msgstr "User is not a participant in the specified dataset."
 
-#: server/db/users/queries/builtin/solution.py:108
+#: server/db/users/database.py:326
 msgid "No solution found for this exercise."
 msgstr "No solution found for this exercise."
 
-#: server/db/users/queries/builtin/solution.py:114
+#: server/db/users/database.py:332
 msgid "Your query is not supported. Please ensure it is a valid SQL SELECT query."
 msgstr "Your query is not supported. Please ensure it is a valid SQL SELECT query."
 
-#: server/db/users/queries/builtin/solution.py:146
+#: server/db/users/database.py:341
 msgid "Teacher-provided solution is not supported."
 msgstr "Teacher-provided solution is not supported."
 
-#: server/db/users/queries/builtin/solution.py:154
+#: server/db/users/database.py:349
 msgid ""
 "Your query has different columns from the solution. Cannot compare "
 "results."
@@ -146,17 +146,15 @@ msgstr ""
 "Your query has different columns from the solution. Cannot compare "
 "results."
 
-#: server/db/users/queries/builtin/solution.py:155
-#: server/db/users/queries/builtin/solution.py:167
+#: server/db/users/database.py:350 server/db/users/database.py:362
 msgid "Expected:"
 msgstr "Expected:"
 
-#: server/db/users/queries/builtin/solution.py:156
-#: server/db/users/queries/builtin/solution.py:168
+#: server/db/users/database.py:351 server/db/users/database.py:363
 msgid "Your query:"
 msgstr "Your query:"
 
-#: server/db/users/queries/builtin/solution.py:166
+#: server/db/users/database.py:361
 msgid ""
 "Your query has different data types from the solution. Cannot compare "
 "results."
@@ -164,7 +162,7 @@ msgstr ""
 "Your query has different data types from the solution. Cannot compare "
 "results."
 
-#: server/db/users/queries/builtin/solution.py:177
+#: server/db/users/database.py:372
 msgid "Solution is correct."
 msgstr "Solution is correct."
 
@@ -176,11 +174,27 @@ msgstr ""
 "You don't have enough coins to use this feature. Check the Profile page "
 "to learn how to earn more."
 
-#: server/sql/result/dataset.py:86
+#: server/sql/result/dataset.py:39
+msgid "row"
+msgstr "row"
+
+#: server/sql/result/dataset.py:39
+msgid "rows"
+msgstr "rows"
+
+#: server/sql/result/dataset.py:39
+msgid "column"
+msgstr "column"
+
+#: server/sql/result/dataset.py:39
+msgid "columns"
+msgstr "columns"
+
+#: server/sql/result/dataset.py:92
 msgid "Your query"
 msgstr "Your query"
 
-#: server/sql/result/dataset.py:87
+#: server/sql/result/dataset.py:93
 msgid "Solution"
 msgstr "Soluzione"
 
