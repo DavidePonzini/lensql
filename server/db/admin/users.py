@@ -737,14 +737,16 @@ class User:
                 '''
                     SELECT
                         query_type,
-                        queries,
-                        queries_d,
-                        queries_success
+                        SUM(queries),
+                        SUM(queries_d),
+                        SUM(queries_success)
                     FROM
                         {schema}.v_stats_queries_by_exercise
                     WHERE
                         dataset_id = {dataset_id}
                         AND username = {username}
+                    GROUP BY
+                        query_type
                 ''').format(
                     schema=database.sql.Identifier(SCHEMA),
                     dataset_id=database.sql.Placeholder('dataset_id'),
