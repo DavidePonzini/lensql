@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { NavLink } from "react-router-dom";
 
 import "./Query.css";
 
@@ -72,7 +73,17 @@ function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, h
 
     return (
         <>
-            <h2 className="exercise-title">{exerciseTitle}</h2>
+            <div className="row">
+                <div className="col">
+                    <h2>{exerciseTitle}</h2>
+                </div>
+                <div className="col text-end">
+                    <NavLink to={`/datasets/${datasetId}`} className="btn btn-link mb-3">
+                        <i className="fa-solid fa-arrow-left"></i> {t('pages.exercises.query.back_to_dataset')}
+                    </NavLink>
+                </div>
+            </div>
+
             <p className="exercise-request" style={{ position: 'relative', paddingLeft: '1rem' }}>{exerciseText}</p>
 
             <SqlEditor onChange={setSqlText} />

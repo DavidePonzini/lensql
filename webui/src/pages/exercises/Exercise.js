@@ -32,6 +32,7 @@ function Exercise() {
             <Query
                 exerciseId={exerciseId}
                 datasetId={exercise.dataset_id}
+                exerciseTitle={exercise.title}
                 exerciseText={exercise.request}
                 attempts={exercise.attempts}
                 hasSolution={exercise.solutions.length > 0}

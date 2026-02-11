@@ -430,7 +430,8 @@
                 "user_name": "Tu"
             },
             "query": {
-                "back_to_top": "Torna in cima"
+                "back_to_top": "Torna in cima",
+                "back_to_dataset": "Torna al dataset"
             },
             "query_result": {
                 "builtin": "Funzione incorporata di LensQL",

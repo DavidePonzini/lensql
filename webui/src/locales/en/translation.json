@@ -430,7 +430,8 @@
                 "user_name": "You"
             },
             "query": {
-                "back_to_top": "Back to top"
+                "back_to_top": "Back to top",
+                "back_to_dataset": "Back to dataset"
             },
             "query_result": {
                 "builtin": "LensQL built-in function",
