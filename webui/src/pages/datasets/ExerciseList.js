@@ -23,7 +23,7 @@ function ExerciseList() {
         const response = await apiRequest(`/api/exercises?dataset_id=${datasetId}`, 'GET');
 
         const sortedExercises = (response.data ?? []).slice().sort((a, b) => {
-            return (a.title > b.title) - (a.title < b.title);
+            return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
         });
 
 
