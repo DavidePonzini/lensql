@@ -1159,7 +1159,7 @@
             "40": {
                 "name": "Implied, tautological or inconsistent expression",
                 "description": "Query contains expressions that are always true, always false, or logically redundant.",
-                "example": "SELECT * FROM students WHERE age > 10 AND age > 5 OR name = name;",
+                "example": "SELECT * FROM students WHERE age > 10 AND age > 5 AND name = name;",
                 "explanation": "The expression age > 10 AND age > 5 is redundant because if age is greater than 10, it is inherently greater than 5. Additionally, the condition name = name is always true for all rows. Simplifying the query to remove these redundancies will improve clarity and performance.",
                 "correction": "SELECT * FROM students WHERE age > 10;"
             },

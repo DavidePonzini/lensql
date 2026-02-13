@@ -1159,7 +1159,7 @@
             "40": {
                 "name": "Espressione implicita, tautologica o incoerente",
                 "description": "La query contiene espressioni sempre vere, sempre false o logicamente ridondanti.",
-                "example": "SELECT * FROM studenti WHERE età > 10 AND età > 5 OR nome = nome;",
+                "example": "SELECT * FROM studenti WHERE età > 10 AND età > 5 AND nome = nome;",
                 "explanation": "L'espressione età > 10 AND età > 5 è ridondante perché se l'età è maggiore di 10 è già maggiore di 5. Inoltre la condizione nome = nome è sempre vera per tutte le righe. Semplificare la query rimuovendo queste ridondanze migliora chiarezza e prestazioni.",
                 "correction": "SELECT * FROM studenti WHERE età > 10;"
             },
