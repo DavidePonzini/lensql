@@ -8,18 +8,15 @@ from typing import Iterable
 from .exception import PostgresqlException
 from typing import Any
 
-HOST        =       os.getenv('USER_DB_HOST_POSTGRES', 'localhost')
-PORT        =   int(os.getenv('USER_DB_PORT_POSTGRES', '5432'))
-
 class PostgresqlConnection(DatabaseConnection):
-    def __init__(self, dbname: str, username: str, autocommit: bool = True):
-        super().__init__(dbname, username)
+    def __init__(self, host: str, port: int, autocommit: bool = True):
+        super().__init__(host, port)
         self.connection = psycopg2.connect(
-            host=HOST,
-            port=PORT,
-            dbname=dbname,
-            user=username,
-            password='' # Password is not needed for the db_users_postgres
+            host=host,
+            port=port,
+            dbname='postgres',
+            user='postgres',
+            password='' # Password is set to trust in the container configuration
         )
 
         self.connection.autocommit = autocommit
@@ -30,7 +27,7 @@ class PostgresqlConnection(DatabaseConnection):
         try:
             self.connection.close()
         except Exception as e:
-            dav_tools.messages.error(f"Error closing PostgreSQL connection for user {self.username}: {e}")
+            dav_tools.messages.error(f"Error closing PostgreSQL connection for user database {self.host}: {e}")
 
     def cursor(self):
         return self.connection.cursor()

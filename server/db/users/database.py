@@ -18,9 +18,14 @@ from typing import Iterable
 import pandas as pd
 from flask_babel import _
 from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
+import docker
+from docker.models.containers import Container
+import docker.errors
 
 MAX_CONNECTION_AGE = datetime.timedelta(hours=float(os.getenv('MAX_CONNECTION_HOURS', '4')))
 CLEANUP_INTERVAL_SECONDS = int(os.getenv('CLEANUP_INTERVAL_SECONDS', '60'))
+
+PROJECT_NAME = os.getenv('COMPOSE_PROJECT_NAME', 'lensql')
 
 class Database(ABC):
     connections: dict[str, DatabaseConnection] = {}
@@ -108,10 +113,48 @@ class Database(ABC):
     # endregion        
     
     # region Connections
+    @property
     @abstractmethod
-    def _get_connection(self, username: str, autocommit: bool = True) -> DatabaseConnection:
-        '''Gets a connection for the specified user.'''
+    def db_type(self) -> str:
+        '''Returns the type of the database (e.g. "postgresql", "mysql", etc.).'''
         pass
+
+    @property
+    def hostname(self) -> str:
+        '''Returns the hostname to connect to the database container.'''
+        return f'{PROJECT_NAME}_db_user_{self.dbname}_{self.db_type}'
+    
+    @property
+    @abstractmethod
+    def port(self) -> int:
+        '''Returns the port to connect to the database container.'''
+        pass
+
+    @abstractmethod
+    def create_container(self) -> Container:
+        '''Creates a Docker container with the given name.'''
+        pass
+
+    def start_container(self) -> Container:
+        '''Gets the Docker container for the given username, or creates it if it doesn't exist.'''
+        
+        client = docker.from_env()
+        
+        try:
+            container = client.containers.get(self.hostname)
+        
+            if container.status != 'running':
+                container.start()
+        
+            return container
+        except docker.errors.NotFound:
+            return self.create_container()
+
+    @abstractmethod
+    def _get_connection(self, autocommit: bool = True) -> DatabaseConnection:
+        '''Gets a connection to the database. This method should ensure the database container is running before returning the connection.'''
+        pass
+
 
     def connect(self, autocommit: bool = True) -> DatabaseConnection:
         '''Connects to the database as the specified user.'''
@@ -122,7 +165,7 @@ class Database(ABC):
             return conn
         
         with self.conn_lock:
-            conn = self._get_connection(self.dbname, autocommit=autocommit)
+            conn = self._get_connection(autocommit=autocommit)
             self.connections[self.dbname] = conn
             return conn
 
@@ -131,7 +174,7 @@ class Database(ABC):
             Connects to the database as the admin user.
             This connection is not added to the connection pool.
         '''
-        return self._get_connection(self.admin_username, autocommit=autocommit)
+        return self._get_connection(autocommit=autocommit)
     # endregion
 
     # region Cleanup

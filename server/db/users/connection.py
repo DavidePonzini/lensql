@@ -9,16 +9,15 @@ from typing import Iterable
 import dav_tools
 
 class DatabaseConnection(ABC):
-    def __init__(self, dbname: str, username: str, autocommit: bool = True):
-        self.dbname = dbname
-        self.username = username
+    def __init__(self, host: str, port: int, autocommit: bool = True):
+        self.host = host
+        self.port = port
         self.autocommit = autocommit
         self.last_operation_ts = datetime.datetime.now()
 
     @abstractmethod
     def execute_sql(self, statement: SQLCode) -> Iterable[QueryResult]:
         '''Executes the given SQLCode statement and yields QueryResult objects.'''
-        dav_tools.messages.debug(f'{id(self)} Executing SQL for user {self.username} on database {self.dbname}: {statement}')
 
         pass
 
@@ -46,7 +45,7 @@ class DatabaseConnection(ABC):
         self.last_operation_ts = datetime.datetime.now()
 
     def __enter__(self):
-        dav_tools.messages.debug(f'{id(self)} Opened connection for user {self.username} to database {self.dbname}')
+        dav_tools.messages.debug(f'{id(self)} Opened connection for user database {self.host}')
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -56,7 +55,7 @@ class DatabaseConnection(ABC):
             self.commit()
 
         self.close()
-        dav_tools.messages.debug(f'{id(self)} Closed connection for user {self.username} to database {self.dbname}')
+        dav_tools.messages.debug(f'{id(self)} Closed connection for user database {self.host}')
 
     @property
     def time_since_last_operation(self) -> datetime.timedelta:

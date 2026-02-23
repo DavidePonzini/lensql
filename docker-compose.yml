@@ -3,6 +3,8 @@ services:
     build: .
     container_name: ${COMPOSE_PROJECT_NAME}_nginx_prod
     restart: unless-stopped
+    networks:
+      - default
     ports:
       - "${PORT:-3001}:80"
     profiles:
@@ -14,6 +16,8 @@ services:
     build: ./nginx
     container_name: ${COMPOSE_PROJECT_NAME}_nginx_dev
     restart: unless-stopped
+    networks:
+      - default
     ports:
       - "${PORT:-3001}:80"
     profiles:
@@ -34,6 +38,8 @@ services:
     build: ./webui
     container_name: ${COMPOSE_PROJECT_NAME}_webui
     restart: unless-stopped
+    networks:
+      - default
     ports:
       - "3000:3000"
     profiles:
@@ -45,23 +51,26 @@ services:
     restart: unless-stopped
     depends_on:
       - db_admin
-      - db_users_postgres
-      - db_users_mysql
+      # - db_users_postgres
+      # - db_users_mysql
     environment:
       - DB_HOST=db_admin
       - DB_PORT=5432
       - DB_USERNAME=postgres
       - DB_PASSWORD=password
       - DB_NAME=postgres
-      - USER_DB_HOST_POSTGRES=db_users_postgres
-      - USER_DB_PORT_POSTGRES=5432
-      - USER_DB_HOST_MYSQL=db_users_mysql
-      - USER_DB_PORT_MYSQL=3306
       - MAX_CONNECTION_HOURS=4
       - CLEANUP_INTERVAL_SECONDS=3600
       - MAX_CONTENT_LENGTH=20971520
+      - DB_USERS_NETWORK=${COMPOSE_PROJECT_NAME}_db_users_network
+      - PROJECT_NAME=${COMPOSE_PROJECT_NAME}
     env_file:
       - server/.env
+    networks:
+      - default
+      - db_users
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   db_admin:
     build: ./db_admin
@@ -69,28 +78,30 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
+    networks:
+      - default
     volumes:
       - db_admin_pgdata:/var/lib/postgresql/data
 
-  db_users_postgres:
-    image: postgres:latest
-    command: -c 'max_connections=500'
-    container_name: ${COMPOSE_PROJECT_NAME}_db_users_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_HOST_AUTH_METHOD: trust
-    volumes:
-      - db_users_pgdata:/var/lib/postgresql/data
+  # db_users_postgres:
+  #   image: postgres:latest
+  #   command: -c 'max_connections=500'
+  #   container_name: ${COMPOSE_PROJECT_NAME}_db_users_postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_HOST_AUTH_METHOD: trust
+  #   volumes:
+  #     - db_users_pgdata:/var/lib/postgresql/data
 
-  db_users_mysql:
-    image: mysql:latest
-    container_name: ${COMPOSE_PROJECT_NAME}_db_users_mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-    volumes:
-      - db_users_mysql_data:/var/lib/mysql
+  # db_users_mysql:
+  #   image: mysql:latest
+  #   container_name: ${COMPOSE_PROJECT_NAME}_db_users_mysql
+  #   restart: unless-stopped
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #   volumes:
+  #     - db_users_mysql_data:/var/lib/mysql
 
   # docs_api:
   #   image: docker.swagger.io/swaggerapi/swagger-ui
@@ -107,7 +118,13 @@ services:
 volumes:
   db_admin_pgdata:
     name: ${COMPOSE_PROJECT_NAME}_db_admin_pgdata
-  db_users_pgdata:
-    name: ${COMPOSE_PROJECT_NAME}_db_users_pgdata
-  db_users_mysql_data:
-    name: ${COMPOSE_PROJECT_NAME}_db_users_mysql_data
+  # db_users_pgdata:
+  #   name: ${COMPOSE_PROJECT_NAME}_db_users_pgdata
+  # db_users_mysql_data:
+  #   name: ${COMPOSE_PROJECT_NAME}_db_users_mysql_data
+
+networks:
+  default:
+    name: ${COMPOSE_PROJECT_NAME}_network
+  db_users:
+    name: ${COMPOSE_PROJECT_NAME}_db_users_network
