@@ -5,6 +5,7 @@ from ... import gamification
 from ...gamification.rewards import Badges
 
 import bcrypt
+import re
 
 def _hash_password(password: str) -> str:
     '''Hash a password using bcrypt'''
@@ -18,7 +19,8 @@ class User:
     '''User data model'''
 
     def __init__(self, username: str):
-        self.username = username
+        # Normalize username to prevent issues with database names and container names
+        self.username = re.sub(r'[^a-zA-Z0-9_]', '_', username)
 
         # Lazy properties
         self._badges: list[str] | None = None
@@ -179,7 +181,7 @@ class User:
             is_teacher=database.sql.Placeholder('is_teacher'),
             is_admin=database.sql.Placeholder('is_admin')
         )
-
+        
         db.execute(query, {
             'username': self.username,
             'password_hash': hashed_password,

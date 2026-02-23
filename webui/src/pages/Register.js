@@ -32,6 +32,11 @@ function Register() {
             setUsernameError(t('pages.register.usernameRequired'));
             return false;
         }
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            setIsUsernameValid(false);
+            setUsernameError(t('pages.register.usernameInvalid'));
+            return false;
+        }
         setIsUsernameValid(true);
         setUsernameError('');
         return true;
