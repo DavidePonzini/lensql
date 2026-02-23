@@ -21,6 +21,7 @@ class User:
     def __init__(self, username: str):
         # Normalize username to prevent issues with database names and container names
         self.username = re.sub(r'[^a-zA-Z0-9_]', '_', username)
+        assert re.match(r'^[a-zA-Z0-9_]+$', self.username), 'Username can only contain letters, numbers, and underscores'
 
         # Lazy properties
         self._badges: list[str] | None = None
