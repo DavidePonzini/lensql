@@ -68,7 +68,11 @@ if __name__ == '__main__':
 
     for query in tqdm(list_queries(), ncols=80):
         old_errors = query.errors
-        errors = detect_errors(query)
+        try:
+            errors = detect_errors(query)
+        except Exception as e:
+            messages.error(f'Error processing query {query.query_id}: {e}')
+            continue
 
         old_count += len(old_errors)
         new_count += len(errors)
