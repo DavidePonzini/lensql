@@ -1,7 +1,7 @@
 dav_tools==0.4.19
-sql-error-categorizer>=0.2.1
+sql-error-categorizer>=0.2.2
 sql-assignment-generator>=0.0.10
-sqlscope
+sqlscope>=1.0.7
 Flask>=3.1.0
 Flask_Cors>=5.0.0
 flask_babel
@@ -18,3 +18,4 @@ tqdm
 ipython
 psycopg2
 mysql-connector-python
+docker
