@@ -63,6 +63,8 @@ def list_queries() -> list[Query]:
 
 
 if __name__ == '__main__':
+    import sys
+    
     old_count = 0
     new_count = 0
 
@@ -71,6 +73,7 @@ if __name__ == '__main__':
         try:
             errors = detect_errors(query)
         except Exception as e:
+            print(file=sys.stderr)
             messages.error(f'Error processing query {query.query_id}: {e}')
             continue
 
