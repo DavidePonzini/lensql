@@ -55,7 +55,7 @@ INSERT INTO lensql.datasets(
     description,
     dataset,
     domain,
-    search_path
+    ''
 FROM datasets;
 
 INSERT INTO lensql.dataset_members(

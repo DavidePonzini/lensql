@@ -68,6 +68,9 @@ SELECT
     e.generation_error,
     ARRAY_AGG(e.generation_difficulty ORDER BY e.generation_difficulty) AS generation_difficulties
 FROM exercises e
+WHERE
+    e.generation_error IS NOT NULL
+    AND e.generation_difficulty IS NOT NULL
 GROUP BY e.dataset_id, e.generation_error
 ORDER BY e.dataset_id, e.generation_error;
 
