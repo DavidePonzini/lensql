@@ -78,7 +78,8 @@ CREATE TABLE datasets (
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL DEFAULT '',
     dataset TEXT DEFAULT NULL,
-    domain VARCHAR(255) DEFAULT NULL
+    domain VARCHAR(255) DEFAULT NULL,
+    search_path TEXT NOT NULL DEFAULT 'public'
 );
 
 CREATE TABLE dataset_members (
@@ -106,7 +107,6 @@ CREATE TABLE exercises (
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
     solutions TEXT NOT NULL DEFAULT '[]',  -- JSON array of solution strings
-    search_path TEXT NOT NULL DEFAULT 'public',
     created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if exercises are assigned
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     generation_difficulty INTEGER DEFAULT NULL,

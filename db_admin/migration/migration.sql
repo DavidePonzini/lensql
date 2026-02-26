@@ -47,13 +47,15 @@ INSERT INTO lensql.datasets(
     name,
     description,
     dataset,
-    domain
+    domain,
+    search_path
 ) SELECT 
     id,
     name,
     description,
     dataset,
-    domain
+    domain,
+    search_path
 FROM datasets;
 
 INSERT INTO lensql.dataset_members(
@@ -89,7 +91,6 @@ INSERT INTO lensql.exercises(
     title,
     request,
     solutions,
-    search_path,
     created_by,
     created_ts,
     generation_difficulty,
@@ -101,7 +102,6 @@ INSERT INTO lensql.exercises(
     title,
     request,
     solutions,
-    search_path,
     created_by,
     created_ts,
     generation_difficulty,

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import useUserInfo from '../../hooks/useUserInfo';
 
-function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolutions, searchPath, setSearchPath }) {
+function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolutions }) {
     const { userInfo } = useUserInfo();
     const { t } = useTranslation();
 
@@ -73,19 +73,6 @@ function ExerciseMask({ title, setTitle, request, setRequest, solutions, setSolu
                                 {t('pages.datasets.exercise_mask.add_answer')}
                             </button>
                         </div>
-                    </div>
-
-                    <div className="mb-3">
-                        <label className="form-label">{t('pages.datasets.exercise_mask.search_path_label')}</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            defaultValue={searchPath}
-                            onInput={(e) => {
-                                setSearchPath(e.target.value);
-                            }}
-                            placeholder='public'
-                        />
                     </div>
                 </>
             )}

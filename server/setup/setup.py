@@ -22,12 +22,12 @@ if __name__ == '__main__':
             'id': '_EXPLORE',
             'name': 'Explore SQL',
             'description': 'Sandbox environment to explore SQL queries without restrictions.',
+            'search_path': 'public',
             'exercises': [
                 {
                     'name': 'Explore SQL',
                     'request': 'You can write any SQL query here',
                     'solutions': [],
-                    'search_path': 'public',
                 }
             ]
         },
@@ -36,49 +36,43 @@ if __name__ == '__main__':
             'id': '_WELCOME_MIEDEMA',
             'name': 'Sample Dataset: Miedema',
             'description': 'A sample dataset for practicing queries.',
+                'search_path': 'miedema',
             'exercises': [
                 {
                     'name': 'Exercise 1',
                     'request': 'List all IDs&names of customer living in Eindhoven.',
                     'solutions': ['SELECT cID, cName FROM customer WHERE city = \'Eindhoven\';'],
-                    'search_path': 'miedema',
                 },
                 {
                     'name': 'Exercise 2',
                     'request': 'List all pairs of customer IDs who live on a street with the same name but in a different city.',
                     'solutions': ['SELECT c1.cid AS id1, c2.cid AS id2 FROM customer c1 JOIN customer c2 ON c1.street = c2.street AND c1.city <> c2.city WHERE c1.cID < c2.cID;'],
-                    'search_path': 'miedema',
                 },
                 {
                     'name': 'Exercise 3',
                     'request': 'List all customer IDs, dates and quantities of transactions containing products named Apples.',
                     'solutions': ['SELECT t.cID, t.date, t.quantity FROM transaction t JOIN product p ON t.pID = p.pID WHERE p.pName = \'Apples\';'],
-                    'search_path': 'miedema',
                 },
                 {
                     'name': 'Exercise 4',
                     'request': 'Find the names of all inventory items that have a higher unit price than Bananas.',
                     'solutions': ['SELECT DISTINCT pname FROM product p JOIN inventory i ON i.pid = p.pid WHERE i.unit_price > ALL( SELECT i.unit_price FROM product p JOIN inventory i ON i.pid = p.pid WHERE p.pname = \'Banana\' );',
                                 'SELECT DISTINCT pname FROM product p JOIN inventory i ON i.pid = p.pid WHERE i.unit_price > ANY( SELECT i.unit_price FROM product p JOIN inventory i ON i.pid = p.pid WHERE p.pname = \'Banana\' );'],
-                    'search_path': 'miedema',
                 },
                 {
                     'name': 'Exercise 5',
                     'request': 'Return a list of the number of stores per city.',
                     'solutions': ['SELECT city, COUNT(sID) AS num_stores FROM store GROUP BY city;'],
-                    'search_path': 'miedema',
                 },
                 {
                     'name': 'Exercise 6',
                     'request': 'Return the stores table ordered alphabetically on city.',
                     'solutions': ['SELECT * FROM store ORDER BY city;'],
-                    'search_path': 'miedema',
                 },
                 {
                     'name': 'Exercise 7',
                     'request': 'A store-chain consists of at least two stores with the same name but different IDs. Find the names of the store-chains that on average sell product in quantities of more than 4.',
                     'solutions': ['SELECT s.sName FROM store s JOIN transaction t ON s.sID = t.sID GROUP BY s.sName HAVING COUNT(DISTINCT s.sID) >= 2 AND AVG(t.quantity) > 4;'],
-                    'search_path': 'miedema',
                 }
             ]
         }
@@ -89,16 +83,17 @@ if __name__ == '__main__':
         with open(f'server/setup/datasets/{ds["file"]}') as f:
             dataset_str = f.read()
 
-        dataset = db.admin.Dataset(ds["id"])
+        dataset = db.admin.Dataset(ds['id'])
         if dataset.exists():
             messages.warning(f'  Dataset {ds["name"]} already exists, skipping creation.')
             db_exists = True
         else:
             dataset = db.admin.Dataset.create(
-                title=ds["name"],
-                description=ds["description"],
+                title=ds['name'],
+                description=ds['description'],
                 dataset_str=dataset_str,
-                dataset_id=ds["id"]
+                dataset_id=ds['id'],
+                search_path=ds['search_path']
             )
             db_exists = False
             messages.success(f'  Dataset {ds["name"]} created successfully.')
@@ -117,7 +112,6 @@ if __name__ == '__main__':
                     dataset_id=dataset.dataset_id,
                     request=exercise_data['request'],
                     solutions=exercise_data['solutions'],
-                    search_path=exercise_data['search_path'],
                 )
 
                 messages.success(f'  Exercise {exercise_data["name"]} added to dataset {ds["name"]} successfully.')

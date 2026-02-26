@@ -8,6 +8,7 @@ SELECT
     d.id,
     d.name,
     d.description,
+    d.search_path,
     dm.is_owner,
     dm.joined_ts,
 

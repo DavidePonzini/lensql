@@ -234,7 +234,8 @@
                 ],
                 "title_placeholder": "Titolo descrittivo del dataset",
                 "description_placeholder": "Breve descrizione dello scopo del dataset",
-                "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;"
+                "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;",
+                "search_path_label": "Search path della soluzione"
             },
             "dataset_update": {
                 "modal_title": "Modifica Dataset",
@@ -277,8 +278,7 @@
                 "add_answer": "Aggiungi risposta",
                 "remove_answer": "Rimuovi risposta",
                 "title_placeholder": "Titolo breve e descrittivo per l'esercizio",
-                "request_placeholder": "Cosa dovrebbe fare la query?",
-                "search_path_label": "Percorso di ricerca della soluzione"
+                "request_placeholder": "Cosa dovrebbe fare la query?"
             },
             "exercise_update": {
                 "title": "Modifica esercizio",

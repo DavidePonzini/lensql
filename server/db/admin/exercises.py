@@ -13,7 +13,6 @@ class Exercise:
                  title: str | None = None,
                  request: str | None = None,
                  solutions: list[str] | None = None,
-                 search_path: str | None = None,
                  difficulty: int | None = None,
                  learning_objectives: list[str] | None = None,
                  all_properties_loaded: bool = False
@@ -27,7 +26,6 @@ class Exercise:
         self._title = title
         self._request = request
         self._solutions = solutions
-        self._search_path = search_path
         self._difficulty = difficulty
         self._learning_objectives = learning_objectives
     
@@ -87,17 +85,6 @@ class Exercise:
 
         return self._solutions
     
-    @property
-    def search_path(self) -> str:
-        '''Get the search path of the exercise'''
-
-        if not self._properties_loaded:
-            self._load_properties()
-
-        assert self._search_path is not None, "Search path should be loaded by _load_properties"
-
-        return self._search_path
-
     @property
     def difficulty(self) -> int | None:
         '''Get the difficulty level of the exercise'''
@@ -223,7 +210,6 @@ class Exercise:
                 e.is_hidden,
                 e.request,
                 e.solutions,
-                e.search_path,
                 e.generation_difficulty
             FROM
                 {schema}.exercises e
@@ -247,8 +233,7 @@ class Exercise:
         self._is_hidden = row[2]
         self._request = row[3]
         self._solutions = json.loads(row[4])
-        self._search_path = row[5]
-        self._difficulty = row[6]
+        self._difficulty = row[5]
 
     @staticmethod
     def create(title: str, *,
@@ -256,7 +241,6 @@ class Exercise:
                dataset_id: str,
                request: str,
                solutions: list[str] = [],
-               search_path: str = 'public',
                difficulty: int | None = None,
                error: int | None = None
               ) -> 'Exercise':
@@ -268,7 +252,6 @@ class Exercise:
             'is_hidden': False,
             'request': request,
             'solutions': json.dumps(solutions),
-            'search_path': search_path,
             'created_by': user.username,
             'generation_difficulty': difficulty,
             'generation_error': error
@@ -284,10 +267,9 @@ class Exercise:
                         title=title,
                         request=request,
                         solutions=solutions,
-                        search_path=search_path,
                         difficulty=difficulty)
 
-    def update(self, *, title: str, request: str, solutions: list[str] = [], search_path: str = 'public') -> None:
+    def update(self, *, title: str, request: str, solutions: list[str] = []) -> None:
         '''Update an existing exercise'''
 
         query = database.sql.SQL('''
@@ -295,21 +277,18 @@ class Exercise:
             SET title = {title},
                 request = {request},
                 solutions = {solutions},
-                search_path = {search_path}
             WHERE id = {exercise_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             title=database.sql.Placeholder('title'),
             request=database.sql.Placeholder('request'),
             solutions=database.sql.Placeholder('solutions'),
-            search_path=database.sql.Placeholder('search_path'),
             exercise_id=database.sql.Placeholder('exercise_id'),
         )
         db.execute(query, {
             'title': title,
             'request': request,
             'solutions': json.dumps(solutions),
-            'search_path': search_path,
             'exercise_id': self.exercise_id
         })
 

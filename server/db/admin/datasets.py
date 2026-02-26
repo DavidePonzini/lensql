@@ -8,43 +8,61 @@ from .exercises import Exercise
 class Dataset:
     '''Dataset-related database operations'''
 
-    def __init__(self, dataset_id: str, *,
-                 name: str | None = None,
-                 description: str | None = None,
-                 dataset_str: str | None = None
-                ) -> None:
+    def __init__(
+        self,
+        dataset_id: str, *,
+        name: str | None = None,
+        description: str | None = None,
+        dataset_str: str | None = None,
+        search_path: str | None = None
+    ) -> None:
         self.dataset_id = dataset_id
 
         # Lazy properties
         self._name = name
         self._description = description
         self._dataset_str = dataset_str
+        self._search_path = search_path
 
     # region Properties
+    def _load_properties(self) -> None:
+        '''Load all properties of the dataset from the database'''
+
+        query = database.sql.SQL(
+        '''
+            SELECT
+                name,
+                description,
+                dataset,
+                search_path
+            FROM {schema}.datasets
+            WHERE id = {dataset_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            dataset_id=database.sql.Placeholder('dataset_id')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'dataset_id': self.dataset_id
+        })
+
+        if len(result) == 0:
+            raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
+
+        self._name = result[0][0]
+        self._description = result[0][1]
+        self._dataset_str = result[0][2] or ''
+        self._search_path = result[0][3]
+
     @property
     def name(self) -> str:
         '''Get the name of the dataset'''
 
         if self._name is None:
-            query = database.sql.SQL(
-            '''
-                SELECT name
-                FROM {schema}.datasets
-                WHERE id = {dataset_id}
-            ''').format(
-                schema=database.sql.Identifier(SCHEMA),
-                dataset_id=database.sql.Placeholder('dataset_id')
-            )
+            self._load_properties()
 
-            result = db.execute_and_fetch(query, {
-                'dataset_id': self.dataset_id
-            })
-
-            if len(result) == 0:
-                raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
-
-            self._name = result[0][0]
-        
+            if self._name is None:
+                raise ValueError(f'Failed to load name for dataset with ID {self.dataset_id}')
         return self._name
     
     @property
@@ -52,24 +70,10 @@ class Dataset:
         '''Get the description of the dataset'''
 
         if self._description is None:
-            query = database.sql.SQL(
-            '''
-                SELECT description
-                FROM {schema}.datasets
-                WHERE id = {dataset_id}
-            ''').format(
-                schema=database.sql.Identifier(SCHEMA),
-                dataset_id=database.sql.Placeholder('dataset_id')
-            )
+            self._load_properties()
 
-            result = db.execute_and_fetch(query, {
-                'dataset_id': self.dataset_id
-            })
-
-            if len(result) == 0:
-                raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
-
-            self._description = result[0][0]
+            if self._description is None:
+                raise ValueError(f'Failed to load description for dataset with ID {self.dataset_id}')
         
         return self._description
     
@@ -78,24 +82,10 @@ class Dataset:
         '''Get the dataset string'''
 
         if self._dataset_str is None:
-            query = database.sql.SQL(
-            '''
-                SELECT dataset
-                FROM {schema}.datasets
-                WHERE id = {dataset_id}
-            ''').format(
-                schema=database.sql.Identifier(SCHEMA),
-                dataset_id=database.sql.Placeholder('dataset_id')
-            )
+            self._load_properties()
 
-            result = db.execute_and_fetch(query, {
-                'dataset_id': self.dataset_id
-            })
-
-            if len(result) == 0:
-                raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
-
-            self._dataset_str = result[0][0] or ''
+            if self._dataset_str is None:
+                raise ValueError(f'Failed to load dataset string for dataset with ID {self.dataset_id}')
         
         return self._dataset_str
     
@@ -103,6 +93,17 @@ class Dataset:
     def is_special(self) -> bool:
         '''Check if the dataset is special (ID contains a special character)'''
         return not self.dataset_id.isalnum()
+    
+    @property
+    def search_path(self) -> str:
+        '''Get the search path for the dataset'''
+
+        if self._search_path is None:
+            self._load_properties()
+
+            if self._search_path is None:
+                raise ValueError(f'Failed to load search path for dataset with ID {self.dataset_id}')
+        return self._search_path
     # endregion
 
     # region CRUD
@@ -126,7 +127,15 @@ class Dataset:
         return result[0][0] > 0
 
     @staticmethod
-    def create(title: str, description: str, dataset_str: str, *, domain: str | None = None, dataset_id: str | None = None) -> 'Dataset':
+    def create(
+        title: str,
+        description: str,
+        dataset_str: str,
+        *,
+        domain: str | None = None,
+        dataset_id: str | None = None,
+        search_path: str | None = None
+    ) -> 'Dataset':
         '''Create a new dataset, optionally with a specified ID'''
 
         if dataset_id is not None:
@@ -135,23 +144,25 @@ class Dataset:
                 'name': title,
                 'description': description,
                 'dataset': dataset_str.strip() or None,
-                'domain': domain
+                'domain': domain,
+                'search_path': search_path
             }, ['id'])
         else:
             result = db.insert(SCHEMA, 'datasets', {
                 'name': title,
                 'description': description,
                 'dataset': dataset_str.strip() or None,
-                'domain': domain
+                'domain': domain,
+                'search_path': search_path
             }, ['id'])
 
         assert result is not None and len(result) > 0, 'Failed to create dataset'
 
         dataset_id = result[0][0]
 
-        return Dataset(dataset_id, name=title, description=description, dataset_str=dataset_str)
+        return Dataset(dataset_id, name=title, description=description, dataset_str=dataset_str, search_path=search_path)
 
-    def update(self, title: str, description: str, dataset_str: str) -> None:
+    def update(self, title: str, description: str, dataset_str: str, search_path: str | None = None) -> None:
         '''Update an existing dataset'''
 
         query = database.sql.SQL(
@@ -160,21 +171,24 @@ class Dataset:
             SET
                 name = {title},
                 description = {description},
-                dataset = {dataset}
+                dataset = {dataset},
+                search_path = {search_path}
             WHERE id = {dataset_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             title=database.sql.Placeholder('title'),
             description=database.sql.Placeholder('description'),
             dataset_id=database.sql.Placeholder('dataset_id'),
-            dataset=database.sql.Placeholder('dataset')
+            dataset=database.sql.Placeholder('dataset'),
+            search_path=database.sql.Placeholder('search_path')
         )
 
         db.execute(query, {
             'title': title,
             'description': description,
             'dataset_id': self.dataset_id,
-            'dataset': dataset_str.strip() or None
+            'dataset': dataset_str.strip() or None,
+            'search_path': search_path
         })
 
     def delete(self) -> None:
@@ -433,7 +447,6 @@ class Dataset:
                     e.is_hidden,
                     e.request,
                     e.solutions,
-                    e.search_path,
                     e.generation_difficulty
                 FROM
                     {schema}.exercises e
@@ -453,7 +466,6 @@ class Dataset:
                     e.is_hidden,
                     e.request,
                     e.solutions,
-                    e.search_path,
                     e.generation_difficulty
                 FROM
                     {schema}.exercises e
@@ -477,8 +489,7 @@ class Dataset:
                 is_hidden=row[2],
                 request=row[3],
                 solutions=row[4],
-                search_path=row[5],
-                difficulty=row[6],
+                difficulty=row[5],
                 all_properties_loaded=True
             ) for row in result
         ]

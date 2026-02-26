@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-function DatasetMask({ title, setTitle, description, setDescription, dataset, setDataset }) {
+function DatasetMask({ title, setTitle, description, setDescription, dataset, setDataset, searchPath, setSearchPath }) {
     const { t } = useTranslation();
 
     const tips = t('pages.datasets.dataset_mask.tips', { returnObjects: true });
@@ -45,6 +45,20 @@ function DatasetMask({ title, setTitle, description, setDescription, dataset, se
                     </ul>
                 </div>
             </div>
+
+            <div className="mb-3">
+                <label className="form-label">{t('pages.datasets.dataset_mask.search_path_label')}</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    defaultValue={searchPath}
+                    onInput={(e) => {
+                        setSearchPath(e.target.value);
+                    }}
+                    placeholder='public'
+                />
+            </div>
+
         </>
     );
 }

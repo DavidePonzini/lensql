@@ -1233,6 +1233,7 @@ class User:
                 id,
                 name,
                 description,
+                search_path,
                 is_owner,
                 joined_ts,
                 participants,
@@ -1254,11 +1255,12 @@ class User:
             'dataset_id': row[0],
             'title': row[1],
             'description': row[2],
-            'is_owner': bool(row[3]),
-            'joined_ts': row[4],
-            'participants': int(row[5]),
-            'exercises': int(row[6]),
-            'queries_user': int(row[7]),
-            'queries_students': int(row[8])
+            'search_path': row[3],
+            'is_owner': bool(row[4]),
+            'joined_ts': row[5],
+            'participants': int(row[6]),
+            'exercises': int(row[7]),
+            'queries_user': int(row[8]),
+            'queries_students': int(row[9])
         } for row in result]
     # endregion

@@ -77,7 +77,7 @@ def run_query():
 
     user.add_rewards(rewards=rewards, badges=badges)
     exercise_solutions = excercise.solutions
-    exercise_search_path = excercise.search_path
+    exercise_search_path = db.admin.Dataset(excercise.dataset_id).search_path
     
     def generate_results():
         yield json.dumps({
@@ -252,6 +252,7 @@ def check_solution():
     data = request.get_json()
     query_str = data['query']
     exercise = db.admin.Exercise(int(data['exercise_id']))
+    dataset = db.admin.Dataset(exercise.dataset_id)
 
     coins = user.get_coins()
     attempts = exercise.count_attempts(user)
@@ -265,7 +266,7 @@ def check_solution():
         )
 
     database = db.users.PostgresqlDatabase(user.username)
-    check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions, solution_search_path=exercise.search_path)
+    check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions, solution_search_path=dataset.search_path)
 
     batch = db.admin.QueryBatch.log(
         user=user,
