@@ -276,7 +276,7 @@ class Exercise:
             UPDATE {schema}.exercises
             SET title = {title},
                 request = {request},
-                solutions = {solutions},
+                solutions = {solutions}
             WHERE id = {exercise_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
