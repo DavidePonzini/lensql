@@ -5,38 +5,31 @@ from server.db.admin import Dataset, Exercise, User
 import random
 from datetime import datetime
 
-TITLE = 'Targeted Practice'
-SUBTITLES = [
-    'Short practice sets tailored to your learning progress.',
-]
-
 admin_user = User('lens')
 
 def generate_assignment(
     user: User,
     errors: list[tuple[SqlErrors, DifficultyLevel]],
     *,
+    title: str | None = None,
+    description: str | None = None,
     dataset_id: str | None = None,
+    input_dataset_str: str | None = None,
+    input_exercise_count: int | None = None,
     domain: str | None = None,
     sql_dialect: str = 'postgres',
     language: str = 'en',
 ) -> Dataset:
     '''Generate SQL assignments based on specified SQL errors and difficulty levels.'''
 
-    if dataset_id is not None:
-        dataset = Dataset(dataset_id=dataset_id)
-        exercise_counter = len(dataset.list_exercises(user))
-        dataset_str = dataset.dataset_str
-    else:
-        dataset = None
-        dataset_str = None
-        exercise_counter = 0
+    if input_exercise_count is None:
+        input_exercise_count = 0
     
     assignment = sql_assignment_generator.generate_assignment(
         errors=errors,
         sql_dialect=sql_dialect,
         language=language,
-        dataset_str=dataset_str,
+        dataset_str=input_dataset_str,
         domain=domain,
         shuffle_exercises=True,
         max_dataset_attempts=10,
@@ -44,25 +37,50 @@ def generate_assignment(
         max_unique_attempts=10,
     )
 
-    
-    if dataset is None:
+    if title is None:
+        if language == 'it':
+            title = 'Pratica personalizzata'
+        else:
+            title = 'Targeted Practice Set'
+    else:
+        if language == 'it':
+            title = f'Pratica personalizzata: {title}'
+        else:
+            title = f'Targeted Practice Set: {title}'
+    if description is None:
+        if language == 'it':
+            description = 'Esercizi personalizzati basati sul tuo progresso di apprendimento.'
+        else:
+            description = 'Practice set tailored to your learning progress.'
+
+    if dataset_id is None:
+        # Generate a new dataset
+
         # format: 'p_250113'
         schema_name = datetime.now().strftime('p_%y%m%d')
-        
+        if input_dataset_str is not None:
+            dataset_str = input_dataset_str
+        else:
+            dataset_str = assignment.dataset.to_sql(schema_name)
+    
         # Save dataset to the database
         dataset = Dataset.create(
-            title=TITLE,
-            description=random.choice(SUBTITLES),
-            dataset_str=assignment.dataset.to_sql(schema_name),
+            title=title,
+            description=description,
+            dataset_str=dataset_str,
             domain=domain,
             search_path=schema_name,
         )
+    else:
+        # Use existing dataset
+        dataset = Dataset(dataset_id)
         
 
     # Add admin user as participant and set as owner
     dataset.add_participant(admin_user)
     dataset.set_owner_status(admin_user, True)
 
+    exercise_counter = input_exercise_count if input_exercise_count is not None else 0
     def get_exercise_name() -> str:
         nonlocal exercise_counter
         exercise_counter += 1
@@ -141,11 +159,12 @@ def select_difficulty_levels() -> list[DifficultyLevel]:
 
 if __name__ == '__main__':
     dav_tools.argument_parser.add_argument('user', help='Username to assign the generated exercises to')
-    dav_tools.argument_parser.add_argument('-f', '--from-dataset', help='Only extract error patterns from this dataset')
-    dav_tools.argument_parser.add_argument('-d', '--dataset', help='Generate exercises in this dataset, instead of generating a new dataset')
-    dav_tools.argument_parser.add_argument('--domain', help='Optional domain to filter exercises by')
-    dav_tools.argument_parser.add_argument('--assign_to', help='Username to assign the generated exercises to (alternative to user)')
+    dav_tools.argument_parser.add_argument('-i', '--input', help='Use this dataset as a template, instead of generating a new one')
+    dav_tools.argument_parser.add_argument('-o', '--output', help='Generate exercises in this dataset. If not provided, a new dataset will be created')
+    dav_tools.argument_parser.add_argument('--assign-to', help='Username to assign the generated exercises to (alternative to user)')
     dav_tools.argument_parser.add_argument('--dialect', help='SQL dialect to use for generated exercises (default: postgres)', default='postgres')
+    dav_tools.argument_parser.add_argument('--domain', help='Optional domain to filter exercises by')
+    dav_tools.argument_parser.add_argument('--from-dataset', help='Only extract error patterns from this dataset')
     dav_tools.argument_parser.add_argument('--language', help='Language to use for generated exercises (default: en)', default='en', choices=['en', 'it'])
     dav_tools.argument_parser.parse_args()
 
@@ -180,10 +199,28 @@ if __name__ == '__main__':
     else:
         assign_to_user = user
 
+    # If --input dataset is provided, use it as a template
+    if dav_tools.argument_parser.args.input is None:
+        input_dataset_str = None
+        input_exercise_count = None
+        title = None
+        description = None
+    else:
+        input_dataset = Dataset(dav_tools.argument_parser.args.input)
+        input_dataset_str = input_dataset.dataset_str
+        input_exercise_count = len(input_dataset.list_exercises(assign_to_user))
+        title = input_dataset.name
+        description = input_dataset.description
+
+    # Generate the assignment dataset and exercises
     dataset = generate_assignment(
         assign_to_user,
         errors,
-        dataset_id=dav_tools.argument_parser.args.dataset,
+        title=title,
+        description=description,
+        dataset_id=dav_tools.argument_parser.args.output,
+        input_dataset_str=input_dataset_str,
+        input_exercise_count=input_exercise_count,
         domain=dav_tools.argument_parser.args.domain,
         sql_dialect=dav_tools.argument_parser.args.dialect,
         language=dav_tools.argument_parser.args.language
