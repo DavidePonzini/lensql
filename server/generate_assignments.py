@@ -15,16 +15,13 @@ def generate_assignment(
     description: str | None = None,
     dataset_id: str | None = None,
     input_dataset_str: str | None = None,
-    input_exercise_count: int | None = None,
+    input_exercise_count: int = 0,
     domain: str | None = None,
     sql_dialect: str = 'postgres',
     language: str = 'en',
 ) -> Dataset:
     '''Generate SQL assignments based on specified SQL errors and difficulty levels.'''
 
-    if input_exercise_count is None:
-        input_exercise_count = 0
-    
     assignment = sql_assignment_generator.generate_assignment(
         errors=errors,
         sql_dialect=sql_dialect,
@@ -80,16 +77,15 @@ def generate_assignment(
     dataset.add_participant(admin_user)
     dataset.set_owner_status(admin_user, True)
 
-    exercise_counter = input_exercise_count if input_exercise_count is not None else 0
     def get_exercise_name() -> str:
-        nonlocal exercise_counter
-        exercise_counter += 1
+        nonlocal input_exercise_count
+        input_exercise_count += 1
 
         if language == 'en':
-            return f'Exercise {exercise_counter}'
+            return f'Exercise {input_exercise_count}'
         if language == 'it':
-            return f'Esercizio {exercise_counter}'
-        return f'Exercise {exercise_counter}'
+            return f'Esercizio {input_exercise_count}'
+        return f'Exercise {input_exercise_count}'
 
     # Save each exercise to the database
     for exercise_data in assignment.exercises:
@@ -170,6 +166,20 @@ if __name__ == '__main__':
 
     user = User(dav_tools.argument_parser.args.user)
 
+    input_dataset_id = dav_tools.argument_parser.args.input
+    output_dataset_id = dav_tools.argument_parser.args.output
+
+    assign_to = dav_tools.argument_parser.args.assign_to
+    # If --assign_to is provided, use that user instead of the one specified by 'user' argument
+    if assign_to:
+        assign_to_user = User(assign_to)
+    else:
+        assign_to_user = user
+
+    domain = dav_tools.argument_parser.args.domain
+    sql_dialect = dav_tools.argument_parser.args.dialect
+    language = dav_tools.argument_parser.args.language
+
     # Extract error stats for the user, optionally filtered by dataset
     sorted_error_stats = get_error_stats(user, dataset_id=dav_tools.argument_parser.args.from_dataset)
 
@@ -192,25 +202,25 @@ if __name__ == '__main__':
         for difficulty in difficulty_levels:
             errors.append((SqlErrors(error['error_id']), difficulty))
 
-    # If --assign_to is provided, use that user instead of the one specified by 'user' argument
-    assign_to = dav_tools.argument_parser.args.assign_to
-    if assign_to:
-        assign_to_user = User(assign_to)
-    else:
-        assign_to_user = user
-
+    
     # If --input dataset is provided, use it as a template
-    if dav_tools.argument_parser.args.input is None:
+    if input_dataset_id is None:
         input_dataset_str = None
         input_exercise_count = None
         title = None
         description = None
     else:
-        input_dataset = Dataset(dav_tools.argument_parser.args.input)
+        input_dataset = Dataset(input_dataset_id)
         input_dataset_str = input_dataset.dataset_str
-        input_exercise_count = len(input_dataset.list_exercises(assign_to_user))
         title = input_dataset.name
         description = input_dataset.description
+
+        # Only set input_exercise_count if the output dataset is not the input one,
+        # otherwise we would be counting the exercises we are generating as part of the input dataset
+        if output_dataset_id != input_dataset_id:
+            input_exercise_count = len(input_dataset.list_exercises(assign_to_user))
+        else:
+            input_exercise_count = 0
 
     # Generate the assignment dataset and exercises
     dataset = generate_assignment(
@@ -218,12 +228,12 @@ if __name__ == '__main__':
         errors,
         title=title,
         description=description,
-        dataset_id=dav_tools.argument_parser.args.output,
+        dataset_id=output_dataset_id,
         input_dataset_str=input_dataset_str,
         input_exercise_count=input_exercise_count,
-        domain=dav_tools.argument_parser.args.domain,
-        sql_dialect=dav_tools.argument_parser.args.dialect,
-        language=dav_tools.argument_parser.args.language
+        domain=domain,
+        sql_dialect=sql_dialect,
+        language=language
     )
 
     dav_tools.messages.info(f'Dataset ID: {dataset.dataset_id}')
