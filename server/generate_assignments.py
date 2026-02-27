@@ -206,7 +206,7 @@ if __name__ == '__main__':
     # If --input dataset is provided, use it as a template
     if input_dataset_id is None:
         input_dataset_str = None
-        input_exercise_count = None
+        input_exercise_count = 0
         title = None
         description = None
     else:
@@ -215,9 +215,9 @@ if __name__ == '__main__':
         title = input_dataset.name
         description = input_dataset.description
 
-        # Only set input_exercise_count if the output dataset is not the input one,
-        # otherwise we would be counting the exercises we are generating as part of the input dataset
-        if output_dataset_id != input_dataset_id:
+        # Only set input_exercise_count if the output dataset is the same as the input dataset,
+        # otherwise we don't want to count existing exercises in a different dataset
+        if output_dataset_id == input_dataset_id:
             input_exercise_count = len(input_dataset.list_exercises(assign_to_user))
         else:
             input_exercise_count = 0
