@@ -29,18 +29,8 @@ def generate_assignment(
         dataset_str = dataset.dataset_str
     else:
         dataset = None
-        exercise_counter = 0
         dataset_str = None
-    
-    def exercise_naming_func(error: SqlErrors, difficulty: DifficultyLevel) -> str:
-        nonlocal exercise_counter
-        exercise_counter += 1
-
-        if language == 'en':
-            return f'Exercise {exercise_counter}'
-        if language == 'it':
-            return f'Esercizio {exercise_counter}'
-        return f'Exercise {exercise_counter}'
+        exercise_counter = 0
     
     assignment = sql_assignment_generator.generate_assignment(
         errors=errors,
@@ -49,7 +39,6 @@ def generate_assignment(
         dataset_str=dataset_str,
         domain=domain,
         shuffle_exercises=True,
-        naming_func=exercise_naming_func,
         max_dataset_attempts=10,
         max_exercise_attempts=10,
         max_unique_attempts=10,
@@ -74,10 +63,20 @@ def generate_assignment(
     dataset.add_participant(admin_user)
     dataset.set_owner_status(admin_user, True)
 
+    def get_exercise_name() -> str:
+        nonlocal exercise_counter
+        exercise_counter += 1
+
+        if language == 'en':
+            return f'Exercise {exercise_counter}'
+        if language == 'it':
+            return f'Esercizio {exercise_counter}'
+        return f'Exercise {exercise_counter}'
+
     # Save each exercise to the database
     for exercise_data in assignment.exercises:
         Exercise.create(
-            title=exercise_data.title,
+            title=get_exercise_name(),
             user=admin_user,
             dataset_id=dataset.dataset_id,
             request=exercise_data.request,
