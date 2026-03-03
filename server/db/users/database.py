@@ -100,18 +100,6 @@ class Database(ABC):
                     notices=conn.notices)
     # endregion
 
-    # region Database Creation
-    @abstractmethod
-    def init(self, password: str) -> bool:
-        '''Initializes the database.'''
-        pass
-
-    @abstractmethod
-    def exists(self) -> bool:
-        '''Checks if the database exists.'''
-        pass
-    # endregion        
-    
     # region Connections
     @property
     @abstractmethod
@@ -142,30 +130,56 @@ class Database(ABC):
         
         try:
             container = client.containers.get(self.hostname)
+            container.reload()  # refresh container status from Docker
+            if container:
+                dav_tools.messages.debug(f'Container "{container.name}" status: {container.status}')
         
             if container.status != 'running':
                 container.start()
+                container.reload()  # refresh container status after starting
+                dav_tools.messages.info(f'Started container for database {self.dbname} (container name: {container.name})')
         
             return container
         except docker.errors.NotFound:
             return self.create_container()
 
+    def get_connection(self, autocommit: bool = True, timeout_s: int = 30) -> DatabaseConnection:
+        '''Gets a connection to the database, creating a new one if necessary.'''
+        self.start_container() # ensure container is running before connecting
+
+        deadline = time.time() + timeout_s
+
+        while time.time() < deadline:
+            try:
+                return self._get_connection(autocommit=autocommit)
+            except Exception as e:
+                dav_tools.messages.warning(f'Failed to get connection for {self.hostname}: {e}')
+                time.sleep(1)
+
+        raise Exception(f'Timeout getting connection for {self.hostname} after {timeout_s} seconds.')
+
     @abstractmethod
     def _get_connection(self, autocommit: bool = True) -> DatabaseConnection:
-        '''Gets a connection to the database. This method should ensure the database container is running before returning the connection.'''
+        '''Gets a connection to the database.'''
         pass
-
 
     def connect(self, autocommit: bool = True) -> DatabaseConnection:
         '''Connects to the database as the specified user.'''
         
         if self.dbname in self.connections:
             conn = self.connections[self.dbname]
-            conn.clear_notices()
-            return conn
-        
+
+            if conn.is_open():
+                conn.clear_notices()
+                return conn
+            
+            # Stale connection in the pool, remove it and create a new one
+            with self.conn_lock:
+                del self.connections[self.dbname]
+            dav_tools.messages.warning(f'Connection for {self.dbname} was closed, removed from pool. Creating a new connection.')
+
         with self.conn_lock:
-            conn = self._get_connection(autocommit=autocommit)
+            conn = self.get_connection(autocommit=autocommit)
             self.connections[self.dbname] = conn
             return conn
 
@@ -174,7 +188,7 @@ class Database(ABC):
             Connects to the database as the admin user.
             This connection is not added to the connection pool.
         '''
-        return self._get_connection(autocommit=autocommit)
+        return self.get_connection(autocommit=autocommit)
     # endregion
 
     # region Cleanup

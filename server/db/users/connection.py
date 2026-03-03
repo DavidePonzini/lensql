@@ -27,6 +27,11 @@ class DatabaseConnection(ABC):
         pass
 
     @abstractmethod
+    def is_open(self) -> bool:
+        '''Returns True if the connection is open, False otherwise.'''
+        pass
+
+    @abstractmethod
     def close(self) -> None:
         '''Closes the database connection.'''
         pass

@@ -29,6 +29,9 @@ class PostgresqlConnection(DatabaseConnection):
         except Exception as e:
             dav_tools.messages.error(f"Error closing PostgreSQL connection for user database {self.host}: {e}")
 
+    def is_open(self) -> bool:
+        return self.connection and not self.connection.closed
+
     def cursor(self):
         return self.connection.cursor()
     
