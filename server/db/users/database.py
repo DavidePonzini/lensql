@@ -44,6 +44,8 @@ class Database(ABC):
     data_types: dict[int, str] = {}
     '''Mapping of data type codes to their names.'''
 
+    project_name = os.getenv('COMPOSE_PROJECT_NAME', 'lensql')
+
     def __init__(self, dbname: str):
         self.dbname = dbname
 
@@ -105,14 +107,21 @@ class Database(ABC):
     # region Connections
     @property
     @abstractmethod
-    def db_type(self) -> str:
-        '''Returns the type of the database (e.g. "postgresql", "mysql", etc.).'''
+    def dbms_name(self) -> str:
+        '''Returns the name of the DBMS for this database (e.g. "postgresql", "mysql", etc.).'''
         pass
 
     @property
     def hostname(self) -> str:
         '''Returns the hostname to connect to the database container.'''
-        return f'{PROJECT_NAME}_db_user_{self.dbname}_{self.db_type}'
+        return f'{PROJECT_NAME}_db_user_{self.dbname}_{self.dbms_name}'
+    
+    @property
+    def container_labels(self) -> list[str]:
+        '''Returns the labels to identify the database container.'''
+        return [
+            f'{self.project_name}_db_user'
+        ]
     
     @property
     @abstractmethod

@@ -34,6 +34,7 @@ def run_query():
     data = request.get_json()
     query_str = data['query_str']
     excercise = db.admin.Exercise(data['exercise_id'])
+    dataset = db.admin.Dataset(excercise.dataset_id)
 
     rewards = []
     badges = []
@@ -85,7 +86,7 @@ def run_query():
             'badges': [badge.to_dict() for badge in badges],
         }) + '\n'  # Important: one JSON object per line
 
-        database = db.users.PostgresqlDatabase(user.username)
+        database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
         for query_result in database.execute_sql(query_str=query_str):
             search_path = database.get_search_path()
 
@@ -171,8 +172,9 @@ def show_search_path():
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
+    dataset = db.admin.Dataset(exercise.dataset_id)
     
-    database = db.users.PostgresqlDatabase(user.username)
+    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
     result = database.builtin_show_search_path()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -185,8 +187,9 @@ def list_schemas():
     user = db.admin.User(get_jwt_identity())
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    
-    database = db.users.PostgresqlDatabase(user.username)
+    dataset = db.admin.Dataset(exercise.dataset_id)
+
+    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
     result = database.builtin_list_schemas()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -200,8 +203,9 @@ def list_tables():
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    
-    database = db.users.PostgresqlDatabase(user.username)
+    dataset = db.admin.Dataset(exercise.dataset_id)
+
+    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
     result = database.builtin_list_tables()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -215,8 +219,9 @@ def list_all_tables():
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    
-    database = db.users.PostgresqlDatabase(user.username)
+    dataset = db.admin.Dataset(exercise.dataset_id)
+
+    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
     result = database.builtin_list_all_tables()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -230,8 +235,9 @@ def list_constraints():
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
+    dataset = db.admin.Dataset(exercise.dataset_id)
     
-    database = db.users.PostgresqlDatabase(user.username)
+    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
     result = database.builtin_list_constraints()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -246,6 +252,7 @@ def check_solution():
     data = request.get_json()
     query_str = data['query']
     exercise = db.admin.Exercise(int(data['exercise_id']))
+    dataset = db.admin.Dataset(exercise.dataset_id)
 
     coins = user.get_coins()
     attempts = exercise.count_attempts(user)
@@ -258,7 +265,7 @@ def check_solution():
             attempts=attempts,
         )
 
-    database = db.users.PostgresqlDatabase(user.username)
+    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
     check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions, solution_search_path=exercise.search_path)
 
     batch = db.admin.QueryBatch.log(

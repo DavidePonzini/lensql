@@ -29,13 +29,6 @@ def register_user(user: admin.User,
     if not user.register_account(password, school=school, is_teacher=is_teacher, is_admin=is_admin):
         dav_tools.messages.error(f'User "{user.username}" already exists.')
     
-    # Register on user DB (PostgreSQL)
-    if not users.PostgresqlDatabase(user.username).init(password):
-        dav_tools.messages.error(f'Failed to initialize database for user {user.username}. Deleting user.')
-
-    # Register on user DB (MySQL)
-    # TODO
-    
     for dataset in datasets:
         dataset.add_participant(user)
     

@@ -14,6 +14,7 @@ function DatasetUpdate({ datasetId, refresh, className }) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [dataset, setDataset] = useState('');
+    const [dbms, setDbms] = useState('');
 
     async function handleEditDataset() {
         await apiRequest('/api/datasets', 'PUT', {
@@ -21,6 +22,7 @@ function DatasetUpdate({ datasetId, refresh, className }) {
             'title': title,
             'description': description,
             'dataset': dataset,
+            'dbms': dbms,
         });
 
         refresh();
@@ -33,6 +35,7 @@ function DatasetUpdate({ datasetId, refresh, className }) {
         setTitle(result.data.title);
         setDescription(result.data.description);
         setDataset(result.data.dataset_str);
+        setDbms(result.data.dbms);
     }, [datasetId, apiRequest]);
 
     useEffect(() => {
@@ -61,6 +64,8 @@ function DatasetUpdate({ datasetId, refresh, className }) {
                 setDescription={setDescription}
                 dataset={dataset}
                 setDataset={setDataset}
+                dbms={dbms}
+                setDbms={setDbms}
             />
         </ButtonModal>
     );

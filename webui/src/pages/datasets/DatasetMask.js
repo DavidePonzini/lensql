@@ -1,7 +1,20 @@
 import { useTranslation } from 'react-i18next';
 
-function DatasetMask({ title, setTitle, description, setDescription, dataset, setDataset }) {
+function DatasetMask({
+    title,
+    setTitle,
+    description,
+    setDescription,
+    dataset,
+    setDataset,
+    dbms,
+    setDbms,
+}) {
     const { t } = useTranslation();
+
+    if (dbms == '') {
+        setDbms('postgresql');
+    }
 
     const tips = t('pages.datasets.dataset_mask.tips', { returnObjects: true });
 
@@ -44,6 +57,20 @@ function DatasetMask({ title, setTitle, description, setDescription, dataset, se
                         ))}
                     </ul>
                 </div>
+            </div>
+            <div className="mb-3">
+                <label className="form-label">{t('pages.datasets.dataset_mask.dbms_label')}</label>
+                <select
+                    className="form-select"
+                    value={dbms}
+                    onChange={(e) => setDbms(e.target.value)}
+                >
+                    <option value="postgresql">PostgreSQL</option>
+                    <option value="mysql">MySQL</option>
+                    <option disabled value="sqlite">SQLite</option>
+                    <option disabled value="sqlserver">SQL Server</option>
+                    <option disabled value="oracle">Oracle</option>
+                </select>
             </div>
         </>
     );

@@ -11,7 +11,8 @@ class Dataset:
     def __init__(self, dataset_id: str, *,
                  name: str | None = None,
                  description: str | None = None,
-                 dataset_str: str | None = None
+                 dataset_str: str | None = None,
+                 dbms: str | None = None
                 ) -> None:
         self.dataset_id = dataset_id
 
@@ -19,6 +20,7 @@ class Dataset:
         self._name = name
         self._description = description
         self._dataset_str = dataset_str
+        self._dbms = dbms
 
     # region Properties
     @property
@@ -100,6 +102,32 @@ class Dataset:
         return self._dataset_str
     
     @property
+    def dbms(self) -> str:
+        '''Get the DBMS of the dataset'''
+
+        if self._dbms is None:
+            query = database.sql.SQL(
+            '''
+                SELECT dbms
+                FROM {schema}.datasets
+                WHERE id = {dataset_id}
+            ''').format(
+                schema=database.sql.Identifier(SCHEMA),
+                dataset_id=database.sql.Placeholder('dataset_id')
+            )
+
+            result = db.execute_and_fetch(query, {
+                'dataset_id': self.dataset_id
+            })
+
+            if len(result) == 0:
+                raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
+
+            self._dbms = result[0][0] or ''
+        
+        return self._dbms
+    
+    @property
     def is_special(self) -> bool:
         '''Check if the dataset is special (ID contains a special character)'''
         return not self.dataset_id.isalnum()
@@ -126,7 +154,15 @@ class Dataset:
         return result[0][0] > 0
 
     @staticmethod
-    def create(title: str, description: str, dataset_str: str, *, domain: str | None = None, dataset_id: str | None = None) -> 'Dataset':
+    def create(
+        title: str,
+        description: str,
+        dataset_str: str,
+        dbms: str,
+        *,
+        domain: str | None = None,
+        dataset_id: str | None = None
+    ) -> 'Dataset':
         '''Create a new dataset, optionally with a specified ID'''
 
         if dataset_id is not None:
@@ -135,23 +171,25 @@ class Dataset:
                 'name': title,
                 'description': description,
                 'dataset': dataset_str.strip() or None,
-                'domain': domain
+                'domain': domain,
+                'dbms': dbms
             }, ['id'])
         else:
             result = db.insert(SCHEMA, 'datasets', {
                 'name': title,
                 'description': description,
                 'dataset': dataset_str.strip() or None,
-                'domain': domain
+                'domain': domain,
+                'dbms': dbms
             }, ['id'])
 
         assert result is not None and len(result) > 0, 'Failed to create dataset'
 
         dataset_id = result[0][0]
 
-        return Dataset(dataset_id, name=title, description=description, dataset_str=dataset_str)
+        return Dataset(dataset_id, name=title, description=description, dataset_str=dataset_str, dbms=dbms)
 
-    def update(self, title: str, description: str, dataset_str: str) -> None:
+    def update(self, title: str, description: str, dataset_str: str, dbms: str) -> None:
         '''Update an existing dataset'''
 
         query = database.sql.SQL(
@@ -160,21 +198,24 @@ class Dataset:
             SET
                 name = {title},
                 description = {description},
-                dataset = {dataset}
+                dataset = {dataset},
+                dbms = {dbms}
             WHERE id = {dataset_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             title=database.sql.Placeholder('title'),
             description=database.sql.Placeholder('description'),
             dataset_id=database.sql.Placeholder('dataset_id'),
-            dataset=database.sql.Placeholder('dataset')
+            dataset=database.sql.Placeholder('dataset'),
+            dbms=database.sql.Placeholder('dbms')
         )
 
         db.execute(query, {
             'title': title,
             'description': description,
             'dataset_id': self.dataset_id,
-            'dataset': dataset_str.strip() or None
+            'dataset': dataset_str.strip() or None,
+            'dbms': dbms
         })
 
     def delete(self) -> None:

@@ -22,6 +22,7 @@ if __name__ == '__main__':
             'id': '_EXPLORE',
             'name': 'Explore SQL',
             'description': 'Sandbox environment to explore SQL queries without restrictions.',
+            'dbms': 'postgresql',
             'exercises': [
                 {
                     'name': 'Explore SQL',
@@ -36,6 +37,7 @@ if __name__ == '__main__':
             'id': '_WELCOME_MIEDEMA',
             'name': 'Sample Dataset: Miedema',
             'description': 'A sample dataset for practicing queries.',
+            'dbms': 'postgresql',
             'exercises': [
                 {
                     'name': 'Exercise 1',
@@ -89,16 +91,17 @@ if __name__ == '__main__':
         with open(f'server/setup/datasets/{ds["file"]}') as f:
             dataset_str = f.read()
 
-        dataset = db.admin.Dataset(ds["id"])
+        dataset = db.admin.Dataset(ds['id'])
         if dataset.exists():
             messages.warning(f'  Dataset {ds["name"]} already exists, skipping creation.')
             db_exists = True
         else:
             dataset = db.admin.Dataset.create(
-                title=ds["name"],
-                description=ds["description"],
+                title=ds['name'],
+                description=ds['description'],
                 dataset_str=dataset_str,
-                dataset_id=ds["id"]
+                dataset_id=ds['id'],
+                dbms=ds['dbms'],
             )
             db_exists = False
             messages.success(f'  Dataset {ds["name"]} created successfully.')

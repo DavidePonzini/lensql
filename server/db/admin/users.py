@@ -1227,7 +1227,7 @@ class User:
             - exercises: The number of exercises in the dataset
             - queries_user: The number of queries run by the user
             - queries_students: The number of queries run by students (0 if the user is not a teacher)
-        
+            - dbms: The DBMS of the dataset
         '''
 
         query = database.sql.SQL(
@@ -1236,6 +1236,7 @@ class User:
                 id,
                 name,
                 description,
+                dbms,
                 is_owner,
                 joined_ts,
                 participants,
@@ -1257,11 +1258,12 @@ class User:
             'dataset_id': row[0],
             'title': row[1],
             'description': row[2],
-            'is_owner': bool(row[3]),
-            'joined_ts': row[4],
-            'participants': int(row[5]),
-            'exercises': int(row[6]),
-            'queries_user': int(row[7]),
-            'queries_students': int(row[8])
+            'dbms': row[3],
+            'is_owner': bool(row[4]),
+            'joined_ts': row[5],
+            'participants': int(row[6]),
+            'exercises': int(row[7]),
+            'queries_user': int(row[8]),
+            'queries_students': int(row[9]),
         } for row in result]
     # endregion

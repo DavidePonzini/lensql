@@ -78,7 +78,8 @@ CREATE TABLE datasets (
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL DEFAULT '',
     dataset TEXT DEFAULT NULL,
-    domain VARCHAR(255) DEFAULT NULL
+    domain VARCHAR(255) DEFAULT NULL,
+    dbms VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE dataset_members (

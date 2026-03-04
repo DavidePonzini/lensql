@@ -22,6 +22,7 @@ prod: stop locales_compile
 
 stop:
 	docker compose --profile dev --profile prod --profile maintenance down
+	docker rm -f $$(docker ps -aq --filter "label=${COMPOSE_PROJECT_NAME}_db_user") || true
 
 maintenance:
 	docker compose down nginx_prod nginx_dev

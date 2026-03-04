@@ -4,14 +4,12 @@ from .connection import PostgresqlConnection
 from .queries import PostgresqlBuiltinQueries, PostgresqlMetadataQueries
 from ..database import Database
 
-from psycopg2 import sql
 import dav_tools
 import os
 import docker
 from docker.models.containers import Container
 
 NETWORK_NAME = os.getenv('DB_USERS_NETWORK', 'db_users')
-
 
 class PostgresqlDatabase(Database):
     Database.admin_username = 'postgres'
@@ -22,7 +20,7 @@ class PostgresqlDatabase(Database):
     Database.data_types = DATA_TYPES
 
     @property
-    def db_type(self) -> str:
+    def dbms_name(self) -> str:
         return 'postgresql'
     
     @property
@@ -39,9 +37,6 @@ class PostgresqlDatabase(Database):
                 'POSTGRES_PASSWORD': 'password',
                 'POSTGRES_HOST_AUTH_METHOD': 'trust',
             },
-            # ports={
-            #     f'{self.port}/tcp': self.port,
-            # },
             detach=True,
             network=NETWORK_NAME,
             volumes={
@@ -51,6 +46,7 @@ class PostgresqlDatabase(Database):
                     'mode': 'rw',
                 }
             },
+            labels=self.container_labels,
             mem_limit='512m',
             nano_cpus=1_000_000_000,  # Limit to 1 CPU,
         )

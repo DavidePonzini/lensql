@@ -47,13 +47,15 @@ INSERT INTO lensql.datasets(
     name,
     description,
     dataset,
-    domain
+    domain,
+    dbms
 ) SELECT 
     id,
     name,
     description,
     dataset,
-    domain
+    domain,
+    dbms
 FROM datasets;
 
 INSERT INTO lensql.dataset_members(
@@ -241,5 +243,7 @@ INSERT INTO lensql.messages(
     feedback,
     feedback_ts
 FROM messages;
+
+SELECT '>>> IMPORTANT: remember to update sequences! <<<' AS reminder;
 
 COMMIT;

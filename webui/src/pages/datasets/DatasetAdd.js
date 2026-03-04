@@ -12,12 +12,14 @@ function DatasetAdd({ refresh, className }) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [dataset, setDataset] = useState('');
+    const [dbms, setDbms] = useState('');
 
     async function handleAdd() {
         await apiRequest('/api/datasets', 'POST', {
             'title': title,
             'description': description,
             'dataset': dataset,
+            'dbms': dbms,
         });
 
         refresh();
@@ -50,6 +52,8 @@ function DatasetAdd({ refresh, className }) {
                 setDescription={setDescription}
                 dataset={dataset}
                 setDataset={setDataset}
+                dbms={dbms}
+                setDbms={setDbms}
             />
         </ButtonModal>
     );
