@@ -1,5 +1,6 @@
 from .database import Database
 from .postgresql import PostgresqlDatabase
+from .mysql import MySQLDatabase
 
 import os
 
@@ -10,13 +11,7 @@ def get_database(dbname: str, dbms: str) -> Database:
     if dbms == 'postgresql':
         return PostgresqlDatabase(dbname)
 
-    # if dbms == 'mysql':
-    #     return MySQLDatabase()
+    if dbms == 'mysql':
+        return MySQLDatabase(dbname)
 
     raise ValueError(f'Unsupported DBMS: {dbms} ({dbname})')
-
-def start_cleanup_threads():
-    '''Starts cleanup threads for all database backends.'''
-
-    PostgresqlDatabase.start_cleanup_thread()
-    # mysql.start_cleanup_thread()

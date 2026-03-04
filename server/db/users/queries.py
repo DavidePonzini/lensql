@@ -41,6 +41,12 @@ class BuiltinQueries(ABC):
 class MetadataQueries(ABC):
     @staticmethod
     @abstractmethod
+    def set_search_path(search_path: str) -> str:
+        '''Sets the search path for the user.'''
+        pass
+
+    @staticmethod
+    @abstractmethod
     def get_search_path() -> str:
         '''Returns the current search path for the user.'''
         pass

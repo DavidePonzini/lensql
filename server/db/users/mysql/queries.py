@@ -1,35 +1,38 @@
 from ..queries import BuiltinQueries, MetadataQueries
 
-class PostgresqlBuiltinQueries(BuiltinQueries):
+
+class MySQLBuiltinQueries(BuiltinQueries):
     @staticmethod
     def set_search_path(search_path: str) -> str:
+        '''Sets the search path for the user.'''
+        # MySQL does not have a search_path concept like PostgreSQL.
+        # Instead, we can use the "USE database" command to switch databases.
         return f'''
-            SET search_path TO {search_path};
+            USE {search_path};
         '''
 
     @staticmethod
     def show_search_path() -> str:
         return '''
-            SHOW search_path;
+            SELECT DATABASE() AS current_database;
         '''
 
     @staticmethod
     def list_users() -> str:
         return '''
             SELECT
-                usename AS username
+                user AS username
             FROM
-                pg_catalog.pg_user
+                mysql.user
             ORDER BY
-                usename;
+                user;
         '''
-    
+
     @staticmethod
     def list_schemas() -> str:
         return '''
             SELECT
-                schema_name,
-                schema_owner
+                schema_name
             FROM
                 information_schema.schemata
             ORDER BY
@@ -40,13 +43,13 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
     def list_tables() -> str:
         return '''
             SELECT
-                table_schema AS schema,
-                table_name as table,
-                table_type as type
+                table_schema AS schema_name,
+                table_name AS table_name,
+                table_type AS type
             FROM
                 information_schema.tables
             WHERE
-                table_schema = current_schema()
+                table_schema = DATABASE()
             ORDER BY
                 table_schema,
                 table_name;
@@ -56,9 +59,9 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
     def list_all_tables() -> str:
         return '''
             SELECT
-                table_schema AS schema,
-                table_name as table,
-                table_type as type
+                table_schema AS schema_name,
+                table_name AS table_name,
+                table_type AS type
             FROM
                 information_schema.tables
             ORDER BY
@@ -70,33 +73,32 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
     def list_constraints() -> str:
         return '''
             SELECT
-                tc.table_schema AS schema,
-                tc.table_name AS table,
-                tc.constraint_name AS constraint,
-                tc.constraint_type AS type
+                tc.table_schema AS schema_name,
+                tc.table_name,
+                tc.constraint_name,
+                tc.constraint_type
             FROM
                 information_schema.table_constraints AS tc
             WHERE
-                tc.table_schema <> 'pg_catalog'
-                AND tc.table_schema <> 'information_schema'
+                tc.table_schema NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys')
             ORDER BY
                 tc.table_schema,
                 tc.table_name,
                 tc.constraint_name;
         '''
 
-    
-class PostgresqlMetadataQueries(MetadataQueries):
+
+class MySQLMetadataQueries(MetadataQueries):
     @staticmethod
     def get_search_path() -> str:
         return '''
-            SHOW search_path;
+            SELECT DATABASE() AS current_database;
         '''
 
     @staticmethod
     def get_columns() -> str:
         return '''
-                        SELECT
+            SELECT
                 cols.table_schema AS schema_name,
                 cols.table_name,
                 cols.column_name,
@@ -104,47 +106,36 @@ class PostgresqlMetadataQueries(MetadataQueries):
                 cols.numeric_precision,
                 cols.numeric_scale,
                 (cols.is_nullable = 'YES') AS is_nullable,
-                fk.foreign_table_schema AS foreign_key_schema,
-                fk.foreign_table_name AS foreign_key_table,
-                fk.foreign_column_name AS foreign_key_column
+                fk.referenced_table_schema AS foreign_key_schema,
+                fk.referenced_table_name AS foreign_key_table,
+                fk.referenced_column_name AS foreign_key_column
             FROM information_schema.columns AS cols
 
-            -- Foreign Key
-            LEFT JOIN (
-                SELECT
-                    kcu.table_schema,
-                    kcu.table_name,
-                    kcu.column_name,
-                    ccu.table_schema AS foreign_table_schema,
-                    ccu.table_name AS foreign_table_name,
-                    ccu.column_name AS foreign_column_name
-                FROM information_schema.table_constraints tc
-                JOIN information_schema.key_column_usage kcu
-                ON tc.constraint_name = kcu.constraint_name
-                JOIN information_schema.constraint_column_usage ccu
-                ON tc.constraint_name = ccu.constraint_name
-                WHERE tc.constraint_type = 'FOREIGN KEY'
-            ) fk ON fk.table_schema = cols.table_schema
+            LEFT JOIN information_schema.key_column_usage fk
+                ON fk.table_schema = cols.table_schema
                 AND fk.table_name = cols.table_name
                 AND fk.column_name = cols.column_name
+                AND fk.referenced_table_name IS NOT NULL
 
-            WHERE cols.table_schema NOT IN ('pg_catalog', 'information_schema')
+            WHERE cols.table_schema NOT IN
+                ('mysql', 'information_schema', 'performance_schema', 'sys');
         '''
 
     @staticmethod
     def get_unique_columns() -> str:
         return '''
-        SELECT
+            SELECT
                 kcu.table_schema AS schema_name,
                 kcu.table_name,
                 tc.constraint_type,
-                array_agg(kcu.column_name ORDER BY kcu.ordinal_position) AS columns
+                GROUP_CONCAT(kcu.column_name ORDER BY kcu.ordinal_position) AS columns
             FROM information_schema.table_constraints tc
             JOIN information_schema.key_column_usage kcu
-            ON tc.constraint_name = kcu.constraint_name
-            AND tc.constraint_schema = kcu.constraint_schema
+                ON tc.constraint_name = kcu.constraint_name
+                AND tc.constraint_schema = kcu.constraint_schema
             WHERE tc.constraint_type IN ('UNIQUE', 'PRIMARY KEY')
-            AND kcu.table_schema NOT IN ('pg_catalog', 'information_schema')
+            AND kcu.table_schema NOT IN
+                ('mysql', 'information_schema', 'performance_schema', 'sys')
             GROUP BY
                 kcu.table_schema,
                 kcu.table_name,

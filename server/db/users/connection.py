@@ -1,19 +1,15 @@
 from abc import ABC, abstractmethod
-import datetime
-from server.sql import SQLCode, SQLException, QueryResult, QueryResultDataset, QueryResultError, QueryResultMessage, Column
+from server.sql import SQLCode, QueryResult
 from typing import Any
 
 from typing import Iterable
 
-
-import dav_tools
 
 class DatabaseConnection(ABC):
     def __init__(self, host: str, port: int, autocommit: bool = True):
         self.host = host
         self.port = port
         self.autocommit = autocommit
-        self.last_operation_ts = datetime.datetime.now()
 
     @abstractmethod
     def execute_sql(self, statement: SQLCode) -> Iterable[QueryResult]:
@@ -46,9 +42,6 @@ class DatabaseConnection(ABC):
         '''Commits the current transaction.'''
         pass
 
-    def update_last_operation_ts(self) -> None:
-        self.last_operation_ts = datetime.datetime.now()
-
     def __enter__(self):
         return self
     
@@ -60,10 +53,6 @@ class DatabaseConnection(ABC):
 
         self.close()
 
-    @property
-    def time_since_last_operation(self) -> datetime.timedelta:
-        return datetime.datetime.now() - self.last_operation_ts
-    
     @property
     @abstractmethod
     def notices(self) -> list[str]:
