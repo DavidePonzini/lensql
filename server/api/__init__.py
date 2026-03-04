@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_babel import Babel
 import os
+import dav_tools
 
 from .util import localization
 from server import db
@@ -14,7 +15,11 @@ def create_app() -> Flask:
     """Create and configure the Flask application."""
     
     app = Flask(__name__)
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'key')
+    jwt_secret_key = os.getenv('JWT_SECRET_KEY', 'key')
+    if len(jwt_secret_key.encode('utf-8')) < 32:
+        dav_tools.messages.critical_error('JWT_SECRET_KEY is less than 32 bytes long. Set a different JWT_SECRET_KEY environment variable for better security.')
+
+    app.config['JWT_SECRET_KEY'] = jwt_secret_key
     app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH', 1024*1024*20))   # 20MB
     app.config['BABEL_DEFAULT_LOCALE'] = 'en'
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = '../locales'  # Relative path starts from the app root, which is this file's directory
