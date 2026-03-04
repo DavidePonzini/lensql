@@ -87,7 +87,10 @@ class Database(ABC):
             except SQLException as e:
                 if conn is None:
                     return # cannot rollback if no connection
-                
+                if not conn.is_open():
+                    dav_tools.messages.debug(f'Connection for {self.dbname} is closed, cannot rollback. Exception: {e}')
+                    return # cannot rollback if connection is closed
+
                 try:
                     conn.rollback()
                     conn.update_last_operation_ts()
@@ -130,18 +133,33 @@ class Database(ABC):
         
         try:
             container = client.containers.get(self.hostname)
-            container.reload()  # refresh container status from Docker
-            if container:
-                dav_tools.messages.debug(f'Container "{container.name}" status: {container.status}')
-        
-            if container.status != 'running':
-                container.start()
-                container.reload()  # refresh container status after starting
-                dav_tools.messages.info(f'Started container for database {self.dbname} (container name: {container.name})')
-        
-            return container
         except docker.errors.NotFound:
             return self.create_container()
+        
+        container.reload()  # refresh container status from Docker
+        dav_tools.messages.debug(f'Container "{container.name}" status: {container.status}')
+
+        # If the container exists but is not running, start it.
+        # If it fails to start due to a network error, remove it and create it again
+        #   (this can happen if the network was removed while the container still exists).
+        try:
+            container.start()
+            return container
+        except docker.errors.APIError:
+            container_network_ids = [net['NetworkID'] for net in container.attrs['NetworkSettings']['Networks'].values()]
+            existing_network_ids = [net.id for net in client.networks.list()]
+
+            if not any(net_id in existing_network_ids for net_id in container_network_ids):
+                dav_tools.messages.warning(f'Container {container.name} is connected to a network that no longer exists. Removing container and creating a new one.')
+                # Remove container only (do NOT remove volumes)
+                try:
+                    container.remove(force=True)
+                except Exception:
+                    pass
+                return self.create_container()
+            
+            raise
+
 
     def get_connection(self, autocommit: bool = True, timeout_s: int = 30) -> DatabaseConnection:
         '''Gets a connection to the database, creating a new one if necessary.'''
@@ -151,9 +169,11 @@ class Database(ABC):
 
         while time.time() < deadline:
             try:
-                return self._get_connection(autocommit=autocommit)
+                conn = self._get_connection(autocommit=autocommit)
+                dav_tools.messages.info(f'Got connection for {self.hostname}')
+                return conn
             except Exception as e:
-                dav_tools.messages.warning(f'Failed to get connection for {self.hostname}: {e}')
+                dav_tools.messages.warning(f'Failed to get connection for {self.hostname}: {e}. Retrying in 1 second... (will timeout after {int(deadline - time.time())} seconds)')
                 time.sleep(1)
 
         raise Exception(f'Timeout getting connection for {self.hostname} after {timeout_s} seconds.')
@@ -180,6 +200,7 @@ class Database(ABC):
 
         with self.conn_lock:
             conn = self.get_connection(autocommit=autocommit)
+            dav_tools.messages.debug(f'Adding connection for {self.dbname} to pool.')
             self.connections[self.dbname] = conn
             return conn
 
