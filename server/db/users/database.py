@@ -88,7 +88,6 @@ class Database(ABC):
                 if conn is None:
                     return # cannot rollback if no connection
                 if not conn.is_open():
-                    dav_tools.messages.debug(f'Connection for {self.dbname} is closed, cannot rollback. Exception: {e}')
                     return # cannot rollback if connection is closed
 
                 try:
@@ -136,9 +135,6 @@ class Database(ABC):
         except docker.errors.NotFound:
             return self.create_container()
         
-        container.reload()  # refresh container status from Docker
-        dav_tools.messages.debug(f'Container "{container.name}" status: {container.status}')
-
         # If the container exists but is not running, start it.
         # If it fails to start due to a network error, remove it and create it again
         #   (this can happen if the network was removed while the container still exists).
@@ -170,7 +166,6 @@ class Database(ABC):
         while time.time() < deadline:
             try:
                 conn = self._get_connection(autocommit=autocommit)
-                dav_tools.messages.info(f'Got connection for {self.hostname}')
                 return conn
             except Exception as e:
                 dav_tools.messages.warning(f'Failed to get connection for {self.hostname}: {e}. Retrying in 1 second... (will timeout after {int(deadline - time.time())} seconds)')
@@ -196,11 +191,10 @@ class Database(ABC):
             # Stale connection in the pool, remove it and create a new one
             with self.conn_lock:
                 del self.connections[self.dbname]
-            dav_tools.messages.warning(f'Connection for {self.dbname} was closed, removed from pool. Creating a new connection.')
+            dav_tools.messages.info(f'Connection for {self.dbname} was closed, removed from pool. Creating a new connection.')
 
         with self.conn_lock:
             conn = self.get_connection(autocommit=autocommit)
-            dav_tools.messages.debug(f'Adding connection for {self.dbname} to pool.')
             self.connections[self.dbname] = conn
             return conn
 
@@ -375,6 +369,9 @@ class Database(ABC):
         except SQLException:
             # Connection was not opened, nothing to rollback
             if conn is None:
+                return None, False
+            
+            if not conn.is_open():
                 return None, False
             
             try:

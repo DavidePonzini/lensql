@@ -30,7 +30,23 @@ class PostgresqlConnection(DatabaseConnection):
             dav_tools.messages.error(f"Error closing PostgreSQL connection for user database {self.host}: {e}")
 
     def is_open(self) -> bool:
-        return self.connection and not self.connection.closed
+        # Quick local check first
+        if not self.connection or self.connection.closed:
+            return False
+
+        # Active check: forces a round-trip to the server
+        try:
+            with self.connection.cursor() as cur:
+                cur.execute('SELECT 1;')
+                cur.fetchone()
+            return True
+        except psycopg2.Error:
+            # The connection is broken/stale (e.g., container restarted)
+            try:
+                self.connection.close()
+            except Exception:
+                pass
+            return False
 
     def cursor(self):
         return self.connection.cursor()
