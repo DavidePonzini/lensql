@@ -53,8 +53,6 @@ services:
     restart: unless-stopped
     depends_on:
       - db_admin
-      # - db_users_postgres
-      # - db_users_mysql
     environment:
       - DB_HOST=db_admin
       - DB_PORT=5432
@@ -85,45 +83,9 @@ services:
     volumes:
       - db_admin_pgdata:/var/lib/postgresql/data
 
-  # db_users_postgres:
-  #   image: postgres:latest
-  #   command: -c 'max_connections=500'
-  #   container_name: ${COMPOSE_PROJECT_NAME}_db_users_postgres
-  #   restart: unless-stopped
-  #   environment:
-  #     POSTGRES_PASSWORD: password
-  #     POSTGRES_HOST_AUTH_METHOD: trust
-  #   volumes:
-  #     - db_users_pgdata:/var/lib/postgresql/data
-
-  # db_users_mysql:
-  #   image: mysql:latest
-  #   container_name: ${COMPOSE_PROJECT_NAME}_db_users_mysql
-  #   restart: unless-stopped
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: password
-  #   volumes:
-  #     - db_users_mysql_data:/var/lib/mysql
-
-  # docs_api:
-  #   image: docker.swagger.io/swaggerapi/swagger-ui
-  #   container_name: ${COMPOSE_PROJECT_NAME}_docs_api
-  #   restart: unless-stopped
-  #   environment:
-  #     - SWAGGER_JSON=/docs/api.yaml
-  #     - SUPPORTED_SUBMIT_METHODS=[]
-  #   volumes:
-  #     - ./docs/swaggerui:/docs
-  #   profiles:
-  #     - dev
-
 volumes:
   db_admin_pgdata:
     name: ${COMPOSE_PROJECT_NAME}_db_admin_pgdata
-  # db_users_pgdata:
-  #   name: ${COMPOSE_PROJECT_NAME}_db_users_pgdata
-  # db_users_mysql_data:
-  #   name: ${COMPOSE_PROJECT_NAME}_db_users_mysql_data
 
 networks:
   default:
