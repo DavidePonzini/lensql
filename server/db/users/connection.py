@@ -50,7 +50,6 @@ class DatabaseConnection(ABC):
         self.last_operation_ts = datetime.datetime.now()
 
     def __enter__(self):
-        dav_tools.messages.debug(f'{id(self)} Opened connection for user database {self.host}')
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -60,7 +59,6 @@ class DatabaseConnection(ABC):
             self.commit()
 
         self.close()
-        dav_tools.messages.debug(f'{id(self)} Closed connection for user database {self.host}')
 
     @property
     def time_since_last_operation(self) -> datetime.timedelta:

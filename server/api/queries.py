@@ -86,11 +86,8 @@ def run_query():
         }) + '\n'  # Important: one JSON object per line
 
         database = db.users.PostgresqlDatabase(user.username)
-        import dav_tools
         for query_result in database.execute_sql(query_str=query_str):
-            dav_tools.messages.debug(f'executed query: {query_str}')
             search_path = database.get_search_path()
-            dav_tools.messages.debug(f'current search path: {search_path}')
 
             query = db.admin.Query.log(
                 query_batch=batch,
@@ -103,11 +100,8 @@ def run_query():
             )
             query_result.query_id = query.query_id
 
-            dav_tools.messages.debug(f'context columns')
             context_columns = database.get_columns()
-            dav_tools.messages.debug(f'context columns: {context_columns}')
             context_unique_columns = database.get_unique_columns()
-            dav_tools.messages.debug(f'context unique columns: {context_unique_columns}')
 
             # Log context and errors for SELECT queries
             if query_result.query.query_type == 'SELECT':
