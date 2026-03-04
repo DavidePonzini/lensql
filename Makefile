@@ -14,11 +14,14 @@ endif
 
 .PHONY: $(VENV)_upgrade dev prod stop setup psql psql_users active_users dump clean locales_extract locales_compile recategorize_errors ipython
 
+prod: stop locales_compile
+	export PORT=$(PORT) && docker compose --profile prod up -d --build
+
 dev: stop locales_compile
 	export PORT=$(PORT) && docker compose --profile dev up --build
 
-prod: stop locales_compile
-	export PORT=$(PORT) && docker compose --profile prod up -d --build
+logs:
+	docker compose --profile dev --profile prod --profile maintenance logs -f
 
 stop:
 	docker compose --profile dev --profile prod --profile maintenance down

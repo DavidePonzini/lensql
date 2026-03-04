@@ -128,17 +128,21 @@ class MySQLMetadataQueries(MetadataQueries):
                 kcu.table_schema AS schema_name,
                 kcu.table_name,
                 tc.constraint_type,
-                GROUP_CONCAT(kcu.column_name ORDER BY kcu.ordinal_position) AS columns
-            FROM information_schema.table_constraints tc
-            JOIN information_schema.key_column_usage kcu
-                ON tc.constraint_name = kcu.constraint_name
-                AND tc.constraint_schema = kcu.constraint_schema
+                CONCAT(
+                    '{',
+                    GROUP_CONCAT(DISTINCT kcu.column_name SEPARATOR ','),
+                    '}'
+                ) AS columns
+            FROM information_schema.table_constraints AS tc
+            JOIN information_schema.key_column_usage AS kcu
+                ON  tc.constraint_schema = kcu.table_schema
+                AND tc.table_name = kcu.table_name
+                AND tc.constraint_name = kcu.constraint_name
             WHERE tc.constraint_type IN ('UNIQUE', 'PRIMARY KEY')
-            AND kcu.table_schema NOT IN
-                ('mysql', 'information_schema', 'performance_schema', 'sys')
+            AND kcu.table_schema NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys')
             GROUP BY
                 kcu.table_schema,
                 kcu.table_name,
-                kcu.constraint_name,
+                tc.constraint_name,
                 tc.constraint_type;
         '''
