@@ -265,13 +265,8 @@ def check_solution():
             attempts=attempts,
         )
 
-<<<<<<< HEAD
-    database = db.users.PostgresqlDatabase(user.username)
-    check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions, solution_search_path=dataset.search_path)
-=======
     database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
-    check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions, solution_search_path=exercise.search_path)
->>>>>>> dev/mysql
+    check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions, solution_search_path=dataset.search_path)
 
     batch = db.admin.QueryBatch.log(
         user=user,

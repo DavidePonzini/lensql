@@ -39,7 +39,8 @@ class DatasetsAPI(MethodView):
             title=title,
             description=description,
             dataset_str=dataset_str,
-            dbms=dbms
+            dbms=dbms,
+            search_path=dataset_search_path,
         )
         dataset.add_participant(user)
         dataset.set_owner_status(user, True)
@@ -56,26 +57,20 @@ class DatasetsAPI(MethodView):
         title = data['title']
         description = data['description']
         dataset_str = data['dataset']
-<<<<<<< HEAD
-        dataset_search_path = data.get('search_path', 'public') or 'public'   # Handle empty string
-=======
+        dataset_search_path = data['search_path'] or 'public'   # Handle empty string
         dbms = data['dbms']
->>>>>>> dev/mysql
 
         dataset = db.admin.Dataset(dataset_id)
         if not dataset.has_owner(user):
             return responses.response(False, message=_('You are not authorized to modify this dataset.'))
 
-<<<<<<< HEAD
-        dataset.update(title=title, description=description, dataset_str=dataset_str, search_path=dataset_search_path)
-=======
         dataset.update(
             title=title,
             description=description,
             dataset_str=dataset_str,
-            dbms=dbms
+            search_path=dataset_search_path,
+            dbms=dbms,
         )
->>>>>>> dev/mysql
 
         return responses.response(True)
 
@@ -100,11 +95,8 @@ def get_dataset(dataset_id):
         'title': dataset.name,
         'description': dataset.description,
         'dataset_str': dataset.dataset_str,
-<<<<<<< HEAD
         'search_path': dataset.search_path,
-=======
         'dbms': dataset.dbms,
->>>>>>> dev/mysql
     }
 
     return responses.response(True, data=result)
