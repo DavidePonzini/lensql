@@ -46,15 +46,11 @@ ipython: $(VENV)
 psql:
 	docker exec -it $(COMPOSE_PROJECT_NAME)_db_admin psql -U postgres
 
-psql_users:
-	docker exec -it $(COMPOSE_PROJECT_NAME)_db_users psql -U postgres
-
 active_users:
 	docker exec -t $(COMPOSE_PROJECT_NAME)_db_admin psql -U postgres -c "SELECT * FROM lensql.v_active_users;"
 
 dump:
 	docker exec -t $(COMPOSE_PROJECT_NAME)_db_admin pg_dump -U postgres -n lensql > dump_admin_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
-	docker exec -t $(COMPOSE_PROJECT_NAME)_db_users pg_dumpall -U postgres > dump_users_$(shell date +'%Y.%m.%d-%H.%M.%S').sql
 
 locales_extract: $(VENV)
 	$(VENV_BIN)/pybabel extract -F server/babel.cfg -o server/messages.pot server/
