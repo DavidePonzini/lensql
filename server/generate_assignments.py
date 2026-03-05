@@ -67,6 +67,7 @@ def generate_assignment(
             dataset_str=dataset_str,
             domain=domain,
             search_path=schema_name,
+            dbms=sql_dialect,
         )
     else:
         # Use existing dataset
