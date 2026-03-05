@@ -59,7 +59,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE badges (
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if badges exist
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
     badge VARCHAR(255) NOT NULL,        -- e.g. 'name.level' (in this way we can keep ts of each level achieved)
     ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
@@ -67,7 +67,7 @@ CREATE TABLE badges (
 );
 
 CREATE TABLE user_unique_queries (
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if unique queries exist
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
     query_hash TEXT NOT NULL,
 
     PRIMARY KEY (username, query_hash)
@@ -84,8 +84,8 @@ CREATE TABLE datasets (
 );
 
 CREATE TABLE dataset_members (
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,
-    dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- dataset can only be deleted if no members are present
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
+    dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE CASCADE,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_owner BOOLEAN NOT NULL DEFAULT FALSE,
     joined_ts TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -103,15 +103,15 @@ CREATE TABLE errors (
 
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
-    dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of dataset if exercises are assigned
+    dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE CASCADE,
     is_hidden BOOLEAN NOT NULL DEFAULT TRUE,
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
     solutions TEXT NOT NULL DEFAULT '[]',  -- JSON array of solution strings
-    created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if exercises are assigned
+    created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     generation_difficulty INTEGER DEFAULT NULL,
-    generation_error INTEGER DEFAULT NULL REFERENCES errors(id) ON DELETE SET NULL ON UPDATE CASCADE
+    generation_error INTEGER DEFAULT NULL REFERENCES errors(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE learning_objectives (
@@ -120,16 +120,16 @@ CREATE TABLE learning_objectives (
 
 CREATE TABLE has_learning_objective (
     exercise_id INTEGER NOT NULL REFERENCES exercises(id),
-    objective_id VARCHAR(255) NOT NULL REFERENCES learning_objectives(id) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of objective if it is associated with an exercise
+    objective_id VARCHAR(255) NOT NULL REFERENCES learning_objectives(id) ON UPDATE CASCADE ON DELETE CASCADE,
 
     PRIMARY KEY (exercise_id, objective_id)
 );
 
 CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE RESTRICT,  -- prevent deletion of user if queries exist
+    username VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
     ts TIMESTAMP NOT NULL DEFAULT NOW(),
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE RESTRICT   -- prevent deletion of exercise if queries exist
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE CASCADE
 );
 
 CREATE TABLE queries (

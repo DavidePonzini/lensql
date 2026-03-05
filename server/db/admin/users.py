@@ -299,7 +299,7 @@ class User:
         badge_names = [row[0] for row in result]
 
 
-        info = self._load_properties()
+        self._load_properties()
 
         current_level_up = gamification.XP(self.xp).level
         current_queries_unique = self.count_unique_queries()

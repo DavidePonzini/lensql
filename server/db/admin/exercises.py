@@ -295,21 +295,38 @@ class Exercise:
     def delete(self) -> bool:
         '''Delete an exercise'''
 
-        try:
-            query = database.sql.SQL('''
-                DELETE FROM {schema}.exercises
-                WHERE id = {exercise_id}
-            ''').format(
-                schema=database.sql.Identifier(SCHEMA),
-                exercise_id=database.sql.Placeholder('exercise_id')
+        query = database.sql.SQL('''
+            SELECT EXISTS (
+                SELECT 1
+                FROM {schema}.query_batches qb
+                WHERE qb.exercise_id = {exercise_id}
             )
-            db.execute(query, {
-                'exercise_id': self.exercise_id
-            })
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            exercise_id=database.sql.Placeholder('exercise_id')
+        )
+        result = db.execute_and_fetch(query, {
+            'exercise_id': self.exercise_id
+        })
 
-            return True
-        except Exception:
+        is_in_use = result[0][0]
+
+        if is_in_use:
             return False
+
+        query = database.sql.SQL('''
+            DELETE FROM {schema}.exercises e
+            WHERE
+                e.id = {exercise_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            exercise_id=database.sql.Placeholder('exercise_id')
+        )
+        db.execute(query, {
+            'exercise_id': self.exercise_id
+        })
+
+        return True
     # endregion
 
     # region Learning Objectives

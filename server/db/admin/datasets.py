@@ -231,8 +231,14 @@ class Dataset:
 
         query = database.sql.SQL(
         '''
-            DELETE FROM {schema}.datasets
-            WHERE id = {dataset_id}
+            DELETE FROM {schema}.datasets d
+            WHERE
+                d.id = {dataset_id}
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM {schema}.exercises e
+                    WHERE e.dataset_id = d.id
+                )
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             dataset_id=database.sql.Placeholder('dataset_id')
