@@ -12,20 +12,16 @@ NETWORK_NAME = os.getenv('DB_USERS_NETWORK', 'db_users')
 
 
 class MySQLDatabase(Database):
-    Database.admin_username = 'root'
-
-    Database.builtin_queries = MySQLBuiltinQueries
-    Database.metadata_queries = MySQLMetadataQueries
-
-    Database.data_types = DATA_TYPES
-
-    @property
-    def dbms_name(self) -> str:
-        return 'mysql'
-
-    @property
-    def port(self) -> int:
-        return 3306
+    def __init__(self, dbname: str):
+        super().__init__(
+            dbname=dbname,
+            port=3306,
+            dbms_name='mysql',
+            admin_username='root',
+            builtin_queries=MySQLBuiltinQueries,
+            metadata_queries=MySQLMetadataQueries,
+            data_types=DATA_TYPES,
+        )
 
     def create_container(self) -> Container:
         client = docker.from_env()

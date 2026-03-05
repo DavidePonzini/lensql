@@ -20,25 +20,28 @@ PROJECT_NAME = os.getenv('COMPOSE_PROJECT_NAME', 'lensql')
 
 class Database(ABC):
     connections: dict[str, DatabaseConnection] = {}
-    '''Pool of active connections. Keyed by dbname (which always matches the username).'''
+    '''Pool of active connections. Keyed by `username_dbms`.'''
     conn_lock: threading.Lock = threading.Lock()
     '''Lock for accessing the connections pool.'''
     
-    admin_username: str = ''
-    '''Username of the admin user for this database type.'''
-
-    builtin_queries: type[BuiltinQueries]
-    '''Class containing raw SQL queries for built-in operations.'''
-    metadata_queries: type[MetadataQueries]
-    '''Class containing raw SQL queries for metadata operations.'''
-
-    data_types: dict[int, str] = {}
-    '''Mapping of data type codes to their names.'''
-
-    project_name = os.getenv('COMPOSE_PROJECT_NAME', 'lensql')
-
-    def __init__(self, dbname: str):
+    def __init__(
+            self,
+            dbname: str,
+            *,
+            port: int,
+            dbms_name: str,
+            admin_username: str,
+            builtin_queries: type[BuiltinQueries],
+            metadata_queries: type[MetadataQueries],
+            data_types: dict[int, str],
+        ):
         self.dbname = dbname
+        self.port = port
+        self.dbms_name = dbms_name
+        self.admin_username = admin_username
+        self.builtin_queries = builtin_queries
+        self.metadata_queries = metadata_queries
+        self.data_types = data_types
 
     def get_datatype_name(self, data_type_code: int) -> str:
         '''Returns the name of the data type for the given type code, or the code itself if not found.'''
@@ -94,12 +97,6 @@ class Database(ABC):
 
     # region Connections
     @property
-    @abstractmethod
-    def dbms_name(self) -> str:
-        '''Returns the name of the DBMS for this database (e.g. "postgresql", "mysql", etc.).'''
-        pass
-
-    @property
     def hostname(self) -> str:
         '''Returns the hostname to connect to the database container.'''
         return f'{PROJECT_NAME}_db_user_{self.dbname}_{self.dbms_name}'
@@ -108,15 +105,9 @@ class Database(ABC):
     def container_labels(self) -> list[str]:
         '''Returns the labels to identify the database container.'''
         return [
-            f'{self.project_name}_db_user'
+            f'{PROJECT_NAME}_db_user'
         ]
     
-    @property
-    @abstractmethod
-    def port(self) -> int:
-        '''Returns the port to connect to the database container.'''
-        pass
-
     @abstractmethod
     def create_container(self) -> Container:
         '''Creates a Docker container with the given name.'''
@@ -177,8 +168,8 @@ class Database(ABC):
     def connect(self, autocommit: bool = True) -> DatabaseConnection:
         '''Connects to the database as the specified user.'''
         
-        if self.dbname in self.connections:
-            conn = self.connections[self.dbname]
+        if f'{self.dbname}_{self.dbms_name}' in self.connections:
+            conn = self.connections[f'{self.dbname}_{self.dbms_name}']
 
             if conn.is_open():
                 conn.clear_notices()
@@ -186,12 +177,12 @@ class Database(ABC):
             
             # Stale connection in the pool, remove it and create a new one
             with self.conn_lock:
-                del self.connections[self.dbname]
+                del self.connections[f'{self.dbname}_{self.dbms_name}']
             dav_tools.messages.info(f'Connection for {self.dbname} was closed, removed from pool. Creating a new connection.')
 
         with self.conn_lock:
             conn = self.get_connection(autocommit=autocommit)
-            self.connections[self.dbname] = conn
+            self.connections[f'{self.dbname}_{self.dbms_name}'] = conn
             return conn
 
     def connect_as_admin(self, autocommit: bool = True) -> DatabaseConnection:

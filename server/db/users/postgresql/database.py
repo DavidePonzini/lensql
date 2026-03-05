@@ -1,4 +1,6 @@
 
+from server.db.users.queries import BuiltinQueries, MetadataQueries
+
 from .data_types import DATA_TYPES
 from .connection import PostgresqlConnection
 from .queries import PostgresqlBuiltinQueries, PostgresqlMetadataQueries
@@ -12,21 +14,17 @@ from docker.models.containers import Container
 NETWORK_NAME = os.getenv('DB_USERS_NETWORK', 'db_users')
 
 class PostgresqlDatabase(Database):
-    Database.admin_username = 'postgres'
+    def __init__(self, dbname: str,):
+        super().__init__(
+            dbname=dbname,
+            port=5432,
+            dbms_name='postgresql',
+            admin_username='postgres',
+            builtin_queries=PostgresqlBuiltinQueries,
+            metadata_queries=PostgresqlMetadataQueries,
+            data_types=DATA_TYPES,
+        )
 
-    Database.builtin_queries = PostgresqlBuiltinQueries
-    Database.metadata_queries = PostgresqlMetadataQueries
-
-    Database.data_types = DATA_TYPES
-
-    @property
-    def dbms_name(self) -> str:
-        return 'postgresql'
-    
-    @property
-    def port(self) -> int:
-        return 5432
-    
     def create_container(self) -> Container:
         client = docker.from_env()
 
