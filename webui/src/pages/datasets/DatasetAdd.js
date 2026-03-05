@@ -13,6 +13,7 @@ function DatasetAdd({ refresh, className }) {
     const [description, setDescription] = useState('');
     const [dataset, setDataset] = useState('');
     const [searchPath, setSearchPath] = useState('');
+    const [dbms, setDbms] = useState('');
 
     async function handleAdd() {
         await apiRequest('/api/datasets', 'POST', {
@@ -20,6 +21,7 @@ function DatasetAdd({ refresh, className }) {
             'description': description,
             'dataset': dataset,
             'search_path': searchPath,
+            'dbms': dbms,
         });
 
         refresh();
@@ -54,6 +56,8 @@ function DatasetAdd({ refresh, className }) {
                 setDataset={setDataset}
                 searchPath={searchPath}
                 setSearchPath={setSearchPath}
+                dbms={dbms}
+                setDbms={setDbms}
             />
         </ButtonModal>
     );

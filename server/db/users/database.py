@@ -1,26 +1,22 @@
-from dataclasses import dataclass
-
-from server.sql.result.dataset import QueryResultDataset
 
 from .connection import DatabaseConnection
 from .queries import BuiltinQueries, MetadataQueries
-from .solution import CheckExecutionStatus, result_dataset, result_message, CheckResult, CheckResultMessage, CheckResultDataset
+from .solution import CheckExecutionStatus, result_message, CheckResult, CheckResultMessage, CheckResultDataset
+from ...sql import SQLCode, QueryResult, SQLException, QueryResultError, QueryResultDataset
 
-from server.sql import SQLCode, QueryResult, SQLException, QueryResultError, Column
-
-from abc import ABC, abstractmethod
 import threading
 import time
-import datetime
 import os
 import dav_tools
+import docker
+import docker.errors
+from docker.models.containers import Container
+from abc import ABC, abstractmethod
 from typing import Iterable
-import pandas as pd
 from flask_babel import _
 from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
 
-MAX_CONNECTION_AGE = datetime.timedelta(hours=float(os.getenv('MAX_CONNECTION_HOURS', '4')))
-CLEANUP_INTERVAL_SECONDS = int(os.getenv('CLEANUP_INTERVAL_SECONDS', '60'))
+PROJECT_NAME = os.getenv('COMPOSE_PROJECT_NAME', 'lensql')
 
 class Database(ABC):
     connections: dict[str, DatabaseConnection] = {}
@@ -38,6 +34,8 @@ class Database(ABC):
 
     data_types: dict[int, str] = {}
     '''Mapping of data type codes to their names.'''
+
+    project_name = os.getenv('COMPOSE_PROJECT_NAME', 'lensql')
 
     def __init__(self, dbname: str):
         self.dbname = dbname
@@ -77,15 +75,14 @@ class Database(ABC):
                         result.query = SQLCode(builtin_name, builtin=True)
                     
                     yield result
-
-                conn.update_last_operation_ts()
             except SQLException as e:
                 if conn is None:
                     return # cannot rollback if no connection
-                
+                if not conn.is_open():
+                    return # cannot rollback if connection is closed
+
                 try:
                     conn.rollback()
-                    conn.update_last_operation_ts()
                 except Exception as e2:     # catch all to avoid handling each DB exception separately
                     dav_tools.messages.error(f'Error rolling back connection for db "{self.dbname}": {e2}')
                 
@@ -95,22 +92,86 @@ class Database(ABC):
                     notices=conn.notices)
     # endregion
 
-    # region Database Creation
+    # region Connections
+    @property
     @abstractmethod
-    def init(self, password: str) -> bool:
-        '''Initializes the database.'''
+    def dbms_name(self) -> str:
+        '''Returns the name of the DBMS for this database (e.g. "postgresql", "mysql", etc.).'''
+        pass
+
+    @property
+    def hostname(self) -> str:
+        '''Returns the hostname to connect to the database container.'''
+        return f'{PROJECT_NAME}_db_user_{self.dbname}_{self.dbms_name}'
+    
+    @property
+    def container_labels(self) -> list[str]:
+        '''Returns the labels to identify the database container.'''
+        return [
+            f'{self.project_name}_db_user'
+        ]
+    
+    @property
+    @abstractmethod
+    def port(self) -> int:
+        '''Returns the port to connect to the database container.'''
         pass
 
     @abstractmethod
-    def exists(self) -> bool:
-        '''Checks if the database exists.'''
+    def create_container(self) -> Container:
+        '''Creates a Docker container with the given name.'''
         pass
-    # endregion        
-    
-    # region Connections
+
+    def start_container(self) -> Container:
+        '''Gets the Docker container for the given username, or creates it if it doesn't exist.'''
+        
+        client = docker.from_env()
+        
+        try:
+            container = client.containers.get(self.hostname)
+        except docker.errors.NotFound:
+            return self.create_container()
+        
+        # If the container exists but is not running, start it.
+        # If it fails to start due to a network error, remove it and create it again
+        #   (this can happen if the network was removed while the container still exists).
+        try:
+            container.start()
+            return container
+        except docker.errors.APIError:
+            container_network_ids = [net['NetworkID'] for net in container.attrs['NetworkSettings']['Networks'].values()]
+            existing_network_ids = [net.id for net in client.networks.list()]
+
+            if not any(net_id in existing_network_ids for net_id in container_network_ids):
+                dav_tools.messages.warning(f'Container {container.name} is connected to a network that no longer exists. Removing container and creating a new one.')
+                # Remove container only (do NOT remove volumes)
+                try:
+                    container.remove(force=True)
+                except Exception:
+                    pass
+                return self.create_container()
+            
+            raise
+
+    def get_connection(self, autocommit: bool = True, timeout_s: int = 30) -> DatabaseConnection:
+        '''Gets a connection to the database, creating a new one if necessary.'''
+        self.start_container() # ensure container is running before connecting
+
+        deadline = time.time() + timeout_s
+
+        while time.time() < deadline:
+            try:
+                conn = self._get_connection(autocommit=autocommit)
+                return conn
+            except Exception as e:
+                dav_tools.messages.warning(f'Failed to get connection for {self.hostname}: {e}. Retrying in 1 second... (will timeout after {int(deadline - time.time())} seconds)')
+                time.sleep(1)
+
+        raise Exception(f'Timeout getting connection for {self.hostname} after {timeout_s} seconds.')
+
     @abstractmethod
-    def _get_connection(self, username: str, autocommit: bool = True) -> DatabaseConnection:
-        '''Gets a connection for the specified user.'''
+    def _get_connection(self, autocommit: bool = True) -> DatabaseConnection:
+        '''Gets a connection to the database.'''
         pass
 
     def connect(self, autocommit: bool = True) -> DatabaseConnection:
@@ -118,11 +179,18 @@ class Database(ABC):
         
         if self.dbname in self.connections:
             conn = self.connections[self.dbname]
-            conn.clear_notices()
-            return conn
-        
+
+            if conn.is_open():
+                conn.clear_notices()
+                return conn
+            
+            # Stale connection in the pool, remove it and create a new one
+            with self.conn_lock:
+                del self.connections[self.dbname]
+            dav_tools.messages.info(f'Connection for {self.dbname} was closed, removed from pool. Creating a new connection.')
+
         with self.conn_lock:
-            conn = self._get_connection(self.dbname, autocommit=autocommit)
+            conn = self.get_connection(autocommit=autocommit)
             self.connections[self.dbname] = conn
             return conn
 
@@ -131,42 +199,7 @@ class Database(ABC):
             Connects to the database as the admin user.
             This connection is not added to the connection pool.
         '''
-        return self._get_connection(self.admin_username, autocommit=autocommit)
-    # endregion
-
-    # region Cleanup
-    @staticmethod
-    def _connection_cleanup_thread() -> None:
-        '''
-        Thread that cleans up idle connections.
-        '''
-        while True:
-            # Sleep first to avoid immediate cleanup on startup
-            time.sleep(CLEANUP_INTERVAL_SECONDS)
-
-            with Database.conn_lock:
-                to_remove = []  # don't remove while iterating
-
-                for username, conn in Database.connections.items():
-                    if conn.time_since_last_operation.total_seconds() > 300:  # 5 minutes idle
-                        conn.close()
-                        to_remove.append(username)
-
-                for username in to_remove:
-                    try:
-                        del Database.connections[username]
-                        dav_tools.messages.info(f"Closed expired connection for user: {username}")
-                    except Exception as e:
-                        dav_tools.messages.error(f"Error closing connection for user {username}: {e}")
-
-    @staticmethod
-    def start_cleanup_thread() -> None:
-        '''
-            Starts a thread that will periodically check for expired connections
-            and close them if they are older than MAX_CONNECTION_AGE.
-        '''
-        cleanup_thread = threading.Thread(target=Database._connection_cleanup_thread, daemon=True)
-        cleanup_thread.start()
+        return self.get_connection(autocommit=autocommit)
     # endregion
 
     # region Builtin Queries
@@ -202,6 +235,11 @@ class Database(ABC):
     # endregion
 
     # region Metadata Queries
+    def set_search_path(self, search_path: str) -> None:
+        '''Sets the search path for the current connection.'''
+
+        self.connect().execute_sql_raw(self.metadata_queries.set_search_path(search_path))
+
     def get_search_path(self) -> str:
         '''Returns the current search path for the user.'''
 
@@ -278,12 +316,12 @@ class Database(ABC):
             if search_path is not None:
                 # Set the search path for the connection, and reset it back to the original after executing the query
                 current_search_path = self.get_search_path()
-                conn.execute_sql_raw(f'SET search_path TO {search_path};')
+                self.set_search_path(search_path)
 
                 results = conn.execute_sql(statement)
                 dataset = next(iter(results), None) # iterator needs to be exhausted here, before resetting search path
 
-                conn.execute_sql_raw(f'SET search_path TO {current_search_path};')
+                self.set_search_path(current_search_path)
             else:
                 results = conn.execute_sql(statement)
                 dataset = next(iter(results), None)
@@ -292,16 +330,17 @@ class Database(ABC):
             if not isinstance(dataset, QueryResultDataset):
                 return None, False
 
-            conn.update_last_operation_ts()
             return dataset, True
         except SQLException:
             # Connection was not opened, nothing to rollback
             if conn is None:
                 return None, False
             
+            if not conn.is_open():
+                return None, False
+            
             try:
                 conn.rollback()
-                conn.update_last_operation_ts()
             except Exception as e2:     # catch all to avoid handling each DB exception separately
                 dav_tools.messages.error(f'Error rolling back connection for db "{self.dbname}": {e2}')
             

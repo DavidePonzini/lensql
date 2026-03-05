@@ -5,6 +5,7 @@ from ... import gamification
 from ...gamification.rewards import Badges
 
 import bcrypt
+import re
 
 def _hash_password(password: str) -> str:
     '''Hash a password using bcrypt'''
@@ -18,7 +19,9 @@ class User:
     '''User data model'''
 
     def __init__(self, username: str):
-        self.username = username
+        # Normalize username to prevent issues with database names and container names
+        self.username = re.sub(r'[^a-zA-Z0-9_]', '_', username)
+        assert re.match(r'^[a-zA-Z0-9_]+$', self.username), 'Username can only contain letters, numbers, and underscores'
 
         # Lazy properties
         self._badges: list[str] | None = None
@@ -179,7 +182,7 @@ class User:
             is_teacher=database.sql.Placeholder('is_teacher'),
             is_admin=database.sql.Placeholder('is_admin')
         )
-
+        
         db.execute(query, {
             'username': self.username,
             'password_hash': hashed_password,
@@ -1224,7 +1227,7 @@ class User:
             - exercises: The number of exercises in the dataset
             - queries_user: The number of queries run by the user
             - queries_students: The number of queries run by students (0 if the user is not a teacher)
-        
+            - dbms: The DBMS of the dataset
         '''
 
         query = database.sql.SQL(
@@ -1234,6 +1237,7 @@ class User:
                 name,
                 description,
                 search_path,
+                dbms,
                 is_owner,
                 joined_ts,
                 participants,
@@ -1256,11 +1260,12 @@ class User:
             'title': row[1],
             'description': row[2],
             'search_path': row[3],
-            'is_owner': bool(row[4]),
-            'joined_ts': row[5],
-            'participants': int(row[6]),
-            'exercises': int(row[7]),
-            'queries_user': int(row[8]),
-            'queries_students': int(row[9])
+            'dbms': row[4],
+            'is_owner': bool(row[5]),
+            'joined_ts': row[6],
+            'participants': int(row[7]),
+            'exercises': int(row[8]),
+            'queries_user': int(row[9]),
+            'queries_students': int(row[10])
         } for row in result]
     # endregion

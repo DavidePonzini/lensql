@@ -2,15 +2,19 @@ from ..queries import BuiltinQueries, MetadataQueries
 
 class PostgresqlBuiltinQueries(BuiltinQueries):
     @staticmethod
+    def set_search_path(search_path: str) -> str:
+        return f'''
+            SET search_path TO {search_path};
+        '''
+
+    @staticmethod
     def show_search_path() -> str:
-        '''Shows the search path for the database.'''
         return '''
             SHOW search_path;
         '''
 
     @staticmethod
     def list_users() -> str:
-        '''Lists all users in the database.'''
         return '''
             SELECT
                 usename AS username
@@ -22,7 +26,6 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
     
     @staticmethod
     def list_schemas() -> str:
-        '''Lists all schemas in the database.'''
         return '''
             SELECT
                 schema_name,
@@ -35,7 +38,6 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
 
     @staticmethod
     def list_tables() -> str:
-        '''Lists tables in the current search_path.'''
         return '''
             SELECT
                 table_schema AS schema,
@@ -52,7 +54,6 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
 
     @staticmethod
     def list_all_tables() -> str:
-        '''Lists all tables in the database.'''
         return '''
             SELECT
                 table_schema AS schema,
@@ -67,7 +68,6 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
 
     @staticmethod
     def list_constraints() -> str:
-        '''Lists all constraints in the database.'''
         return '''
             SELECT
                 tc.table_schema AS schema,
@@ -89,14 +89,12 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
 class PostgresqlMetadataQueries(MetadataQueries):
     @staticmethod
     def get_search_path() -> str:
-        '''Returns the current search path for the user.'''
         return '''
             SHOW search_path;
         '''
 
     @staticmethod
     def get_columns() -> str:
-        '''Lists all tables and their columns.'''
         return '''
                         SELECT
                 cols.table_schema AS schema_name,
@@ -135,7 +133,6 @@ class PostgresqlMetadataQueries(MetadataQueries):
 
     @staticmethod
     def get_unique_columns() -> str:
-        '''Lists unique columns.'''
         return '''
         SELECT
                 kcu.table_schema AS schema_name,

@@ -1,30 +1,30 @@
 from abc import ABC, abstractmethod
-import datetime
-from server.sql import SQLCode, SQLException, QueryResult, QueryResultDataset, QueryResultError, QueryResultMessage, Column
+from server.sql import SQLCode, QueryResult
 from typing import Any
 
 from typing import Iterable
 
 
-import dav_tools
-
 class DatabaseConnection(ABC):
-    def __init__(self, dbname: str, username: str, autocommit: bool = True):
-        self.dbname = dbname
-        self.username = username
+    def __init__(self, host: str, port: int, autocommit: bool = True):
+        self.host = host
+        self.port = port
         self.autocommit = autocommit
-        self.last_operation_ts = datetime.datetime.now()
 
     @abstractmethod
     def execute_sql(self, statement: SQLCode) -> Iterable[QueryResult]:
         '''Executes the given SQLCode statement and yields QueryResult objects.'''
-        dav_tools.messages.debug(f'{id(self)} Executing SQL for user {self.username} on database {self.dbname}: {statement}')
 
         pass
 
     @abstractmethod
     def execute_sql_raw(self, statement: str) -> list[tuple[Any, ...]]:
         '''Executes the given SQL statement and returns the raw results as a list of tuples.'''
+        pass
+
+    @abstractmethod
+    def is_open(self) -> bool:
+        '''Returns True if the connection is open, False otherwise.'''
         pass
 
     @abstractmethod
@@ -42,11 +42,7 @@ class DatabaseConnection(ABC):
         '''Commits the current transaction.'''
         pass
 
-    def update_last_operation_ts(self) -> None:
-        self.last_operation_ts = datetime.datetime.now()
-
     def __enter__(self):
-        dav_tools.messages.debug(f'{id(self)} Opened connection for user {self.username} to database {self.dbname}')
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -56,12 +52,7 @@ class DatabaseConnection(ABC):
             self.commit()
 
         self.close()
-        dav_tools.messages.debug(f'{id(self)} Closed connection for user {self.username} to database {self.dbname}')
 
-    @property
-    def time_since_last_operation(self) -> datetime.timedelta:
-        return datetime.datetime.now() - self.last_operation_ts
-    
     @property
     @abstractmethod
     def notices(self) -> list[str]:

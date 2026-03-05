@@ -93,18 +93,19 @@ function DatasetList() {
                     <p className="loading">{t('pages.datasets.dataset_list.loading')}</p>
                 )}
 
-                {datasets.map((cl) => (
+                {datasets.map((dataset) => (
                     <DatasetCard
-                        key={cl.dataset_id}
-                        title={cl.title}
-                        description={cl.description}
-                        datasetId={cl.dataset_id}
-                        isOwner={cl.is_owner}
-                        participants={cl.participants}
-                        exercises={cl.exercises}
-                        queriesUser={cl.queries_user}
-                        queriesStudents={cl.queries_students}
+                        key={dataset.dataset_id}
+                        title={dataset.title}
+                        description={dataset.description}
+                        datasetId={dataset.dataset_id}
+                        isOwner={dataset.is_owner}
+                        participants={dataset.participants}
+                        exercises={dataset.exercises}
+                        queriesUser={dataset.queries_user}
+                        queriesStudents={dataset.queries_students}
                         refreshDatasets={getDatasets}
+                        dbms={dataset.dbms}
                     />
                 ))}
             </CardList>

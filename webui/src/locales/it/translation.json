@@ -235,7 +235,8 @@
                 "title_placeholder": "Titolo descrittivo del dataset",
                 "description_placeholder": "Breve descrizione dello scopo del dataset",
                 "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;",
-                "search_path_label": "Search path della soluzione"
+                "search_path_label": "Search path della soluzione",
+                "dbms_label": "DBMS"
             },
             "dataset_update": {
                 "modal_title": "Modifica Dataset",
@@ -354,6 +355,7 @@
             "username": "Nome utente",
             "usernamePlaceholder": "Nome utente",
             "usernameRequired": "Inserisci un nome utente.",
+            "usernameInvalid": "Il nome utente può contenere solo lettere, numeri e underscore.",
             "password": "Password",
             "passwordPlaceholder": "Password",
             "passwordRequired": "Inserisci una password.",
@@ -373,6 +375,7 @@
             "username": "Nome utente",
             "usernamePlaceholder": "Nome utente",
             "usernameRequired": "Inserisci un nome utente.",
+            "usernameInvalid": "Il nome utente può contenere solo lettere, numeri e underscore.",
             "password": "Password",
             "passwordPlaceholder": "Password",
             "passwordRequired": "Inserisci una password.",

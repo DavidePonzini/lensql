@@ -12,7 +12,18 @@ import LearningStatsAll from '../../components/learningStats/LearningStatsAll';
 
 import DatasetUpdate from './DatasetUpdate';
 
-function DatasetCard({ title, description, datasetId, isOwner = false, participants, exercises, queriesUser, queriesStudents, refreshDatasets }) {
+function DatasetCard({
+    title,
+    description,
+    datasetId,
+    isOwner = false,
+    participants,
+    exercises,
+    queriesUser,
+    queriesStudents,
+    refreshDatasets,
+    dbms,
+}) {
     const { apiRequest } = useAuth();
     const { userInfo } = useUserInfo();
     const { t } = useTranslation();
@@ -63,14 +74,26 @@ function DatasetCard({ title, description, datasetId, isOwner = false, participa
             <Card.Header>
                 <h5 className="card-title">
                     {title}
-                    {isNew && (
-                        <span className="badge bg-success ms-2">{t('pages.datasets.dataset_card.badge_new')}</span>
-                    )}
+
+                    <div className='vr mx-2 mb-1' style={{ verticalAlign: 'middle', height: '2.5rem' }} />
+
+                    <small className='text-body-secondary'>
+                        {dbms == 'postgresql' && 'PostgreSQL'}
+                        {dbms == 'mysql' && 'MySQL'}
+                        {dbms == 'sqlserver' && 'SQL Server'}
+                        {dbms == 'oracle' && 'Oracle'}
+                        {dbms == 'sqlite' && 'SQLite'}
+                    </small>
+
                     {isSpecial && (
                         <span className="badge bg-secondary ms-2">
                             <i className="fa fa-thumbtack me-1"></i>
                             {t('pages.datasets.dataset_card.badge_special')}
                         </span>
+                    )}
+
+                    {isNew && (
+                        <span className="badge bg-success ms-2">{t('pages.datasets.dataset_card.badge_new')}</span>
                     )}
                 </h5>
                 <h6 className="card-subtitle text-muted">{description}</h6>

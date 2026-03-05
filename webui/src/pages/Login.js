@@ -30,6 +30,11 @@ function Login() {
             setUsernameError(t('pages.login.usernameRequired'));
             return;
         }
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            setIsUsernameValid(false);
+            setUsernameError(t('pages.login.usernameInvalid'));
+            return;
+        }
 
         setIsUsernameValid(true);
         setUsernameError('');

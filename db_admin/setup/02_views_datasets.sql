@@ -9,6 +9,7 @@ SELECT
     d.name,
     d.description,
     d.search_path,
+    d.dbms,
     dm.is_owner,
     dm.joined_ts,
 

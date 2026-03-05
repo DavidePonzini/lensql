@@ -23,6 +23,7 @@ if __name__ == '__main__':
             'name': 'Explore SQL',
             'description': 'Sandbox environment to explore SQL queries without restrictions.',
             'search_path': 'public',
+            'dbms': 'postgresql',
             'exercises': [
                 {
                     'name': 'Explore SQL',
@@ -36,7 +37,8 @@ if __name__ == '__main__':
             'id': '_WELCOME_MIEDEMA',
             'name': 'Sample Dataset: Miedema',
             'description': 'A sample dataset for practicing queries.',
-                'search_path': 'miedema',
+            'search_path': 'miedema',
+            'dbms': 'postgresql',
             'exercises': [
                 {
                     'name': 'Exercise 1',
@@ -93,7 +95,8 @@ if __name__ == '__main__':
                 description=ds['description'],
                 dataset_str=dataset_str,
                 dataset_id=ds['id'],
-                search_path=ds['search_path']
+                search_path=ds['search_path'],
+                dbms=ds['dbms'],
             )
             db_exists = False
             messages.success(f'  Dataset {ds["name"]} created successfully.')

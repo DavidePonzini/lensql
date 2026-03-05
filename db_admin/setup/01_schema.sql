@@ -79,7 +79,8 @@ CREATE TABLE datasets (
     description TEXT NOT NULL DEFAULT '',
     dataset TEXT DEFAULT NULL,
     domain VARCHAR(255) DEFAULT NULL,
-    search_path TEXT NOT NULL DEFAULT 'public'
+    search_path TEXT NOT NULL DEFAULT 'public',
+    dbms VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE dataset_members (
