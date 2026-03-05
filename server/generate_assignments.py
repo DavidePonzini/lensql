@@ -50,6 +50,12 @@ def generate_assignment(
         else:
             description = 'Practice set tailored to your learning progress.'
 
+    # Map 'postgres' to 'postgresql' for consistency with database entries
+    if sql_dialect == 'postgres':
+        dbms = 'postgresql'
+    else:
+        dbms = sql_dialect
+
     if dataset_id is None:
         # Generate a new dataset
 
@@ -67,7 +73,7 @@ def generate_assignment(
             dataset_str=dataset_str,
             domain=domain,
             search_path=schema_name,
-            dbms=sql_dialect,
+            dbms=dbms,
         )
     else:
         # Use existing dataset
