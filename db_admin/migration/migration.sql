@@ -48,7 +48,7 @@ INSERT INTO lensql.datasets(
     description,
     dataset,
     domain,
-    search_path
+    search_path,
     dbms
 ) SELECT 
     id,

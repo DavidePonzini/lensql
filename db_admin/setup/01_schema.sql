@@ -108,7 +108,7 @@ CREATE TABLE exercises (
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,
     solutions TEXT NOT NULL DEFAULT '[]',  -- JSON array of solution strings
-    created_by VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
+    created_by VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE SET NULL, -- allows to keep exercises even if the creator is deleted
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     generation_difficulty INTEGER DEFAULT NULL,
     generation_error INTEGER DEFAULT NULL REFERENCES errors(id) ON UPDATE CASCADE ON DELETE CASCADE
@@ -119,7 +119,7 @@ CREATE TABLE learning_objectives (
 );
 
 CREATE TABLE has_learning_objective (
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id),
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON UPDATE CASCADE ON DELETE CASCADE,
     objective_id VARCHAR(255) NOT NULL REFERENCES learning_objectives(id) ON UPDATE CASCADE ON DELETE CASCADE,
 
     PRIMARY KEY (exercise_id, objective_id)
@@ -129,12 +129,12 @@ CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
     ts TIMESTAMP NOT NULL DEFAULT NOW(),
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE CASCADE
+    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE queries (
     id SERIAL PRIMARY KEY,
-    batch_id INTEGER NOT NULL REFERENCES query_batches(id) ON DELETE CASCADE,
+    batch_id INTEGER NOT NULL REFERENCES query_batches(id) ON UPDATE CASCADE ON DELETE CASCADE,
     query TEXT NOT NULL,
     search_path TEXT DEFAULT NULL,
     success BOOLEAN,        -- supports NULL for queries that are not executed (e.g. when checking solutions in particular cases)
@@ -146,14 +146,14 @@ CREATE TABLE queries (
 
 -- solutions attempted by students
 CREATE TABLE exercise_solutions (
-    id INTEGER NOT NULL REFERENCES queries(id) PRIMARY KEY,
+    id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE PRIMARY KEY,
     is_correct BOOLEAN,
     solution_ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE query_context_columns (
     id SERIAL PRIMARY KEY,
-    query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
+    query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
     schema_name TEXT NOT NULL,
     table_name TEXT NOT NULL,
     column_name TEXT NOT NULL,
@@ -168,7 +168,7 @@ CREATE TABLE query_context_columns (
 
 CREATE TABLE query_context_columns_unique (
     id SERIAL PRIMARY KEY,
-    query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
+    query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
     schema_name TEXT NOT NULL,
     table_name TEXT NOT NULL,
     constraint_type VARCHAR(32) NOT NULL,
@@ -178,14 +178,14 @@ CREATE TABLE query_context_columns_unique (
 
 CREATE TABLE has_error(
     id SERIAL PRIMARY KEY,
-    query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
-    error_id INTEGER NOT NULL REFERENCES errors(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    error_id INTEGER NOT NULL REFERENCES errors(id) ON UPDATE CASCADE ON DELETE CASCADE,
     details TEXT[] DEFAULT NULL
 );
 
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
-    query_id INTEGER NOT NULL REFERENCES queries(id) ON DELETE CASCADE,
+    query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
     answer TEXT NOT NULL,
     button VARCHAR(255) NOT NULL,
     msg_idx INTEGER NOT NULL,
