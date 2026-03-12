@@ -14,13 +14,15 @@ function Exercise() {
     const [exercise, setExercise] = useState(null);
 
     useEffect(() => {
-        async function fetchAssignment() {
+        async function fetchExercise() {
             const data = await apiRequest(`/api/exercises/get/${exerciseId}`, 'GET');
 
             setExercise(data.data);
+
+            await apiRequest(`/api/exercises/opened/${exerciseId}`, 'POST');
         }
 
-        fetchAssignment();
+        fetchExercise();
     }, [exerciseId, apiRequest]);
 
     if (!exercise) return (

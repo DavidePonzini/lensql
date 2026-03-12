@@ -110,6 +110,16 @@ INSERT INTO lensql.exercises(
     generation_error
 FROM exercises;
 
+INSERT INTO lensql.opened_exercises(
+    exercise_id,
+    username,
+    ts
+) SELECT 
+    exercise_id,
+    username,
+    ts
+FROM opened_exercises;
+
 INSERT INTO lensql.learning_objectives(
     id
 ) SELECT 
@@ -251,6 +261,12 @@ SET search_path TO lensql;
 SELECT setval(
     'exercises_id_seq',
     COALESCE((SELECT MAX(id) FROM exercises), 0) + 1,
+    false
+);
+
+SELECT setval(
+    'opened_exercises_id_seq',
+    COALESCE((SELECT MAX(id) FROM opened_exercises), 0) + 1,
     false
 );
 
