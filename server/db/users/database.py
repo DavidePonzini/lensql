@@ -16,7 +16,7 @@ from typing import Iterable
 from flask_babel import _
 from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
 
-PROJECT_NAME = os.getenv('COMPOSE_PROJECT_NAME', 'lensql')
+PROJECT_NAME = os.getenv('PROJECT_NAME', 'lensql')
 
 class Database(ABC):
     connections: dict[str, DatabaseConnection] = {}
