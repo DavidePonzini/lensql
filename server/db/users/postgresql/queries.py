@@ -2,12 +2,6 @@ from ..queries import BuiltinQueries, MetadataQueries
 
 class PostgresqlBuiltinQueries(BuiltinQueries):
     @staticmethod
-    def set_search_path(search_path: str) -> str:
-        return f'''
-            SET search_path TO {search_path};
-        '''
-
-    @staticmethod
     def show_search_path() -> str:
         return '''
             SHOW search_path;
@@ -87,6 +81,12 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
 
     
 class PostgresqlMetadataQueries(MetadataQueries):
+    @staticmethod
+    def set_search_path(search_path: str) -> str:
+        return f'''
+            SET search_path TO {search_path};
+        '''
+
     @staticmethod
     def get_search_path() -> str:
         return '''

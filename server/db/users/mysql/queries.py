@@ -3,15 +3,6 @@ from ..queries import BuiltinQueries, MetadataQueries
 
 class MySQLBuiltinQueries(BuiltinQueries):
     @staticmethod
-    def set_search_path(search_path: str) -> str:
-        '''Sets the search path for the user.'''
-        # MySQL does not have a search_path concept like PostgreSQL.
-        # Instead, we can use the "USE database" command to switch databases.
-        return f'''
-            USE {search_path};
-        '''
-
-    @staticmethod
     def show_search_path() -> str:
         return '''
             SELECT DATABASE() AS current_database;
@@ -89,6 +80,15 @@ class MySQLBuiltinQueries(BuiltinQueries):
 
 
 class MySQLMetadataQueries(MetadataQueries):
+    @staticmethod
+    def set_search_path(search_path: str) -> str:
+        '''Sets the search path for the user.'''
+        # MySQL does not have a search_path concept like PostgreSQL.
+        # Instead, we can use the "USE database" command to switch databases.
+        return f'''
+            USE {search_path};
+        '''
+
     @staticmethod
     def get_search_path() -> str:
         return '''
