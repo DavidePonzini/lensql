@@ -437,7 +437,8 @@
             },
             "query": {
                 "back_to_top": "Torna in cima",
-                "back_to_dataset": "Torna al dataset"
+                "back_to_dataset": "Torna al dataset",
+                "init_dataset": "Inizializza Dataset"
             },
             "query_result": {
                 "builtin": "Funzione incorporata di LensQL",

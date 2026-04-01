@@ -12,7 +12,7 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors
+.PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors stress_start stress_stop maintenance maintenance_stop logs
 
 prod: stop locales_compile
 	export PORT=$(PORT) && docker compose --profile prod up -d --build
@@ -74,3 +74,10 @@ clean:
 	rm -f server/messages.pot
 	find server/locales -name '*.mo' -delete
 
+stress_start:
+	for i in `seq 1 $(STRESS_COUNT)`; do docker run --rm -d --env MYSQL_RANDOM_ROOT_PASSWORD=true --name "test_mysql_$$i" mysql --innodb-use-native-aio=0; done
+	for i in `seq 1 $(STRESS_COUNT)`; do docker run --rm -d --env POSTGRES_PASSWORD=password --name "test_postgres_$$i" postgres; done
+
+stress_stop:
+	for i in `seq 1 $(STRESS_COUNT)`; do docker stop "test_postgres_$$i"; done || true
+	for i in `seq 1 $(STRESS_COUNT)`; do docker stop "test_mysql_$$i"; done || true

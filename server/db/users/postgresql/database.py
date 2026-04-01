@@ -40,7 +40,7 @@ class PostgresqlDatabase(Database):
             volumes={
                 # Mount a volume for PostgreSQL data persistence
                 f'{self.hostname}_data': {
-                    'bind': '/var/lib/postgresql/data',
+                    'bind': '/var/lib/postgresql',
                     'mode': 'rw',
                 }
             },

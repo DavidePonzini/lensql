@@ -437,7 +437,8 @@
             },
             "query": {
                 "back_to_top": "Back to top",
-                "back_to_dataset": "Back to dataset"
+                "back_to_dataset": "Back to dataset",
+                "init_dataset": "Initialize Dataset"
             },
             "query_result": {
                 "builtin": "LensQL built-in function",

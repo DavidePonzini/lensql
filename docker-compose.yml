@@ -81,7 +81,22 @@ services:
     networks:
       - default
     volumes:
-      - db_admin_pgdata:/var/lib/postgresql/data
+      - db_admin_pgdata:/var/lib/postgresql
+
+  preload_db_users_postgres:
+    image: postgres
+    restart: no
+    environment:
+      POSTGRES_PASSWORD: password
+    command: ['true']
+
+  preload_db_users_mysql:
+    image: mysql
+    restart: no
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: true
+    command: ['true']
+      
 
 volumes:
   db_admin_pgdata:
