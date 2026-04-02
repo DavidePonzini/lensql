@@ -242,7 +242,14 @@ function Register() {
                                         required
                                     />
                                     <label className="form-check-label" htmlFor="register-logging">
-                                        {t('pages.register.disclaimer')}
+                                        {t('pages.register.disclaimer_prefix')}{' '}
+                                        <Link to="/terms">{t('pages.register.termsLink')}</Link>{' '}
+                                        {t('pages.register.disclaimer_and')}{' '}
+                                        <Link to="/privacy">{t('pages.register.privacyLink')}</Link>.
+                                        <br />
+                                        <span className="text-muted small">
+                                            {t('pages.register.disclaimer')}
+                                        </span>
                                     </label>
                                 </div>
 
