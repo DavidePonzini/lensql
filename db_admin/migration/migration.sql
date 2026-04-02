@@ -267,8 +267,8 @@ SELECT setval(
 );
 
 SELECT setval(
-    'navigation_id_seq',
-    COALESCE((SELECT MAX(id) FROM navigation), 0) + 1,
+    'navigation_logs_id_seq',
+    COALESCE((SELECT MAX(id) FROM navigation_logs), 0) + 1,
     false
 );
 

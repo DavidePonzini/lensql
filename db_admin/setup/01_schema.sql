@@ -58,7 +58,7 @@ CREATE TABLE users (
     can_use_ai BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE navigation(
+CREATE TABLE navigation_logs(
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
     url TEXT NOT NULL,

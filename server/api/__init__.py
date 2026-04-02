@@ -36,7 +36,7 @@ def create_app() -> Flask:
     jwt.init_app(app)
 
     # Register blueprints
-    from . import auth, datasets, exercises, messages, queries, users
+    from . import auth, datasets, exercises, messages, queries, users, navigation
 
     app.register_blueprint(auth.bp, url_prefix='/auth')
     app.register_blueprint(datasets.bp, url_prefix='/datasets')
@@ -44,6 +44,6 @@ def create_app() -> Flask:
     app.register_blueprint(messages.bp, url_prefix='/messages')
     app.register_blueprint(queries.bp, url_prefix='/queries')
     app.register_blueprint(users.bp, url_prefix='/users')
-
+    app.register_blueprint(navigation.bp, url_prefix='/navigation')
     return app
 
