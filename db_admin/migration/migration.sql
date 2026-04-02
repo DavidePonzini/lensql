@@ -28,11 +28,13 @@ INSERT INTO lensql.navigation(
     id,
     username,
     url,
+    event,
     ts
 ) SELECT 
     id,
     username,
     url,
+    event,
     ts
 FROM navigation;
 

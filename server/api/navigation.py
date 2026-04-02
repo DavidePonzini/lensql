@@ -18,7 +18,8 @@ def log_navigation():
 
     data = request.get_json()
     url = data['url']
+    event = data['event']
 
-    user.log_navigation(url)
+    user.log_navigation(url, event)
 
     return responses.response(True)

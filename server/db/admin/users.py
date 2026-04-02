@@ -1271,19 +1271,21 @@ class User:
     # endregion
 
     # region Navigation
-    def log_navigation(self, url: str) -> None:
+    def log_navigation(self, url: str, event: str) -> None:
         '''Log a navigation event for the user'''
 
         query = database.sql.SQL('''
-            INSERT INTO {schema}.navigation_logs (username, url)
-            VALUES ({username}, {url})
+            INSERT INTO {schema}.navigation_logs (username, url, event)
+            VALUES ({username}, {url}, {event})
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username'),
-            url=database.sql.Placeholder('url')
+            url=database.sql.Placeholder('url'),
+            event=database.sql.Placeholder('event')
         )
 
         db.execute(query, {
             'username': self.username,
-            'url': url
+            'url': url,
+            'event': event
         })
