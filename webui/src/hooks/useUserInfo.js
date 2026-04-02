@@ -7,14 +7,16 @@ import useGamificationData from './useGamificationData';
 const UserInfoContext = createContext();
 
 function UserInfoProvider({ children }) {
-    const { apiRequest, accessToken, logout } = useAuth();
+    const { apiRequest, isLoggedIn, logout } = useAuth();
     const { getXpStats } = useGamificationData();
 
     const [userInfo, setUserInfo] = useState(null);
+    const [loadingUserInfo, setLoadingUserInfo] = useState(false);
 
     const loadUserInfo = useCallback(async () => {
-        if (!accessToken) return;
+        if (!isLoggedIn || loadingUserInfo) return;
 
+        setLoadingUserInfo(true);
         try {
             const data = await apiRequest('/api/users/info');
             const xp = getXpStats(data.xp);
@@ -32,8 +34,10 @@ function UserInfoProvider({ children }) {
         } catch (err) {
             console.error('Failed to load user info.', err);
             logout();
+        } finally {
+            setLoadingUserInfo(false);
         }
-    }, [accessToken, apiRequest, logout, getXpStats]);
+    }, [isLoggedIn, loadingUserInfo, apiRequest, logout, getXpStats]);
 
     const incrementStats = useCallback((coins = 0, experience = 0) => {
         setUserInfo(prev => {
@@ -70,18 +74,19 @@ function UserInfoProvider({ children }) {
     }, [logout]);
 
     useEffect(() => {
-        if (accessToken && !userInfo) {
+        if (isLoggedIn && !userInfo) {
             loadUserInfo();
         }
-    }, [accessToken, userInfo, loadUserInfo]);
+    }, [isLoggedIn, userInfo, loadUserInfo]);
 
     const value = useMemo(() => ({
         userInfo,
+        loadingUserInfo,
         loadUserInfo,
         incrementStats,
         logout: logoutUser,
         setTeacherStatus,
-    }), [userInfo, loadUserInfo, incrementStats, logoutUser, setTeacherStatus]);
+    }), [userInfo, loadingUserInfo, loadUserInfo, incrementStats, logoutUser, setTeacherStatus]);
 
     return (
         <UserInfoContext.Provider value={value}>{children}</UserInfoContext.Provider>

@@ -10,3 +10,4 @@ docs/_build
 .pytest_cache
 
 q.csv
+.codex

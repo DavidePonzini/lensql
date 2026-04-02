@@ -1,7 +1,15 @@
 '''This module handles authentication-related endpoints for the API.'''
 
-from flask import Blueprint, request
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    get_jwt_identity,
+    set_access_cookies,
+    set_refresh_cookies,
+    unset_jwt_cookies,
+)
 from datetime import timedelta
 from flask_babel import _
 
@@ -26,7 +34,10 @@ def login():
     access_token = create_access_token(identity=username, expires_delta=timedelta(minutes=15))
     refresh_token = create_refresh_token(identity=username, expires_delta=timedelta(days=7))
 
-    return responses.response(True, access_token=access_token, refresh_token=refresh_token)
+    resp = responses.response(True)
+    set_access_cookies(resp, access_token)
+    set_refresh_cookies(resp, refresh_token)
+    return resp
 
 @bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
@@ -35,7 +46,16 @@ def refresh():
     current_user = get_jwt_identity()
     access_token = create_access_token(identity=current_user, expires_delta=timedelta(minutes=15))
 
-    return responses.response(True, access_token=access_token)
+    resp = responses.response(True)
+    set_access_cookies(resp, access_token)
+    return resp
+
+@bp.route('/logout', methods=['POST'])
+def logout():
+    '''Clear auth cookies.'''
+    resp = jsonify({'success': True})
+    unset_jwt_cookies(resp)
+    return resp
 
 @bp.route('/register', methods=['POST'])
 def register():

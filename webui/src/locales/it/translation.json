@@ -62,6 +62,7 @@
             "developed_by": "Sviluppato da Davide Ponzini.",
             "license": "Licenza Pubblica Generale GNU",
             "contact": "Contatta",
+            "cookies": "Cookie Policy",
             "social": {
                 "website": "Sito Web",
                 "github": "GitHub",
@@ -191,6 +192,16 @@
         "admin": {
             "title": "Pagina di amministrazione",
             "empty": "Nessun contenuto disponibile"
+        },
+        "cookies": {
+            "title": "Cookie Policy",
+            "updated": "Ultimo aggiornamento: 2 aprile 2026",
+            "what_title": "Quali cookie usiamo",
+            "what_body": "Utilizziamo cookie di autenticazione per mantenerti connesso e ricordare la lingua preferita. Sono essenziali per il funzionamento del sito.",
+            "how_title": "Come vengono impostati",
+            "how_body": "I cookie vengono impostati al login e aggiornati durante la navigazione. Sono limitati al percorso /api e non sono usati per pubblicità.",
+            "manage_title": "Come gestire i cookie",
+            "manage_body": "Puoi cancellare i cookie dalle impostazioni del browser in qualsiasi momento. Se li blocchi, dovrai effettuare di nuovo il login ad ogni sessione."
         },
         "datasetes": {
             "dataset": {

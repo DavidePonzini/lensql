@@ -85,6 +85,7 @@ function Register() {
                     'Content-Type': 'application/json',
                     'X-Language': i18n.language || 'en', // Use the current language from i18n
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     username: usernameInput,
                     password: passwordInput,

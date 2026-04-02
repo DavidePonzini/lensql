@@ -37,6 +37,10 @@ function Footer() {
                     <a href='mailto:davide.ponzini@edu.unige.it' className='link'>
                         {t('components.footer.contact')}
                     </a>
+                    &nbsp;·&nbsp;
+                    <a href='/cookies' className='link'>
+                        {t('components.footer.cookies')}
+                    </a>
                 </div>
 
                 <div className="center">

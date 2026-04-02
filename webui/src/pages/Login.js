@@ -71,6 +71,7 @@ function Login() {
                     'Content-Type': 'application/json',
                     'X-Language': i18n.language || 'en', // Use the current language from i18n
                 },
+                credentials: 'include',
                 body: JSON.stringify({ username: usernameInput, password: passwordInput })
             });
 
@@ -78,7 +79,7 @@ function Login() {
 
             if (data.success) {
                 setError('');
-                saveTokens(data.access_token, data.refresh_token);
+                saveTokens();
                 navigate('/');
             } else {
                 setError(data.message || t('pages.login.errorLoginFailed'));

@@ -9,6 +9,7 @@ export function useUserNavigationTracking() {
     const lastPathRef = useRef(null);
     const visibleRef = useRef(document.visibilityState === 'visible');
 
+    // TODO: use cookie-based authetication for logging navigation events. Adapt the code and the api endpoint. Change the other endpoints to use cookie-based auth as well. Create a cookie notice/policy page.
     function sendEvent(url, event) {
 
         const body = JSON.stringify(

@@ -20,6 +20,7 @@ import DatasetList from './datasets/DatasetList';
 import Exercise from './exercises/Exercise';
 import Admin from './admin/Admin';
 import Tutorial from './Tutorial';
+import Cookies from './Cookies';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -37,10 +38,11 @@ function App() {
 
                 <div className="content">
                     <Routes>
-                        <Route path="/">
-                            <Route index element={<Home />} />
-                            <Route path="about" element={<About />} />
-                            <Route path="howto" element={<Tutorial />} />
+                            <Route path="/">
+                                <Route index element={<Home />} />
+                                <Route path="about" element={<About />} />
+                                <Route path="howto" element={<Tutorial />} />
+                                <Route path="cookies" element={<Cookies />} />
 
                             {isLoggedIn ? (
                                 <>

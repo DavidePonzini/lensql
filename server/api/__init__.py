@@ -23,11 +23,17 @@ def create_app() -> Flask:
     app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH', 1024*1024*20))   # 20MB
     app.config['BABEL_DEFAULT_LOCALE'] = 'en'
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = '../locales'  # Relative path starts from the app root, which is this file's directory
+    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    app.config['JWT_COOKIE_SECURE'] = os.getenv('JWT_COOKIE_SECURE', 'False').lower() == 'true'
+    app.config['JWT_COOKIE_SAMESITE'] = os.getenv('JWT_COOKIE_SAMESITE', 'Lax')
+    app.config['JWT_ACCESS_COOKIE_PATH'] = '/api'
+    app.config['JWT_REFRESH_COOKIE_PATH'] = '/api/auth/refresh'
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 
     # Setup CORS
     CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True,
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-     allow_headers=["Content-Type", "Authorization"])
+     allow_headers=["Content-Type", "Authorization", "X-Language"])
     
     # Setup localization
     babel.init_app(app, locale_selector=localization.get_locale)
@@ -46,4 +52,3 @@ def create_app() -> Flask:
     app.register_blueprint(users.bp, url_prefix='/users')
     app.register_blueprint(navigation.bp, url_prefix='/navigation')
     return app
-

@@ -16,45 +16,45 @@ function AuthProvider({ children }) {
 
     const MAX_REQUEST_SIZE = 1024 * 1024 * 20;
 
-    const [accessToken, setAccessToken] = useState(sessionStorage.getItem('access_token'));
-    const [refreshToken, setRefreshToken] = useState(sessionStorage.getItem('refresh_token'));
+    const hasAccessCookie = typeof document !== 'undefined' && document.cookie.includes('access_token_cookie=');
+    const [isAuthenticated, setIsAuthenticated] = useState(
+        sessionStorage.getItem('is_authenticated') === 'true' || hasAccessCookie
+    );
 
     const logout = useCallback(() => {
-        sessionStorage.removeItem('access_token');
-        sessionStorage.removeItem('refresh_token');
-        setAccessToken(null);
-        setRefreshToken(null);
+        fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include',
+        }).catch(() => {
+            // ignore network errors on logout
+        }).finally(() => {
+            sessionStorage.removeItem('is_authenticated');
+            setIsAuthenticated(false);
+        });
     }, []);
 
     const refreshAccessToken = useCallback(async () => {
-        if (!refreshToken) {
-            logout();
-            throw new Error('No refresh token.');
-        }
-
         const response = await fetch('/api/auth/refresh', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + refreshToken,
                 'Content-Type': 'application/json'
-            }
+            },
+            credentials: 'include'
         });
 
         const data = await response.json();
         if (data.success) {
-            sessionStorage.setItem('access_token', data.access_token);
-            setAccessToken(data.access_token);
-            return data.access_token;
+            setIsAuthenticated(true);
+            sessionStorage.setItem('is_authenticated', 'true');
+            return true;
         } else {
             logout();
             throw new Error('Refresh token invalid.');
         }
-    }, [refreshToken, logout]);
+    }, [logout]);
 
     const apiRequest = useCallback(async (endpoint, method = 'GET', body = null, { stream = false } = {}) => {
-        let token = accessToken;
-
-        async function doRequest(currentToken) {
+        async function doRequest() {
             let content = body ? JSON.stringify(body) : null;
             if (content && content.length > MAX_REQUEST_SIZE) {
                 throw new RequestSizeError(content.length, MAX_REQUEST_SIZE);
@@ -63,19 +63,19 @@ function AuthProvider({ children }) {
             return fetch(endpoint, {
                 method,
                 headers: {
-                    'Authorization': 'Bearer ' + currentToken,
                     'Content-Type': 'application/json',
                     'X-Language': i18n.language,
                 },
+                credentials: 'include',
                 body: content,
             });
         }
 
-        let response = await doRequest(token);
+        let response = await doRequest();
 
         if (response.status === 401) {
-            token = await refreshAccessToken();
-            response = await doRequest(token);
+            await refreshAccessToken();
+            response = await doRequest();
         }
 
         if (!response.ok) {
@@ -85,22 +85,19 @@ function AuthProvider({ children }) {
         }
 
         return stream ? response.body : response.json();
-    }, [accessToken, refreshAccessToken, MAX_REQUEST_SIZE, i18n.language]);
+    }, [refreshAccessToken, MAX_REQUEST_SIZE, i18n.language]);
 
-    const saveTokens = useCallback((access, refresh) => {
-        sessionStorage.setItem('access_token', access);
-        sessionStorage.setItem('refresh_token', refresh);
-        setAccessToken(access);
-        setRefreshToken(refresh);
+    const saveTokens = useCallback(() => {
+        sessionStorage.setItem('is_authenticated', 'true');
+        setIsAuthenticated(true);
     }, []);
 
     const value = useMemo(() => ({
-        isLoggedIn: !!accessToken,
+        isLoggedIn: isAuthenticated,
         saveTokens,
         logout,
         apiRequest,
-        accessToken,
-    }), [accessToken, apiRequest, logout, saveTokens]);
+    }), [isAuthenticated, apiRequest, logout, saveTokens]);
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
