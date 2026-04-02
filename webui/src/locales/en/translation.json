@@ -402,6 +402,8 @@
             "schoolRequired": "Please enter your school.",
             "registerAsTeacher": "I am a Teacher",
             "registerAsTeacherInfo": "Teachers can see learning stats for their students and have additional options available when creating datasets and exercises. This option can be changed anytime from the profile page.",
+            "disclaimer": "I agree that my queries and app usage may be logged for research purposes.",
+            "disclaimer_required": "You must agree to research logging to continue.",
             "errorServer": "Could not connect to the server.",
             "errorGeneric": "Registration failed"
         },

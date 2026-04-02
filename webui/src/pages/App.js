@@ -8,6 +8,7 @@ import Navbar from "../components/navbar/Navbar";
 import Separator from "../components/Separator";
 import Footer from "../components/footer/Footer";
 import BadgeNotifier from '../components/notifications/BadgeNotifier';
+import NavigationTracker from '../components/NavigationTracker';
 
 import Home from './Home';
 import About from './About';
@@ -34,6 +35,7 @@ function App() {
     return (
         <>
             <Router>
+                <NavigationTracker />
                 <Navbar />
 
                 <div className="content">
@@ -82,3 +84,4 @@ function App() {
 }
 
 export default App;
+

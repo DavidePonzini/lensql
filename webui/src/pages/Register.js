@@ -21,6 +21,7 @@ function Register() {
     const [isSchoolValid, setIsSchoolValid] = useState(false);
 
     const [isTeacherInput, setIsTeacherInput] = useState(false);
+    const [agreeLogging, setAgreeLogging] = useState(false);
 
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -77,6 +78,11 @@ function Register() {
 
     async function handleRegister(event) {
         event.preventDefault();
+
+        if (!agreeLogging) {
+            setError(t('pages.register.disclaimer_required'));
+            return;
+        }
 
         try {
             const response = await fetch('/api/auth/register', {
@@ -226,13 +232,27 @@ function Register() {
                                     </label>
                                 </div>
 
+                                <div className="form-check mb-4">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="register-logging"
+                                        checked={agreeLogging}
+                                        onChange={(e) => setAgreeLogging(e.target.checked)}
+                                        required
+                                    />
+                                    <label className="form-check-label" htmlFor="register-logging">
+                                        {t('pages.register.disclaimer')}
+                                    </label>
+                                </div>
+
                                 {/* Submit */}
                                 <div className="pt-1 mb-4">
                                     <button
                                         className="btn btn-primary btn-lg btn-block w-100"
                                         type="submit"
                                         disabled={
-                                            !isUsernameValid || !isPasswordValid || !isSchoolValid
+                                            !isUsernameValid || !isPasswordValid || !isSchoolValid || !agreeLogging
                                         }
                                     >
                                         {t('pages.register.submit')}

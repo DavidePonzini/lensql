@@ -403,7 +403,9 @@
             "errorServer": "Impossibile connettersi al server.",
             "errorGeneric": "Registrazione fallita",
             "registerAsTeacher": "Registrati come docente",
-            "registerAsTeacherInfo": "I docenti possono vedere le statistiche di apprendimento dei loro studenti e hanno opzioni aggiuntive disponibili quando creano dataset ed esercizi. Questa opzione può essere modificata in qualsiasi momento dalla pagina del profilo."
+            "registerAsTeacherInfo": "I docenti possono vedere le statistiche di apprendimento dei loro studenti e hanno opzioni aggiuntive disponibili quando creano dataset ed esercizi. Questa opzione può essere modificata in qualsiasi momento dalla pagina del profilo.",
+            "disclaimer": "Accetto che le mie query e l'uso dell'app possano essere registrati per fini di ricerca.",
+            "disclaimer_required": "Devi accettare la registrazione per fini di ricerca per continuare."
         },
         "exercises": {
             "buttons": {

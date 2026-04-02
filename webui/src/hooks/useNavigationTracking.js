@@ -2,15 +2,16 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import useAuth from './useAuth';
 
-export function useUserNavigationTracking() {
+function useNavigationTracking() {
     const { apiRequest, isLoggedIn } = useAuth();
 
     const location = useLocation();
     const lastPathRef = useRef(null);
     const visibleRef = useRef(document.visibilityState === 'visible');
+    const wasLoggedInRef = useRef(isLoggedIn);
 
-    // TODO: use cookie-based authetication for logging navigation events. Adapt the code and the api endpoint. Change the other endpoints to use cookie-based auth as well. Create a cookie notice/policy page.
-    function sendEvent(url, event) {
+    function sendEvent(url, event, { force = false } = {}) {
+        if (!isLoggedIn && !force) return;
 
         const body = JSON.stringify(
             {
@@ -30,25 +31,17 @@ export function useUserNavigationTracking() {
 
     // Route change tracking
     useEffect(() => {
-        if (!isLoggedIn) {
-            return;
-        }
-
         const url = location.pathname + location.search + location.hash;
 
         if (lastPathRef.current !== url) {
             lastPathRef.current = url;
 
-            sendEvent(url, 'PAGE_VISIT');
+            sendEvent(url, 'VISIT');
         }
     }, [location, isLoggedIn]);
 
     // Focus / unfocus / close tracking
     useEffect(() => {
-        if (!isLoggedIn) {
-            return;
-        }
-
         function handleVisibilityChange() {
             const url = window.location.pathname + window.location.search + window.location.hash;
 
@@ -77,4 +70,19 @@ export function useUserNavigationTracking() {
             window.removeEventListener('pagehide', handlePageHide);
         };
     }, [isLoggedIn]);
+
+    // Login / logout tracking
+    useEffect(() => {
+        const url = window.location.pathname + window.location.search + window.location.hash;
+
+        if (isLoggedIn && !wasLoggedInRef.current) {
+            sendEvent(url, 'LOGIN', { force: true });
+        } else if (!isLoggedIn && wasLoggedInRef.current) {
+            sendEvent(url, 'LOGOUT', { force: true });
+        }
+
+        wasLoggedInRef.current = isLoggedIn;
+    }, [isLoggedIn]);
 }
+
+export default useNavigationTracking;
