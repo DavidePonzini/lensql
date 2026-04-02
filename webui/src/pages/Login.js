@@ -80,6 +80,18 @@ function Login() {
             if (data.success) {
                 setError('');
                 saveTokens();
+                // Log login while cookies are fresh
+                fetch('/api/navigation/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        url: window.location.pathname + window.location.search + window.location.hash,
+                        event: 'LOGIN'
+                    }),
+                    keepalive: true,
+                }).catch(() => {});
+
                 navigate('/');
             } else {
                 setError(data.message || t('pages.login.errorLoginFailed'));

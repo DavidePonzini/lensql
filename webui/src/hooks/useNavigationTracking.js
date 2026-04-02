@@ -8,10 +8,10 @@ function useNavigationTracking() {
     const location = useLocation();
     const lastPathRef = useRef(null);
     const visibleRef = useRef(document.visibilityState === 'visible');
-    const wasLoggedInRef = useRef(isLoggedIn);
 
-    function sendEvent(url, event, { force = false } = {}) {
-        if (!isLoggedIn && !force) return;
+    function sendEvent(url, event) {
+        if (!isLoggedIn)
+            return;
 
         const body = JSON.stringify(
             {
@@ -33,12 +33,12 @@ function useNavigationTracking() {
     useEffect(() => {
         const url = location.pathname + location.search + location.hash;
 
-        if (lastPathRef.current !== url) {
+        if (isLoggedIn && lastPathRef.current !== url) {
             lastPathRef.current = url;
 
             sendEvent(url, 'VISIT');
         }
-    }, [location, isLoggedIn]);
+    }, [location]);
 
     // Focus / unfocus / close tracking
     useEffect(() => {
@@ -69,20 +69,8 @@ function useNavigationTracking() {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('pagehide', handlePageHide);
         };
-    }, [isLoggedIn]);
+    }, []);
 
-    // Login / logout tracking
-    useEffect(() => {
-        const url = window.location.pathname + window.location.search + window.location.hash;
-
-        if (isLoggedIn && !wasLoggedInRef.current) {
-            sendEvent(url, 'LOGIN', { force: true });
-        } else if (!isLoggedIn && wasLoggedInRef.current) {
-            sendEvent(url, 'LOGOUT', { force: true });
-        }
-
-        wasLoggedInRef.current = isLoggedIn;
-    }, [isLoggedIn]);
 }
 
 export default useNavigationTracking;

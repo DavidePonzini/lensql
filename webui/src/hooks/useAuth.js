@@ -22,6 +22,17 @@ function AuthProvider({ children }) {
     );
 
     const logout = useCallback(() => {
+        const url = window.location?.pathname + window.location?.search + window.location?.hash;
+
+        // log the logout event while the cookie is still present
+        fetch('/api/navigation/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ url, event: 'LOGOUT' }),
+            keepalive: true,
+        }).catch(() => {});
+
         fetch('/api/auth/logout', {
             method: 'POST',
             credentials: 'include',
