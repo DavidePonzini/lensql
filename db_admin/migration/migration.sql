@@ -24,6 +24,18 @@ INSERT INTO lensql.users(
     can_use_ai
 FROM users;
 
+INSERT INTO lensql.navigation(
+    id,
+    username,
+    url,
+    ts
+) SELECT 
+    id,
+    username,
+    url,
+    ts
+FROM navigation;
+
 INSERT INTO lensql.badges(
     username,
     badge,
@@ -109,16 +121,6 @@ INSERT INTO lensql.exercises(
     generation_difficulty,
     generation_error
 FROM exercises;
-
-INSERT INTO lensql.opened_exercises(
-    exercise_id,
-    username,
-    ts
-) SELECT 
-    exercise_id,
-    username,
-    ts
-FROM opened_exercises;
 
 INSERT INTO lensql.learning_objectives(
     id
@@ -265,8 +267,8 @@ SELECT setval(
 );
 
 SELECT setval(
-    'opened_exercises_id_seq',
-    COALESCE((SELECT MAX(id) FROM opened_exercises), 0) + 1,
+    'navigation_id_seq',
+    COALESCE((SELECT MAX(id) FROM navigation), 0) + 1,
     false
 );
 

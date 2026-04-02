@@ -58,6 +58,14 @@ CREATE TABLE users (
     can_use_ai BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+CREATE TABLE navigation(
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
+    url TEXT NOT NULL,
+    ts TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+
 CREATE TABLE badges (
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
     badge VARCHAR(255) NOT NULL,        -- e.g. 'name.level' (in this way we can keep ts of each level achieved)
@@ -112,13 +120,6 @@ CREATE TABLE exercises (
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     generation_difficulty INTEGER DEFAULT NULL,
     generation_error INTEGER DEFAULT NULL REFERENCES errors(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-CREATE TABLE opened_exercises(
-    id SERIAL PRIMARY KEY,
-    exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
-    ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE learning_objectives (
