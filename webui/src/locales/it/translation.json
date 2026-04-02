@@ -63,6 +63,8 @@
             "license": "Licenza Pubblica Generale GNU",
             "contact": "Contatta",
             "cookies": "Cookie Policy",
+            "privacy": "Privacy",
+            "terms": "Termini",
             "social": {
                 "website": "Sito Web",
                 "github": "GitHub",
@@ -197,11 +199,43 @@
             "title": "Cookie Policy",
             "updated": "Ultimo aggiornamento: 2 aprile 2026",
             "what_title": "Quali cookie usiamo",
-            "what_body": "Utilizziamo cookie di autenticazione per mantenerti connesso e ricordare la lingua preferita. Sono essenziali per il funzionamento del sito.",
+            "what_body": "Usiamo solo cookie essenziali: autenticazione per mantenerti loggato e lingua per ricordare la tua preferenza.",
             "how_title": "Come vengono impostati",
-            "how_body": "I cookie vengono impostati al login e aggiornati durante la navigazione. Sono limitati al percorso /api e non sono usati per pubblicità.",
+            "how_body": "I cookie vengono impostati al login e aggiornati durante la navigazione; sono limitati a /api, HttpOnly e non usati per pubblicità.",
             "manage_title": "Come gestire i cookie",
-            "manage_body": "Puoi cancellare i cookie dalle impostazioni del browser in qualsiasi momento. Se li blocchi, dovrai effettuare di nuovo il login ad ogni sessione."
+            "manage_body": "Puoi cancellare i cookie nelle impostazioni del browser. Bloccando i cookie di autenticazione verrai disconnesso e il tracciamento di navigazione potrebbe non funzionare.",
+            "necessary_title": "Cookie strettamente necessari",
+            "necessary_body": "I cookie di autenticazione e lingua sono necessari per il funzionamento del servizio (sessioni di login, protezioni di sicurezza, localizzazione). Non richiediamo consenso per questi.",
+            "research_title": "Ricerca e analisi",
+            "research_body": "Gli eventi di navigazione e le query vengono registrati per migliorare l'esperienza di apprendimento e per scopi di ricerca, come descritto nell'informativa privacy."
+        },
+        "privacy": {
+            "title": "Informativa Privacy",
+            "updated": "Ultimo aggiornamento: 2 aprile 2026",
+            "data_title": "Cosa raccogliamo",
+            "data_body": "Dati account (username, ruolo, scuola), cookie di autenticazione, eventi di navigazione nell'app, query SQL e feedback inseriti, log tecnici per sicurezza.",
+            "use_title": "Come usiamo i dati",
+            "use_body": "Per erogare il servizio (autenticazione, esercizi), misurare le prestazioni, migliorare le funzionalità didattiche e svolgere ricerca sulla didattica SQL.",
+            "disclosure_title": "Condivisione",
+            "disclosure_body": "I dati restano all'interno del team di ricerca e dei fornitori di hosting vincolati da contratto. Non vendiamo dati personali né usiamo tracker di terze parti.",
+            "rights_title": "I tuoi diritti",
+            "rights_body": "Puoi richiedere accesso o cancellazione dei tuoi dati account via email. La cancellazione può rimuovere i progressi. I cookie essenziali sono necessari per il login.",
+            "contact_title": "Contatti",
+            "contact_body": "Domande o richieste: davide.ponzini@edu.unige.it"
+        },
+        "terms": {
+            "title": "Termini di Utilizzo",
+            "updated": "Ultimo aggiornamento: 2 aprile 2026",
+            "use_title": "Uso consentito",
+            "use_body": "Usa la piattaforma per imparare SQL. Non caricare contenuti illegali, confidenziali o malevoli e non tentare di interrompere il servizio.",
+            "account_title": "Account",
+            "account_body": "Mantieni riservate le tue credenziali. Sei responsabile delle attività svolte con il tuo account.",
+            "content_title": "I tuoi contenuti",
+            "content_body": "Le query e i feedback che invii possono essere registrati e usati per ricerca e miglioramento del servizio, come descritto nell'informativa privacy.",
+            "liability_title": "Responsabilità",
+            "liability_body": "Il servizio è fornito \"così com'è\" senza garanzie. Potremmo modificarlo o sospenderlo. Nei limiti di legge, la responsabilità è limitata al massimo consentito.",
+            "contact_title": "Contatti",
+            "contact_body": "Per domande su questi termini: davide.ponzini@edu.unige.it"
         },
         "datasetes": {
             "dataset": {

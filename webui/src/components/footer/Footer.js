@@ -41,6 +41,14 @@ function Footer() {
                     <a href='/cookies' className='link'>
                         {t('components.footer.cookies')}
                     </a>
+                    &nbsp;·&nbsp;
+                    <a href='/privacy' className='link'>
+                        {t('components.footer.privacy')}
+                    </a>
+                    &nbsp;·&nbsp;
+                    <a href='/terms' className='link'>
+                        {t('components.footer.terms')}
+                    </a>
                 </div>
 
                 <div className="center">

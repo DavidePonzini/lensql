@@ -63,6 +63,8 @@
             "license": "GNU General Public License",
             "contact": "Contact",
             "cookies": "Cookie Policy",
+            "privacy": "Privacy",
+            "terms": "Terms",
             "social": {
                 "website": "Website",
                 "github": "GitHub",
@@ -197,11 +199,43 @@
             "title": "Cookie Policy",
             "updated": "Last updated: April 2, 2026",
             "what_title": "What cookies we use",
-            "what_body": "We use authentication cookies to keep you signed in and remember your language preference. These are essential for the site to function.",
+            "what_body": "We use only essential cookies: authentication cookies to keep you signed in and a language cookie so the interface stays in your chosen language.",
             "how_title": "How cookies are set",
-            "how_body": "Cookies are set when you log in and refreshed while you navigate. They are scoped to the /api path and are not used for advertising.",
+            "how_body": "Cookies are set at login and refreshed during navigation; they are scoped to /api, marked HttpOnly, and not used for advertising.",
             "manage_title": "How to manage cookies",
-            "manage_body": "You can clear cookies from your browser settings at any time. If you block authentication cookies, you will need to log in again each session."
+            "manage_body": "You can clear cookies in your browser at any time. Blocking auth cookies will sign you out and may prevent navigation logging.",
+            "necessary_title": "Strictly necessary cookies",
+            "necessary_body": "Auth and language cookies are required for the service to work (login sessions, CSRF protection, localization). Consent is not requested for these.",
+            "research_title": "Research and analytics",
+            "research_body": "Navigation and query events are logged to improve the learning experience and for research, as described in the privacy notice."
+        },
+        "privacy": {
+            "title": "Privacy Notice",
+            "updated": "Last updated: April 2, 2026",
+            "data_title": "What we collect",
+            "data_body": "Account details (username, role, school), authentication cookies, app navigation events, SQL queries and feedback you submit, and technical logs for security.",
+            "use_title": "How we use it",
+            "use_body": "To provide the service (authentication, exercises), measure performance, improve learning features, and conduct research on SQL education.",
+            "disclosure_title": "Sharing",
+            "disclosure_body": "Data stays within the research team and hosting providers bound by contract. We do not sell personal data or use third-party trackers.",
+            "rights_title": "Your choices",
+            "rights_body": "You can request access or deletion of your account data via email. Deleting may remove progress. Essential cookies are required for login.",
+            "contact_title": "Contact",
+            "contact_body": "Questions or requests: davide.ponzini@edu.unige.it"
+        },
+        "terms": {
+            "title": "Terms of Use",
+            "updated": "Last updated: April 2, 2026",
+            "use_title": "Acceptable use",
+            "use_body": "Use the platform for learning SQL. Do not upload unlawful, confidential, or malicious content, and do not attempt to disrupt the service.",
+            "account_title": "Accounts",
+            "account_body": "Keep your credentials confidential. You are responsible for activity under your account.",
+            "content_title": "Your content",
+            "content_body": "Queries and feedback you submit may be logged and used for research and improving the service, as described in the privacy notice.",
+            "liability_title": "Availability and liability",
+            "liability_body": "The service is provided “as is” without warranties. We may modify or suspend it. To the fullest extent permitted by law, liability is limited to the maximum allowed.",
+            "contact_title": "Contact",
+            "contact_body": "For questions about these terms: davide.ponzini@edu.unige.it"
         },
         "datasets": {
             "dataset": {

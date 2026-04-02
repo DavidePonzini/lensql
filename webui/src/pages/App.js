@@ -22,6 +22,8 @@ import Exercise from './exercises/Exercise';
 import Admin from './admin/Admin';
 import Tutorial from './Tutorial';
 import Cookies from './Cookies';
+import Privacy from './Privacy';
+import Terms from './Terms';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -45,6 +47,8 @@ function App() {
                                 <Route path="about" element={<About />} />
                                 <Route path="howto" element={<Tutorial />} />
                                 <Route path="cookies" element={<Cookies />} />
+                                <Route path="privacy" element={<Privacy />} />
+                                <Route path="terms" element={<Terms />} />
 
                             {isLoggedIn ? (
                                 <>
@@ -84,4 +88,3 @@ function App() {
 }
 
 export default App;
-

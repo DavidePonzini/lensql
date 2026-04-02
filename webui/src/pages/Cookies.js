@@ -16,6 +16,12 @@ function Cookies() {
 
             <h4 className="mt-4">{t('pages.cookies.manage_title')}</h4>
             <p>{t('pages.cookies.manage_body')}</p>
+
+            <h4 className="mt-4">{t('pages.cookies.necessary_title')}</h4>
+            <p>{t('pages.cookies.necessary_body')}</p>
+
+            <h4 className="mt-4">{t('pages.cookies.research_title')}</h4>
+            <p>{t('pages.cookies.research_body')}</p>
         </div>
     );
 }
