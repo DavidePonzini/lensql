@@ -227,20 +227,3 @@ def get_exercise(exercise_id):
     }
 
     return responses.response(True, data=result)
-
-@bp.route('/opened/<exercise_id>', methods=['POST'])
-@jwt_required()
-def mark_exercise_opened(exercise_id):
-    '''Mark an exercise as opened by the user.'''
-
-    user = db.admin.User(get_jwt_identity())
-
-    exercise = db.admin.Exercise(int(exercise_id))
-
-    dataset = db.admin.Dataset(exercise.dataset_id)
-    if not dataset.has_participant(user):
-        return responses.response(False, message=_('You are not a participant of this dataset.'))
-
-    exercise.set_opened_by_user(user)
-
-    return responses.response(True)

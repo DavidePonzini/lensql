@@ -327,22 +327,6 @@ class Exercise:
         })
 
         return True
-    
-    def set_opened_by_user(self, user: User) -> None:
-        '''Mark an exercise as opened by a user. This is used to track which exercises a user has seen.'''
-
-        query = database.sql.SQL('''
-            INSERT INTO {schema}.opened_exercises (exercise_id, username)
-            VALUES ({exercise_id}, {username})
-        ''').format(
-            schema=database.sql.Identifier(SCHEMA),
-            exercise_id=database.sql.Placeholder('exercise_id'),
-            username=database.sql.Placeholder('username')
-        )
-        db.execute(query, {
-            'exercise_id': self.exercise_id,
-            'username': user.username
-        })
     # endregion
 
     # region Learning Objectives

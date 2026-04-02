@@ -18,8 +18,6 @@ function Exercise() {
             const data = await apiRequest(`/api/exercises/get/${exerciseId}`, 'GET');
 
             setExercise(data.data);
-
-            await apiRequest(`/api/exercises/opened/${exerciseId}`, 'POST');
         }
 
         fetchExercise();
