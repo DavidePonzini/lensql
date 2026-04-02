@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-11 12:36+0100\n"
+"POT-Creation-Date: 2026-04-02 10:40+0200\n"
 "PO-Revision-Date: 2025-07-29 15:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: it\n"
@@ -38,23 +38,23 @@ msgstr "Impossibile reimpostare la password. Riprova."
 msgid "Password reset successfully."
 msgstr "Password reimpostata con successo."
 
-#: server/api/datasets.py:55
+#: server/api/datasets.py:65
 msgid "You are not authorized to modify this dataset."
 msgstr "Non sei autorizzato a modificare questo dataset."
 
-#: server/api/datasets.py:76 server/api/datasets.py:189
+#: server/api/datasets.py:92 server/api/datasets.py:207
 msgid "You do not have access to this dataset."
 msgstr "Non hai accesso a questo dataset."
 
-#: server/api/datasets.py:98
+#: server/api/datasets.py:116
 msgid "Dataset does not exist."
 msgstr "Il dataset non esiste."
 
-#: server/api/datasets.py:125
+#: server/api/datasets.py:143
 msgid "This is a special dataset and cannot be left."
 msgstr "Questo è un dataset speciale e non può essere abbandonato"
 
-#: server/api/datasets.py:130
+#: server/api/datasets.py:148
 msgid ""
 "You cannot leave this dataset, as you are an owner and it has data "
 "associated with it."
@@ -62,11 +62,11 @@ msgstr ""
 "Non puoi abbandonare questo dataset perché sei un proprietario e contiene"
 " dei dati associati."
 
-#: server/api/datasets.py:156 server/api/datasets.py:174
+#: server/api/datasets.py:174 server/api/datasets.py:192
 msgid "You are not an owner of this dataset."
 msgstr "Non sei un proprietario di questo dataset."
 
-#: server/api/datasets.py:159
+#: server/api/datasets.py:177
 msgid "You cannot set yourself as an owner of this dataset."
 msgstr "Non puoi assegnarti come proprietario di questo dataset."
 
@@ -74,32 +74,32 @@ msgstr "Non puoi assegnarti come proprietario di questo dataset."
 msgid "Dataset ID is required."
 msgstr "ID dataset richiesto"
 
-#: server/api/exercises.py:31 server/api/exercises.py:136
-#: server/api/exercises.py:224
+#: server/api/exercises.py:31 server/api/exercises.py:131
+#: server/api/exercises.py:219 server/api/exercises.py:242
 msgid "You are not a participant of this dataset."
 msgstr "Non sei un partecipante di questo dataset."
 
-#: server/api/exercises.py:60
+#: server/api/exercises.py:58
 msgid "You are not authorized to add exercises to this dataset."
 msgstr "Non sei autorizzato ad aggiungere esercizi a questo dataset."
 
-#: server/api/exercises.py:88 server/api/exercises.py:180
+#: server/api/exercises.py:84 server/api/exercises.py:175
 msgid "You are not authorized to edit this exercise."
 msgstr "Non sei autorizzato a modificare questo esercizio."
 
-#: server/api/exercises.py:109
+#: server/api/exercises.py:104
 msgid "You are not authorized to delete this exercise."
 msgstr "Non sei autorizzato a cancellare questo esercizio."
 
-#: server/api/exercises.py:114
+#: server/api/exercises.py:109
 msgid "Cannot delete exercise. There are queries associated with it."
 msgstr "Impossibile eliminare l'esercizio. Ci sono query associate."
 
-#: server/api/exercises.py:131
+#: server/api/exercises.py:126
 msgid "Exercise ID is required."
 msgstr "ID esercizio richiesto."
 
-#: server/api/exercises.py:154
+#: server/api/exercises.py:149
 msgid "You are not authorized to set learning objectives for this exercise."
 msgstr ""
 "Non sei autorizzato a impostare gli obiettivi didattici per questo "
@@ -124,21 +124,21 @@ msgstr "Congratulazioni, non ho trovato alcun errore nella tua query!"
 msgid "User is not a participant in the specified dataset."
 msgstr "L'utente non è un partecipante del dataset specificato."
 
-#: server/db/users/database.py:326
+#: server/db/users/database.py:356
 msgid "No solution found for this exercise."
 msgstr "Nessuna soluzione trovata per questo esercizio."
 
-#: server/db/users/database.py:332
+#: server/db/users/database.py:362
 msgid "Your query is not supported. Please ensure it is a valid SQL SELECT query."
 msgstr ""
 "La tua query non è supportata. Assicurati che sia una query SQL SELECT "
 "valida."
 
-#: server/db/users/database.py:341
-msgid "Teacher-provided solution is not supported."
-msgstr "La soluzione fornita dall'insegnante non è supportata."
+#: server/db/users/database.py:371
+msgid "Error executing teacher-provided solution. Have you initialized the dataset?"
+msgstr "Errore nell'esecuzione della soluzione fornita dall'insegnante. Hai inizializzato il dataset?"
 
-#: server/db/users/database.py:349
+#: server/db/users/database.py:379
 msgid ""
 "Your query has different columns from the solution. Cannot compare "
 "results."
@@ -146,15 +146,15 @@ msgstr ""
 "La tua query ha colonne diverse rispetto alla soluzione. Impossibile "
 "confrontare i risultati."
 
-#: server/db/users/database.py:350 server/db/users/database.py:362
+#: server/db/users/database.py:380 server/db/users/database.py:392
 msgid "Expected:"
 msgstr "Atteso:"
 
-#: server/db/users/database.py:351 server/db/users/database.py:363
+#: server/db/users/database.py:381 server/db/users/database.py:393
 msgid "Your query:"
 msgstr "La tua query:"
 
-#: server/db/users/database.py:361
+#: server/db/users/database.py:391
 msgid ""
 "Your query has different data types from the solution. Cannot compare "
 "results."
@@ -162,9 +162,9 @@ msgstr ""
 "La tua query ha tipi di dati diversi rispetto alla soluzione. Impossibile"
 " confrontare i risultati."
 
-#: server/db/users/database.py:372
-msgid "Solution is correct."
-msgstr "La soluzione è corretta."
+#: server/db/users/database.py:402
+msgid "Your query returns the same values as the solution."
+msgstr ""
 
 #: server/gamification/__init__.py:8
 msgid ""
@@ -182,19 +182,20 @@ msgstr "riga"
 msgid "rows"
 msgstr "righe"
 
-#: server/sql/result/dataset.py:39
+#: server/sql/result/dataset.py:40
 msgid "column"
 msgstr "colonna"
 
-#: server/sql/result/dataset.py:39
+#: server/sql/result/dataset.py:40
 msgid "columns"
 msgstr "colonne"
 
-#: server/sql/result/dataset.py:92
+#: server/sql/result/dataset.py:94
 msgid "Your query"
 msgstr "La tua query"
 
-#: server/sql/result/dataset.py:93
+#: server/sql/result/dataset.py:95
 msgid "Solution"
 msgstr "Soluzione"
+
 

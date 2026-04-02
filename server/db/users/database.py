@@ -368,7 +368,7 @@ class Database(ABC):
 
             if result_solution is None:
                 message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'
-                message += _('Teacher-provided solution is not supported.')
+                message += _('Error executing teacher-provided solution. Have you initialized the dataset?')
 
                 results.append(CheckResultMessage(correct=None, execution_success=execution_success_solution, message=message))
                 continue
@@ -399,7 +399,7 @@ class Database(ABC):
 
             if has_same_result:
                 message = '<i class="fa fa-check text-success me-1"></i>'
-                message += _('Solution is correct.') + '<br/>'
+                message += _('Your query returns the same values as the solution.') + '<br/>'
                 result = CheckResultMessage(correct=True, execution_success=execution_success, message=message)
                 return result.to_result()
             else:
