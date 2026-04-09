@@ -1,4 +1,5 @@
 import sqlparse
+import sqlscope
 from typing import Iterable, Self
 from .query_goal import QueryGoal
 
@@ -41,7 +42,8 @@ class SQLCode:
     def split(self) -> Iterable['SQLCode']:
         '''Split the SQL query into individual statements'''
         for query in sqlparse.split(self.query, strip_semicolon=False):
-            yield SQLCode(query)
+            if query.strip():  # Skip empty statements
+                yield SQLCode(query)
 
     def _parse(self) -> tuple[sqlparse.sql.Statement]:
         '''Parse the SQL query and return the first statement'''
@@ -144,10 +146,25 @@ class SQLCode:
 
         if self.builtin:
             return QueryGoal.BUILTIN.value
-
+        
         # Only consider SELECT queries
         if self.query_type != 'SELECT':
-            return 'UNKNOWN'
+            return QueryGoal.UNKNOWN.value
         
-        # TODO
-        return 'TODO'
+        query = sqlscope.Query(self.query)
+
+        # If the query has multiple SELECT statements (i.e., set operations, subqueries, CTEs), it's likely focused on a specific task rather than exploratory
+        if len(query.selects) > 1:
+            return QueryGoal.FOCUSED.value
+        
+        main_select = query.selects[0]
+
+        # If the query has no FROM clause, it's likely not related to the exercise and we cannot determine the goal
+        if not main_select.referenced_tables:
+            return QueryGoal.UNKNOWN.value
+
+        # If the query is a SELECT * without WHERE/GROUP BY/HAVING, it's likely exploratory
+        if not main_select.where and not main_select.group_by and not main_select.having:
+            return QueryGoal.EXPLORATORY.value
+
+        return QueryGoal.FOCUSED.value
