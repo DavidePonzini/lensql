@@ -42,8 +42,10 @@ class SQLCode:
     def split(self) -> Iterable['SQLCode']:
         '''Split the SQL query into individual statements'''
         for query in sqlparse.split(self.query, strip_semicolon=False):
-            if query.strip():  # Skip empty statements
-                yield SQLCode(query)
+            sql_code = SQLCode(query)
+
+            if sql_code.strip_comments().query.strip():  # Only yield non-empty statements after stripping comments
+                yield sql_code
 
     def _parse(self) -> tuple[sqlparse.sql.Statement]:
         '''Parse the SQL query and return the first statement'''
