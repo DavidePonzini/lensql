@@ -38,7 +38,7 @@ function Navbar() {
                 </button>
 
                 {/* Right-side content, always visible */}
-                <div className='d-lg-flex align-items-center order-2'>
+                <div className='d-lg-flex align-items-center ms-auto order-2'>
                     <div className="navbar-text d-flex align-items-center">
                         {isLoggedIn ? (
                             <>
