@@ -1,3 +1,4 @@
+import json
 from typing import Any
 from dav_tools import database
 from .connection import db, SCHEMA
@@ -529,7 +530,7 @@ class Dataset:
                 title=row[1],
                 is_hidden=row[2],
                 request=row[3],
-                solutions=row[4],
+                solutions=json.loads(row[4]),
                 difficulty=row[5],
                 all_properties_loaded=True
             ) for row in result
