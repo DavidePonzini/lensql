@@ -199,7 +199,6 @@ class Exercise:
         return result[0][0] if result else False
     
     def get_last_query_batch_string_by_user(self, user: User) -> str | None:
-        # select query from queries q join query_batches qb on qb.id = q.batch_id where username = 'dav' and exercise_id = 1 and qb.id = (select max(id) from query_batches where username = 'dav' and exercise_id = 1) order by qb.ts;
         '''Get the last query batch string for an exercise by a user'''
 
         query = database.sql.SQL(
