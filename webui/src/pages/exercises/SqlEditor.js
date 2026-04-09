@@ -2,7 +2,7 @@ import { useRef } from 'react';
 
 import Editor from '@monaco-editor/react';
 
-const SqlEditor = ({ onChange, }) => {
+const SqlEditor = ({ onChange, value }) => {
     const editorRef = useRef(null);
 
     const handleEditorDidMount = (editor, monaco) => {
@@ -33,6 +33,7 @@ const SqlEditor = ({ onChange, }) => {
                 theme="vs-dark" // Dark theme
                 onMount={handleEditorDidMount}
                 onChange={handleEditorChange}
+                value={value}
                 options={
                     {
                         fontSize: 16,

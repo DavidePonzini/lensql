@@ -13,7 +13,7 @@ import ButtonsExercise from "./ButtonsExercise";
 import ButtonAction from "../../components/buttons/ButtonAction";
 import { Button } from "react-bootstrap";
 
-function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, hasSolution }) {
+function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, hasSolution, lastQuery }) {
     const { t } = useTranslation();
     const { apiRequest } = useAuth();
 
@@ -151,7 +151,7 @@ function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, h
                 {t('pages.exercises.query.init_dataset')}
             </ButtonAction>
 
-            <SqlEditor onChange={setSqlText} />
+            <SqlEditor onChange={setSqlText} value={lastQuery || ''} />
 
             <div className="mt-3 support-buttons">
                 <div className="row">

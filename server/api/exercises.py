@@ -224,6 +224,7 @@ def get_exercise(exercise_id):
         'request': exercise.request,
         'attempts': exercise.count_attempts(user),
         'solutions': exercise.solutions,
+        'last_query': exercise.get_last_query_batch_string_by_user(user),
     }
 
     return responses.response(True, data=result)

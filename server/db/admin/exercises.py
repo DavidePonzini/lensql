@@ -121,7 +121,9 @@ class Exercise:
             self._learning_objectives = [ row[0] for row in result ]
 
         return self._learning_objectives
+    # endregion
 
+    # region User Interactions
     def count_attempts(self, user: User) -> int:
         '''Get the number of solution attempts for an exercise by a user'''
 
@@ -195,6 +197,39 @@ class Exercise:
         })
 
         return result[0][0] if result else False
+    
+    def get_last_query_batch_string_by_user(self, user: User) -> str | None:
+        # select query from queries q join query_batches qb on qb.id = q.batch_id where username = 'dav' and exercise_id = 1 and qb.id = (select max(id) from query_batches where username = 'dav' and exercise_id = 1) order by qb.ts;
+        '''Get the last query batch string for an exercise by a user'''
+
+        query = database.sql.SQL(
+        '''
+            SELECT q.query
+            FROM
+                {schema}.queries q
+                JOIN {schema}.query_batches qb ON q.batch_id = qb.id
+            WHERE
+                qb.exercise_id = {exercise_id}
+                AND qb.username = {username}
+                AND qb.id = (
+                    SELECT MAX(id)
+                    FROM {schema}.query_batches
+                    WHERE username = {username}
+                    AND exercise_id = {exercise_id}
+                )
+            ORDER BY qb.ts
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            exercise_id=database.sql.Placeholder('exercise_id'),
+            username=database.sql.Placeholder('username')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'exercise_id': self.exercise_id,
+            'username': user.username
+        })
+
+        return '\n\n'.join(row[0] for row in result) if result else None
     # endregion
 
     # region CRUD Operations

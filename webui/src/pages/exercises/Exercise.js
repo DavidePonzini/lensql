@@ -36,6 +36,7 @@ function Exercise() {
                 exerciseText={exercise.request}
                 attempts={exercise.attempts}
                 hasSolution={exercise.solutions.length > 0}
+                lastQuery={exercise.last_query}
             />
         </div>
     );
