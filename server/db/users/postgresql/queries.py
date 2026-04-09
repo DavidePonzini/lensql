@@ -47,32 +47,40 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
         '''
 
     @staticmethod
-    def list_all_tables() -> str:
+    def describe_tables() -> str:
         return '''
             SELECT
-                table_schema AS schema,
-                table_name as table,
-                table_type as type
-            FROM
-                information_schema.tables
-            ORDER BY
-                table_schema,
-                table_name;
+                t.relname AS table_name,
+                a.attname AS column_name,
+                pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type,
+                CASE WHEN a.attnotnull THEN 'not null' ELSE '' END AS nullable,
+                pg_get_expr(ad.adbin, ad.adrelid) AS default
+            FROM pg_attribute a
+            JOIN pg_class t
+                ON a.attrelid = t.oid
+            JOIN pg_namespace n
+                ON t.relnamespace = n.oid
+            LEFT JOIN pg_attrdef ad
+                ON a.attrelid = ad.adrelid
+            AND a.attnum = ad.adnum
+            WHERE n.nspname = current_schema()
+            AND t.relkind = 'r'
+            AND a.attnum > 0
+            AND NOT a.attisdropped
+            ORDER BY t.relname, a.attnum;
         '''
 
     @staticmethod
     def list_constraints() -> str:
         return '''
             SELECT
-                tc.table_schema AS schema,
                 tc.table_name AS table,
                 tc.constraint_name AS constraint,
                 tc.constraint_type AS type
             FROM
                 information_schema.table_constraints AS tc
             WHERE
-                tc.table_schema <> 'pg_catalog'
-                AND tc.table_schema <> 'information_schema'
+                tc.table_schema = current_schema()
             ORDER BY
                 tc.table_schema,
                 tc.table_name,

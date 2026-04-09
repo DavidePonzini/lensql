@@ -209,12 +209,21 @@ class Exercise:
                 JOIN {schema}.query_batches qb ON q.batch_id = qb.id
             WHERE
                 qb.exercise_id = {exercise_id}
+                AND q.query_goal <> 'BUILTIN'
                 AND qb.username = {username}
                 AND qb.id = (
                     SELECT MAX(id)
-                    FROM {schema}.query_batches
-                    WHERE username = {username}
-                    AND exercise_id = {exercise_id}
+                    FROM {schema}.query_batches qb2
+                    WHERE
+                        qb2.username = {username}
+                        AND EXISTS (
+                            SELECT 1
+                            FROM {schema}.queries q2
+                            WHERE q2.batch_id = qb2.id
+                            AND q2.query_goal <> 'BUILTIN'
+                            AND qb2.exercise_id = {exercise_id}
+                        )
+                    AND qb2.exercise_id = {exercise_id}
                 )
             ORDER BY qb.ts
         ''').format(

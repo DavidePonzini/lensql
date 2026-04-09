@@ -45,7 +45,11 @@ class QueryResultDataset(QueryResult):
     @property
     def result_text(self) -> str:
         return self._result.replace({None: 'NULL'}).to_csv()
-    
+
+    def row_count(self) -> int:
+        '''Returns the number of rows in the result.'''
+        return len(self._result)
+
     def has_same_columns(self, other: Self) -> bool:
         '''Checks if the columns of this result are the same as those of another result.'''
         return self.columns == other.columns

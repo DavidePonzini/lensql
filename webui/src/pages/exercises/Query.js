@@ -11,7 +11,6 @@ import ButtonsQuery from "./ButtonsQuery";
 import ButtonsDatabase from "./ButtonsDatabase";
 import ButtonsExercise from "./ButtonsExercise";
 import ButtonAction from "../../components/buttons/ButtonAction";
-import { Button } from "react-bootstrap";
 
 function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, hasSolution, lastQuery }) {
     const { t } = useTranslation();
@@ -19,7 +18,7 @@ function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, h
 
     const SCROLL_GRACE_PERIOD = 500; // milliseconds
 
-    const [sqlText, setSqlText] = useState('');
+    const [sqlText, setSqlText] = useState(lastQuery || '');
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState([]);
     const [showTopBtn, setShowTopBtn] = useState(false);

@@ -454,11 +454,12 @@
                 },
                 "database": {
                     "show_search_path": "Mostra Search Path",
-                    "list_tables": "Elenca Tabelle",
-                    "list_tables_current": "Schema Corrente",
-                    "list_tables_all": "Tutti gli Schemi",
                     "list_schemas": "Elenca Schemi",
-                    "list_constraints": "Elenca Vincoli"
+                    "list_tables": "Elenca Tabelle",
+                    "describe_tables": "Descrivi Tabelle",
+                    "advanced": "Avanzato",
+                    "list_constraints": "Elenca Vincoli",
+                    "list_users": "Elenca Utenti"
                 },
                 "exercise": {
                     "dataset": "Dataset",

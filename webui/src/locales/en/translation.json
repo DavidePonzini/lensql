@@ -454,11 +454,12 @@
                 },
                 "database": {
                     "show_search_path": "Show Search Path",
-                    "list_tables": "List Tables",
-                    "list_tables_current": "Current Schema",
-                    "list_tables_all": "All Schemas",
                     "list_schemas": "List Schemas",
-                    "list_constraints": "List Constraints"
+                    "list_tables": "List Tables",
+                    "describe_tables": "Describe Tables",
+                    "advanced": "Advanced",
+                    "list_constraints": "List Constraints",
+                    "list_users": "List Users"
                 },
                 "exercise": {
                     "dataset": "Dataset",

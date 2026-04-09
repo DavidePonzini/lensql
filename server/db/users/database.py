@@ -1,4 +1,6 @@
 
+from server.sql.result.message import QueryResultMessage
+
 from .connection import DatabaseConnection
 from .queries import BuiltinQueries, MetadataQueries
 from .solution import CheckExecutionStatus, result_message, CheckResult, CheckResultMessage, CheckResultDataset
@@ -194,35 +196,73 @@ class Database(ABC):
     # endregion
 
     # region Builtin Queries
+    def builtin_command(self, query: str, builtin_name: str, fallback_message: str | None = None) -> Iterable[QueryResult]:
+        '''Formats a builtin command with the given query and fallback message.'''
+
+        for result in self.execute_sql(query, builtin_name=builtin_name):
+            if not isinstance(result, QueryResultDataset):
+                yield result
+                continue
+
+            if fallback_message is not None and result.row_count() == 0:
+                yield QueryResultMessage(
+                    query=SQLCode(builtin_name, builtin=True),
+                    message=fallback_message
+                )
+                continue
+
+            yield result
+
     def builtin_show_search_path(self) -> Iterable[QueryResult]:
         '''Shows the search path for the database.'''
 
-        yield from self.execute_sql(self.builtin_queries.show_search_path(), builtin_name='SHOW_SEARCH_PATH')
+        yield from self.builtin_command(
+            query=self.builtin_queries.show_search_path(),
+            builtin_name='SHOW_SEARCH_PATH',
+        )
 
     def builtin_list_users(self) -> Iterable[QueryResult]:
         '''Lists all users in the database.'''
 
-        yield from self.execute_sql(self.builtin_queries.list_users(), builtin_name='LIST_USERS')
+        yield from self.builtin_command(
+            query=self.builtin_queries.list_users(),
+            builtin_name='LIST_USERS',
+        )
 
     def builtin_list_schemas(self) -> Iterable[QueryResult]:
         '''Lists all schemas in the database.'''
         
-        yield from self.execute_sql(self.builtin_queries.list_schemas(), builtin_name='LIST_SCHEMAS')
+        yield from self.builtin_command(
+            query=self.builtin_queries.list_schemas(),
+            builtin_name='LIST_SCHEMAS',
+        )
 
     def builtin_list_tables(self) -> Iterable[QueryResult]:
         '''Lists tables in the current search_path.'''
 
-        yield from self.execute_sql(self.builtin_queries.list_tables(), builtin_name='LIST_TABLES')
+        yield from self.builtin_command(
+            query=self.builtin_queries.list_tables(),
+            builtin_name='LIST_TABLES',
+            fallback_message=_('No tables found in the current search path.')
+        )
 
-    def builtin_list_all_tables(self) -> Iterable[QueryResult]:
-        '''Lists all tables in the database.'''
+    def builtin_describe_tables(self) -> Iterable[QueryResult]:
+        '''Describes tables in the current search_path.'''
 
-        yield from self.execute_sql(self.builtin_queries.list_all_tables(), builtin_name='LIST_ALL_TABLES')
+        yield from self.builtin_command(
+            query=self.builtin_queries.describe_tables(),
+            builtin_name='DESCRIBE_TABLES',
+            fallback_message=_('No tables found in the current search path.')
+        )
 
     def builtin_list_constraints(self) -> Iterable[QueryResult]:
         '''Lists all constraints in the database.'''
 
-        yield from self.execute_sql(self.builtin_queries.list_constraints(), builtin_name='LIST_CONSTRAINTS')
+        yield from self.builtin_command(
+            query=self.builtin_queries.list_constraints(),
+            builtin_name='LIST_CONSTRAINTS',
+            fallback_message=_('No constraints found in the current search path.')
+        )
     # endregion
 
     # region Metadata Queries

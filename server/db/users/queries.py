@@ -27,8 +27,8 @@ class BuiltinQueries(ABC):
 
     @staticmethod
     @abstractmethod
-    def list_all_tables() -> str:
-        '''Lists all tables in the database.'''
+    def describe_tables() -> str:
+        '''Describes tables in the current search_path.'''
         pass
 
     @staticmethod

@@ -212,9 +212,9 @@ def list_tables():
 
     return responses.response_query(result, is_builtin=True)
 
-@bp.route('/builtin/list-all-tables', methods=['POST'])
+@bp.route('/builtin/describe-tables', methods=['POST'])
 @jwt_required()
-def list_all_tables():
+def describe_tables():
     user = db.admin.User(get_jwt_identity())
 
     data = request.get_json()
@@ -222,7 +222,7 @@ def list_all_tables():
     dataset = db.admin.Dataset(exercise.dataset_id)
 
     database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
-    result = database.builtin_list_all_tables()
+    result = database.builtin_describe_tables()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
 
@@ -239,6 +239,22 @@ def list_constraints():
     
     database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
     result = database.builtin_list_constraints()
+    result = next(iter(result))
+    result.query_id = log_builtin_query(user, exercise, result)
+
+    return responses.response_query(result, is_builtin=True)
+
+@bp.route('/builtin/list-users', methods=['POST'])
+@jwt_required()
+def list_users():
+    user = db.admin.User(get_jwt_identity())
+
+    data = request.get_json()
+    exercise = db.admin.Exercise(int(data['exercise_id']))
+    dataset = db.admin.Dataset(exercise.dataset_id)
+    
+    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+    result = database.builtin_list_users()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
 
