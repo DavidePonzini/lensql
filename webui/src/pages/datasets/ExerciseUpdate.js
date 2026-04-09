@@ -33,8 +33,6 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
 
         const result = await apiRequest(`/api/exercises/get/${exerciseId}`, 'GET');
 
-        console.log('Fetched exercise data:', result);
-
         setTitle(result.data.title);
         setRequest(result.data.request);
         setSolutions(result.data.solutions);
