@@ -192,7 +192,7 @@ def init_dataset():
     dataset_str = dataset.dataset_str
 
     def generate_results() -> Iterable[str]:
-        database = db.users.PostgresqlDatabase(user.username)
+        database = db.users.get_database(user.username, dataset.dbms)
         for query_result in database.execute_sql(dataset_str, strip_comments=False):
             yield json.dumps({
                 'success': query_result.success,

@@ -47,6 +47,32 @@ class MySQLBuiltinQueries(BuiltinQueries):
         '''
 
     @staticmethod
+    def describe_tables() -> str:
+        return '''
+            SELECT
+                cols.table_name AS table_name,
+                cols.column_name AS column_name,
+                cols.column_type AS data_type,
+                CASE
+                    WHEN cols.is_nullable = 'NO' THEN 'not null'
+                    ELSE ''
+                END AS nullable,
+                cols.column_default AS `default`
+            FROM
+                information_schema.columns AS cols
+            JOIN
+                information_schema.tables AS tables
+                ON tables.table_schema = cols.table_schema
+                AND tables.table_name = cols.table_name
+            WHERE
+                cols.table_schema = DATABASE()
+                AND tables.table_type = 'BASE TABLE'
+            ORDER BY
+                cols.table_name,
+                cols.ordinal_position;
+        '''
+
+    @staticmethod
     def list_all_tables() -> str:
         return '''
             SELECT
@@ -71,7 +97,7 @@ class MySQLBuiltinQueries(BuiltinQueries):
             FROM
                 information_schema.table_constraints AS tc
             WHERE
-                tc.table_schema NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys')
+                tc.table_schema = DATABASE()
             ORDER BY
                 tc.table_schema,
                 tc.table_name,
@@ -111,14 +137,31 @@ class MySQLMetadataQueries(MetadataQueries):
                 fk.referenced_column_name AS foreign_key_column
             FROM information_schema.columns AS cols
 
-            LEFT JOIN information_schema.key_column_usage fk
+            LEFT JOIN (
+                SELECT
+                    kcu.table_schema,
+                    kcu.table_name,
+                    kcu.column_name,
+                    kcu.referenced_table_schema,
+                    kcu.referenced_table_name,
+                    kcu.referenced_column_name
+                FROM information_schema.table_constraints AS tc
+                JOIN information_schema.key_column_usage AS kcu
+                    ON tc.constraint_schema = kcu.constraint_schema
+                    AND tc.table_name = kcu.table_name
+                    AND tc.constraint_name = kcu.constraint_name
+                WHERE tc.constraint_type = 'FOREIGN KEY'
+            ) AS fk
                 ON fk.table_schema = cols.table_schema
                 AND fk.table_name = cols.table_name
                 AND fk.column_name = cols.column_name
-                AND fk.referenced_table_name IS NOT NULL
 
             WHERE cols.table_schema NOT IN
-                ('mysql', 'information_schema', 'performance_schema', 'sys');
+                ('mysql', 'information_schema', 'performance_schema', 'sys')
+            ORDER BY
+                cols.table_schema,
+                cols.table_name,
+                cols.ordinal_position;
         '''
 
     @staticmethod
@@ -130,7 +173,7 @@ class MySQLMetadataQueries(MetadataQueries):
                 tc.constraint_type,
                 CONCAT(
                     '{',
-                    GROUP_CONCAT(DISTINCT kcu.column_name SEPARATOR ','),
+                    GROUP_CONCAT(kcu.column_name ORDER BY kcu.ordinal_position SEPARATOR ','),
                     '}'
                 ) AS columns
             FROM information_schema.table_constraints AS tc
