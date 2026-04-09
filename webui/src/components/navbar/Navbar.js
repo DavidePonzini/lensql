@@ -42,23 +42,6 @@ function Navbar() {
                     <div className="navbar-text d-flex align-items-center">
                         {isLoggedIn ? (
                             <>
-                                <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.username_tooltip')}>
-                                    <i className="fa-solid fa-user" />
-                                    <span>{loadingUserInfo ? t('components.navbar.nav.loading') : userInfo?.username || t('components.navbar.nav.unknown')}</span>
-                                </span>
-
-                                {userInfo?.isTeacher && (
-                                    <i className="fa fa-chalkboard-teacher text-primary mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.teacher_tooltip')}></i>
-                                )}
-
-                                {userInfo?.isAdmin && (
-                                    <i className="fa fa-shield-alt text-danger mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.admin_tooltip')}></i>
-                                )}
-
-                                <div className="vr mx-1" />
-
-                                <GamificationStats userInfo={userInfo} />
-
                                 <LanguageSelectionButton className="mx-1" />
 
                                 <button className="btn btn-outline-danger mx-1" type="button" onClick={logout}>
@@ -83,7 +66,7 @@ function Navbar() {
 
                 {/* Collapsible content in the middle */}
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                    <ul className="navbar-nav me-auto mb-2 mb-lg-0 w-100">
                         <li className="nav-item">
                             <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/" end>
                                 {t('components.navbar.nav.home')}
@@ -145,6 +128,31 @@ function Navbar() {
                                     <i className="fa-solid fa-shield-alt"></i> {t('components.navbar.nav.admin')}
                                 </NavLink>
                             </li>
+                        )}
+
+                        {isLoggedIn && (
+                            <div className="navbar-text d-flex align-items-center ms-auto">
+                                {isLoggedIn && (
+                                    <>
+                                        <span className="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.username_tooltip')}>
+                                            <i className="fa-solid fa-user" />
+                                            <span>{loadingUserInfo ? t('components.navbar.nav.loading') : userInfo?.username || t('components.navbar.nav.unknown')}</span>
+                                        </span>
+
+                                        {userInfo?.isTeacher && (
+                                            <i className="fa fa-chalkboard-teacher text-primary mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.teacher_tooltip')}></i>
+                                        )}
+
+                                        {userInfo?.isAdmin && (
+                                            <i className="fa fa-shield-alt text-danger mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title={t('components.navbar.nav.admin_tooltip')}></i>
+                                        )}
+
+                                        <div className="vr mx-1" />
+
+                                        <GamificationStats userInfo={userInfo} />
+                                    </>
+                                )}
+                            </div>
                         )}
                     </ul>
                 </div>
