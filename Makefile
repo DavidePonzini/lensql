@@ -16,27 +16,34 @@ endif
 
 prod: stop locales_compile
 	export PORT=$(PORT) && docker compose --profile prod up -d --build
+	tput cnorm	# Needed to reset terminal pointer, sometimes hidden by docker compose
 
 dev: stop locales_compile
 	export PORT=$(PORT) && docker compose --profile dev up --build
+	tput cnorm	# Needed to reset terminal pointer, sometimes hidden by docker compose
 
 logs:
 	docker compose --profile dev --profile prod --profile maintenance logs -f
+	tput cnorm	# Needed to reset terminal pointer, sometimes hidden by docker compose
 
 stop: stop_app stop_user_dbs
 
 stop_app:
 	docker compose --profile dev --profile prod --profile maintenance down
+	tput cnorm	# Needed to reset terminal pointer, sometimes hidden by docker compose
 
 stop_user_dbs:
 	docker rm -f $$(docker ps -aq --filter "label=${COMPOSE_PROJECT_NAME}_db_user") || true
+	tput cnorm	# Needed to reset terminal pointer, sometimes hidden by docker compose
 
 maintenance:
 	docker compose down nginx_prod nginx_dev
 	docker compose up -d nginx_maintenance
+	tput cnorm	# Needed to reset terminal pointer, sometimes hidden by docker compose
 
 maintenance_stop:
 	docker compose down nginx_maintenance
+	tput cnorm	# Needed to reset terminal pointer, sometimes hidden by docker compose
 
 setup:
 	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/setup/setup.py
