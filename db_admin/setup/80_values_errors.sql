@@ -98,8 +98,9 @@ INSERT INTO errors(id, category, subcategory, error) VALUES
     ( 93, 'COM', 'Complication', 'Unnecessary argument of COUNT'),
     ( 94, 'COM', 'Complication', 'Unnecessary GROUP BY in EXISTS subquery'),
     ( 95, 'COM', 'Complication', 'GROUP BY with singleton groups'),
-    ( 96, 'COM', 'Complication', 'GROUP BY can be replaced with DISTINCT'),
-    ( 97, 'COM', 'Complication', 'UNION can be replaced by OR'),
+    ( 96, 'COM', 'Complication', 'GROUP BY with only a single group'),
+    ( 97, 'COM', 'Complication', 'GROUP BY can be replaced with DISTINCT'),
+    ( 98, 'COM', 'Complication', 'UNION can be replaced by OR'),
     ( 99, 'COM', 'Complication', 'Unnecessary column in ORDER BY clause'),
     (100, 'COM', 'Complication', 'ORDER BY in subquery'),
     (101, 'COM', 'Complication', 'Inefficient HAVING'),
@@ -108,6 +109,6 @@ INSERT INTO errors(id, category, subcategory, error) VALUES
     (104, 'COM', 'Complication', 'Condition on left table in LEFT OUTER JOIN'),
     (105, 'COM', 'Complication', 'OUTER JOIN can be replaced by INNER JOIN')
     
-    ON CONFLICT (id) DO NOTHING;
+    ON CONFLICT (id) DO UPDATE SET category = EXCLUDED.category, subcategory = EXCLUDED.subcategory, error = EXCLUDED.error;
 
 COMMIT;
