@@ -1,4 +1,5 @@
 from server import db
+from sql_error_categorizer import DetectedError, SqlErrors
 
 from dav_tools import messages
 
@@ -143,6 +144,31 @@ if __name__ == '__main__':
             messages.error(f'  Failed to register user {user}')
     # endregion
 
+    # region Default values
+    # Add a dummy query and all errors to admin user
+    messages.info('Adding all errors to admin user...')
+
+    exercise = db.admin.Dataset('_EXPLORE').list_exercises(ADMIN_USER)[0]
+
+    query_batch = db.admin.QueryBatch.log(
+        user=ADMIN_USER,
+        exercise=exercise,
+    )
+
+    query = db.admin.Query.log(
+        query_batch=query_batch,
+        sql_string='DUMMY QUERY',
+        search_path='public',
+        success=False,
+        result='DUMMY RESULT',
+        query_type='DUMMY',
+        query_goal='DUMMY',
+    )
+
+    query.log_errors([DetectedError(e) for e in SqlErrors])
+
+    messages.success('All errors added to admin user.')
+    # endregion
         
             
 
