@@ -127,38 +127,29 @@ def print_error_stats(error_stats: list[dict]):
         error_name = SqlErrors(error_id).name if error_id in SqlErrors._value2member_map_ else 'Unknown Error'
         dav_tools.messages.message(f'{i+1}. {error_name}: {error["count"]}')
 
-def select_errors_to_target(error_stats: list[dict]) -> list[dict]:
+def select_errors_to_target(error_stats: list[dict]) -> list[tuple[SqlErrors, DifficultyLevel]]:
     '''Prompt user to select which errors to target from the error stats.'''
-    indexes: list[int] = []
+    selection: list[tuple[int, str]] = []
     while True:
-        indexes_input = dav_tools.messages.ask('Enter space-separated error numbers to target (e.g. "1 3 5")')
+        selection_input = dav_tools.messages.ask('Enter space-separated error numbers and difficulties to target (e.g. "1a 3b 5c")')
         try:
-            indexes = [int(i) for i in indexes_input.split()]
-            if all(1 <= i <= len(error_stats) for i in indexes):
+            selection = [(int(i[:-1]), i[-1]) for i in selection_input.split()]
+            if all(1 <= i <= len(error_stats) and d in ['a', 'b', 'c'] for i, d in selection):
                 break
             else:
-                dav_tools.messages.error('Invalid input. Please enter valid error numbers from the list.')
+                dav_tools.messages.error('Invalid input. Please enter valid error numbers and difficulties from the list.')
         except ValueError:
-            dav_tools.messages.error('Invalid input. Please enter space-separated numbers.')
+            dav_tools.messages.error('Invalid input. Please enter space-separated error numbers and difficulties.')
 
-    return [error_stats[i-1] for i in indexes]
+    
+    result: list[tuple[SqlErrors, DifficultyLevel]] = []
 
-def select_difficulty_levels() -> list[DifficultyLevel]:
-    '''Prompt user to select which difficulty levels to target.'''
-    difficulty_levels: list[DifficultyLevel] = []
-    while True:
-        difficulty_input = dav_tools.messages.ask('Enter space-separated difficulty levels to target (1=Easy, 2=Medium, 3=Hard, e.g. "1 3")')
-        try:
-            difficulty_indexes = [int(i) for i in difficulty_input.split()]
-            if all(1 <= i <= 3 for i in difficulty_indexes):
-                difficulty_levels = [DifficultyLevel(i) for i in difficulty_indexes]
-                break
-            else:
-                dav_tools.messages.error('Invalid input. Please enter valid difficulty numbers (1, 2, or 3).')
-        except ValueError:
-            dav_tools.messages.error('Invalid input. Please enter space-separated numbers.')
-
-    return difficulty_levels
+    for e, d in selection:
+        error_id = error_stats[e-1]['error_id']
+        difficulty = DifficultyLevel(ord(d) - ord('a') + 1)
+        result.append((SqlErrors(error_id), difficulty))
+    
+    return result
 
 if __name__ == '__main__':
     dav_tools.argument_parser.add_argument('user', help='Username to assign the generated exercises to')
@@ -196,20 +187,9 @@ if __name__ == '__main__':
 
     print_error_stats(sorted_error_stats)
 
-    # Prompt user to select which errors to target
-    top_errors = select_errors_to_target(sorted_error_stats)
+    # Prompt user to select which errors to target and their corresponding difficulty levels
+    errors: list[tuple[SqlErrors, DifficultyLevel]] = select_errors_to_target(sorted_error_stats)
 
-    # Prompt user to select difficulty levels
-    difficulty_levels = select_difficulty_levels()
-
-    errors: list[tuple[SqlErrors, DifficultyLevel]] = []
-
-    # Create a list of (error, difficulty) tuples for the selected errors and difficulty levels
-    for error in top_errors:
-        for difficulty in difficulty_levels:
-            errors.append((SqlErrors(error['error_id']), difficulty))
-
-    
     # If --input dataset is provided, use it as a template
     if input_dataset_id is None:
         input_dataset_str = None
