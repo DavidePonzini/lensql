@@ -64,6 +64,7 @@ services:
       - MAX_CONTENT_LENGTH=20971520
       - DB_USERS_NETWORK=${COMPOSE_PROJECT_NAME}_db_users_network
       - PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+      - LLM_MODEL=gpt-4o-mini
     env_file:
       - server/.env
     networks:
