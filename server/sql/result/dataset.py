@@ -59,9 +59,9 @@ class QueryResultDataset(QueryResult):
         if len(self.columns) != len(other.columns):
             return False
 
-        for col1, col2 in zip(self.columns, other.columns):
-            if col1.name != col2.name:
-                return False
+        # for col1, col2 in zip(self.columns, other.columns):
+        #     if col1.name != col2.name:
+        #         return False
         
         return True
     
@@ -74,9 +74,12 @@ class QueryResultDataset(QueryResult):
         return wrong_types
     
     def compare_results(self, other: Self) -> tuple[bool, pd.DataFrame]:
+        other_cp = other._result.copy()
+        other_cp.columns = self._result.columns  # Align column names for comparison
+        
         # Count row occurrences
         vc_self = self._result.value_counts().reset_index(name='count_self')
-        vc_other = other._result.value_counts().reset_index(name='count_other')
+        vc_other = other_cp.value_counts().reset_index(name='count_other')
 
         # Outer join on all columns to align rows
         merged = pd.merge(
