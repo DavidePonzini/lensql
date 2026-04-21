@@ -1,7 +1,7 @@
 from dav_tools import database, messages
 from sql_error_categorizer import build_catalog, get_errors, detectors, DetectedError
 
-from server.db.admin import Query
+from server.db.admin import Query, Dataset
 from server.db.admin.connection import db, SCHEMA
 
 from tqdm import tqdm
@@ -17,6 +17,8 @@ DETECTORS = [
 def detect_errors(query: Query) -> list[DetectedError]:
     context_columns, context_unique_constraints = query.get_context()
 
+    dataset = Dataset(query.query_batch.exercise.dataset_id)
+
     catalog = build_catalog(
         columns_info=context_columns,
         unique_constraints_info=context_unique_constraints
@@ -27,7 +29,7 @@ def detect_errors(query: Query) -> list[DetectedError]:
                     solutions=query.query_batch.exercise.solutions,
                     catalog=catalog,
                     search_path=query.search_path,
-                    solution_search_path=query.query_batch.exercise.search_path,
+                    solution_search_path=dataset.search_path,
                     detectors=DETECTORS
                 )
 
