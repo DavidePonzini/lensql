@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server import db, llm, gamification
 from .util import responses
+from ..sql import SQLCode
 from server.gamification import NOT_ENOUGH_COINS_MESSAGE
 
 from flask_babel import _
@@ -73,7 +74,7 @@ def explain_error_message():
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
     
     exception = query.result
-    answer_str = llm.explain_error_message(user.username, query.sql_string, exception)
+    answer_str = llm.explain_error_message(query.sql_string, exception)
 
     answer = db.admin.Message.log(
         answer=answer_str,
@@ -107,7 +108,7 @@ def locate_error_cause():
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
     exception = query.result
-    answer_str = llm.locate_error_cause(user.username, query.sql_string, exception)
+    answer_str = llm.locate_error_cause(query.sql_string, exception)
 
     answer = db.admin.Message.log(
         answer=answer_str,
@@ -141,7 +142,7 @@ def provide_error_example():
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
     exception = query.result
-    answer_str = llm.provide_error_example(user.username, query.sql_string, exception)
+    answer_str = llm.provide_error_example(query.sql_string, exception)
     
     answer = db.admin.Message.log(
         answer=answer_str,
@@ -175,7 +176,7 @@ def fix_query():
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
     
     exception = query.result
-    answer_str = llm.fix_query(user.username, query.sql_string, exception, query.errors)
+    answer_str = llm.fix_query(query.sql_string, exception, query.errors)
 
     answer = db.admin.Message.log(
         answer=answer_str,
@@ -208,7 +209,7 @@ def describe_my_query():
     if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
-    answer_str = llm.describe_my_query(user.username, query.sql_string)
+    answer_str = llm.describe_my_query(query.sql_string)
     answer = db.admin.Message.log(
         answer=answer_str,
         button=request.path,
@@ -240,7 +241,7 @@ def explain_my_query():
     if not user.can_afford(cost):
         return responses.response(answer=NOT_ENOUGH_COINS_MESSAGE)
 
-    answer_str = llm.explain_my_query(user.username, query.sql_string)
+    answer_str = llm.explain_my_query(query.sql_string)
     answer = db.admin.Message.log(
         answer=answer_str,
         button=request.path,
@@ -275,7 +276,7 @@ def detect_errors():
     if not query.errors:
         return responses.response(answer=_("Congratulations, I couldn't find any errors in your query!"))
 
-    answer_str = llm.detect_errors(user.username, query.sql_string, errors=query.errors)
+    answer_str = llm.detect_errors(query.sql_string, errors=query.errors)
     answer = db.admin.Message.log(
         answer=answer_str,
         button=request.path,

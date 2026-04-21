@@ -1,113 +1,67 @@
-from . import tools, prompts, format, chatgpt
+from . import prompts, format, chatgpt
 from sql_error_categorizer import DetectedError
 
-def explain_error_message(username: str, code: str, exception: str) -> str:
-    message = chatgpt.Message()
-    
-    message.add_message_system(prompts.get_system_instructions())
-    message.add_message_user(prompts.explain_error(code, exception))
-    answer = chatgpt.generate_answer(message, json_format=format.MessageFormat,
-        tools=[
-            tools.get_search_path,
-            tools.get_tables,
-        ], username=username,
+def explain_error_message(code: str, exception: str) -> str:
+    answer = chatgpt.generate_answer(
+        system_prompt=prompts.get_system_instructions(),
+        user_prompt=prompts.explain_error(code, exception),
+        json_format=format.MessageFormat,
     )
 
-    return str(answer)
+    return str(answer[0])
 
-def locate_error_cause(username: str, code: str, exception: str) -> str:
-    message = chatgpt.Message()
-    
-    message.add_message_system(prompts.get_system_instructions())
-    message.add_message_user(prompts.locate_error_cause(code, exception))
-    answer = chatgpt.generate_answer(message, json_format=format.MessageFormat,
-        tools=[
-            tools.get_search_path,
-            tools.get_tables,
-        ], username=username,
+def locate_error_cause(code: str, exception: str) -> str:
+    answer = chatgpt.generate_answer(
+        system_prompt=prompts.get_system_instructions(),
+        user_prompt=prompts.locate_error_cause(code, exception),
+        json_format=format.MessageFormat,
     )
 
-    return str(answer)
+    return str(answer[0])
 
-def provide_error_example(username: str, code: str, exception: str) -> str:
-    message = chatgpt.Message()
-
-    message.add_message_system(prompts.get_system_instructions())
-    message.add_message_user(prompts.provide_error_example(code, exception))
-    answer = chatgpt.generate_answer(message,
+def provide_error_example(code: str, exception: str) -> str:
+    answer = chatgpt.generate_answer(
+        system_prompt=prompts.get_system_instructions(),
+        user_prompt=prompts.provide_error_example(code, exception),
         json_format=format.MessageFormatWithCode,
-        tools=[
-            tools.get_search_path,
-            tools.get_tables,
-        ],
-        username=username,
     )
 
-    return str(answer)
+    return str(answer[0])
 
-def fix_query(username: str, code: str, exception: str, errors: list[DetectedError]) -> str:
-    message = chatgpt.Message()
+def fix_query(code: str, exception: str, errors: list[DetectedError]) -> str:
+    answer = chatgpt.generate_answer(
+        system_prompt=prompts.get_system_instructions(),
+        user_prompt=prompts.fix_query(code, exception, errors=errors),
+        json_format=format.MessageFormatWithCode,
+    )
 
-    message.add_message_system(prompts.get_system_instructions())
-    message.add_message_user(prompts.fix_query(code, exception, errors=errors))
-    answer = chatgpt.generate_answer(message,
+    return str(answer[0])
+
+def describe_my_query(code: str) -> str:
+    answer = chatgpt.generate_answer(
+        system_prompt=prompts.get_system_instructions(),
+        user_prompt=prompts.describe_my_query(code),
         json_format=format.MessageFormat,
-        tools=[
-            tools.get_search_path,
-            tools.get_tables,
-        ],
-        username=username,
     )
 
-    return str(answer)
+    return str(answer[0])
 
-def describe_my_query(username: str, code: str) -> str:
-    message = chatgpt.Message()
-    
-    message.add_message_system(prompts.get_system_instructions())
-    message.add_message_user(prompts.describe_my_query(code))
-    answer = chatgpt.generate_answer(message,
+def explain_my_query(code: str) -> str:
+    answer = chatgpt.generate_answer(
+        system_prompt=prompts.get_system_instructions(),
+        user_prompt=prompts.explain_my_query(code),
         json_format=format.MessageFormat,
-        tools=[
-            tools.get_search_path,
-            tools.get_tables,
-        ],
-        username=username,
     )
 
-    return str(answer)
+    return str(answer[0])
 
-def explain_my_query(username: str, code: str) -> str:
-    message = chatgpt.Message()
-    
-    message.add_message_system(prompts.get_system_instructions())
-    message.add_message_user(prompts.explain_my_query(code))
-
-    answer = chatgpt.generate_answer(message,
-        json_format=format.MessageFormat,
-        tools=[
-            tools.get_search_path,
-            tools.get_tables,
-        ],
-        username=username,
-    )
-
-    return str(answer)
-
-def detect_errors(username: str, code: str, errors: list[DetectedError]) -> str:
+def detect_errors(code: str, errors: list[DetectedError]) -> str:
     assert len(errors) > 0, "No errors to detect"
 
-    message = chatgpt.Message()
-    
-    message.add_message_system(prompts.get_system_instructions())
-    message.add_message_user(prompts.detect_errors(code, errors=errors))
-    answer = chatgpt.generate_answer(message,
+    answer = chatgpt.generate_answer(
+        system_prompt=prompts.get_system_instructions(),
+        user_prompt=prompts.detect_errors(code, errors=errors),
         json_format=format.MessageFormat,
-        tools=[
-            tools.get_search_path,
-            tools.get_tables,
-        ],
-        username=username,
     )
 
-    return str(answer)
+    return str(answer[0])
