@@ -1,5 +1,6 @@
 from server.sql import SQLCode
 from . import util
+import sqlscope
 
 from sql_error_categorizer import DetectedError
 
@@ -42,9 +43,52 @@ Fammi vedere... sembra che la tua query <b>GOAL DESCRIPTION</b>.
 '''
 
 def explain_my_query(code: str, *, sql_language='PostgreSQL'):
-    query = SQLCode(code)
-    query = query.strip_comments()
-    
+
+    def clause_template(clause: str, code: str) -> dict[str, str]:
+        if clause == 'from':
+            return {
+                'en': f'The <code>FROM</code> clause (<code>{code}</code>) reads data from EXPLANATION OF FROM CLAUSE.',
+                'it': f'La clausola <code>FROM</code> (<code>{code}</code>) legge i dati da SPIEGAZIONE DELLA CLAUSOLA FROM.',
+            }
+        if clause == 'where':
+            return {
+                'en': f'The <code>WHERE</code> clause (<code>{code}</code>) keeps only the rows EXPLANATION OF WHERE CLAUSE.',
+                'it': f'La clausola <code>WHERE</code> (<code>{code}</code>) mantiene solo le righe SPIEGAZIONE DELLA CLAUSOLA WHERE.',
+            }
+        if clause == 'group_by':
+            return {
+                'en': f'The <code>GROUP BY</code> clause (<code>{code}</code>) groups the data EXPLANATION OF GROUP BY CLAUSE.',
+                'it': f'La clausola <code>GROUP BY</code> (<code>{code}</code>) raggruppa i dati SPIEGAZIONE DELLA CLAUSOLA GROUP BY.',
+            }
+        if clause == 'having':
+            return {
+                'en': f'The <code>HAVING</code> clause (<code>{code}</code>) keeps only the groups EXPLANATION OF HAVING CLAUSE.',
+                'it': f'La clausola <code>HAVING</code> (<code>{code}</code>) mantiene solo i gruppi SPIEGAZIONE DELLA CLAUSOLA HAVING.'
+            }
+        if clause == 'order_by':
+            return {
+                'en': f'The <code>ORDER BY</code> clause (<code>{code}</code>) sorts the results EXPLANATION OF ORDER BY CLAUSE.',
+                'it': f'La clausola <code>ORDER BY</code> (<code>{code}</code>) ordina i risultati SPIEGAZIONE DELLA CLAUSOLA ORDER BY.',
+            }
+        if clause == 'limit':
+            return {
+                'en': f'The <code>LIMIT</code> clause (<code>{code}</code>) keeps only the first EXPLANATION OF LIMIT CLAUSE rows.',
+                'it': f'La clausola <code>LIMIT</code> (<code>{code}</code>) mantiene solo le prime SPIEGAZIONE DELLA CLAUSOLA LIMIT righe.',
+            }
+        if clause == 'select':
+            return {
+                'en': f'The <code>SELECT</code> clause (<code>{code}</code>) makes the query return EXPLANATION OF SELECT CLAUSE.',
+                'it': f'La clausola <code>SELECT</code> (<code>{code}</code>) fa sì che la query restituisca SPIEGAZIONE DELLA CLAUSOLA SELECT.',
+            }
+        return {
+            'en': f'The <code>{code}</code> clause EXPLANATION OF {code} CLAUSE.',
+            'it': f'La clausola <code>{code}</code> CLAUSE SPIEGAZIONE DELLA CLAUSOLA {code}.',
+        }
+
+    code = SQLCode(code).strip_comments().query
+
+    query = sqlscope.Query(code)
+
     request = {
         'en': f'''
 Hi Lens! I'm interested in diving deeper into the purpose of the following {sql_language} query.
@@ -60,67 +104,56 @@ Inoltre, so che la query è stata formulata deliberatamente in questo modo, quin
 ''',
     }
 
-    clauses = [
-        {
-            'sql': 'FROM',
-            'template': {
-                'en': 'The <code>FROM</code> clause reads data from EXPLANATION OF FROM CLAUSE.',
-                'it': 'La clausola <code>FROM</code> legge i dati da SPIEGAZIONE DELLA CLAUSOLA FROM.',
-            }
-        },
-        {
-            'sql': 'WHERE',
-            'template': {
-                'en': 'The <code>WHERE</code> clause keeps only the rows EXPLANATION OF WHERE CLAUSE.',
-                'it': 'La clausola <code>WHERE</code> mantiene solo le righe SPIEGAZIONE DELLA CLAUSOLA WHERE.',
-            }
-        },
-        {
-            'sql': 'GROUP BY',
-            'template': {
-                'en': 'The <code>GROUP BY</code> clause groups the data EXPLANATION OF GROUP BY CLAUSE.',
-                'it': 'La clausola <code>GROUP BY</code> raggruppa i dati SPIEGAZIONE DELLA CLAUSOLA GROUP BY.',
-            }
-        },
-        {
-            'sql': 'HAVING',
-            'template': {
-                'en': 'The <code>HAVING</code> clause keeps only the groups EXPLANATION OF HAVING CLAUSE.',
-                'it': 'La clausola <code>HAVING</code> mantiene solo i gruppi SPIEGAZIONE DELLA CLAUSOLA HAVING.'
-            }
-        },
-        {
-            'sql': 'ORDER BY',
-            'template': {
-                'en': 'The <code>ORDER BY</code> clause sorts the results EXPLANATION OF ORDER BY CLAUSE.',
-                'it': 'La clausola <code>ORDER BY</code> ordina i risultati SPIEGAZIONE DELLA CLAUSOLA ORDER BY.',
-            }
-        },
-        {
-            'sql': 'LIMIT',
-            'template': {
-                'en': 'The <code>LIMIT</code> clause keeps only the first EXPLANATION OF LIMIT CLAUSE rows.',
-                'it': 'La clausola <code>LIMIT</code> mantiene solo le prime SPIEGAZIONE DELLA CLAUSOLA LIMIT righe.',
-            }
-        },
-        {
-            'sql': 'SELECT',
-            'template': {
-                'en': 'The <code>SELECT</code> clause makes the query return EXPLANATION OF SELECT CLAUSE.',
-                'it': 'La clausola <code>SELECT</code> fa sì che la query restituisca SPIEGAZIONE DELLA CLAUSOLA SELECT.',
-            }
-        },
-    ]
+    queries: list[dict] = []
+    for select in query.selects:
+        if not select.ast:
+            # we can assume the AST is always valid, since this button can only be called after a successful execution of the query
+            continue
 
-    # keep only the clauses present in the query
-    clauses = [clause for clause in clauses if query.has_clause(clause['sql'])]
+        q: dict[str, str] = {
+            'query': select.sql,
+            'from': '',
+            'where': '',
+            'group_by': '',
+            'having': '',
+            'order_by': '',
+            'limit': '',
+            'offset': '',
+            'select': '',
+        }
 
+        ast_args = select.ast.args
+
+        if ast_args.get('from_'):
+            q['from'] = ast_args["from_"].sql()
+        if ast_args.get('joins'):
+            q['from'] += ' ' + ' '.join(join.sql() for join in ast_args.get('joins', []))
+        if ast_args.get('where'):
+            q['where'] = ast_args['where'].sql()
+        if ast_args.get('group'):
+            q['group_by'] = ast_args['group'].sql()
+        if ast_args.get('having'):
+            q['having'] = ast_args['having'].sql()
+        if ast_args.get('order'):
+            q['order_by'] = ast_args['order'].sql()
+        if ast_args.get('limit'):
+            q['limit'] = ast_args['limit'].sql()
+        if ast_args.get('offset'):
+            q['offset'] = ast_args['offset'].sql()
+        q['select'] = f'SELECT {", ".join(exp.sql() for exp in ast_args["expressions"])}'
+
+        queries.append(q)
 
     # templates for each clause present in the query
-    clauses_template_values = []
-    for clause in clauses:
-        clauses_template_values.append(util.get_localized(clause['template']))
-    clauses_template = ''.join([f'<li>{clause}</li>' for clause in clauses_template_values])
+    clauses_template = ''
+    for q in queries:
+        clauses_template += f'<li><code>{q["query"]}</code></li>'
+        clauses_template += '<ol class="detailed-explanantion">'
+        for clause in ['from', 'where', 'group_by', 'having', 'order_by', 'limit', 'offset', 'select']:
+            if q[clause]:
+                clauses_template += f'<li>{util.get_localized(clause_template(clause, q[clause]))}</li>'
+
+        clauses_template += '</ol>'
 
     template = {
         'en': f'''
@@ -129,9 +162,9 @@ The query you wrote <b>GOAL DESCRIPTION</b>.
 <br><br>
 </div>
 Here is a detailed explanation of your query:
-<ol class="detailed-explanantion">
+<ul>
 {clauses_template}
-</ol>
+</ul>
 ''',
         'it': f'''
 <div class="hidden">
