@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-02 10:40+0200\n"
+"POT-Creation-Date: 2026-04-21 11:16+0200\n"
 "PO-Revision-Date: 2025-07-29 15:17+0200\n"
 "Last-Translator: Davide Ponzini <davide.ponzini@edu.unige.it>\n"
 "Language: en\n"
@@ -18,27 +18,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: server/api/auth.py:24
+#: server/api/auth.py:32
 msgid "Cannot login. Please check your username and password."
 msgstr "Cannot login. Please check your username and password."
 
-#: server/api/auth.py:52
+#: server/api/auth.py:72
 msgid "Username already exists. Please choose a different username."
 msgstr "Username already exists. Please choose a different username."
 
-#: server/api/auth.py:60
+#: server/api/auth.py:80
 msgid "Registration failed. Please try again."
 msgstr "Registration failed. Please try again."
 
-#: server/api/auth.py:75
+#: server/api/auth.py:95
 msgid "Old password is incorrect."
 msgstr "Old password is incorrect."
 
-#: server/api/auth.py:78
+#: server/api/auth.py:98
 msgid "Failed to reset password. Please try again."
 msgstr "Failed to reset password. Please try again."
 
-#: server/api/auth.py:80
+#: server/api/auth.py:100
 msgid "Password reset successfully."
 msgstr "Password reset successfully."
 
@@ -79,7 +79,7 @@ msgid "Dataset ID is required."
 msgstr "Dataset ID is required."
 
 #: server/api/exercises.py:31 server/api/exercises.py:131
-#: server/api/exercises.py:219 server/api/exercises.py:242
+#: server/api/exercises.py:219
 msgid "You are not a participant of this dataset."
 msgstr "You are not a participant of this dataset."
 
@@ -126,19 +126,31 @@ msgstr "Congratulations, I couldn't find any errors in your query!"
 msgid "User is not a participant in the specified dataset."
 msgstr "User is not a participant in the specified dataset."
 
-#: server/db/users/database.py:356
+#: server/db/users/database.py:246 server/db/users/database.py:255
+msgid "No tables found in the current search path."
+msgstr ""
+
+#: server/db/users/database.py:264
+msgid "No constraints found in the current search path."
+msgstr ""
+
+#: server/db/users/database.py:396
 msgid "No solution found for this exercise."
 msgstr "No solution found for this exercise."
 
-#: server/db/users/database.py:362
+#: server/db/users/database.py:402
 msgid "Your query is not supported. Please ensure it is a valid SQL SELECT query."
 msgstr "Your query is not supported. Please ensure it is a valid SQL SELECT query."
 
-#: server/db/users/database.py:371
-msgid "Error executing teacher-provided solution. Have you initialized the dataset?"
-msgstr "Error executing teacher-provided solution. Have you initialized the dataset?"
+#: server/db/users/database.py:411
+msgid ""
+"Error executing teacher-provided solution. Have you initialized the "
+"dataset?"
+msgstr ""
+"Error executing teacher-provided solution. Have you initialized the "
+"dataset?"
 
-#: server/db/users/database.py:379
+#: server/db/users/database.py:419
 msgid ""
 "Your query has different columns from the solution. Cannot compare "
 "results."
@@ -146,15 +158,15 @@ msgstr ""
 "Your query has different columns from the solution. Cannot compare "
 "results."
 
-#: server/db/users/database.py:380 server/db/users/database.py:392
+#: server/db/users/database.py:420 server/db/users/database.py:432
 msgid "Expected:"
 msgstr "Expected:"
 
-#: server/db/users/database.py:381 server/db/users/database.py:393
+#: server/db/users/database.py:421 server/db/users/database.py:433
 msgid "Your query:"
 msgstr "Your query:"
 
-#: server/db/users/database.py:391
+#: server/db/users/database.py:431
 msgid ""
 "Your query has different data types from the solution. Cannot compare "
 "results."
@@ -162,7 +174,7 @@ msgstr ""
 "Your query has different data types from the solution. Cannot compare "
 "results."
 
-#: server/db/users/database.py:402
+#: server/db/users/database.py:442
 msgid "Your query returns the same values as the solution."
 msgstr "Your query returns the same values as the solution."
 
@@ -190,12 +202,11 @@ msgstr "column"
 msgid "columns"
 msgstr "columns"
 
-#: server/sql/result/dataset.py:94
-msgid "Your query"
-msgstr "Your query"
+#: server/sql/result/dataset.py:98
+msgid "Unexpected"
+msgstr "Unexpected"
 
-#: server/sql/result/dataset.py:95
-msgid "Solution"
-msgstr "Soluzione"
-
+#: server/sql/result/dataset.py:99
+msgid "Missing"
+msgstr "Missing"
 

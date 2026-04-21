@@ -95,8 +95,8 @@ class QueryResultDataset(QueryResult):
             rows['only_in'] = origin
             return rows
 
-        only_in_self = expand_rows(merged, 1, _('Your query'))
-        only_in_other = expand_rows(merged, -1, _('Solution'))
+        only_in_self = expand_rows(merged, 1, _('Unexpected'))
+        only_in_other = expand_rows(merged, -1, _('Missing'))
 
         diff_rows = pd.concat([only_in_self, only_in_other], ignore_index=True)
 
