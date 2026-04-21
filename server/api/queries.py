@@ -123,7 +123,7 @@ def run_query():
                     search_path=search_path,
                     solution_search_path=exercise_search_path,
                     detectors=DETECTORS,
-                    debug=True
+                    debug=False,
                 )
                 print(flush=True)   # Ensure all debug output is flushed
 
