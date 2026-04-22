@@ -34,7 +34,19 @@ class QueryResultDataset(QueryResult):
             show_dimensions=False,
             border=0
         )
-        result = result.replace('<thead>', '<thead class="table-dark">').replace('<tbody>', '<tbody class="table-group-divider">')
+        result = result.replace(
+            '<thead>',
+            '<thead class="table-dark">'
+        ).replace(
+            '<tbody>',
+            '<tbody class="table-group-divider">'
+        ).replace(
+            '__UNEXPECTED__',
+            f'<b style="color: red;">{_("Unexpected")}:</b> {_("your query should not return this row")}'
+        ).replace(
+            '__MISSING__',
+            f'<b style="color: blue;">{_("Missing")}:</b> {_("your query should return this row but it does not")}'
+        )
         
         row_str = _("row") if rows == 1 else _("rows")
         col_str = _("column") if cols == 1 else _("columns")
@@ -95,11 +107,11 @@ class QueryResultDataset(QueryResult):
             rows = df[df['diff'] * sign > 0]
             rows = rows.loc[rows.index.repeat(rows['diff'].abs())]
             rows = rows[self._result.columns.tolist()]
-            rows['only_in'] = origin
+            rows['check_result'] = origin
             return rows
 
-        only_in_self = expand_rows(merged, 1, _('Unexpected'))
-        only_in_other = expand_rows(merged, -1, _('Missing'))
+        only_in_self = expand_rows(merged, 1, '__UNEXPECTED__')
+        only_in_other = expand_rows(merged, -1, '__MISSING__')
 
         diff_rows = pd.concat([only_in_self, only_in_other], ignore_index=True)
 

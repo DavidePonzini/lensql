@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-21 11:16+0200\n"
+"POT-Creation-Date: 2026-04-22 13:00+0200\n"
 "PO-Revision-Date: 2025-07-29 15:17+0200\n"
 "Last-Translator: Davide Ponzini <davide.ponzini@edu.unige.it>\n"
 "Language: en\n"
@@ -107,10 +107,10 @@ msgstr "Exercise ID is required."
 msgid "You are not authorized to set learning objectives for this exercise."
 msgstr "You are not authorized to set learning objectives for this exercise."
 
-#: server/api/messages.py:63 server/api/messages.py:98
-#: server/api/messages.py:132 server/api/messages.py:166
-#: server/api/messages.py:200 server/api/messages.py:232
-#: server/api/messages.py:264
+#: server/api/messages.py:64 server/api/messages.py:99
+#: server/api/messages.py:133 server/api/messages.py:167
+#: server/api/messages.py:201 server/api/messages.py:233
+#: server/api/messages.py:265
 msgid ""
 "AI features are disabled for your account. Please contact support if you "
 "believe this is an error."
@@ -118,7 +118,7 @@ msgstr ""
 "AI features are disabled for your account. Please contact support if you "
 "believe this is an error."
 
-#: server/api/messages.py:276
+#: server/api/messages.py:277
 msgid "Congratulations, I couldn't find any errors in your query!"
 msgstr "Congratulations, I couldn't find any errors in your query!"
 
@@ -186,27 +186,35 @@ msgstr ""
 "You don't have enough coins to use this feature. Check the Profile page "
 "to learn how to earn more."
 
-#: server/sql/result/dataset.py:39
-msgid "row"
-msgstr "row"
-
-#: server/sql/result/dataset.py:39
-msgid "rows"
-msgstr "rows"
-
-#: server/sql/result/dataset.py:40
-msgid "column"
-msgstr "column"
-
-#: server/sql/result/dataset.py:40
-msgid "columns"
-msgstr "columns"
-
-#: server/sql/result/dataset.py:98
+#: server/sql/result/dataset.py:45
 msgid "Unexpected"
 msgstr "Unexpected"
 
-#: server/sql/result/dataset.py:99
+#: server/sql/result/dataset.py:45
+msgid "your query should not return this row"
+msgstr "your query should not return this row"
+
+#: server/sql/result/dataset.py:48
 msgid "Missing"
 msgstr "Missing"
+
+#: server/sql/result/dataset.py:48
+msgid "your query should return this row but it does not"
+msgstr "your query should return this row but it does not"
+
+#: server/sql/result/dataset.py:51
+msgid "row"
+msgstr "row"
+
+#: server/sql/result/dataset.py:51
+msgid "rows"
+msgstr "rows"
+
+#: server/sql/result/dataset.py:52
+msgid "column"
+msgstr "column"
+
+#: server/sql/result/dataset.py:52
+msgid "columns"
+msgstr "columns"
 
