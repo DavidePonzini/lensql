@@ -14,11 +14,11 @@ endif
 
 .PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors stress_start stress_stop maintenance maintenance_stop logs
 
-prod: stop locales_compile
+prod: stop_app locales_compile
 	export PORT=$(PORT) && docker compose --profile prod up -d --build
 	@tput cnorm
 
-dev: stop locales_compile
+dev: stop_app locales_compile
 	export PORT=$(PORT) && docker compose --profile dev up --build
 	@tput cnorm
 
