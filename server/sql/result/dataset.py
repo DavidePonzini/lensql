@@ -86,17 +86,29 @@ class QueryResultDataset(QueryResult):
         return wrong_types
     
     def compare_results(self, other: Self) -> tuple[bool, pd.DataFrame]:
+        self_cp = self._result.copy()
         other_cp = other._result.copy()
-        other_cp.columns = self._result.columns  # Align column names for comparison
-        
+
+        # NOTE: duplicate columns names are not supported, as they would cause issues with pd.merge
+        column_names_no_duplicates: list[str] = []
+        for col in self.columns:
+            count = column_names_no_duplicates.count(col.name)
+            if count == 0:
+                column_names_no_duplicates.append(col.name)
+            else:
+                column_names_no_duplicates.append(f"{col.name}_{count}")
+
+        self_cp.columns = column_names_no_duplicates
+        other_cp.columns = column_names_no_duplicates
+
         # Count row occurrences
-        vc_self = self._result.value_counts().reset_index(name='count_self')
+        vc_self = self_cp.value_counts().reset_index(name='count_self')
         vc_other = other_cp.value_counts().reset_index(name='count_other')
 
         # Outer join on all columns to align rows
         merged = pd.merge(
             vc_self, vc_other,
-            on=self._result.columns.tolist(),
+            on=column_names_no_duplicates,
             how='outer'
         ).fillna(0)
 
@@ -106,7 +118,7 @@ class QueryResultDataset(QueryResult):
         def expand_rows(df, sign, origin):
             rows = df[df['diff'] * sign > 0]
             rows = rows.loc[rows.index.repeat(rows['diff'].abs())]
-            rows = rows[self._result.columns.tolist()]
+            rows = rows[column_names_no_duplicates]
             rows['check_result'] = origin
             return rows
 
