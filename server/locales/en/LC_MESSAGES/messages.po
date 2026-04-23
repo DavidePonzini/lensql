@@ -196,7 +196,7 @@ msgstr "Missing"
 
 #: server/sql/result/dataset.py:53
 msgid "Correct"
-msgstr ""
+msgstr "Correct"
 
 #: server/sql/result/dataset.py:56
 msgid "row"
