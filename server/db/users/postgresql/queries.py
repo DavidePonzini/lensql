@@ -62,7 +62,7 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
                 ON t.relnamespace = n.oid
             LEFT JOIN pg_attrdef ad
                 ON a.attrelid = ad.adrelid
-            AND a.attnum = ad.adnum
+                AND a.attnum = ad.adnum
             WHERE n.nspname = current_schema()
             AND t.relkind = 'r'
             AND a.attnum > 0
@@ -74,17 +74,60 @@ class PostgresqlBuiltinQueries(BuiltinQueries):
     def list_constraints() -> str:
         return '''
             SELECT
-                tc.table_name AS table,
-                tc.constraint_name AS constraint,
-                tc.constraint_type AS type
-            FROM
-                information_schema.table_constraints AS tc
-            WHERE
-                tc.table_schema = current_schema()
-            ORDER BY
-                tc.table_schema,
-                tc.table_name,
-                tc.constraint_name;
+                n.nspname AS schema_name,
+                t.relname AS table_name,
+                c.conname AS constraint_name,
+                CASE c.contype
+                    WHEN 'p' THEN 'PRIMARY KEY'
+                    WHEN 'u' THEN 'UNIQUE'
+                    WHEN 'f' THEN 'FOREIGN KEY'
+                    WHEN 'c' THEN 'CHECK'
+                    ELSE c.contype::text
+                END AS constraint_type,
+                CASE
+                    WHEN c.contype IN ('p', 'u') THEN pk_uq.columns
+                    WHEN c.contype = 'f' THEN fk.columns
+                    WHEN c.contype = 'c' THEN pg_get_constraintdef(c.oid)
+                    ELSE ''
+                END AS constraint_info
+            FROM pg_constraint c
+            JOIN pg_class t
+                ON t.oid = c.conrelid
+            JOIN pg_namespace n
+                ON n.oid = t.relnamespace
+
+            LEFT JOIN LATERAL (
+                SELECT string_agg(a.attname, ', ' ORDER BY u.ord) AS columns
+                FROM unnest(c.conkey) WITH ORDINALITY AS u(attnum, ord)
+                JOIN pg_attribute a
+                    ON a.attrelid = c.conrelid
+                AND a.attnum = u.attnum
+                WHERE c.contype IN ('p', 'u')
+            ) pk_uq ON TRUE
+
+            LEFT JOIN LATERAL (
+                SELECT string_agg(
+                    src.attname || ' -> ' || refns.nspname || '.' || reft.relname || '.' || ref.attname,
+                    ', '
+                    ORDER BY u.ord
+                ) AS columns
+                FROM unnest(c.conkey, c.confkey) WITH ORDINALITY AS u(src_attnum, ref_attnum, ord)
+                JOIN pg_attribute src
+                    ON src.attrelid = c.conrelid
+                AND src.attnum = u.src_attnum
+                JOIN pg_class reft
+                    ON reft.oid = c.confrelid
+                JOIN pg_namespace refns
+                    ON refns.oid = reft.relnamespace
+                JOIN pg_attribute ref
+                    ON ref.attrelid = c.confrelid
+                AND ref.attnum = u.ref_attnum
+                WHERE c.contype = 'f'
+            ) fk ON TRUE
+
+            WHERE n.nspname = current_schema()
+            AND c.contype <> 'n'
+            ORDER BY n.nspname, t.relname, c.conname;
         '''
 
     

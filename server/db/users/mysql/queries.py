@@ -93,15 +93,79 @@ class MySQLBuiltinQueries(BuiltinQueries):
                 tc.table_schema AS schema_name,
                 tc.table_name,
                 tc.constraint_name,
-                tc.constraint_type
+                tc.constraint_type,
+                CASE
+                    WHEN tc.constraint_type IN ('PRIMARY KEY', 'UNIQUE') THEN pk_uq.columns
+                    WHEN tc.constraint_type = 'FOREIGN KEY' THEN fk.columns
+                    WHEN tc.constraint_type = 'CHECK' THEN cc.check_clause
+                    ELSE ''
+                END AS constraint_info
             FROM
                 information_schema.table_constraints AS tc
+            LEFT JOIN (
+                SELECT
+                    kcu.constraint_schema,
+                    kcu.table_name,
+                    kcu.constraint_name,
+                    GROUP_CONCAT(
+                        kcu.column_name
+                        ORDER BY kcu.ordinal_position
+                        SEPARATOR ', '
+                    ) AS columns
+                FROM
+                    information_schema.key_column_usage AS kcu
+                WHERE
+                    kcu.constraint_schema = DATABASE()
+                    AND kcu.referenced_table_name IS NULL
+                GROUP BY
+                    kcu.constraint_schema,
+                    kcu.table_name,
+                    kcu.constraint_name
+            ) AS pk_uq
+                ON pk_uq.constraint_schema = tc.constraint_schema
+                AND pk_uq.table_name = tc.table_name
+                AND pk_uq.constraint_name = tc.constraint_name
+            LEFT JOIN (
+                SELECT
+                    kcu.constraint_schema,
+                    kcu.table_name,
+                    kcu.constraint_name,
+                    GROUP_CONCAT(
+                        CONCAT(
+                            kcu.column_name,
+                            ' -> ',
+                            kcu.referenced_table_schema,
+                            '.',
+                            kcu.referenced_table_name,
+                            '.',
+                            kcu.referenced_column_name
+                        )
+                        ORDER BY kcu.ordinal_position
+                        SEPARATOR ', '
+                    ) AS columns
+                FROM
+                    information_schema.key_column_usage AS kcu
+                WHERE
+                    kcu.constraint_schema = DATABASE()
+                    AND kcu.referenced_table_name IS NOT NULL
+                GROUP BY
+                    kcu.constraint_schema,
+                    kcu.table_name,
+                    kcu.constraint_name
+            ) AS fk
+                ON fk.constraint_schema = tc.constraint_schema
+                AND fk.table_name = tc.table_name
+                AND fk.constraint_name = tc.constraint_name
+            LEFT JOIN
+                information_schema.check_constraints AS cc
+                ON cc.constraint_schema = tc.constraint_schema
+                AND cc.constraint_name = tc.constraint_name
             WHERE
                 tc.table_schema = DATABASE()
             ORDER BY
-                tc.table_schema,
-                tc.table_name,
-                tc.constraint_name;
+                schema_name,
+                table_name,
+                constraint_name;
         '''
 
 
