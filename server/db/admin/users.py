@@ -136,6 +136,49 @@ class User:
             return False
         
         return result[0][0] is True
+
+    @property
+    def last_search_path(self) -> str | None:
+        '''Return the last search path used by the user, if any.'''
+
+        query = database.sql.SQL('''
+            SELECT
+                last_search_path
+            FROM
+                {schema}.users
+            WHERE
+                username = {username}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            username=database.sql.Placeholder('username')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'username': self.username
+        })
+
+        if len(result) == 0:
+            return None
+
+        return result[0][0]
+
+    def set_last_search_path(self, search_path: str | None) -> None:
+        '''Persist the last search path used by the user.'''
+
+        query = database.sql.SQL('''
+            UPDATE {schema}.users
+            SET last_search_path = {last_search_path}
+            WHERE username = {username}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            last_search_path=database.sql.Placeholder('last_search_path'),
+            username=database.sql.Placeholder('username')
+        )
+
+        db.execute(query, {
+            'last_search_path': search_path,
+            'username': self.username
+        })
     # endregion
 
     # region Auth

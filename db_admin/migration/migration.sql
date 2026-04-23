@@ -10,7 +10,8 @@ INSERT INTO lensql.users(
     registration_ts,
     experience,
     coins,
-    can_use_ai
+    can_use_ai,
+    last_search_path
 ) SELECT 
     username,
     password_hash,
@@ -21,7 +22,8 @@ INSERT INTO lensql.users(
     registration_ts,
     experience,
     coins,
-    can_use_ai
+    can_use_ai,
+    last_search_path
 FROM users;
 
 INSERT INTO lensql.navigation(

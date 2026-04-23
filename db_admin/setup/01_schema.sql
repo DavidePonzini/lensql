@@ -55,7 +55,8 @@ CREATE TABLE users (
     registration_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     experience INTEGER NOT NULL DEFAULT 0,
     coins INTEGER NOT NULL DEFAULT 50,
-    can_use_ai BOOLEAN NOT NULL DEFAULT TRUE
+    can_use_ai BOOLEAN NOT NULL DEFAULT TRUE,
+    last_search_path TEXT DEFAULT NULL
 );
 
 CREATE TABLE navigation_logs(

@@ -5,6 +5,7 @@ from .connection import DatabaseConnection
 from .queries import BuiltinQueries, MetadataQueries
 from .solution import CheckExecutionStatus, result_message, CheckResult, CheckResultMessage, CheckResultDataset
 from ...sql import SQLCode, QueryResult, SQLException, QueryResultError, QueryResultDataset
+from .. import admin
 
 import threading
 import time
@@ -80,6 +81,8 @@ class Database(ABC):
                         result.query = SQLCode(builtin_name, builtin=True)
                     
                     yield result
+
+                self._persist_current_search_path(conn)
             except SQLException as e:
                 if conn is None:
                     return # cannot rollback if no connection
@@ -184,6 +187,7 @@ class Database(ABC):
 
         with self.conn_lock:
             conn = self.get_connection(autocommit=autocommit)
+            self._restore_last_search_path(conn)
             self.connections[f'{self.dbname}_{self.dbms_name}'] = conn
             return conn
 
@@ -277,6 +281,28 @@ class Database(ABC):
         result = self.connect().execute_sql_raw(self.metadata_queries.get_search_path())
 
         return result[0][0]
+
+    def _persist_current_search_path(self, conn: DatabaseConnection) -> None:
+        '''Persist the current search path for future connections.'''
+
+        try:
+            result = conn.execute_sql_raw(self.metadata_queries.get_search_path())
+            search_path = result[0][0] if result else None
+            admin.User(self.dbname).set_last_search_path(search_path)
+        except Exception as e:
+            dav_tools.messages.warning(f'Failed to persist search_path for {self.dbname}: {e}')
+
+    def _restore_last_search_path(self, conn: DatabaseConnection) -> None:
+        '''Restore the last saved search path on a newly opened connection.'''
+
+        try:
+            search_path = admin.User(self.dbname).last_search_path
+            if not search_path:
+                return
+
+            conn.execute_sql_raw(self.metadata_queries.set_search_path(search_path))
+        except Exception as e:
+            dav_tools.messages.warning(f'Failed to restore search_path for {self.dbname}: {e}')
 
     def get_columns(self) -> list[CatalogColumnInfo]:
         '''Lists all tables'''
