@@ -14,11 +14,11 @@ endif
 
 .PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors stress_start stress_stop maintenance maintenance_stop logs
 
-prod: stop_app locales_compile
+prod: stop_app locales_compile test
 	export PORT=$(PORT) && docker compose --profile prod up -d --build
 	@tput cnorm
 
-dev: stop_app locales_compile
+dev: stop_app locales_compile test
 	export PORT=$(PORT) && docker compose --profile dev up --build
 	@tput cnorm
 
@@ -44,6 +44,9 @@ maintenance:
 maintenance_stop:
 	 export PORT=$(PORT) && docker compose down nginx_maintenance
 	@tput cnorm
+
+test: $(VENV)
+	$(VENV_BIN)/pytest
 
 setup:
 	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/setup/setup.py
