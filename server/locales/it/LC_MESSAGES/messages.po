@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-22 13:00+0200\n"
+"POT-Creation-Date: 2026-04-23 15:38+0200\n"
 "PO-Revision-Date: 2025-07-29 15:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: it\n"
@@ -124,25 +124,25 @@ msgstr "Congratulazioni, non ho trovato alcun errore nella tua query!"
 msgid "User is not a participant in the specified dataset."
 msgstr "L'utente non è un partecipante del dataset specificato."
 
-#: server/db/users/database.py:246 server/db/users/database.py:255
+#: server/db/users/database.py:250 server/db/users/database.py:259
 msgid "No tables found in the current search path."
 msgstr ""
 
-#: server/db/users/database.py:264
+#: server/db/users/database.py:268
 msgid "No constraints found in the current search path."
 msgstr ""
 
-#: server/db/users/database.py:396
+#: server/db/users/database.py:422
 msgid "No solution found for this exercise."
 msgstr "Nessuna soluzione trovata per questo esercizio."
 
-#: server/db/users/database.py:402
+#: server/db/users/database.py:428
 msgid "Your query is not supported. Please ensure it is a valid SQL SELECT query."
 msgstr ""
 "La tua query non è supportata. Assicurati che sia una query SQL SELECT "
 "valida."
 
-#: server/db/users/database.py:411
+#: server/db/users/database.py:437
 msgid ""
 "Error executing teacher-provided solution. Have you initialized the "
 "dataset?"
@@ -150,7 +150,7 @@ msgstr ""
 "Errore nell'esecuzione della soluzione fornita dall'insegnante. Hai "
 "inizializzato il dataset?"
 
-#: server/db/users/database.py:419
+#: server/db/users/database.py:445
 msgid ""
 "Your query has different columns from the solution. Cannot compare "
 "results."
@@ -158,15 +158,15 @@ msgstr ""
 "La tua query ha colonne diverse rispetto alla soluzione. Impossibile "
 "confrontare i risultati."
 
-#: server/db/users/database.py:420 server/db/users/database.py:432
+#: server/db/users/database.py:446 server/db/users/database.py:458
 msgid "Expected:"
 msgstr "Atteso:"
 
-#: server/db/users/database.py:421 server/db/users/database.py:433
+#: server/db/users/database.py:447 server/db/users/database.py:459
 msgid "Your query:"
 msgstr "La tua query:"
 
-#: server/db/users/database.py:431
+#: server/db/users/database.py:457
 msgid ""
 "Your query has different data types from the solution. Cannot compare "
 "results."
@@ -174,7 +174,7 @@ msgstr ""
 "La tua query ha tipi di dati diversi rispetto alla soluzione. Impossibile"
 " confrontare i risultati."
 
-#: server/db/users/database.py:442
+#: server/db/users/database.py:468
 msgid "Your query returns the same values as the solution."
 msgstr ""
 
@@ -186,36 +186,45 @@ msgstr ""
 "Non hai abbastanza monete per usare questa funzione. Consulta la pagina "
 "del profilo per scoprire come guadagnarne di più."
 
-#: server/sql/result/dataset.py:45
+#: server/sql/result/dataset.py:47
 msgid "Unexpected"
 msgstr "Non previsto"
 
-#: server/sql/result/dataset.py:45
-msgid "your query should not return this row"
-msgstr "la tua query non dovrebbe ritornare questa riga"
-
-#: server/sql/result/dataset.py:48
+#: server/sql/result/dataset.py:50
 msgid "Missing"
 msgstr "Mancante"
 
-#: server/sql/result/dataset.py:48
-msgid "your query should return this row but it does not"
-msgstr "la tua query dovrebbe ritornare questa riga, ma non lo fa"
+#: server/sql/result/dataset.py:53
+msgid "Correct"
+msgstr ""
 
-#: server/sql/result/dataset.py:51
+#: server/sql/result/dataset.py:56
 msgid "row"
 msgstr "riga"
 
-#: server/sql/result/dataset.py:51
+#: server/sql/result/dataset.py:56
 msgid "rows"
 msgstr "righe"
 
-#: server/sql/result/dataset.py:52
+#: server/sql/result/dataset.py:57
 msgid "column"
 msgstr "colonna"
 
-#: server/sql/result/dataset.py:52
+#: server/sql/result/dataset.py:57
 msgid "columns"
 msgstr "colonne"
+
+#: server/sql/result/dataset.py:129
+msgid "your query should not return this row"
+msgstr "la tua query non dovrebbe ritornare questa riga"
+
+#: server/sql/result/dataset.py:130
+msgid "your query should return this row but it does not"
+msgstr "la tua query dovrebbe ritornare questa riga, ma non lo fa"
+
+#: server/sql/result/dataset.py:142
+#, python-brace-format
+msgid "{count} rows in your query are correct"
+msgstr "{count} righe sono corrette"
 
 

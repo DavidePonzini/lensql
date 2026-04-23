@@ -34,6 +34,8 @@ class QueryResultDataset(QueryResult):
             show_dimensions=False,
             border=0
         )
+        
+        # Styling options go here, otherwise HTML tags are converted to text and shown in the result table instead of being rendered as HTML. 
         result = result.replace(
             '<thead>',
             '<thead class="table-dark">'
@@ -42,12 +44,15 @@ class QueryResultDataset(QueryResult):
             '<tbody class="table-group-divider">'
         ).replace(
             '__UNEXPECTED__',
-            f'<b style="color: red;">{_("Unexpected")}:</b> {_("your query should not return this row")}'
+            f'<b style="color: red;">{_("Unexpected")}:</b>'
         ).replace(
             '__MISSING__',
-            f'<b style="color: blue;">{_("Missing")}:</b> {_("your query should return this row but it does not")}'
+            f'<b style="color: blue;">{_("Missing")}:</b>'
+        ).replace(
+            '__CORRECT__',
+            f'<b style="color: green;">{_("Correct")}:</b>'
         )
-        
+
         row_str = _("row") if rows == 1 else _("rows")
         col_str = _("column") if cols == 1 else _("columns")
         dimensions = f'<p><i>{rows} {row_str} × {cols} {col_str}</i></p>'
@@ -102,8 +107,8 @@ class QueryResultDataset(QueryResult):
         other_cp.columns = column_names_no_duplicates
 
         # Count row occurrences
-        vc_self = self_cp.value_counts().reset_index(name='count_self')
-        vc_other = other_cp.value_counts().reset_index(name='count_other')
+        vc_self = self_cp.value_counts().reset_index(name='__count_self__')
+        vc_other = other_cp.value_counts().reset_index(name='__count_other__')
 
         # Outer join on all columns to align rows
         merged = pd.merge(
@@ -112,22 +117,38 @@ class QueryResultDataset(QueryResult):
             how='outer'
         ).fillna(0)
 
-        merged['diff'] = merged['count_self'] - merged['count_other']
+        merged['__diff__'] = merged['__count_self__'] - merged['__count_other__']
 
         # Helper to expand rows with origin label
-        def expand_rows(df, sign, origin):
-            rows = df[df['diff'] * sign > 0]
-            rows = rows.loc[rows.index.repeat(rows['diff'].abs())]
+        def expand_rows(df: pd.DataFrame, label: str) -> pd.DataFrame:
+            repeat_counts = df['__diff__'].abs().where(
+                df['__diff__'].ne(0),
+                df['__count_self__'],
+            ).astype(int)
+
+            rows = df.loc[df.index.repeat(repeat_counts)]
             rows = rows[column_names_no_duplicates]
-            rows['check_result'] = origin
+            rows['check_result'] = label
             return rows
 
-        only_in_self = expand_rows(merged, 1, '__UNEXPECTED__')
-        only_in_other = expand_rows(merged, -1, '__MISSING__')
+        unexpected_rows = expand_rows(merged[merged['__diff__'] > 0], f'__UNEXPECTED__ {_("your query should not return this row")}')
+        missing_rows = expand_rows(merged[merged['__diff__'] < 0], f'__MISSING__ {_("your query should return this row but it does not")}')
+        correct_rows = expand_rows(merged[merged['__diff__'] == 0], '__CORRECT__')
 
-        diff_rows = pd.concat([only_in_self, only_in_other], ignore_index=True)
+        # for correct rows, print a single row with no values and the amount of correct rows in the check_result column
+        if len(correct_rows) == 0:
+            # Don't print the correct rows if there are none
+            correct_rows = correct_rows[0:0]
+        else:
+            count = len(correct_rows)
 
+            correct_rows = correct_rows.iloc[0:1]
+            correct_rows[column_names_no_duplicates] = ''
+            correct_rows['check_result'] = f'__CORRECT__ {_("{count} rows in your query are correct").format(count=count)}'
+
+        diff_rows = pd.concat([unexpected_rows, missing_rows], ignore_index=True)
         are_equal = diff_rows.empty
 
-        return are_equal, diff_rows
+        result = pd.concat([diff_rows, correct_rows], ignore_index=True)
 
+        return are_equal, result
