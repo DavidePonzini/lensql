@@ -69,6 +69,25 @@ function DatasetCard({
         refreshDatasets();
     }
 
+    async function handleExport() {
+        const response = await apiRequest(`/api/datasets/export/${datasetId}`, 'GET');
+
+        if (!response.success) {
+            alert(response.message);
+            return;
+        }
+
+        const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${datasetId}.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+    }
+
     return (
         <Card className={`my-2 ${isNew ? 'border border-3 border-success' : ''}`}>
             <Card.Header>
@@ -78,11 +97,11 @@ function DatasetCard({
                     <div className='vr mx-2 mb-1' style={{ verticalAlign: 'middle', height: '2.5rem' }} />
 
                     <small className='text-body-secondary'>
-                        {dbms == 'postgresql' && 'PostgreSQL'}
-                        {dbms == 'mysql' && 'MySQL'}
-                        {dbms == 'sqlserver' && 'SQL Server'}
-                        {dbms == 'oracle' && 'Oracle'}
-                        {dbms == 'sqlite' && 'SQLite'}
+                        {dbms === 'postgresql' && 'PostgreSQL'}
+                        {dbms === 'mysql' && 'MySQL'}
+                        {dbms === 'sqlserver' && 'SQL Server'}
+                        {dbms === 'oracle' && 'Oracle'}
+                        {dbms === 'sqlite' && 'SQLite'}
                     </small>
 
                     {isSpecial && (
@@ -173,6 +192,15 @@ function DatasetCard({
                             refresh={refreshDatasets}
                             className="btn btn-warning me-2"
                         />
+
+                        <Button
+                            variant="secondary"
+                            onClick={handleExport}
+                            className='me-2'
+                        >
+                            <i className="fa fa-file-export me-1"></i>
+                            {t('pages.datasets.dataset_card.export')}
+                        </Button>
 
                         <ButtonModal
                             className="btn btn-warning me-2"

@@ -237,7 +237,7 @@
             "contact_title": "Contatti",
             "contact_body": "Per domande su questi termini: davide.ponzini@edu.unige.it"
         },
-        "datasetes": {
+        "datasets": {
             "dataset": {
                 "new": "Nuovo Dataset",
                 "save": "Salva"
@@ -255,6 +255,7 @@
                 "confirm_leave": "Sei sicuro di voler abbandonare questo dataset?",
                 "my_learning_analytics": "Le mie statistiche di apprendimento",
                 "student_learning_analytics": "Statistiche di apprendimento degli studenti",
+                "export": "Esporta",
                 "set_owners": "Imposta Proprietari",
                 "participants": "Partecipanti"
             },
@@ -262,6 +263,7 @@
                 "title": "I miei dataset",
                 "empty": "Nessun dataset trovato. Unisciti a un dataset o creane uno nuovo.",
                 "new_dataset_suggestion": "Se vuoi eseguire una query non assegnata da un docente, crea un nuovo dataset.",
+                "import": "Importa Dataset",
                 "join": "Unisciti a un dataset",
                 "join_prompt": "Inserisci il codice del dataset:",
                 "loading": "Caricamento..."

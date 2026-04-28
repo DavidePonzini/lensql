@@ -1,5 +1,7 @@
 '''This module handles dataset-related endpoints for the API.'''
 
+from dataclasses import asdict
+
 from flask import Blueprint, request
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -209,3 +211,33 @@ def get_dataset_str(dataset_id):
     result = dataset.dataset_str
 
     return responses.response(True, data=result)
+
+
+@bp.route('/export/<dataset_id>', methods=['GET'])
+@jwt_required()
+def export_dataset(dataset_id):
+    '''Export a dataset by ID.'''
+
+    user = db.admin.User(get_jwt_identity())
+    dataset = db.admin.Dataset(dataset_id)
+
+    if not dataset.has_owner(user):
+        return responses.response(False, message=_('You are not an owner of this dataset.'))
+
+    return responses.response(True, data=asdict(dataset.dump()))
+
+
+@bp.route('/import', methods=['POST'])
+@jwt_required()
+def import_dataset():
+    '''Import a dataset from an exported JSON payload.'''
+
+    user = db.admin.User(get_jwt_identity())
+    data = request.get_json()
+    payload = data['payload']
+
+    dataset = db.admin.Dataset.load_json(payload)
+    dataset.add_participant(user)
+    dataset.set_owner_status(user, True)
+
+    return responses.response(True, dataset_id=dataset.dataset_id)

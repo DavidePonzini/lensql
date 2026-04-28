@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'react-bootstrap';
 
@@ -15,6 +15,7 @@ function DatasetList() {
 
     const [datasets, setDatasets] = useState([]);
     const [loading, setLoading] = useState(true);
+    const importInputRef = useRef(null);
 
     async function handleJoinDataset() {
         const joinCode = prompt(t('pages.datasets.dataset_list.join_prompt'));
@@ -25,6 +26,23 @@ function DatasetList() {
         const result = await apiRequest('/api/datasets/join', 'POST', {
             'dataset_id': code,
         });
+
+        if (!result.success) {
+            alert(result.message);
+            return;
+        }
+
+        getDatasets();
+    }
+
+    async function handleImportDataset(event) {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+
+        if (!file) return;
+
+        const payload = await file.text();
+        const result = await apiRequest('/api/datasets/import', 'POST', { payload });
 
         if (!result.success) {
             alert(result.message);
@@ -75,6 +93,23 @@ function DatasetList() {
                     refresh={getDatasets}
                     className="btn btn-success me-2 mb-2"
                 />
+
+                <input
+                    ref={importInputRef}
+                    type="file"
+                    accept="application/json,.json"
+                    onChange={handleImportDataset}
+                    className="d-none"
+                />
+
+                <Button
+                    variant="success"
+                    onClick={() => importInputRef.current?.click()}
+                    className="me-2 mb-2"
+                >
+                    <i className="fa fa-file-import me-1"></i>
+                    {t('pages.datasets.dataset_list.import')}
+                </Button>
 
                 <Button variant="primary" onClick={handleJoinDataset} className="me-2 mb-2">
                     <i className="fa fa-arrow-right-to-bracket me-1"></i>

@@ -256,12 +256,14 @@
                 "confirm_leave": "Are you sure you want to leave this dataset?",
                 "my_learning_analytics": "My Learning Analytics",
                 "student_learning_analytics": "Students' Learning Analytics",
+                "export": "Export",
                 "set_owners": "Set Owners",
                 "participants": "Participants"
             },
             "dataset_list": {
                 "title": "My Datasets",
                 "empty": "Nothing here. Join a dataset to see exercises.",
+                "import": "Import Dataset",
                 "join": "Join Dataset",
                 "join_prompt": "Enter dataset join code:",
                 "loading": "Loading..."
