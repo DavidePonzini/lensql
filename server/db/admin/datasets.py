@@ -1,10 +1,35 @@
 import json
+from dataclasses import asdict, dataclass
 from typing import Any
 from dav_tools import database
 from .connection import db, SCHEMA
 
 from .users import User
 from .exercises import Exercise
+
+
+@dataclass(frozen=True)
+class ExerciseJSON:
+    title: str
+    request: str
+    solutions: list[str]
+    is_hidden: bool
+    difficulty: int | None
+    error: int | None
+    learning_objectives: list[str]
+    created_by: str | None
+
+
+@dataclass(frozen=True)
+class DatasetJSON:
+    dataset_id: str
+    title: str
+    description: str
+    dataset_str: str
+    search_path: str | None
+    dbms: str | None
+    domain: str | None
+    exercises: list[ExerciseJSON]
 
 class Dataset:
     '''Dataset-related database operations'''
@@ -118,6 +143,29 @@ class Dataset:
             self._dbms = result[0][0] or ''
         
         return self._dbms
+
+    @property
+    def domain(self) -> str | None:
+        '''Get the domain of the dataset'''
+
+        query = database.sql.SQL(
+        '''
+            SELECT domain
+            FROM {schema}.datasets
+            WHERE id = {dataset_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            dataset_id=database.sql.Placeholder('dataset_id')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'dataset_id': self.dataset_id
+        })
+
+        if len(result) == 0:
+            raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
+
+        return result[0][0]
     
     @property
     def is_special(self) -> bool:
@@ -194,6 +242,154 @@ class Dataset:
         dataset_id = result[0][0]
 
         return Dataset(dataset_id, name=title, description=description, dataset_str=dataset_str, search_path=search_path, dbms=dbms)
+
+    def dump(self) -> DatasetJSON:
+        '''Dump a dataset and its exercises to a JSON-serializable structure.'''
+
+        dataset_query = database.sql.SQL(
+        '''
+            SELECT
+                id,
+                name,
+                description,
+                dataset,
+                search_path,
+                dbms,
+                domain
+            FROM {schema}.datasets
+            WHERE id = {dataset_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            dataset_id=database.sql.Placeholder('dataset_id')
+        )
+        dataset_rows = db.execute_and_fetch(dataset_query, {
+            'dataset_id': self.dataset_id
+        })
+        if not dataset_rows:
+            raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
+
+        exercise_query = database.sql.SQL(
+        '''
+            SELECT
+                e.title,
+                e.request,
+                e.solutions,
+                e.is_hidden,
+                e.generation_difficulty,
+                e.generation_error,
+                e.created_by,
+                COALESCE(
+                    ARRAY(
+                        SELECT hlo.objective_id
+                        FROM {schema}.has_learning_objective hlo
+                        WHERE hlo.exercise_id = e.id
+                        ORDER BY hlo.objective_id
+                    ),
+                    ARRAY[]::text[]
+                ) AS learning_objectives
+            FROM {schema}.exercises e
+            WHERE e.dataset_id = {dataset_id}
+            ORDER BY e.id
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            dataset_id=database.sql.Placeholder('dataset_id')
+        )
+        exercise_rows = db.execute_and_fetch(exercise_query, {
+            'dataset_id': self.dataset_id
+        })
+
+        dataset_row = dataset_rows[0]
+        return DatasetJSON(
+            dataset_id=dataset_row[0],
+            title=dataset_row[1],
+            description=dataset_row[2],
+            dataset_str=dataset_row[3] or '',
+            search_path=dataset_row[4],
+            dbms=dataset_row[5],
+            domain=dataset_row[6],
+            exercises=[
+                ExerciseJSON(
+                    title=row[0],
+                    request=row[1],
+                    solutions=json.loads(row[2]) if row[2] else [],
+                    is_hidden=row[3],
+                    difficulty=row[4],
+                    error=row[5],
+                    created_by=row[6],
+                    learning_objectives=list(row[7] or []),
+                )
+                for row in exercise_rows
+            ],
+        )
+
+    @staticmethod
+    def load(dataset: DatasetJSON, *, admin_username: str = 'lens') -> 'Dataset':
+        '''Load a dataset and its exercises from a dumped JSON structure.'''
+
+        admin_user = User(admin_username)
+        created_dataset = Dataset.create(
+            title=dataset.title,
+            description=dataset.description,
+            dataset_str=dataset.dataset_str,
+            domain=dataset.domain,
+            search_path=dataset.search_path,
+            dbms=dataset.dbms or 'postgresql',
+        )
+        created_dataset.add_participant(admin_user)
+        created_dataset.set_owner_status(admin_user, True)
+
+        for exercise in dataset.exercises:
+            created_exercise = Exercise.create(
+                title=exercise.title,
+                user=User(exercise.created_by or admin_username),
+                dataset_id=created_dataset.dataset_id,
+                request=exercise.request,
+                solutions=exercise.solutions,
+                difficulty=exercise.difficulty,
+                error=exercise.error,
+            )
+            created_exercise.set_hidden(exercise.is_hidden)
+
+            for objective_id in exercise.learning_objectives:
+                created_exercise.set_learning_objective(objective_id)
+
+        return created_dataset
+
+    @staticmethod
+    def load_json(payload: str, *, admin_username: str = 'lens') -> 'Dataset':
+        '''Parse a dumped dataset JSON string and load it into the database.'''
+
+        parsed_payload: dict[str, Any] = json.loads(payload)
+        return Dataset.load(
+            DatasetJSON(
+                dataset_id=parsed_payload['dataset_id'],
+                title=parsed_payload['title'],
+                description=parsed_payload['description'],
+                dataset_str=parsed_payload.get('dataset_str', ''),
+                search_path=parsed_payload.get('search_path'),
+                dbms=parsed_payload.get('dbms'),
+                domain=parsed_payload.get('domain'),
+                exercises=[
+                    ExerciseJSON(
+                        title=exercise['title'],
+                        request=exercise['request'],
+                        solutions=list(exercise.get('solutions', [])),
+                        is_hidden=bool(exercise.get('is_hidden', False)),
+                        difficulty=exercise.get('difficulty'),
+                        error=exercise.get('error'),
+                        learning_objectives=list(exercise.get('learning_objectives', [])),
+                        created_by=exercise.get('created_by'),
+                    )
+                    for exercise in parsed_payload.get('exercises', [])
+                ],
+            ),
+            admin_username=admin_username,
+        )
+
+    def dump_json(self) -> str:
+        '''Dump a dataset to a JSON string.'''
+
+        return json.dumps(asdict(self.dump()), indent=2, ensure_ascii=False)
 
     def update(self, title: str, description: str, dataset_str: str, search_path: str | None = None, dbms: str | None = None) -> None:
         '''Update an existing dataset'''
