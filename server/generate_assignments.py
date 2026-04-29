@@ -2,6 +2,7 @@ import dav_tools
 import sql_assignment_generator
 from sql_assignment_generator import SqlErrors, DifficultyLevel
 from server.db.admin import Dataset, Exercise, User
+from server.db.users import get_database
 from datetime import datetime
 
 admin_user = User('lens')
@@ -20,8 +21,21 @@ def generate_assignment(
 ) -> Dataset:
     '''Generate SQL assignments based on specified SQL errors and difficulty levels.'''
 
+    # Map 'postgres' to 'postgresql' for consistency with database entries
+    if sql_dialect == 'postgres':
+        dbms = 'postgresql'
+    else:
+        dbms = sql_dialect
+
+    db = get_database(admin_user.username, dbms)
+    db.get_connection() # Ensure we can connect to the database before proceeding
+
     assignment = sql_assignment_generator.generate_assignment(
         errors=errors,
+        db_host=db.hostname,
+        db_port=db.port,
+        db_user=db.admin_username,
+        db_password='password',
         sql_dialect=sql_dialect,
         language=language,
         dataset_str=input_dataset_str,
@@ -47,12 +61,6 @@ def generate_assignment(
             description = 'Esercizi personalizzati basati sul tuo progresso di apprendimento.'
         else:
             description = 'Practice set tailored to your learning progress.'
-
-    # Map 'postgres' to 'postgresql' for consistency with database entries
-    if sql_dialect == 'postgres':
-        dbms = 'postgresql'
-    else:
-        dbms = sql_dialect
 
     if dataset_id is None:
         # Generate a new dataset
