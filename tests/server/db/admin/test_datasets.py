@@ -116,3 +116,33 @@ def test_load_json_creates_dataset_and_exercises(mocker):
     created_exercise.set_hidden.assert_called_once_with(True)
     created_exercise.set_learning_objective.assert_any_call('LO1')
     created_exercise.set_learning_objective.assert_any_call('LO2')
+
+
+def test_shuffle_renames_exercises_in_randomized_order(mocker):
+    mocker.patch(
+        'server.db.admin.datasets.db.execute_and_fetch',
+        return_value=[
+            [11, 'Request 1', json.dumps(['SELECT 1'])],
+            [22, 'Request 2', json.dumps(['SELECT 2'])],
+            [33, 'Request 3', json.dumps(['SELECT 3'])],
+        ],
+    )
+
+    def reverse_order(exercises):
+        exercises.reverse()
+
+    shuffle = mocker.patch(
+        'server.db.admin.datasets.random.shuffle',
+        side_effect=reverse_order,
+    )
+    update = mocker.patch('server.db.admin.datasets.Exercise.update')
+
+    Dataset('ds1').shuffle(prefix='Task ')
+
+    shuffle.assert_called_once()
+    assert update.call_count == 3
+    assert [call.kwargs for call in update.call_args_list] == [
+        {'title': 'Task 1', 'request': 'Request 3', 'solutions': ['SELECT 3']},
+        {'title': 'Task 2', 'request': 'Request 2', 'solutions': ['SELECT 2']},
+        {'title': 'Task 3', 'request': 'Request 1', 'solutions': ['SELECT 1']},
+    ]

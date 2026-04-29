@@ -1,4 +1,5 @@
 import json
+import random
 from dataclasses import asdict, dataclass
 from typing import Any
 from dav_tools import database
@@ -672,6 +673,47 @@ class Dataset:
     # endregion
 
     # region Exercises
+    def shuffle(self, prefix: str = 'Exercise ') -> None:
+        '''Shuffle dataset exercises and rename them sequentially.'''
+
+        query = database.sql.SQL(
+        '''
+            SELECT
+                e.id,
+                e.request,
+                e.solutions
+            FROM
+                {schema}.exercises e
+            WHERE
+                e.dataset_id = {dataset_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            dataset_id=database.sql.Placeholder('dataset_id')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'dataset_id': self.dataset_id
+        })
+
+        exercises = [
+            Exercise(
+                exercise_id=row[0],
+                dataset_id=self.dataset_id,
+                request=row[1],
+                solutions=json.loads(row[2]),
+                all_properties_loaded=True,
+            )
+            for row in result
+        ]
+        random.shuffle(exercises)
+
+        for index, exercise in enumerate(exercises, start=1):
+            exercise.update(
+                title=f'{prefix}{index}',
+                request=exercise.request,
+                solutions=exercise.solutions,
+            )
+
     def list_exercises(self, user: User) -> list[Exercise]:
         '''Get all exercises assigned to a user in a dataset. Includes hidden exercises if the user is a teacher.'''
 

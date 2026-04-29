@@ -2,13 +2,11 @@ import dav_tools
 import sql_assignment_generator
 from sql_assignment_generator import SqlErrors, DifficultyLevel
 from server.db.admin import Dataset, Exercise, User
-import random
 from datetime import datetime
 
 admin_user = User('lens')
 
 def generate_assignment(
-    user: User,
     errors: list[tuple[SqlErrors, DifficultyLevel]],
     *,
     title: str | None = None,
@@ -106,35 +104,20 @@ def generate_assignment(
             error=exercise_data.error.value
         )
 
-    # Add the specified user as participant
-    dataset.add_participant(user)
-
     return dataset
 
-def get_error_stats(user: User, dataset_id: str | None = None) -> list[dict]:
-    '''Get error stats for a user, optionally filtered by dataset.'''
-    if dataset_id:
-        error_stats = user.get_error_stats(dataset_id=dataset_id)['errors']
-    else:
-        error_stats = user.get_error_stats()['errors']
-    
-    return sorted(error_stats, key=lambda item: item['count'], reverse=True)
+def print_error_list() -> None:
+    for e in SqlErrors:
+        dav_tools.messages.message(e.value, e.name, text_min_len=[5], additional_text_options=[[dav_tools.messages.TextFormat.Style.BOLD]])
 
-def print_error_stats(error_stats: list[dict]):
-    '''Print error stats in a readable format.'''
-    for i, error in enumerate(error_stats):
-        error_id = error['error_id']
-        error_name = SqlErrors(error_id).name if error_id in SqlErrors._value2member_map_ else 'Unknown Error'
-        dav_tools.messages.message(f'{i+1}. {error_name}: {error["count"]}')
-
-def select_errors_to_target(error_stats: list[dict]) -> list[tuple[SqlErrors, DifficultyLevel]]:
+def select_errors_to_target() -> list[tuple[SqlErrors, DifficultyLevel]]:
     '''Prompt user to select which errors to target from the error stats.'''
     selection: list[tuple[int, str]] = []
     while True:
         selection_input = dav_tools.messages.ask('Enter space-separated error numbers and difficulties to target (e.g. "1a 3b 5c")')
         try:
             selection = [(int(i[:-1]), i[-1]) for i in selection_input.split()]
-            if all(1 <= i <= len(error_stats) and d in ['a', 'b', 'c'] for i, d in selection):
+            if all(1 <= i <= len(SqlErrors) and d in ['a', 'b', 'c'] for i, d in selection):
                 break
             else:
                 dav_tools.messages.error('Invalid input. Please enter valid error numbers and difficulties from the list.')
@@ -145,50 +128,29 @@ def select_errors_to_target(error_stats: list[dict]) -> list[tuple[SqlErrors, Di
     result: list[tuple[SqlErrors, DifficultyLevel]] = []
 
     for e, d in selection:
-        error_id = error_stats[e-1]['error_id']
         difficulty = DifficultyLevel(ord(d) - ord('a') + 1)
-        result.append((SqlErrors(error_id), difficulty))
+        result.append((SqlErrors(e), difficulty))
     
     return result
 
 if __name__ == '__main__':
-    dav_tools.argument_parser.add_argument('user', help='Username to assign the generated exercises to')
     dav_tools.argument_parser.add_argument('-i', '--input', help='Use this dataset as a template, instead of generating a new one')
     dav_tools.argument_parser.add_argument('-o', '--output', help='Generate exercises in this dataset. If not provided, a new dataset will be created')
-    dav_tools.argument_parser.add_argument('--assign-to', help='Username to assign the generated exercises to (alternative to user)')
     dav_tools.argument_parser.add_argument('--dialect', help='SQL dialect to use for generated exercises (default: postgres)', default='postgres')
     dav_tools.argument_parser.add_argument('--domain', help='Optional domain to filter exercises by')
-    dav_tools.argument_parser.add_argument('--from-dataset', help='Only extract error patterns from this dataset')
     dav_tools.argument_parser.add_argument('--language', help='Language to use for generated exercises (default: en)', default='en', choices=['en', 'it'])
     dav_tools.argument_parser.parse_args()
 
-    user = User(dav_tools.argument_parser.args.user)
-
     input_dataset_id = dav_tools.argument_parser.args.input
     output_dataset_id = dav_tools.argument_parser.args.output
-
-    assign_to = dav_tools.argument_parser.args.assign_to
-    # If --assign_to is provided, use that user instead of the one specified by 'user' argument
-    if assign_to:
-        assign_to_user = User(assign_to)
-    else:
-        assign_to_user = user
-
     domain = dav_tools.argument_parser.args.domain
     sql_dialect = dav_tools.argument_parser.args.dialect
     language = dav_tools.argument_parser.args.language
 
-    # Extract error stats for the user, optionally filtered by dataset
-    sorted_error_stats = get_error_stats(user, dataset_id=dav_tools.argument_parser.args.from_dataset)
-
-    if not sorted_error_stats:
-        dav_tools.messages.error(f'No error stats found for user {user.username}. Cannot generate targeted assignment.')
-        exit()
-
-    print_error_stats(sorted_error_stats)
+    print_error_list()
 
     # Prompt user to select which errors to target and their corresponding difficulty levels
-    errors: list[tuple[SqlErrors, DifficultyLevel]] = select_errors_to_target(sorted_error_stats)
+    errors: list[tuple[SqlErrors, DifficultyLevel]] = select_errors_to_target()
 
     # If --input dataset is provided, use it as a template
     if input_dataset_id is None:
@@ -205,13 +167,12 @@ if __name__ == '__main__':
         # Only set input_exercise_count if the output dataset is the same as the input dataset,
         # otherwise we don't want to count existing exercises in a different dataset
         if output_dataset_id == input_dataset_id:
-            input_exercise_count = len(input_dataset.list_exercises(assign_to_user))
+            input_exercise_count = len(input_dataset.list_exercises(admin_user))
         else:
             input_exercise_count = 0
 
     # Generate the assignment dataset and exercises
     dataset = generate_assignment(
-        assign_to_user,
         errors,
         title=title,
         description=description,
