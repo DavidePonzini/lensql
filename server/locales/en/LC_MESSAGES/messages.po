@@ -74,6 +74,26 @@ msgstr "You are not an owner of this dataset."
 msgid "You cannot set yourself as an owner of this dataset."
 msgstr "You cannot set yourself as an owner of this dataset."
 
+#: server/api/datasets.py:21
+msgid "Failed to import dataset. JSON syntax error at line %(line)s, column %(column)s: %(details)s."
+msgstr "Failed to import dataset. JSON syntax error at line %(line)s, column %(column)s: %(details)s."
+
+#: server/api/datasets.py:30
+msgid "Failed to import dataset. Missing required field: %(field)s."
+msgstr "Failed to import dataset. Missing required field: %(field)s."
+
+#: server/api/datasets.py:37
+msgid "Invalid dataset content."
+msgstr "Invalid dataset content."
+
+#: server/api/datasets.py:39
+msgid "Failed to import dataset. %(details)s"
+msgstr "Failed to import dataset. %(details)s"
+
+#: server/api/datasets.py:43
+msgid "Failed to import dataset because the server encountered an error."
+msgstr "Failed to import dataset because the server encountered an error."
+
 #: server/api/exercises.py:26
 msgid "Dataset ID is required."
 msgstr "Dataset ID is required."
@@ -226,5 +246,4 @@ msgstr "your query should return this row but it does not"
 #, python-brace-format
 msgid "{count} rows in your query are correct"
 msgstr "{count} rows in your query are correct"
-
 

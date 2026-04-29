@@ -1,8 +1,9 @@
 '''This module handles dataset-related endpoints for the API.'''
 
+import json
 from dataclasses import asdict
 
-from flask import Blueprint, request
+from flask import Blueprint, current_app, request
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_babel import _
@@ -11,6 +12,34 @@ from server import db, gamification
 from .util import responses
 
 bp = Blueprint('datasets', __name__)
+
+
+def _format_dataset_import_error(error: Exception) -> str:
+    '''Format dataset import errors into user-facing messages with context.'''
+
+    if isinstance(error, json.JSONDecodeError):
+        return _(
+            'Failed to import dataset. JSON syntax error at line %(line)s, column %(column)s: %(details)s.',
+            line=error.lineno,
+            column=error.colno,
+            details=error.msg,
+        )
+
+    if isinstance(error, KeyError):
+        field = error.args[0] if error.args else 'unknown'
+        return _(
+            'Failed to import dataset. Missing required field: %(field)s.',
+            field=field,
+        )
+
+    if isinstance(error, (TypeError, ValueError)):
+        details = str(error).strip() or _('Invalid dataset content.')
+        return _(
+            'Failed to import dataset. %(details)s',
+            details=details,
+        )
+
+    return _('Failed to import dataset because the server encountered an error.')
 
 
 class DatasetsAPI(MethodView):
@@ -236,8 +265,17 @@ def import_dataset():
     data = request.get_json()
     payload = data['payload']
 
-    dataset = db.admin.Dataset.load_json(payload)
-    dataset.add_participant(user)
-    dataset.set_owner_status(user, True)
+    try:
+        dataset = db.admin.Dataset.load_json(payload)
+        dataset.add_participant(user)
+        dataset.set_owner_status(user, True)
+    except (json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
+        return responses.response(False, message=_format_dataset_import_error(error))
+    except Exception:
+        current_app.logger.exception('Dataset import failed.')
+        return responses.response(
+            False,
+            message=_('Failed to import dataset because the server encountered an error.'),
+        )
 
     return responses.response(True, dataset_id=dataset.dataset_id)
