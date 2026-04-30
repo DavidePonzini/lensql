@@ -16,6 +16,8 @@ function DatasetList() {
     const [datasets, setDatasets] = useState([]);
     const [loading, setLoading] = useState(true);
     const importInputRef = useRef(null);
+    const joinedDatasetIdRef = useRef(null);
+    const datasetCardRefs = useRef({});
 
     async function handleJoinDataset() {
         const joinCode = prompt(t('pages.datasets.dataset_list.join_prompt'));
@@ -32,6 +34,7 @@ function DatasetList() {
             return;
         }
 
+        joinedDatasetIdRef.current = code;
         getDatasets();
     }
 
@@ -84,6 +87,27 @@ function DatasetList() {
         getDatasets();
     }, [getDatasets]);
 
+    useEffect(() => {
+        const joinedDatasetId = joinedDatasetIdRef.current;
+
+        if (!joinedDatasetId) {
+            return;
+        }
+
+        const targetCard = datasetCardRefs.current[joinedDatasetId];
+
+        if (!targetCard) {
+            return;
+        }
+
+        targetCard.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+        });
+
+        joinedDatasetIdRef.current = null;
+    }, [datasets]);
+
     return (
         <div className="container-md">
             <h1 className=''>{t('pages.datasets.dataset_list.title')}</h1>
@@ -129,19 +153,30 @@ function DatasetList() {
                 )}
 
                 {datasets.map((dataset) => (
-                    <DatasetCard
+                    <div
                         key={dataset.dataset_id}
-                        title={dataset.title}
-                        description={dataset.description}
-                        datasetId={dataset.dataset_id}
-                        isOwner={dataset.is_owner}
-                        participants={dataset.participants}
-                        exercises={dataset.exercises}
-                        queriesUser={dataset.queries_user}
-                        queriesStudents={dataset.queries_students}
-                        refreshDatasets={getDatasets}
-                        dbms={dataset.dbms}
-                    />
+                        ref={(element) => {
+                            if (element) {
+                                datasetCardRefs.current[dataset.dataset_id] = element;
+                                return;
+                            }
+
+                            delete datasetCardRefs.current[dataset.dataset_id];
+                        }}
+                    >
+                        <DatasetCard
+                            title={dataset.title}
+                            description={dataset.description}
+                            datasetId={dataset.dataset_id}
+                            isOwner={dataset.is_owner}
+                            participants={dataset.participants}
+                            exercises={dataset.exercises}
+                            queriesUser={dataset.queries_user}
+                            queriesStudents={dataset.queries_students}
+                            refreshDatasets={getDatasets}
+                            dbms={dataset.dbms}
+                        />
+                    </div>
                 ))}
             </CardList>
         </div>
