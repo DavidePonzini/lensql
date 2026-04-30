@@ -73,6 +73,7 @@ def test_check_solution_returns_rewards_and_logs_context(authenticated_client, m
         result=fake_result,
     )
     fake_database = SimpleNamespace(
+        get_search_path=lambda: 'public',
         check_query_solution=lambda **kwargs: fake_check,
         get_columns=lambda: ['columns'],
         get_unique_columns=lambda: ['unique_columns'],
@@ -81,6 +82,7 @@ def test_check_solution_returns_rewards_and_logs_context(authenticated_client, m
     fake_query = SimpleNamespace(
         query_id=321,
         log_context=mocker.stub(name='log_context'),
+        log_errors=mocker.stub(name='log_errors'),
         log_solution_attempt=mocker.stub(name='log_solution_attempt'),
     )
 
@@ -90,6 +92,8 @@ def test_check_solution_returns_rewards_and_logs_context(authenticated_client, m
     mocker.patch('server.api.queries.db.users.get_database', return_value=fake_database)
     mocker.patch('server.api.queries.db.admin.QueryBatch.log', return_value=fake_batch)
     mocker.patch('server.api.queries.db.admin.Query.log', return_value=fake_query)
+    mocker.patch('server.api.queries.build_catalog', return_value='catalog')
+    mocker.patch('server.api.queries.get_errors', return_value=['error'])
 
     response = authenticated_client.post('/queries/check-solution', json={
         'query': 'SELECT 1',
