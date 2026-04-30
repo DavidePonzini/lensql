@@ -113,6 +113,14 @@
                     "student": "Guarda se stai commettendo meno errori man mano che progredisci.",
                     "teacher": "Guarda se i tuoi studenti stanno commettendo meno errori man mano che progrediscono."
                 },
+                "query_goal": {
+                    "label": "Mostra",
+                    "options": {
+                        "all": "Tutte le query",
+                        "focused": "Query di esercitazione",
+                        "submitted": "Tentativi di soluzione"
+                    }
+                },
                 "count_label": "{{count}} errori",
                 "example_label": "Esempio",
                 "correction_label": "Correzione",

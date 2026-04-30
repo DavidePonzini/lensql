@@ -113,6 +113,14 @@
                     "student": "See whether you're making fewer mistakes as you progress.",
                     "teacher": "See whether your students are making fewer mistakes as they progress."
                 },
+                "query_goal": {
+                    "label": "Show",
+                    "options": {
+                        "all": "All queries",
+                        "focused": "Practice queries",
+                        "submitted": "Solution attempts"
+                    }
+                },
                 "count_label": "{{count}} errors",
                 "example_label": "Example",
                 "correction_label": "Correction",

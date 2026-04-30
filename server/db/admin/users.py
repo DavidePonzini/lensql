@@ -1002,6 +1002,7 @@ class User:
             query = database.sql.SQL(
                 '''
                     SELECT
+                        query_goal,
                         error_id,
                         SUM(occurrences) AS occurrences
                     FROM
@@ -1009,6 +1010,7 @@ class User:
                     WHERE
                         username = {username}
                     GROUP BY
+                        query_goal,
                         error_id
                 '''
             ).format(
@@ -1023,6 +1025,7 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
+                            query_goal,
                             error_id,
                             SUM(occurrences) AS occurrences
                         FROM
@@ -1031,6 +1034,7 @@ class User:
                             dataset_id = {dataset_id}
                             AND is_owner = FALSE
                         GROUP BY
+                            query_goal,
                             error_id
                     '''
                 ).format(
@@ -1043,6 +1047,7 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
+                            query_goal,
                             error_id,
                             SUM(occurrences) AS occurrences
                         FROM
@@ -1051,6 +1056,7 @@ class User:
                             dataset_id = {dataset_id}
                             AND username = {username}
                         GROUP BY
+                            query_goal,
                             error_id
                     '''
                 ).format(
@@ -1066,6 +1072,7 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
+                            query_goal,
                             error_id,
                             SUM(occurrences) AS occurrences
                         FROM
@@ -1074,6 +1081,7 @@ class User:
                             exercise_id = {exercise_id}
                             AND is_owner = FALSE
                         GROUP BY
+                            query_goal,
                             error_id
                     '''
                 ).format(
@@ -1086,6 +1094,7 @@ class User:
                 query = database.sql.SQL(
                     '''
                         SELECT
+                            query_goal,
                             error_id,
                             SUM(occurrences) AS occurrences
                         FROM
@@ -1094,6 +1103,7 @@ class User:
                             exercise_id = {exercise_id}
                             AND username = {username}
                         GROUP BY
+                            query_goal,
                             error_id
                     '''
                 ).format(
@@ -1109,8 +1119,9 @@ class User:
         return {
             'errors': [
                 {
-                    'error_id': row[0],
-                    'count': int(row[1]),                
+                    'query_goal': row[0],
+                    'error_id': row[1],
+                    'count': int(row[2]),
                 } for row in result
             ],
             'timeline': timeline,
@@ -1132,6 +1143,7 @@ class User:
                 '''
                     SELECT
                         day,
+                        query_goal,
                         error_id,
                         occurrences
                     FROM
@@ -1153,6 +1165,7 @@ class User:
                     '''
                         SELECT
                             day,
+                            query_goal,
                             error_id,
                             SUM(occurrences) AS occurrences
                         FROM
@@ -1161,7 +1174,7 @@ class User:
                             dataset_id = {dataset_id}
                             AND is_owner = FALSE
                         GROUP BY
-                            day, error_id
+                            day, query_goal, error_id
                         ORDER BY
                             day ASC
                     '''
@@ -1176,6 +1189,7 @@ class User:
                     '''
                         SELECT
                             day,
+                            query_goal,
                             error_id,
                             SUM(occurrences) AS occurrences 
                         FROM
@@ -1184,7 +1198,7 @@ class User:
                             dataset_id = {dataset_id}
                             AND username = {username}
                         GROUP BY
-                            day, error_id
+                            day, query_goal, error_id
                         ORDER BY
                             day ASC
                     '''
@@ -1201,6 +1215,7 @@ class User:
                     '''
                         SELECT
                             day,
+                            query_goal,
                             error_id,
                             SUM(occurrences) AS occurrences
                         FROM
@@ -1209,7 +1224,7 @@ class User:
                             exercise_id = {exercise_id}
                             AND is_owner = FALSE
                         GROUP BY
-                            day, error_id
+                            day, query_goal, error_id
                         ORDER BY
                             day ASC
                     '''
@@ -1224,6 +1239,7 @@ class User:
                     '''
                         SELECT
                             day,
+                            query_goal,
                             error_id,
                             SUM(occurrences) AS occurrences
                         FROM
@@ -1232,7 +1248,7 @@ class User:
                             exercise_id = {exercise_id}
                             AND username = {username}
                         GROUP BY
-                            day, error_id
+                            day, query_goal, error_id
                         ORDER BY
                             day ASC
                     '''
@@ -1248,8 +1264,9 @@ class User:
         return [
             {
                 'date': row[0],
-                'error_id': int(row[1]),
-                'count': int(row[2]),
+                'query_goal': row[1],
+                'error_id': int(row[2]),
+                'count': int(row[3]),
             } for row in result
         ]            
     # endregion

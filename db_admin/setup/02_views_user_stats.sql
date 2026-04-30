@@ -19,7 +19,7 @@ FROM
     JOIN exercises e ON qb.exercise_id = e.id
     JOIN dataset_members dm ON dm.username = qb.username AND dm.dataset_id = e.dataset_id
 WHERE
-    q.query_type NOT IN ('BUILTIN', 'CHECK_SOLUTION')
+    q.query_type <> 'BUILTIN'
 GROUP BY
     dm.dataset_id,
     qb.exercise_id,
@@ -42,7 +42,7 @@ FROM
     queries q
     JOIN query_batches qb ON qb.id = q.batch_id
 WHERE
-    q.query_type NOT IN ('BUILTIN', 'CHECK_SOLUTION')
+    q.query_type <> 'BUILTIN'
 GROUP BY
     qb.username,
     q.query_type;
@@ -98,6 +98,7 @@ SELECT
     qb.exercise_id,
     qb.username,
     dm.is_owner,
+    q.query_goal,
     he.error_id,
     COUNT(DISTINCT q.id) AS occurrences
 FROM
@@ -111,11 +112,13 @@ GROUP BY
     qb.exercise_id,
     qb.username,
     dm.is_owner,
+    q.query_goal,
     he.error_id;
 
 CREATE VIEW v_stats_errors_by_user AS
 SELECT
     qb.username,
+    q.query_goal,
     he.error_id,
     COUNT(DISTINCT q.id) AS occurrences
 FROM
@@ -124,6 +127,7 @@ FROM
     JOIN query_batches qb ON qb.id = q.batch_id
 GROUP BY
     qb.username,
+    q.query_goal,
     he.error_id;
 
 
@@ -134,6 +138,7 @@ SELECT
     qb.username,
     dm.is_owner,
     DATE(q.ts) AS day,
+    q.query_goal,
     he.error_id,
     COUNT(DISTINCT he.query_id) AS occurrences
 FROM
@@ -148,12 +153,14 @@ GROUP BY
     qb.exercise_id,
     qb.username,
     dm.is_owner,
+    q.query_goal,
     he.error_id;
 
 CREATE VIEW v_stats_error_timeline_by_user AS
 SELECT
     qb.username,
     DATE(q.ts) AS day,
+    q.query_goal,
     he.error_id,
     COUNT(DISTINCT he.query_id) AS occurrences
 FROM
@@ -163,6 +170,7 @@ FROM
 GROUP BY
     day,
     qb.username,
+    q.query_goal,
     he.error_id;
 
 COMMIT;

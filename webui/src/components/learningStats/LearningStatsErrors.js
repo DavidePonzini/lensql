@@ -20,6 +20,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
 
     const { apiRequest } = useAuth();
     const [data, setData] = useState(null);
+    const [selectedQueryGoal, setSelectedQueryGoal] = useState('all');
 
     async function fetchData() {
         const response = await apiRequest(
@@ -34,8 +35,14 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
     // ----------------------------------------------------------------------
     // REAL DATA
     // ----------------------------------------------------------------------
-    const dataErrors = data?.errors || [];        // [{ error_id, count }]
-    const dataTimeline = data?.timeline || [];    // [{ date, error_id, count }]
+    const allErrors = data?.errors || [];
+    const selectedGoalValue = selectedQueryGoal === 'submitted' ? 'CHECK_SOLUTION' : 'FOCUSED';
+    const dataErrors = allErrors.filter(
+        ({ query_goal }) => selectedQueryGoal === 'all' || query_goal === selectedGoalValue
+    );
+    const dataTimeline = (data?.timeline || []).filter(
+        ({ query_goal }) => selectedQueryGoal === 'all' || query_goal === selectedGoalValue
+    );
 
     // ----------------------------------------------------------------------
     // CATEGORY MAPPING
@@ -95,6 +102,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
             cat: categoryOf(error_id),
         }));
 
+    const hasAnyErrors = allErrors.length > 0;
     const hasErrors = dataErrors.length > 0;
 
     // ----------------------------------------------------------------------
@@ -208,155 +216,176 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
 
     return (
         <ObservedOnce onFirstVisible={fetchData}>
-            {!hasErrors ? (
+            {!hasAnyErrors ? (
                 <p className="text-muted" style={{ fontSize: '1.2rem' }}>
                     {t(`components.learningStats.errors.empty.${role}`)}
                 </p>
             ) : (
                 <>
-                    <Row className="mb-4">
-                        {/* PIE */}
-                        <Col>
-                            <Card style={{ height: '100%' }}>
-                                <Card.Header>
-                                    <Card.Title>{t('components.learningStats.errors.kind_title')}</Card.Title>
-                                    <Card.Subtitle className="text-muted">
-                                        {t(`components.learningStats.errors.kind_subtitle.${role}`)}
-                                    </Card.Subtitle>
-                                </Card.Header>
-                                <Card.Body>
-                                    <ResponsiveContainer width="100%" height={250}>
-                                        <PieChart>
-                                            <Tooltip content={pieTooltip} wrapperStyle={{ zIndex: 1000 }}/>
-                                            <Pie
-                                                data={categoryData}
-                                                dataKey="value"
-                                                nameKey="name"
-                                                outerRadius={80}
-                                                label={({ name }) => name}
-                                            >
-                                                {categoryData.map(entry => (
-                                                    <Cell key={entry.cat} fill={CATEGORY_COLOR[entry.cat]} />
-                                                ))}
-                                            </Pie>
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </Card.Body>
-                            </Card>
-                        </Col>
+                    <div className="d-flex justify-content-start align-items-center mb-3">
+                        <label className="me-2 text-muted" htmlFor="error-query-goal-filter">
+                            {t('components.learningStats.errors.query_goal.label')}
+                        </label>
+                        <select
+                            id="error-query-goal-filter"
+                            className="form-select w-auto"
+                            value={selectedQueryGoal}
+                            onChange={(event) => setSelectedQueryGoal(event.target.value)}
+                        >
+                            <option value="all">{t('components.learningStats.errors.query_goal.options.all')}</option>
+                            <option value="focused">{t('components.learningStats.errors.query_goal.options.focused')}</option>
+                            <option value="submitted">{t('components.learningStats.errors.query_goal.options.submitted')}</option>
+                        </select>
+                    </div>
+                    {!hasErrors ? (
+                        <p className="text-muted" style={{ fontSize: '1.2rem' }}>
+                            {t(`components.learningStats.errors.empty.${role}`)}
+                        </p>
+                    ) : (
+                        <>
+                            <Row className="mb-4">
+                                {/* PIE */}
+                                <Col>
+                                    <Card style={{ height: '100%' }}>
+                                        <Card.Header>
+                                            <Card.Title>{t('components.learningStats.errors.kind_title')}</Card.Title>
+                                            <Card.Subtitle className="text-muted">
+                                                {t(`components.learningStats.errors.kind_subtitle.${role}`)}
+                                            </Card.Subtitle>
+                                        </Card.Header>
+                                        <Card.Body>
+                                            <ResponsiveContainer width="100%" height={250}>
+                                                <PieChart>
+                                                    <Tooltip content={pieTooltip} wrapperStyle={{ zIndex: 1000 }}/>
+                                                    <Pie
+                                                        data={categoryData}
+                                                        dataKey="value"
+                                                        nameKey="name"
+                                                        outerRadius={80}
+                                                        label={({ name }) => name}
+                                                    >
+                                                        {categoryData.map(entry => (
+                                                            <Cell key={entry.cat} fill={CATEGORY_COLOR[entry.cat]} />
+                                                        ))}
+                                                    </Pie>
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
 
-                        {/* TIMELINE */}
-                        <Col>
-                            <Card style={{ height: '100%' }}>
-                                <Card.Header>
-                                    <Card.Title>{t(`components.learningStats.errors.timeline_title.${role}`)}</Card.Title>
-                                    <Card.Subtitle className="text-muted">
-                                        {t(`components.learningStats.errors.timeline_subtitle.${role}`)}
-                                    </Card.Subtitle>
-                                </Card.Header>
-                                <Card.Body>
-                                    <ResponsiveContainer width="100%" height={300}>
-                                        <AreaChart data={timelineData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-                                            <CartesianGrid strokeDasharray="3 3" />
+                                {/* TIMELINE */}
+                                <Col>
+                                    <Card style={{ height: '100%' }}>
+                                        <Card.Header>
+                                            <Card.Title>{t(`components.learningStats.errors.timeline_title.${role}`)}</Card.Title>
+                                            <Card.Subtitle className="text-muted">
+                                                {t(`components.learningStats.errors.timeline_subtitle.${role}`)}
+                                            </Card.Subtitle>
+                                        </Card.Header>
+                                        <Card.Body>
+                                            <ResponsiveContainer width="100%" height={300}>
+                                                <AreaChart data={timelineData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                                                    <CartesianGrid strokeDasharray="3 3" />
 
-                                            <XAxis dataKey="dateFormatted" />
-                                            <YAxis domain={[0, 100]} tickFormatter={(v) => `${v.toFixed(0)}%`} />
+                                                    <XAxis dataKey="dateFormatted" />
+                                                    <YAxis domain={[0, 100]} tickFormatter={(v) => `${v.toFixed(0)}%`} />
 
-                                            <Tooltip
-                                                formatter={(value, name) => {
-                                                    const label = t(`errors.categories.${name}.name`);
-                                                    return [`${value.toFixed(1)}%`, label];
-                                                }}
-                                                itemSorter={(entry) => {
-                                                    // Desired order (top → bottom)
-                                                    const ORDER = { com: 1, log: 2, sem: 3, syn: 4 };
-                                                    return ORDER[entry.dataKey];
-                                                }}
-                                                wrapperStyle={{ zIndex: 1000 }}
-                                            />
+                                                    <Tooltip
+                                                        formatter={(value, name) => {
+                                                            const label = t(`errors.categories.${name}.name`);
+                                                            return [`${value.toFixed(1)}%`, label];
+                                                        }}
+                                                        itemSorter={(entry) => {
+                                                            const ORDER = { com: 1, log: 2, sem: 3, syn: 4 };
+                                                            return ORDER[entry.dataKey];
+                                                        }}
+                                                        wrapperStyle={{ zIndex: 1000 }}
+                                                    />
 
-                                            <Legend formatter={(v) => t(`errors.categories.${v}.name`)} />
+                                                    <Legend formatter={(v) => t(`errors.categories.${v}.name`)} />
 
-                                            <Area
-                                                type="linear"
-                                                dataKey="syn"
-                                                stackId="1"
-                                                stroke={CATEGORY_COLOR.syn}
-                                                fill={CATEGORY_COLOR.syn}
-                                                fillOpacity={0.35}
-                                            />
-                                            <Area
-                                                type="linear"
-                                                dataKey="sem"
-                                                stackId="1"
-                                                stroke={CATEGORY_COLOR.sem}
-                                                fill={CATEGORY_COLOR.sem}
-                                                fillOpacity={0.35}
-                                            />
-                                            <Area
-                                                type="linear"
-                                                dataKey="log"
-                                                stackId="1"
-                                                stroke={CATEGORY_COLOR.log}
-                                                fill={CATEGORY_COLOR.log}
-                                                fillOpacity={0.35}
-                                            />
-                                            <Area
-                                                type="linear"
-                                                dataKey="com"
-                                                stackId="1"
-                                                stroke={CATEGORY_COLOR.com}
-                                                fill={CATEGORY_COLOR.com}
-                                                fillOpacity={0.35}
-                                            />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    </Row>
+                                                    <Area
+                                                        type="linear"
+                                                        dataKey="syn"
+                                                        stackId="1"
+                                                        stroke={CATEGORY_COLOR.syn}
+                                                        fill={CATEGORY_COLOR.syn}
+                                                        fillOpacity={0.35}
+                                                    />
+                                                    <Area
+                                                        type="linear"
+                                                        dataKey="sem"
+                                                        stackId="1"
+                                                        stroke={CATEGORY_COLOR.sem}
+                                                        fill={CATEGORY_COLOR.sem}
+                                                        fillOpacity={0.35}
+                                                    />
+                                                    <Area
+                                                        type="linear"
+                                                        dataKey="log"
+                                                        stackId="1"
+                                                        stroke={CATEGORY_COLOR.log}
+                                                        fill={CATEGORY_COLOR.log}
+                                                        fillOpacity={0.35}
+                                                    />
+                                                    <Area
+                                                        type="linear"
+                                                        dataKey="com"
+                                                        stackId="1"
+                                                        stroke={CATEGORY_COLOR.com}
+                                                        fill={CATEGORY_COLOR.com}
+                                                        fillOpacity={0.35}
+                                                    />
+                                                </AreaChart>
+                                            </ResponsiveContainer>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            </Row>
 
-                    <Row className="mb-4">
-                        {/* BAR */}
-                        <Col>
-                            <Card style={{ height: '100%' }}>
-                                <Card.Header>
-                                    <Card.Title>{t('components.learningStats.errors.common_title')}</Card.Title>
-                                    <Card.Subtitle className="text-muted">
-                                        {t(`components.learningStats.errors.common_subtitle.${role}`)}
-                                    </Card.Subtitle>
-                                </Card.Header>
-                                <Card.Body>
-                                    <ResponsiveContainer width="100%" height={40 * perErrorData.length}>
-                                        <BarChart layout="vertical" data={perErrorData} margin={{ left: 40, right: 60 }}>
-                                            <XAxis type="number" hide />
-                                            <YAxis type="category" dataKey="name" width={200} />
-                                            <Tooltip content={barTooltip} wrapperStyle={{ zIndex: 1000 }} />
-                                            <Bar
-                                                dataKey="count"
-                                                isAnimationActive={false}
-                                                shape={(props) => {
-                                                    const barColor = CATEGORY_COLOR[props.payload.cat];
-                                                    return (
-                                                        <rect
-                                                            x={props.x}
-                                                            y={props.y}
-                                                            width={props.width}
-                                                            height={props.height}
-                                                            fill={barColor}
-                                                        />
-                                                    );
-                                                }}
-                                            >
-                                                <LabelList dataKey="count" position="right" fill="#000" />
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-
-                    </Row>
+                            <Row className="mb-4">
+                                {/* BAR */}
+                                <Col>
+                                    <Card style={{ height: '100%' }}>
+                                        <Card.Header>
+                                            <Card.Title>{t('components.learningStats.errors.common_title')}</Card.Title>
+                                            <Card.Subtitle className="text-muted">
+                                                {t(`components.learningStats.errors.common_subtitle.${role}`)}
+                                            </Card.Subtitle>
+                                        </Card.Header>
+                                        <Card.Body>
+                                            <ResponsiveContainer width="100%" height={40 * perErrorData.length}>
+                                                <BarChart layout="vertical" data={perErrorData} margin={{ left: 40, right: 60 }}>
+                                                    <XAxis type="number" hide />
+                                                    <YAxis type="category" dataKey="name" width={200} />
+                                                    <Tooltip content={barTooltip} wrapperStyle={{ zIndex: 1000 }} />
+                                                    <Bar
+                                                        dataKey="count"
+                                                        isAnimationActive={false}
+                                                        shape={(props) => {
+                                                            const barColor = CATEGORY_COLOR[props.payload.cat];
+                                                            return (
+                                                                <rect
+                                                                    x={props.x}
+                                                                    y={props.y}
+                                                                    width={props.width}
+                                                                    height={props.height}
+                                                                    fill={barColor}
+                                                                />
+                                                            );
+                                                        }}
+                                                    >
+                                                        <LabelList dataKey="count" position="right" fill="#000" />
+                                                    </Bar>
+                                                </BarChart>
+                                            </ResponsiveContainer>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        </>
+                    )}
                 </>
             )}
         </ObservedOnce>
