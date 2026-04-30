@@ -342,12 +342,12 @@ class Database(ABC):
     # endregion
 
     # region Solution Checking
-    def _execute_solution_check(self, query: str, *, search_path: str | None = None) -> tuple[QueryResultDataset | None, bool | None]:
+    def _execute_solution_check(self, query: SQLCode, *, search_path: str | None = None) -> tuple[QueryResultDataset | None, bool | None]:
         '''
             Execute the first statement of the query and return the result.
 
             Args:
-                query (str): The SQL query to execute.
+                query (SQLCode): The SQL query to execute.
                 search_path (str | None): Optional search path to set for the connection before executing the query. If None, the current search path is used.
 
             Returns:
@@ -355,15 +355,8 @@ class Database(ABC):
                 bool: True if the query was executed successfully, False otherwise. None if the query was not executed (e.g. not a SELECT query).
         '''
 
-        statements = SQLCode(query).split()
-
-        # Only execute the first statement
-        statement = next(iter(statements), None)
-        if statement is None:
-            return None, None
-
         # Only SELECT queries are supported
-        if statement.query_type != 'SELECT':
+        if query.query_type != 'SELECT':
             return None, None
         
         conn = None
@@ -375,12 +368,12 @@ class Database(ABC):
                 current_search_path = self.get_search_path()
                 self.set_search_path(search_path)
 
-                results = conn.execute_sql(statement)
+                results = conn.execute_sql(query)
                 dataset = next(iter(results), None) # iterator needs to be exhausted here, before resetting search path
 
                 self.set_search_path(current_search_path)
             else:
-                results = conn.execute_sql(statement)
+                results = conn.execute_sql(query)
                 dataset = next(iter(results), None)
 
             # If the query does not return a dataset, we don't need it
@@ -403,13 +396,13 @@ class Database(ABC):
             
             return None, False
 
-    def check_query_solution(self, query_user: str, query_solutions: list[str], solution_search_path: str) -> CheckExecutionStatus:
+    def check_query_solution(self, query_user: SQLCode, query_solutions: list[str], solution_search_path: str) -> CheckExecutionStatus:
         '''
         Checks the user's solution against the exercise solution.
         If multiple queries are present, only the first one is checked.
         If the exercise has no solution, a message is returned.
         Args:
-            query_user (str): The SQL query submitted by the user.
+            query_user (SQLCode): The SQL query submitted by the user.
             query_solutions (list[str]): The list of SQL solutions for the exercise.
 
         Returns:
@@ -418,6 +411,7 @@ class Database(ABC):
             If the solution is incorrect, the QueryResult object contains the comparison of results.
             If the exercise has no solution, a message indicating that is returned.
         '''
+
         if len(query_solutions) == 0:
             message = _('No solution found for this exercise.')
             return result_message(None, None, message)
@@ -430,7 +424,8 @@ class Database(ABC):
 
         results: list[CheckResult] = []
         for query_solution in query_solutions:
-            result_solution, execution_success_solution = self._execute_solution_check(query_solution, search_path=solution_search_path)
+            solution = SQLCode(query_solution)
+            result_solution, execution_success_solution = self._execute_solution_check(solution, search_path=solution_search_path)
 
             if result_solution is None:
                 message = '<i class="fa fa-exclamation-triangle text-danger me-1"></i>'

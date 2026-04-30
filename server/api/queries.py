@@ -3,6 +3,7 @@
 from flask import Blueprint, request
 import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_babel import _
 from sql_error_categorizer import detectors, get_errors, build_catalog
 
 from server import db, gamification
@@ -269,7 +270,7 @@ def check_solution():
     query_str = data['query']
     exercise = db.admin.Exercise(int(data['exercise_id']))
     dataset = db.admin.Dataset(exercise.dataset_id)
-
+    
     coins = user.get_coins()
     attempts = exercise.count_attempts(user)
     cost = gamification.rewards.Actions.Exercise.check_solution_cost(attempts)  # value is negative
@@ -281,9 +282,20 @@ def check_solution():
             attempts=attempts,
         )
 
+    # Only consider the first query in the submitted SQL string
+    all_queries = SQLCode(query_str).split()
+    query = next(iter(all_queries), None)
+
+    if query is None:
+        return responses.response_query(
+            QueryResultMessage(_('No valid SQL query found in the submitted string.'), query=SQLCode(SOLUTION_NAME, builtin=True)),
+            is_builtin=True,
+            attempts=attempts,
+        )
+
     database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
     search_path = database.get_search_path()
-    check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions, solution_search_path=dataset.search_path)
+    check = database.check_query_solution(query_user=query, query_solutions=exercise.solutions, solution_search_path=dataset.search_path)
 
     batch = db.admin.QueryBatch.log(
         user=user,
@@ -296,7 +308,7 @@ def check_solution():
         search_path=search_path,
         success=check.execution_success == True,
         result=check.result.result_text,
-        query_type='CHECK_SOLUTION',
+        query_type=query.query_type,
         query_goal='CHECK_SOLUTION'
     )
 

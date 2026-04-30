@@ -53,7 +53,7 @@ def list_queries() -> list[Query]:
         '''
             SELECT id
             FROM {schema}.queries
-            WHERE query_type = 'SELECT'
+            WHERE query_type IN ('SELECT', 'CHECK_SOLUTION')
         '''
     ).format(
         schema=database.sql.Identifier(SCHEMA)

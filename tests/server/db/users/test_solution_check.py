@@ -64,9 +64,11 @@ class _SolutionCheckDatabase(Database):
         self.results_by_query = results_by_query
         self.calls = []
 
-    def _execute_solution_check(self, query: str, *, search_path: str | None = None):
-        self.calls.append((query, search_path))
-        return self.results_by_query[query]
+    def _execute_solution_check(self, query: SQLCode, *, search_path: str | None = None):
+        assert isinstance(query, SQLCode)
+        query_text = query.query
+        self.calls.append((query_text, search_path))
+        return self.results_by_query[query_text]
 
     def create_container(self):
         raise NotImplementedError
@@ -304,7 +306,7 @@ def test_check_query_solution_parametrized(
     database = _SolutionCheckDatabase(results_by_query)
 
     result = database.check_query_solution(
-        query_user='USER',
+        query_user=SQLCode('USER'),
         query_solutions=query_solutions,
         solution_search_path='public',
     )
