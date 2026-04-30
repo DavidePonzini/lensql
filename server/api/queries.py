@@ -282,6 +282,7 @@ def check_solution():
         )
 
     database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+    search_path = database.get_search_path()
     check = database.check_query_solution(query_user=query_str, query_solutions=exercise.solutions, solution_search_path=dataset.search_path)
 
     batch = db.admin.QueryBatch.log(
@@ -292,17 +293,38 @@ def check_solution():
     query = db.admin.Query.log(
         query_batch=batch,
         sql_string=query_str,
-        search_path='BUILTIN',
+        search_path=search_path,
         success=check.execution_success == True,
         result=check.result.result_text,
         query_type='CHECK_SOLUTION',
         query_goal='CHECK_SOLUTION'
     )
 
+    context_columns = database.get_columns()
+    unique_columns = database.get_unique_columns()
+
     query.log_context(
-        columns=database.get_columns(),
-        unique_columns=database.get_unique_columns()
+        columns=context_columns,
+        unique_columns=unique_columns
     )
+
+    catalog = build_catalog(
+        columns_info=context_columns,
+        unique_constraints_info=unique_columns
+    )
+
+    errors = get_errors(
+        query_str=query_str,
+        solutions=exercise.solutions,
+        catalog=catalog,
+        search_path=search_path,
+        solution_search_path=dataset.search_path,
+        detectors=DETECTORS,
+        debug=False,
+    )
+    print(flush=True)   # Ensure all debug output is flushed
+
+    query.log_errors(errors)
 
     already_solved = exercise.has_been_solved_by_user(user)
     
