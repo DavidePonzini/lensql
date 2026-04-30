@@ -23,7 +23,7 @@ def list_queries() -> list[tuple[int, str, str]]:
 
 def reset_query_type(query: Query, current_query_type: str, query_goal: str) -> str:
     if current_query_type == 'BUILTIN' and query_goal == 'BUILTIN':
-        new_query_type = 'BUILTIN'
+        return 'BUILTIN'
     else:
         new_query_type = SQLCode(query.sql_string).query_type
 

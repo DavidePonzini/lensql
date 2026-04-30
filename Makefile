@@ -52,7 +52,7 @@ setup:
 	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/setup/setup.py
 
 recategorize_errors:
-	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/recategorize_errors.py
+	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/scripts/recategorize_errors.py
 
 psql:
 	docker exec -it $(COMPOSE_PROJECT_NAME)_db_admin psql -U postgres
