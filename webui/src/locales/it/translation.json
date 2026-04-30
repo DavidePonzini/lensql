@@ -953,28 +953,28 @@
                 "name": "Colonna ambigua",
                 "description": "Quando si usano più tabelle in una query, viene riferita una colonna presente in più di una tabella senza specificare a quale tabella appartiene.",
                 "example": "SELECT city\nFROM customer, store;",
-                "explanation": "Entrambe le tabelle contengono una colonna chiamata `city`. Senza qualificare la tabella, il database non può determinare quale colonna `city` usare.",
+                "explanation": "Entrambe le tabelle contengono una colonna chiamata city. Senza qualificare la tabella, il database non può determinare quale colonna city usare.",
                 "correction": "SELECT customer.city\nFROM customer, store;"
             },
             "2": {
                 "name": "Funzione ambigua",
                 "description": "Esistono più funzioni con lo stesso nome e la query non specifica quale usare.",
                 "example": "CREATE FUNCTION my_function(interval) RETURNS text AS $$\n    SELECT 'Interval';\n$$ LANGUAGE sql;\n\nCREATE FUNCTION my_function(time) RETURNS text AS $$\n    SELECT 'Time';\n$$ LANGUAGE sql;\n\nSELECT my_function(NULL);",
-                "explanation": "Esistono due funzioni chiamate `my_function`, una che accetta un interval e un'altra che accetta un time. La query non specifica quale funzione usare, creando ambiguità.",
+                "explanation": "Esistono due funzioni chiamate my_function, una che accetta un interval e un'altra che accetta un time. La query non specifica quale funzione usare, creando ambiguità.",
                 "correction": "SELECT my_function(NULL::interval);"
             },
             "3": {
                 "name": "Colonna non definita",
                 "description": "La query fa riferimento a una colonna che non esiste nelle tabelle specificate.",
                 "example": "SELECT credit_card\nFROM customer;",
-                "explanation": "La tabella customer non contiene una colonna chiamata `credit_card`.",
+                "explanation": "La tabella customer non contiene una colonna chiamata credit_card.",
                 "correction": "SELECT cName\nFROM customer;"
             },
             "4": {
                 "name": "Funzione non definita",
                 "description": "La query fa riferimento a una funzione che non esiste o non è definita.",
                 "example": "SELECT CAPSLOCK(cName)\nFROM customer;",
-                "explanation": "La funzione `CAPSLOCK` non esiste nel database.",
+                "explanation": "La funzione CAPSLOCK non esiste nel database.",
                 "correction": "SELECT UPPER(cName)\nFROM customer;"
             },
             "5": {
@@ -988,35 +988,35 @@
                 "name": "Oggetto non definito",
                 "description": "La query fa riferimento a una tabella che non esiste o non è definita.",
                 "example": "SELECT *\nFROM cats;",
-                "explanation": "La tabella `cats` non esiste nel database.",
+                "explanation": "La tabella cats non esiste nel database.",
                 "correction": "SELECT *\nFROM customer;"
             },
             "7": {
                 "name": "Nome di schema non valido",
                 "description": "La query fa riferimento a uno schema che non esiste o non è definito.",
                 "example": "SELECT *\nFROM shop.customer;",
-                "explanation": "Lo schema `shop` non esiste nel database. In questo esempio, la tabella customer si trova nello schema `public`.",
+                "explanation": "Lo schema shop non esiste nel database. In questo esempio, la tabella customer si trova nello schema public.",
                 "correction": "SELECT *\nFROM public.customer;"
             },
             "8": {
                 "name": "Errori di ortografia",
                 "description": "La query contiene nomi di tabelle, colonne o altri identificatori scritti in modo errato.",
                 "example": "SELECT *\nFROM costumer;",
-                "explanation": "La tabella `costumer` non esiste nel database. È un errore di scrittura di `customer`.",
+                "explanation": "La tabella costumer non esiste nel database. È un errore di scrittura di customer.",
                 "correction": "SELECT *\nFROM customer;"
             },
             "9": {
                 "name": "Sinonimi",
                 "description": "La query usa sinonimi o nomi alternativi per tabelle o colonne che non esistono.",
                 "example": "SELECT *\nFROM clients;",
-                "explanation": "La tabella `clients` non esiste in questo schema. Viene usata come sinonimo di `customer`, che è il nome corretto della tabella.",
+                "explanation": "La tabella clients non esiste in questo schema. Viene usata come sinonimo di customer, che è il nome corretto della tabella.",
                 "correction": "SELECT *\nFROM customer;"
             },
             "10": {
                 "name": "Virgolette mancanti intorno ai dati testuali",
                 "description": "I valori testuali non sono racchiusi tra virgolette, come richiesto per i letterali stringa.",
                 "example": "SELECT *\nFROM customer\nWHERE cName = John;",
-                "explanation": "I valori testuali devono essere racchiusi tra apici singoli (`'`) per essere riconosciuti come letterali stringa.",
+                "explanation": "I valori testuali devono essere racchiusi tra apici singoli (') per essere riconosciuti come letterali stringa.",
                 "correction": "SELECT *\nFROM customer\nWHERE cName = 'John';"
             },
             "11": {
@@ -1028,9 +1028,9 @@
             },
             "12": {
                 "name": "Uso di IS non applicabile",
-                "description": "L'operatore `IS` viene usato per confronti su valori diversi da `NULL` o da espressioni booleane.",
+                "description": "L'operatore IS viene usato per confronti su valori diversi da NULL o da espressioni booleane.",
                 "example": "SELECT * FROM\ncustomer\nWHERE age IS 18;",
-                "explanation": "L'operatore IS dovrebbe essere usato solo per verificare valori `NULL` o espressioni booleane (ad esempio `IS TRUE`, `IS FALSE`). Per gli altri confronti, usa operatori di confronto standard come `=`, `<>`, `>`, `<`, `>=`, `<=`.",
+                "explanation": "L'operatore IS dovrebbe essere usato solo per verificare valori NULL o espressioni booleane (ad esempio IS TRUE, IS FALSE). Per gli altri confronti, usa operatori di confronto standard come =, <>, >, <, >=, <=.",
                 "correction": "SELECT *\nFROM customer\nWHERE age = 18;"
             },
             "13": {
@@ -1042,9 +1042,9 @@
             },
             "14": {
                 "name": "Funzione aggregata fuori da SELECT o HAVING",
-                "description": "Una funzione aggregata è usata in una parte della query in cui non è consentita, come `WHERE` o `GROUP BY`.",
+                "description": "Una funzione aggregata è usata in una parte della query in cui non è consentita, come WHERE o GROUP BY.",
                 "example": "SELECT city\nFROM customer\nWHERE AVG(age) > 18;",
-                "explanation": "Le funzioni aggregate possono essere usate solo nella clausola `SELECT` oppure nella clausola `HAVING` quando si raggruppano i risultati. Questa query prova a usare `AVG` nella clausola `WHERE`, cosa non consentita.",
+                "explanation": "Le funzioni aggregate possono essere usate solo nella clausola SELECT oppure nella clausola HAVING quando si raggruppano i risultati. Questa query prova a usare AVG nella clausola WHERE, cosa non consentita.",
                 "correction": "SELECT city\nFROM customer\nGROUP BY city\nHAVING AVG(age) > 18;"
             },
             "15": {
@@ -1058,28 +1058,28 @@
                 "name": "Colonna di raggruppamento superflua o mancante",
                 "description": "Quando si usa GROUP BY, tutte le colonne non aggregate nella clausola SELECT devono essere incluse nella clausola GROUP BY. Nella clausola HAVING possono essere riferite solo colonne aggregate o incluse in GROUP BY.",
                 "example": "SELECT cName, AVG(unit_price)\nFROM customer\nGROUP BY city;",
-                "explanation": "La query seleziona la colonna `cName`, che non è né aggregata né inclusa nella clausola `GROUP BY`. Questo crea ambiguità su quale `cName` restituire per ogni gruppo. Per correggere il problema, includi `cName` nella clausola `GROUP BY` oppure rimuovila dalla clausola `SELECT`.",
+                "explanation": "La query seleziona la colonna cName, che non è né aggregata né inclusa nella clausola GROUP BY. Questo crea ambiguità su quale cName restituire per ogni gruppo. Per correggere il problema, includi cName nella clausola GROUP BY oppure rimuovila dalla clausola SELECT.",
                 "correction": "SELECT city, AVG(unit_price)\nFROM customer\nGROUP BY city;"
             },
             "17": {
                 "name": "HAVING anomalo: HAVING senza GROUP BY",
-                "description": "La query usa una clausola `HAVING` senza la corrispondente clausola `GROUP BY`.",
+                "description": "La query usa una clausola HAVING senza la corrispondente clausola GROUP BY.",
                 "example": "SELECT *\nFROM customer HAVING AVG(age) > 18;",
-                "explanation": "La clausola `HAVING` serve a filtrare risultati raggruppati e dovrebbe sempre essere usata insieme a una clausola `GROUP BY`.",
+                "explanation": "La clausola HAVING serve a filtrare risultati raggruppati e dovrebbe sempre essere usata insieme a una clausola GROUP BY.",
                 "correction": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city\nHAVING AVG(age) > 18;"
             },
             "18": {
                 "name": "Troppe colonne nella sottoquery",
                 "description": "Una sottoquery restituisce più colonne del previsto nel contesto in cui viene usata.",
                 "example": "SELECT *\nFROM inventory\nWHERE sID IN (\n    SELECT *\n    FROM store\n    WHERE sName = 'Coop'\n);",
-                "explanation": "La sottoquery nella clausola WHERE deve restituire esattamente una colonna da confrontare con `inventory.sID`. Restituire tutte le colonne di store causa una mancata corrispondenza nel numero di colonne.",
-                "correction": "```sql\nSELECT *\nFROM inventory\nWHERE sID IN (\n    SELECT sID\n    FROM store\n    WHERE sName = 'Coop'\n);```"
+                "explanation": "La sottoquery nella clausola WHERE deve restituire esattamente una colonna da confrontare con inventory.sID. Restituire tutte le colonne di store causa una mancata corrispondenza nel numero di colonne.",
+                "correction": "sql\nSELECT *\nFROM inventory\nWHERE sID IN (\n    SELECT sID\n    FROM store\n    WHERE sName = 'Coop'\n);"
             },
             "19": {
                 "name": "Quantificatore mancante",
                 "description": "Viene eseguito un confronto con una sottoquery che può restituire più valori, indipendentemente dai dati attualmente presenti nel database.",
                 "example": "SELECT *\nFROM inventory\nWHERE unit_price >= (\n    SELECT unit_price\n    FROM product\n    NATURAL JOIN inventory\n    WHERE pName = 'Banana'\n);",
-                "explanation": "Il valore di `unit_price` viene confrontato direttamente con il risultato della sottoquery. Questo funziona solo se la sottoquery restituisce un solo valore (cioè se la tabella `product` contiene una sola riga il cui cName è *'Banana'*). Tuttavia, se la tabella viene aggiornata e viene aggiunto un nuovo prodotto con lo stesso cName, la query diventa non valida. Questo problema può essere risolto usando un quantificatore nel confronto (ANY/ALL).",
+                "explanation": "Il valore di unit_price viene confrontato direttamente con il risultato della sottoquery. Questo funziona solo se la sottoquery restituisce un solo valore (cioè se la tabella product contiene una sola riga il cui cName è *'Banana'*). Tuttavia, se la tabella viene aggiornata e viene aggiunto un nuovo prodotto con lo stesso cName, la query diventa non valida. Questo problema può essere risolto usando un quantificatore nel confronto (ANY/ALL).",
                 "correction": "SELECT *\nFROM inventory\nWHERE unit_price >= ANY(\n    SELECT unit_price\n    FROM product\n    NATURAL JOIN inventory\n    WHERE pName = 'Banana'\n);"
             },
             "20": {
@@ -1091,30 +1091,30 @@
             },
             "21": {
                 "name": "Uso di WHERE due volte",
-                "description": "La query contiene più clausole `WHERE`, cosa non consentita.",
+                "description": "La query contiene più clausole WHERE, cosa non consentita.",
                 "example": "SELECT *\nFROM customer\nWHERE age > 18\nWHERE city = 'Genoa';",
-                "explanation": "Una query può avere una sola clausola `WHERE`. Combina più condizioni usando operatori logici come `AND` o `OR`.",
+                "explanation": "Una query può avere una sola clausola WHERE. Combina più condizioni usando operatori logici come AND o OR.",
                 "correction": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';"
             },
             "22": {
                 "name": "Clausola FROM mancante",
-                "description": "Nella query manca la clausola `FROM` e non viene selezionato un valore costante.",
+                "description": "Nella query manca la clausola FROM e non viene selezionato un valore costante.",
                 "example": "SELECT cName\nWHERE age > 18;",
-                "explanation": "La clausola `FROM` è richiesta in un'istruzione SELECT per specificare la tabella da cui recuperare i dati.",
+                "explanation": "La clausola FROM è richiesta in un'istruzione SELECT per specificare la tabella da cui recuperare i dati.",
                 "correction": "SELECT cName\nFROM customer\nWHERE age > 18;"
             },
             "23": {
                 "name": "Confronto con NULL",
-                "description": "La query confronta NULL usando operatori come `=` o `!=` invece di `IS NULL` o `IS NOT NULL`.",
+                "description": "La query confronta NULL usando operatori come = o != invece di IS NULL o IS NOT NULL.",
                 "example": "SELECT *\nFROM customer\nWHERE age = NULL;",
-                "explanation": "Quando verifichi valori NULL, usa `IS NULL` o `IS NOT NULL` invece degli operatori di confronto standard.",
+                "explanation": "Quando verifichi valori NULL, usa IS NULL o IS NOT NULL invece degli operatori di confronto standard.",
                 "correction": "SELECT *\nFROM customer\nWHERE age IS NULL;"
             },
             "24": {
                 "name": "Punto e virgola mancante",
                 "description": "Alla fine dell'istruzione manca il punto e virgola conclusivo.",
                 "example": "SELECT *\nFROM customer",
-                "explanation": "Lo standard SQL richiede che ogni istruzione termini con un punto e virgola (`;`). Assicurati di includerlo alla fine delle query.",
+                "explanation": "Lo standard SQL richiede che ogni istruzione termini con un punto e virgola (;). Assicurati di includerlo alla fine delle query.",
                 "correction": "SELECT *\nFROM customer;"
             },
             "25": {
@@ -1126,30 +1126,30 @@
             },
             "26": {
                 "name": "Clausola duplicata",
-                "description": "Una clausola è ripetuta nella query, ad esempio più clausole `WHERE` o `ORDER BY`.",
+                "description": "Una clausola è ripetuta nella query, ad esempio più clausole WHERE o ORDER BY.",
                 "example": "SELECT *\nFROM customer\nORDER BY cName\nORDER BY cID;",
-                "explanation": "Questa query non è valida perché contiene due clausole `ORDER BY`. Ogni clausola dovrebbe comparire una sola volta in una query.",
+                "explanation": "Questa query non è valida perché contiene due clausole ORDER BY. Ogni clausola dovrebbe comparire una sola volta in una query.",
                 "correction": "SELECT *\nFROM customer\nORDER BY cName, cID;"
             },
             "27": {
                 "name": "Uso di un nome di correlazione non definito",
                 "description": "La query fa riferimento a un nome di correlazione (alias) che non è stato definito.",
                 "example": "SELECT c2.cName\nFROM customer AS c;",
-                "explanation": "Questa query rinomina la tabella customer in `c`, ma poi prova a riferirsi a essa come `c2`, che non è definito.",
+                "explanation": "Questa query rinomina la tabella customer in c, ma poi prova a riferirsi a essa come c2, che non è definito.",
                 "correction": "SELECT c.cName\nFROM customer AS c;"
             },
             "28": {
                 "name": "Confusione tra nomi di tabelle e nomi di colonne",
                 "description": "Viene usato un nome di tabella dove è atteso un nome di colonna, o viceversa.",
                 "example": "SELECT city.customer\nFROM customer;",
-                "explanation": "Questa query prova ad accedere a una colonna chiamata `customer` della tabella `city`, che non esiste. La sintassi corretta è specificare il nome della tabella seguito dal nome della colonna.",
+                "explanation": "Questa query prova ad accedere a una colonna chiamata customer della tabella city, che non esiste. La sintassi corretta è specificare il nome della tabella seguito dal nome della colonna.",
                 "correction": "SELECT customer.city\nFROM customer;"
             },
             "29": {
                 "name": "Ordine errato delle parole chiave (es. FROM customer SELECT fee)",
                 "description": "Le parole chiave nell'istruzione SQL sono nell'ordine sbagliato.",
                 "example": "FROM customer\nSELECT cName;",
-                "explanation": "Assicurati che le parole chiave SQL siano nell'ordine corretto: `SELECT`, `FROM`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT`, `OFFSET`.",
+                "explanation": "Assicurati che le parole chiave SQL siano nell'ordine corretto: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT, OFFSET.",
                 "correction": "SELECT cName\nFROM customer;"
             },
             "30": {
@@ -1163,7 +1163,7 @@
                 "name": "Virgole mancanti",
                 "description": "Quando si elencano più colonne o valori, mancano le virgole di separazione.",
                 "example": "SELECT cID city street\nFROM customer;",
-                "explanation": "In questa query mancano le virgole tra i nomi delle colonne nella clausola `SELECT`. Assicurati che ogni nome di colonna sia separato da una virgola.",
+                "explanation": "In questa query mancano le virgole tra i nomi delle colonne nella clausola SELECT. Assicurati che ogni nome di colonna sia separato da una virgola.",
                 "correction": "SELECT cID, city, street\nFROM customer;"
             },
             "32": {
@@ -1177,21 +1177,21 @@
                 "name": "Parentesi graffe o quadre",
                 "description": "Vengono usate parentesi graffe o quadre al posto delle parentesi tonde.",
                 "example": "SELECT *\nFROM customer\nWHERE age > [(15 + 18) * 2] / (7 + 3);",
-                "explanation": "In SQL sono consentite solo le parentesi tonde ( \"`(`\" e \"`)`\" ) per raggruppare le espressioni.",
+                "explanation": "In SQL sono consentite solo le parentesi tonde ( \"(\" e \")\" ) per raggruppare le espressioni.",
                 "correction": "SELECT *\nFROM customer\nWHERE age > ((15 + 18) * 2) / (7 + 3);"
             },
             "34": {
                 "name": "Parole chiave non standard o standard nel contesto sbagliato",
                 "description": "La query usa parole chiave non valide oppure parole chiave standard in contesti inappropriati.",
                 "example": "SELECT *\nFROM customer\nSORT BY cName;",
-                "explanation": "La parola chiave corretta per ordinare i risultati in SQL è `ORDER BY`, non `SORT BY`.",
+                "explanation": "La parola chiave corretta per ordinare i risultati in SQL è ORDER BY, non SORT BY.",
                 "correction": "SELECT *\nFROM customer\nORDER BY cName;"
             },
             "35": {
                 "name": "Operatori non standard (es. &&, \\|\\| o ==)",
-                "description": "La query usa operatori che non fanno parte della sintassi SQL standard, come `&&`, `||` o `==` invece di `AND`, `OR` o `=`.",
+                "description": "La query usa operatori che non fanno parte della sintassi SQL standard, come &&, || o == invece di AND, OR o =.",
                 "example": "SELECT *\nFROM customer\nWHERE\n    cID == 18\n    && city == 'A';",
-                "explanation": "Gli operatori `==` e `&&`, pur essendo comuni nei linguaggi di programmazione, non sono validi in SQL. Usa invece `=` e `AND`.",
+                "explanation": "Gli operatori == e &&, pur essendo comuni nei linguaggi di programmazione, non sono validi in SQL. Usa invece = e AND.",
                 "correction": "SELECT *\nFROM customer\nWHERE\n    cID = 18\n    AND city = 'A';"
             },
             "36": {
@@ -1203,51 +1203,51 @@
             },
             "37": {
                 "name": "Tuple diverse in un'operazione insiemistica",
-                "description": "Due query combinate con un'operazione insiemistica (`UNION`/`INTERSECT`/`EXCEPT`) restituiscono tuple con cardinalità diverse.",
+                "description": "Due query combinate con un'operazione insiemistica (UNION/INTERSECT/EXCEPT) restituiscono tuple con cardinalità diverse.",
                 "example": "SELECT city\nFROM customer\nUNION\nSELECT city, street\nFROM store;",
-                "explanation": "La prima SELECT restituisce una sola colonna (`city`), mentre la seconda ne restituisce due (`city` e `street`). Le operazioni insiemistiche richiedono che entrambi i risultati abbiano lo stesso numero di colonne.",
+                "explanation": "La prima SELECT restituisce una sola colonna (city), mentre la seconda ne restituisce due (city e street). Le operazioni insiemistiche richiedono che entrambi i risultati abbiano lo stesso numero di colonne.",
                 "correction": "SELECT city\nFROM customer\nUNION\nSELECT city\nFROM store;"
             },
             "38": {
                 "name": "Espressione implicita, tautologica o incoerente",
                 "description": "La query contiene espressioni sempre vere, sempre false o logicamente ridondanti.",
                 "example": "SELECT *\nFROM customer\nWHERE\n    age > 30\n    AND age > 25\n    AND cName = cName;",
-                "explanation": "L'espressione `age > 30 AND age > 25` è ridondante perché se `age` è maggiore di 30, è necessariamente anche maggiore di 25. Inoltre, la condizione `cName = cName` è sempre vera per tutte le righe. Semplificare la query rimuovendo queste ridondanze migliora chiarezza e prestazioni senza alterarne la logica.",
+                "explanation": "L'espressione age > 30 AND age > 25 è ridondante perché se age è maggiore di 30, è necessariamente anche maggiore di 25. Inoltre, la condizione cName = cName è sempre vera per tutte le righe. Semplificare la query rimuovendo queste ridondanze migliora chiarezza e prestazioni senza alterarne la logica.",
                 "correction": "SELECT *\nFROM customer\nWHERE age > 25;"
             },
             "39": {
                 "name": "DISTINCT in SUM o AVG",
-                "description": "Usare `DISTINCT` dentro `SUM` o `AVG` significa sommare o fare la media solo dei valori unici, cosa che quasi mai corrisponde al comportamento desiderato.",
+                "description": "Usare DISTINCT dentro SUM o AVG significa sommare o fare la media solo dei valori unici, cosa che quasi mai corrisponde al comportamento desiderato.",
                 "example": "SELECT AVG(DISTINCT age)\nFROM customer;",
-                "explanation": "Questa query considera prima tutte le età uniche dei clienti (ogni valore viene contato una sola volta) e poi calcola la media di quelle età uniche. Se ci sono 200 clienti di 20 anni e 1 cliente di 30 anni, la media sarà `(20 + 30) / 2 = 25`, il che non riflette correttamente l'età media di tutti i clienti.",
+                "explanation": "Questa query considera prima tutte le età uniche dei clienti (ogni valore viene contato una sola volta) e poi calcola la media di quelle età uniche. Se ci sono 200 clienti di 20 anni e 1 cliente di 30 anni, la media sarà (20 + 30) / 2 = 25, il che non riflette correttamente l'età media di tutti i clienti.",
                 "correction": "SELECT AVG(age)\nFROM customer;"
             },
             "40": {
                 "name": "DISTINCT che potrebbe rimuovere duplicati importanti",
-                "description": "L'uso di `DISTINCT` rimuove le righe duplicate dal risultato e potrebbe escludere involontariamente dati importanti.",
+                "description": "L'uso di DISTINCT rimuove le righe duplicate dal risultato e potrebbe escludere involontariamente dati importanti.",
                 "example": "SELECT DISTINCT cName\nfrom customer\nWHERE city = 'Genoa';",
                 "explanation": "Se più clienti condividono lo stesso nome e vivono a Genova, usare DISTINCT restituirà una sola occorrenza di quel nome, omettendo potenzialmente altri clienti con lo stesso nome che vivono nella stessa città. Questo può portare a risultati incompleti o fuorvianti.",
                 "correction": "SELECT cName\nfrom customer\nWHERE city = 'Genoa';"
             },
             "41": {
                 "name": "Confusione tra >0, IS NOT NULL, stringa vuota e NULL",
-                "description": "Viene usato `> 0` o `= ''` per verificare valori non nulli invece di `IS NOT NULL` o `IS NULL`.",
+                "description": "Viene usato > 0 o = '' per verificare valori non nulli invece di IS NOT NULL o IS NULL.",
                 "example": "SELECT *\nFROM customer\nWHERE street = '';",
-                "explanation": "Questa query prova erroneamente a trovare clienti per i quali non si sa in quale via abitino, controllando una stringa vuota nella colonna `street`. In realtà, però, seleziona clienti che abitano in una via chiamata `''` *(stringa vuota)*.",
+                "explanation": "Questa query prova erroneamente a trovare clienti per i quali non si sa in quale via abitino, controllando una stringa vuota nella colonna street. In realtà, però, seleziona clienti che abitano in una via chiamata '' *(stringa vuota)*.",
                 "correction": "SELECT *\nFROM customer\nWHERE street IS NULL;"
             },
             "42": {
                 "name": "NULL in sottoquery IN/ANY/ALL",
-                "description": "L'uso di valori nullable nelle sottoquery `IN`, `ANY` o `ALL` può portare a risultati inattesi a causa del modo in cui SQL gestisce i NULL.",
+                "description": "L'uso di valori nullable nelle sottoquery IN, ANY o ALL può portare a risultati inattesi a causa del modo in cui SQL gestisce i NULL.",
                 "example": "SELECT *\nFROM customer\nWHERE city IN (\n    SELECT city\n    FROM store\n);",
-                "explanation": "Questa query prova a trovare clienti la cui città compare nella tabella `store`. Tuttavia, se la sottoquery restituisce valori `NULL`, la condizione `IN` può essere valutata come `UNKNOWN`, causando l'esclusione inattesa di righe corrispondenti.",
+                "explanation": "Questa query prova a trovare clienti la cui città compare nella tabella store. Tuttavia, se la sottoquery restituisce valori NULL, la condizione IN può essere valutata come UNKNOWN, causando l'esclusione inattesa di righe corrispondenti.",
                 "correction": "SELECT *\nFROM customer\nWHERE city IN (\n    SELECT city\n    FROM store\n    WHERE city IS NOT NULL\n);"
             },
             "43": {
                 "name": "Condizione di join su colonna non confrontabile",
                 "description": "Una condizione di join viene applicata a colonne che logicamente non possono corrispondere, producendo un insieme di risultati vuoto.",
                 "example": "SELECT *\nFROM\n    store s\n    JOIN inventory i ON s.sID = i.unit_price;",
-                "explanation": "Questa query prova a unire le tabelle `store` e `inventory` sulla condizione che l'`sID` di uno store sia uguale al `unit_price` dell'inventario. Poiché `sID` e `unit_price` sono tipi di dato fondamentalmente diversi, questa condizione di join è illogica e probabilmente non produrrà alcuna riga corrispondente.",
+                "explanation": "Questa query prova a unire le tabelle store e inventory sulla condizione che l'sID di uno store sia uguale al unit_price dell'inventario. Poiché sID e unit_price sono tipi di dato fondamentalmente diversi, questa condizione di join è illogica e probabilmente non produrrà alcuna riga corrispondente.",
                 "correction": "SELECT *\nFROM\n    store s\n    JOIN inventory i ON s.sID = i.sID;"
             },
             "44": {
@@ -1261,126 +1261,126 @@
                 "name": "Colonna di output costante",
                 "description": "Una colonna nell'output ha lo stesso valore costante per tutte le righe.",
                 "example": "SELECT cName, city\nWHERE city = 'Genoa'\nFROM customer;",
-                "explanation": "La colonna `city` non fornisce informazioni utili perché ha lo stesso valore (*'Genoa'*) per tutti i clienti nel risultato. Questa ridondanza può appesantire l'output e rendere più difficile concentrarsi sui dati rilevanti.",
+                "explanation": "La colonna city non fornisce informazioni utili perché ha lo stesso valore (*'Genoa'*) per tutti i clienti nel risultato. Questa ridondanza può appesantire l'output e rendere più difficile concentrarsi sui dati rilevanti.",
                 "correction": "SELECT cName\nFROM customer\nWHERE city = 'Genoa';"
             },
             "46": {
                 "name": "Colonne di output duplicate",
                 "description": "Più colonne nell'output contengono sempre valori identici.",
                 "example": "SELECT cID, cName, cName\nFROM customer;",
-                "explanation": "La query seleziona due volte la colonna `cName`, producendo dati duplicati nell'output. Questa ridondanza può confondere gli utenti e rendere più difficile interpretare i risultati.",
+                "explanation": "La query seleziona due volte la colonna cName, producendo dati duplicati nell'output. Questa ridondanza può confondere gli utenti e rendere più difficile interpretare i risultati.",
                 "correction": "SELECT cID, cName\nFROM customer;"
             },
             "47": {
                 "name": "AND invece di OR",
-                "description": "La query usa `AND` dove sarebbe necessario `OR`.",
+                "description": "La query usa AND dove sarebbe necessario OR.",
                 "example": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';",
-                "explanation": "Questa query trova clienti con più di 18 anni che vivono a Genova. Tuttavia, questo non corrisponde alla richiesta dei dati. In questo caso avrebbe dovuto essere usato `OR` invece di `AND`.",
+                "explanation": "Questa query trova clienti con più di 18 anni che vivono a Genova. Tuttavia, questo non corrisponde alla richiesta dei dati. In questo caso avrebbe dovuto essere usato OR invece di AND.",
                 "correction": "SELECT *\nFROM customer\nWHERE \n    age > 18\n    OR city = 'Genoa';"
             },
             "48": {
                 "name": "OR invece di AND",
-                "description": "La query usa `OR` dove sarebbe necessario `AND`.",
+                "description": "La query usa OR dove sarebbe necessario AND.",
                 "example": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    OR city = 'Genoa';",
-                "explanation": "Questa query trova clienti che hanno più di 18 anni, oltre a quelli che vivono a Genova indipendentemente dall'età. Tuttavia, questo non corrisponde alla richiesta dei dati. In questo caso avrebbe dovuto essere usato `AND` invece di `OR`.",
+                "explanation": "Questa query trova clienti che hanno più di 18 anni, oltre a quelli che vivono a Genova indipendentemente dall'età. Tuttavia, questo non corrisponde alla richiesta dei dati. In questo caso avrebbe dovuto essere usato AND invece di OR.",
                 "correction": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';"
             },
             "49": {
                 "name": "Operatore NOT superfluo",
-                "description": "Una condizione logica usa `NOT` dove non serve, producendo risultati errati.",
+                "description": "Una condizione logica usa NOT dove non serve, producendo risultati errati.",
                 "example": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND NOT city = 'Genoa';",
-                "explanation": "Questa query è pensata per trovare clienti con più di 18 anni che vivono a Genova. Tuttavia, l'operatore `NOT` nega la condizione sulla città, producendo clienti con più di 18 anni che non vivono a Genova.",
+                "explanation": "Questa query è pensata per trovare clienti con più di 18 anni che vivono a Genova. Tuttavia, l'operatore NOT nega la condizione sulla città, producendo clienti con più di 18 anni che non vivono a Genova.",
                 "correction": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';"
             },
             "50": {
                 "name": "Operatore NOT mancante",
-                "description": "In una condizione logica manca un operatore `NOT`, producendo risultati errati.",
+                "description": "In una condizione logica manca un operatore NOT, producendo risultati errati.",
                 "example": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';",
-                "explanation": "Questa query è pensata per trovare clienti con più di 18 anni che non vivono a Genova. Tuttavia, senza l'operatore `NOT`, restituisce clienti con più di 18 anni che vivono a Genova.",
+                "explanation": "Questa query è pensata per trovare clienti con più di 18 anni che non vivono a Genova. Tuttavia, senza l'operatore NOT, restituisce clienti con più di 18 anni che vivono a Genova.",
                 "correction": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND NOT city = 'Genoa';"
             },
             "51": {
                 "name": "Sostituzione della negazione di esistenza con <>",
-                "description": "La query usa `<>` per verificare la non esistenza invece di `NOT IN` o `NOT EXISTS`.",
+                "description": "La query usa <> per verificare la non esistenza invece di NOT IN o NOT EXISTS.",
                 "example": "SELECT *\nFROM store s\nWHERE EXISTS (\n    SELECT 1\n    FROM inventory i\n    WHERE\n        i.sID = s.sID\n        AND i.unit_price <> 5\n);",
-                "explanation": "Questa query usa `<>` per verificare elementi di inventario che non costano 5, ma non impone correttamente la condizione che non debbano esistere elementi con prezzo 5. Invece, controlla se esiste almeno un elemento di inventario che non costa 5, che non è la logica desiderata. L'approccio corretto è usare `NOT EXISTS` per garantire che non esistano elementi di inventario con `unit_price` pari a 5 per ciascuno store.",
+                "explanation": "Questa query usa <> per verificare elementi di inventario che non costano 5, ma non impone correttamente la condizione che non debbano esistere elementi con prezzo 5. Invece, controlla se esiste almeno un elemento di inventario che non costa 5, che non è la logica desiderata. L'approccio corretto è usare NOT EXISTS per garantire che non esistano elementi di inventario con unit_price pari a 5 per ciascuno store.",
                 "correction": "SELECT *\nFROM store s\nWHERE NOT EXISTS (\n    SELECT 1\n    FROM inventory i\n    WHERE\n        i.sID = s.sID\n        AND i.unit_price = 5\n);"
             },
             "52": {
                 "name": "Operatore di confronto errato o valore confrontato errato",
                 "description": "Una condizione usa l'operatore di confronto sbagliato o confronta con un valore errato, producendo risultati non voluti.",
                 "example": "SELECT *\nFROM customer\nWHERE age < 18;",
-                "explanation": "La query usa l'operatore `<` invece di `>`, quindi elenca clienti più giovani di 18 anni invece di quelli più anziani.",
+                "explanation": "La query usa l'operatore < invece di >, quindi elenca clienti più giovani di 18 anni invece di quelli più anziani.",
                 "correction": "SELECT *\nFROM customer\nWHERE age > 18;"
             },
             "53": {
                 "name": "Riferimento a tabella errato",
                 "description": "La query fa riferimento alla tabella sbagliata, producendo risultati errati o inattesi.",
                 "example": "SELECT DISTINCT city\nFROM store;",
-                "explanation": "La query fa riferimento alla tabella `store` invece della tabella `customer`, che è quella in cui è memorizzata l'informazione sulla città dei clienti. Di conseguenza recupera le città da `store` anziché da `customer`, e questo non soddisfa la richiesta dei dati.",
+                "explanation": "La query fa riferimento alla tabella store invece della tabella customer, che è quella in cui è memorizzata l'informazione sulla città dei clienti. Di conseguenza recupera le città da store anziché da customer, e questo non soddisfa la richiesta dei dati.",
                 "correction": "SELECT DISTINCT city\nFROM customer;"
             },
             "54": {
                 "name": "Riferimento a tabella mancante",
                 "description": "La query fa riferimento a meno tabelle del necessario, producendo risultati incompleti.",
                 "example": "SELECT sID\nFROM store;",
-                "explanation": "La query fa riferimento solo alla tabella `store`, che non contiene informazioni sull'inventario. Di conseguenza non riesce a identificare quali store hanno articoli in inventario, producendo risultati incompleti.",
+                "explanation": "La query fa riferimento solo alla tabella store, che non contiene informazioni sull'inventario. Di conseguenza non riesce a identificare quali store hanno articoli in inventario, producendo risultati incompleti.",
                 "correction": "SELECT sID\nFROM\n    store\n    NATURAL JOIN inventory;"
             },
             "55": {
                 "name": "Riferimento a tabella superfluo",
                 "description": "La query fa riferimento a più tabelle del necessario, producendo risultati errati o inattesi.",
                 "example": "SELECT cName\nFROM customer, store;",
-                "explanation": "La query fa riferimento sia alla tabella `customer` sia alla tabella `store`, ma la richiesta dei dati richiede solo informazioni dalla tabella `customer`. L'inclusione della tabella `store` crea un prodotto cartesiano, producendo più righe per ogni nome cliente, che non è il risultato desiderato.",
+                "explanation": "La query fa riferimento sia alla tabella customer sia alla tabella store, ma la richiesta dei dati richiede solo informazioni dalla tabella customer. L'inclusione della tabella store crea un prodotto cartesiano, producendo più righe per ogni nome cliente, che non è il risultato desiderato.",
                 "correction": "SELECT cName\nFROM customer;"
             },
             "56": {
                 "name": "Condizione di join sulla colonna errata",
                 "description": "Una condizione di join usa la colonna sbagliata, producendo risultati errati o inattesi.",
                 "example": "SELECT *\nFROM store s\nJOIN inventory i ON s.sID = i.pID;",
-                "explanation": "La query prova a unire le tabelle `store` e `inventory` usando la condizione `s.sID = i.pID`. Tuttavia, `sID` è l'identificativo dello store e `pID` è l'identificativo del prodotto, quindi questa condizione non collega correttamente le due tabelle. Di conseguenza, la query non restituirà il risultato desiderato di elencare gli store insieme al loro inventario.",
+                "explanation": "La query prova a unire le tabelle store e inventory usando la condizione s.sID = i.pID. Tuttavia, sID è l'identificativo dello store e pID è l'identificativo del prodotto, quindi questa condizione non collega correttamente le due tabelle. Di conseguenza, la query non restituirà il risultato desiderato di elencare gli store insieme al loro inventario.",
                 "correction": "SELECT *\nFROM store s\nJOIN inventory i ON s.sID = i.sID;"
             },
             "57": {
                 "name": "Condizione di join con operatore di confronto errato",
                 "description": "Una condizione di join usa l'operatore di confronto sbagliato, producendo risultati errati o inattesi.",
                 "example": "SELECT c1.cID, c2.cID\nFROM customer c1\nJOIN customer c2 ON c1.city <> c2.city;",
-                "explanation": "La query prova a trovare coppie di clienti che vivono nella stessa città, ma usa l'operatore `<>`, che significa \"diverso\". Di conseguenza recupera coppie di clienti che vivono in città diverse invece di quelli che vivono nella stessa città.",
+                "explanation": "La query prova a trovare coppie di clienti che vivono nella stessa città, ma usa l'operatore <>, che significa \"diverso\". Di conseguenza recupera coppie di clienti che vivono in città diverse invece di quelli che vivono nella stessa città.",
                 "correction": "SELECT c1.cID, c2.cID\nFROM customer c1\nJOIN customer c2 ON c1.city = c2.city;"
             },
             "58": {
                 "name": "Condizione di join mancante",
                 "description": "Una query fa riferimento a più tabelle ma non include le condizioni di join necessarie per collegarle, producendo risultati incompleti o errati.",
                 "example": "SELECT *\nFROM\n    store,\n    inventory\nWHERE\n    city = 'Genoa';",
-                "explanation": "Questa query non include alcuna condizione di join per collegare le tabelle `store` e `inventory`. Di conseguenza produce un prodotto cartesiano delle due tabelle filtrato solo dalla condizione sulla città della tabella `store`. Questo significa che restituirà tutte le combinazioni di store a Genova con tutti gli articoli di inventario, indipendentemente dal fatto che quegli articoli siano realmente presenti in quegli store.",
+                "explanation": "Questa query non include alcuna condizione di join per collegare le tabelle store e inventory. Di conseguenza produce un prodotto cartesiano delle due tabelle filtrato solo dalla condizione sulla città della tabella store. Questo significa che restituirà tutte le combinazioni di store a Genova con tutti gli articoli di inventario, indipendentemente dal fatto che quegli articoli siano realmente presenti in quegli store.",
                 "correction": "SELECT *\nFROM\n    store\n    NATURAL JOIN inventory\nWHERE\n    city = 'Genoa';"
             },
             "59": {
                 "name": "Condizione su OUTER JOIN",
                 "description": "L'uso di una condizione JOIN ON sulla tabella sinistra di una LEFT OUTER JOIN influisce solo sulla tabella destra e può portare a risultati inattesi.",
                 "example": "SELECT *\nFROM\n    customer c\n    LEFT OUTER JOIN store s ON s.city = c.city AND s.sName = 'Coop';",
-                "explanation": "La condizione `s.sName = 'Coop'` viene applicata nella clausola `ON` e influisce su come le righe corrispondono sul lato destro. Se il nome di uno store non soddisfa la condizione, la riga può comunque comparire con valori `NULL`, che non è il comportamento desiderato. Per filtrare le righe, la condizione dovrebbe essere messa nella clausola `WHERE`.",
+                "explanation": "La condizione s.sName = 'Coop' viene applicata nella clausola ON e influisce su come le righe corrispondono sul lato destro. Se il nome di uno store non soddisfa la condizione, la riga può comunque comparire con valori NULL, che non è il comportamento desiderato. Per filtrare le righe, la condizione dovrebbe essere messa nella clausola WHERE.",
                 "correction": "SELECT *\nFROM\n    customer c\n    LEFT OUTER JOIN store s ON s.city = c.city\nWHERE s.sName = 'Coop';"
             },
             "60": {
                 "name": "Annidamento improprio delle espressioni",
                 "description": "Le espressioni non sono annidate correttamente con le parentesi, causando un ordine di valutazione errato.",
                 "example": "SELECT *\nFROM customer\nWHERE age + 5 * 2 > 30;",
-                "explanation": "In questa query, l'operatore di moltiplicazione ha precedenza maggiore rispetto all'operatore di addizione. Di conseguenza, `5 * 2` viene valutato per primo, producendo 10, e poi viene valutato `age + 10`. Questo non è il calcolo desiderato. La valutazione corretta dovrebbe essere `(age + 5) * 2`, che richiede un annidamento corretto con le parentesi.",
+                "explanation": "In questa query, l'operatore di moltiplicazione ha precedenza maggiore rispetto all'operatore di addizione. Di conseguenza, 5 * 2 viene valutato per primo, producendo 10, e poi viene valutato age + 10. Questo non è il calcolo desiderato. La valutazione corretta dovrebbe essere (age + 5) * 2, che richiede un annidamento corretto con le parentesi.",
                 "correction": "SELECT *\nFROM customer\nWHERE (age + 5) * 2 > 30;"
             },
             "61": {
                 "name": "Annidamento improprio delle sottoquery",
                 "description": "Le sottoquery sono annidate in modo improprio, portando a un ordine di valutazione diverso da quello previsto.",
                 "example": "SELECT *\nFROM store s\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM inventory i\n  WHERE i.sID = s.sID\n    AND EXISTS (\n      SELECT 1\n      FROM product p\n      WHERE p.pID = i.pID\n        AND p.suffix = 'XL'\n    )\n);",
-                "explanation": "Questa query è pensata per imporre due condizioni separate: lo store ha righe di inventario e nessuna di quelle righe si riferisce a un prodotto con suffisso `XL`. Annidare `EXISTS` dentro `NOT EXISTS` porta a selezionare store che non hanno alcuna riga di inventario, che non è il risultato desiderato. L'approccio corretto è usare due condizioni `EXISTS` separate allo stesso livello.",
+                "explanation": "Questa query è pensata per imporre due condizioni separate: lo store ha righe di inventario e nessuna di quelle righe si riferisce a un prodotto con suffisso XL. Annidare EXISTS dentro NOT EXISTS porta a selezionare store che non hanno alcuna riga di inventario, che non è il risultato desiderato. L'approccio corretto è usare due condizioni EXISTS separate allo stesso livello.",
                 "correction": "SELECT *\nFROM store s\nWHERE EXISTS (\n  SELECT 1\n  FROM inventory i\n  WHERE i.sID = s.sID\n)\nAND NOT EXISTS (\n  SELECT 1\n  FROM inventory i\n  JOIN product p ON p.pID = i.pID\n  WHERE i.sID = s.sID\n    AND p.suffix = 'XL'\n);"
             },
             "62": {
                 "name": "Virgolette superflue",
                 "description": "Un nome di colonna è racchiuso tra virgolette, trasformandolo di fatto in un letterale stringa.",
                 "example": "SELECT *\nFROM customer c, store s\nWHERE c.city = 's.city';",
-                "explanation": "In questa query, la condizione `c.city = 's.city'` confronta la colonna `city` della tabella `customer` con il letterale stringa `'s.city'`, cosa non corretta. Per confrontare la colonna `city` di entrambe le tabelle, le virgolette intorno a `s.city` devono essere rimosse.",
+                "explanation": "In questa query, la condizione c.city = 's.city' confronta la colonna city della tabella customer con il letterale stringa 's.city', cosa non corretta. Per confrontare la colonna city di entrambe le tabelle, le virgolette intorno a s.city devono essere rimosse.",
                 "correction": "SELECT *\nFROM customer c, store s\nWHERE c.city = s.city;"
             },
             "63": {
@@ -1394,187 +1394,187 @@
                 "name": "Espressione superflua",
                 "description": "Nella query è presente un'espressione logica non richiesta dalla richiesta dei dati.",
                 "example": "SELECT sID\nFROM store\nWHERE\n    sName = 'Coop'\n    AND city = 'Genoa';",
-                "explanation": "La query elenca tutti gli store Coop situati a Genova, ma questo non è ciò che richiedeva la richiesta dei dati. La condizione superflua `city = 'Genoa'` dovrebbe essere rimossa.",
+                "explanation": "La query elenca tutti gli store Coop situati a Genova, ma questo non è ciò che richiedeva la richiesta dei dati. La condizione superflua city = 'Genoa' dovrebbe essere rimossa.",
                 "correction": "SELECT sID\nFROM store\nWHERE sName = 'Coop';"
             },
             "65": {
                 "name": "Espressione sulla colonna errata",
                 "description": "Nella query è presente un'espressione logica richiesta dalla richiesta dei dati, ma applicata alla colonna sbagliata.",
                 "example": "SELECT sID\nFROM store\nWHERE street = 'Coop';",
-                "explanation": "La condizione `= 'Coop'` è corretta, ma dovrebbe essere applicata alla colonna `sName` invece che alla colonna `street`.",
+                "explanation": "La condizione = 'Coop' è corretta, ma dovrebbe essere applicata alla colonna sName invece che alla colonna street.",
                 "correction": "SELECT sID\nFROM store\nWHERE sName = 'Coop';"
             },
             "66": {
                 "name": "Espressione nella clausola errata",
-                "description": "Un'espressione logica corretta è presente nella clausola SBAGLIATA (cioè `WHERE` invece di `HAVING`, o viceversa).",
+                "description": "Un'espressione logica corretta è presente nella clausola SBAGLIATA (cioè WHERE invece di HAVING, o viceversa).",
                 "example": "SELECT city, AVG(age)\nFROM customer\nWHERE age < 30\nGROUP BY city;",
-                "explanation": "Questa query risponde alla seguente richiesta dei dati: *Elenca l'età media dei clienti per ogni città. Considera solo i clienti con meno di 30 anni.* Per soddisfare correttamente la richiesta, la condizione `age < 30` deve essere spostata nella clausola `HAVING`, poiché deve applicarsi al risultato del raggruppamento invece che alle singole righe.",
+                "explanation": "Questa query risponde alla seguente richiesta dei dati: *Elenca l'età media dei clienti per ogni città. Considera solo i clienti con meno di 30 anni.* Per soddisfare correttamente la richiesta, la condizione age < 30 deve essere spostata nella clausola HAVING, poiché deve applicarsi al risultato del raggruppamento invece che alle singole righe.",
                 "correction": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city\nHAVING AVG(age) < 30;"
             },
             "67": {
                 "name": "Caratteri jolly senza LIKE",
-                "description": "Caratteri jolly come % o _ sono usati con `=` invece di `LIKE`, producendo un confronto letterale anziché una corrispondenza per pattern.",
+                "description": "Caratteri jolly come % o _ sono usati con = invece di LIKE, producendo un confronto letterale anziché una corrispondenza per pattern.",
                 "example": "SELECT *\nFROM customer\nWHERE cName = 'J%n';",
-                "explanation": "Questa query seleziona tutti i clienti il cui nome è esattamente `J%n`, incluso il simbolo di percentuale, invece di trovare nomi che iniziano con 'J' e finiscono con 'n'.",
+                "explanation": "Questa query seleziona tutti i clienti il cui nome è esattamente J%n, incluso il simbolo di percentuale, invece di trovare nomi che iniziano con 'J' e finiscono con 'n'.",
                 "correction": "SELECT *\nFROM customer\nWHERE cName LIKE 'J%n';"
             },
             "68": {
                 "name": "Carattere jolly errato",
-                "description": "In un pattern `LIKE` viene usato il carattere jolly sbagliato. Ad esempio, `%` al posto di `_` per corrispondere a un solo carattere, o viceversa.",
+                "description": "In un pattern LIKE viene usato il carattere jolly sbagliato. Ad esempio, % al posto di _ per corrispondere a un solo carattere, o viceversa.",
                 "example": "SELECT *\nFROM customer\nWHERE cName LIKE 'J%n';",
-                "explanation": "Questa query usa il carattere jolly `%`, che corrisponde a una sequenza qualsiasi di caratteri (compresa una sequenza vuota), invece del carattere `_`, che corrisponde esattamente a un solo carattere. Di conseguenza, la query restituirà clienti i cui nomi iniziano con 'J' e finiscono con 'n', indipendentemente da quanti caratteri ci siano in mezzo, e questo non soddisfa la richiesta dei dati.",
+                "explanation": "Questa query usa il carattere jolly %, che corrisponde a una sequenza qualsiasi di caratteri (compresa una sequenza vuota), invece del carattere _, che corrisponde esattamente a un solo carattere. Di conseguenza, la query restituirà clienti i cui nomi iniziano con 'J' e finiscono con 'n', indipendentemente da quanti caratteri ci siano in mezzo, e questo non soddisfa la richiesta dei dati.",
                 "correction": "SELECT *\nFROM customer\nWHERE cName LIKE 'J_n';"
             },
             "69": {
                 "name": "Carattere jolly non valido",
                 "description": "Nel pattern matching vengono usati caratteri jolly non validi al posto di quelli SQL standard, ad esempio * invece di % o ? invece di _.",
                 "example": "SELECT *\nFROM customer\nWHERE cName LIKE 'J*n';",
-                "explanation": "La query usa il carattere jolly `*` per corrispondere a qualsiasi sequenza di caratteri, cosa comune in altri linguaggi di programmazione ma non in SQL. In SQL, per il pattern matching si usa `%`. Di conseguenza, la query non restituisce alcun risultato perché cerca nomi che contengono letteralmente 'J*n' invece di nomi che iniziano con 'J' e finiscono con 'n'.",
+                "explanation": "La query usa il carattere jolly * per corrispondere a qualsiasi sequenza di caratteri, cosa comune in altri linguaggi di programmazione ma non in SQL. In SQL, per il pattern matching si usa %. Di conseguenza, la query non restituisce alcun risultato perché cerca nomi che contengono letteralmente 'J*n' invece di nomi che iniziano con 'J' e finiscono con 'n'.",
                 "correction": "SELECT *\nFROM customer\nWHERE cName LIKE 'J%n';"
             },
             "70": {
                 "name": "Colonna superflua in SELECT",
-                "description": "Nella clausola `SELECT` è inclusa una colonna non prevista o non necessaria per il risultato desiderato.",
+                "description": "Nella clausola SELECT è inclusa una colonna non prevista o non necessaria per il risultato desiderato.",
                 "example": "SELECT cID, cName, street\nFROM customer;",
-                "explanation": "La richiesta dei dati richiede solo gli ID e i nomi dei clienti, ma la query include anche la colonna `street` nella clausola SELECT. Questo aggiunge dati non necessari al risultato.",
+                "explanation": "La richiesta dei dati richiede solo gli ID e i nomi dei clienti, ma la query include anche la colonna street nella clausola SELECT. Questo aggiunge dati non necessari al risultato.",
                 "correction": "SELECT cID, cName\nFROM customer;"
             },
             "71": {
                 "name": "Colonna mancante in SELECT",
-                "description": "Manca una colonna richiesta nella clausola `SELECT`.",
+                "description": "Manca una colonna richiesta nella clausola SELECT.",
                 "example": "SELECT cName\nFROM customer;",
                 "explanation": "L'esercizio richiede sia i nomi sia le età dei clienti, ma la query seleziona solo i primi.",
                 "correction": "SELECT cName, age\nFROM customer;"
             },
             "72": {
                 "name": "DISTINCT mancante in SELECT",
-                "description": "Manca la parola chiave `DISTINCT` nella clausola `SELECT`, causando righe duplicate nel risultato quando l'esercizio richiede valori univoci.",
+                "description": "Manca la parola chiave DISTINCT nella clausola SELECT, causando righe duplicate nel risultato quando l'esercizio richiede valori univoci.",
                 "example": "SELECT city\nFROM customer;",
-                "explanation": "La query recupera le città di tutti i clienti, ma non usa `DISTINCT`, quindi se più clienti vivono nella stessa città, quella città comparirà più volte nel risultato. Questo non soddisfa la richiesta dei dati di elencare città univoche.",
+                "explanation": "La query recupera le città di tutti i clienti, ma non usa DISTINCT, quindi se più clienti vivono nella stessa città, quella città comparirà più volte nel risultato. Questo non soddisfa la richiesta dei dati di elencare città univoche.",
                 "correction": "SELECT DISTINCT city\nFROM customer;"
             },
             "73": {
                 "name": "AS mancante in SELECT",
-                "description": "Una colonna presenta un nome diverso da quello richiesto dall'esercizio a causa dell'assenza di un alias `AS`.",
+                "description": "Una colonna presenta un nome diverso da quello richiesto dall'esercizio a causa dell'assenza di un alias AS.",
                 "example": "SELECT cName\nFROM customer;",
-                "explanation": "La query recupera i nomi di tutti i clienti, ma non etichetta la colonna di output come `name`, come richiesto dalla richiesta dei dati.",
+                "explanation": "La query recupera i nomi di tutti i clienti, ma non etichetta la colonna di output come name, come richiesto dalla richiesta dei dati.",
                 "correction": "SELECT cName AS name\nFROM customer;"
             },
             "74": {
                 "name": "Colonna mancante in ORDER BY",
-                "description": "Manca una colonna richiesta nella clausola `ORDER BY`.",
+                "description": "Manca una colonna richiesta nella clausola ORDER BY.",
                 "example": "SELECT cName, age\nFROM customer\nORDER BY cName;",
-                "explanation": "La query recupera i nomi e le età di tutti i clienti, ma ordina i risultati solo per `cName`. I clienti con lo stesso nome restano non ordinati all'interno del loro gruppo.",
+                "explanation": "La query recupera i nomi e le età di tutti i clienti, ma ordina i risultati solo per cName. I clienti con lo stesso nome restano non ordinati all'interno del loro gruppo.",
                 "correction": "SELECT cName, age\nFROM customer\nORDER BY cName, age;"
             },
             "75": {
                 "name": "Colonna errata in ORDER BY",
-                "description": "Nella clausola `ORDER BY` viene usata una colonna errata, quindi i risultati vengono ordinati in modo non previsto.",
+                "description": "Nella clausola ORDER BY viene usata una colonna errata, quindi i risultati vengono ordinati in modo non previsto.",
                 "example": "SELECT *\nFROM customer\nORDER BY city;",
-                "explanation": "La query ordina i risultati per la colonna `city` invece che per la colonna `cName`, che non è quanto specificato dalla richiesta dei dati. Di conseguenza i clienti vengono ordinati per città invece che per nome.",
+                "explanation": "La query ordina i risultati per la colonna city invece che per la colonna cName, che non è quanto specificato dalla richiesta dei dati. Di conseguenza i clienti vengono ordinati per città invece che per nome.",
                 "correction": "SELECT *\nFROM customer\nORDER BY cName;"
             },
             "76": {
                 "name": "Ordinamento errato delle righe",
-                "description": "La clausola `ORDER BY` ordina i risultati nel verso sbagliato (crescente invece di decrescente, o viceversa).",
+                "description": "La clausola ORDER BY ordina i risultati nel verso sbagliato (crescente invece di decrescente, o viceversa).",
                 "example": "SELECT cName\nFROM customer\nORDER BY cID;",
-                "explanation": "L'esercizio richiede che i risultati siano ordinati per `cName` in ordine decrescente, ma la query li ordina invece in ordine crescente.",
+                "explanation": "L'esercizio richiede che i risultati siano ordinati per cName in ordine decrescente, ma la query li ordina invece in ordine crescente.",
                 "correction": "SELECT cName\nFROM customer\nORDER BY cName DESC;"
             },
             "77": {
                 "name": "Clausola WHERE mancante",
-                "description": "Manca una clausola `WHERE` nella query quando la richiesta dei dati richiede il filtraggio dei risultati in base a condizioni specifiche.",
+                "description": "Manca una clausola WHERE nella query quando la richiesta dei dati richiede il filtraggio dei risultati in base a condizioni specifiche.",
                 "example": "SELECT cName\nFROM customer;",
-                "explanation": "La query non soddisfa la richiesta dei dati perché non include una clausola `WHERE` per filtrare i risultati in base alle condizioni specificate su età e città. Di conseguenza restituisce i nomi di tutti i clienti, indipendentemente dalla loro età o città di residenza, e questo non è ciò che richiede la traccia.",
+                "explanation": "La query non soddisfa la richiesta dei dati perché non include una clausola WHERE per filtrare i risultati in base alle condizioni specificate su età e città. Di conseguenza restituisce i nomi di tutti i clienti, indipendentemente dalla loro età o città di residenza, e questo non è ciò che richiede la traccia.",
                 "correction": "SELECT cName\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';"
             },
             "78": {
                 "name": "Clausola GROUP BY mancante",
-                "description": "Manca una clausola `GROUP BY` nella query quando la richiesta dei dati richiede l'aggregazione dei risultati in base a una o più colonne.",
+                "description": "Manca una clausola GROUP BY nella query quando la richiesta dei dati richiede l'aggregazione dei risultati in base a una o più colonne.",
                 "example": "SELECT AVG(age)\nFROM customer;",
                 "explanation": "La query calcola l'età media di tutti i clienti ma non raggruppa i risultati per città. Di conseguenza restituisce una sola età media per tutti i clienti, non una per ciascuna città.",
                 "correction": "SELECT AVG(age)\nFROM customer\nGROUP BY city;"
             },
             "79": {
                 "name": "Clausola HAVING mancante",
-                "description": "Manca una clausola `HAVING` nella query quando la richiesta dei dati richiede il filtraggio di risultati raggruppati in base a una condizione aggregata.",
+                "description": "Manca una clausola HAVING nella query quando la richiesta dei dati richiede il filtraggio di risultati raggruppati in base a una condizione aggregata.",
                 "example": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city;",
-                "explanation": "La query calcola l'età media dei clienti per ciascuna città ma non include una clausola `HAVING` per filtrare i risultati in base alla condizione che l'età media debba essere maggiore di 30. Di conseguenza restituisce l'età media per tutte le città, non solo per quelle in cui l'età media supera 30.",
+                "explanation": "La query calcola l'età media dei clienti per ciascuna città ma non include una clausola HAVING per filtrare i risultati in base alla condizione che l'età media debba essere maggiore di 30. Di conseguenza restituisce l'età media per tutte le città, non solo per quelle in cui l'età media supera 30.",
                 "correction": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city\nHAVING AVG(age) > 30;"
             },
             "80": {
                 "name": "Clausola ORDER BY mancante",
-                "description": "Manca una clausola `ORDER BY` nella query quando la richiesta dei dati richiede che i risultati siano ordinati in un modo specifico.",
+                "description": "Manca una clausola ORDER BY nella query quando la richiesta dei dati richiede che i risultati siano ordinati in un modo specifico.",
                 "example": "SELECT *\nFROM customer;",
-                "explanation": "La query non soddisfa la richiesta dei dati perché non include una clausola `ORDER BY` per ordinare i risultati alfabeticamente per nome del cliente.",
+                "explanation": "La query non soddisfa la richiesta dei dati perché non include una clausola ORDER BY per ordinare i risultati alfabeticamente per nome del cliente.",
                 "correction": "SELECT *\nFROM customer\nORDER BY cName;"
             },
             "81": {
                 "name": "Clausola LIMIT mancante",
-                "description": "Manca la clausola `LIMIT` nella query quando la richiesta dei dati richiede di limitare il numero di righe restituite.",
+                "description": "Manca la clausola LIMIT nella query quando la richiesta dei dati richiede di limitare il numero di righe restituite.",
                 "example": "SELECT *\nFROM customer;",
-                "explanation": "La query recupera tutti i clienti dal database, ma non include una clausola `LIMIT` per limitare a 10 il numero di righe restituite, come richiesto dalla traccia.",
+                "explanation": "La query recupera tutti i clienti dal database, ma non include una clausola LIMIT per limitare a 10 il numero di righe restituite, come richiesto dalla traccia.",
                 "correction": "SELECT *\nFROM customer\nLIMIT 10;"
             },
             "82": {
                 "name": "Clausola OFFSET mancante",
-                "description": "Manca la clausola `OFFSET` nella query quando la richiesta dei dati richiede di saltare un certo numero di righe prima di iniziare a restituire risultati.",
+                "description": "Manca la clausola OFFSET nella query quando la richiesta dei dati richiede di saltare un certo numero di righe prima di iniziare a restituire risultati.",
                 "example": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 3;",
-                "explanation": "La query non soddisfa la richiesta dei dati perché elenca i primi tre clienti invece del secondo, terzo e quarto cliente. La clausola `OFFSET` è necessaria per saltare il primo cliente.",
+                "explanation": "La query non soddisfa la richiesta dei dati perché elenca i primi tre clienti invece del secondo, terzo e quarto cliente. La clausola OFFSET è necessaria per saltare il primo cliente.",
                 "correction": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 3\nOFFSET 1;"
             },
             "83": {
                 "name": "Clausola WHERE superflua",
-                "description": "La query include una clausola `WHERE` quando la richiesta dei dati non richiede alcun filtraggio dei risultati.",
+                "description": "La query include una clausola WHERE quando la richiesta dei dati non richiede alcun filtraggio dei risultati.",
                 "example": "SELECT cName\nFROM customer\nWHERE city = 'Genoa';",
-                "explanation": "La richiesta dei dati è elencare i nomi di tutti i clienti, indipendentemente dalla loro città. L'inclusione della clausola `WHERE` filtra i risultati includendo solo i clienti di Genova, che non è quanto richiesto. Questo produce un elenco incompleto dei nomi dei clienti.",
+                "explanation": "La richiesta dei dati è elencare i nomi di tutti i clienti, indipendentemente dalla loro città. L'inclusione della clausola WHERE filtra i risultati includendo solo i clienti di Genova, che non è quanto richiesto. Questo produce un elenco incompleto dei nomi dei clienti.",
                 "correction": "SELECT cName\nFROM customer;"
             },
             "84": {
                 "name": "Clausola GROUP BY superflua",
-                "description": "La query include una clausola `GROUP BY` quando la richiesta dei dati non richiede alcuna aggregazione o raggruppamento dei risultati.",
+                "description": "La query include una clausola GROUP BY quando la richiesta dei dati non richiede alcuna aggregazione o raggruppamento dei risultati.",
                 "example": "SELECT AVG(age)\nFROM customer\nGROUP BY city;",
                 "explanation": "La query raggruppa i clienti per città e calcola l'età media per ciascuna città. Tuttavia, la richiesta dei dati è elencare l'età media di tutti i clienti, non raggruppata per città.",
                 "correction": "SELECT AVG(age)\nFROM customer;"
             },
             "85": {
                 "name": "Clausola HAVING superflua",
-                "description": "La query include una clausola `HAVING` quando la richiesta dei dati non richiede alcun filtraggio di risultati raggruppati.",
+                "description": "La query include una clausola HAVING quando la richiesta dei dati non richiede alcun filtraggio di risultati raggruppati.",
                 "example": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city\nHAVING AVG(age) > 30;",
-                "explanation": "La query usa una clausola `HAVING` per filtrare gruppi di clienti in base alla loro età media. Tuttavia, la richiesta dei dati è elencare l'età media di tutti i clienti, non filtrare gruppi. In questo contesto la clausola `HAVING` è superflua.",
+                "explanation": "La query usa una clausola HAVING per filtrare gruppi di clienti in base alla loro età media. Tuttavia, la richiesta dei dati è elencare l'età media di tutti i clienti, non filtrare gruppi. In questo contesto la clausola HAVING è superflua.",
                 "correction": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city;"
             },
             "86": {
                 "name": "Clausola ORDER BY superflua",
-                "description": "La query include una clausola `ORDER BY` quando la richiesta dei dati non richiede alcun ordinamento specifico dei risultati.",
+                "description": "La query include una clausola ORDER BY quando la richiesta dei dati non richiede alcun ordinamento specifico dei risultati.",
                 "example": "SELECT *\nFROM customer\nORDER BY cName;",
-                "explanation": "La richiesta dei dati non specifica alcun ordinamento dei risultati, quindi includere una clausola `ORDER BY` è inutile e aggiunge complessità alla query.",
+                "explanation": "La richiesta dei dati non specifica alcun ordinamento dei risultati, quindi includere una clausola ORDER BY è inutile e aggiunge complessità alla query.",
                 "correction": "SELECT *\nFROM customer;"
             },
             "87": {
                 "name": "Clausola LIMIT superflua",
-                "description": "La query include la clausola `LIMIT` quando la richiesta dei dati non richiede di restringere il numero di risultati restituiti.",
+                "description": "La query include la clausola LIMIT quando la richiesta dei dati non richiede di restringere il numero di risultati restituiti.",
                 "example": "SELECT *\nFROM customer\nLIMIT 10;",
                 "explanation": "La query non soddisfa la richiesta dei dati perché elenca solo 10 clienti invece di tutti quelli presenti nel database.",
                 "correction": "SELECT *\nFROM customer;"
             },
             "88": {
                 "name": "Clausola OFFSET superflua",
-                "description": "La query include la clausola `OFFSET` quando la richiesta dei dati non richiede di saltare alcuna riga del risultato.",
+                "description": "La query include la clausola OFFSET quando la richiesta dei dati non richiede di saltare alcuna riga del risultato.",
                 "example": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 3\nOFFSET 1;",
                 "explanation": "La query non soddisfa la richiesta dei dati perché elenca il secondo, terzo e quarto cliente invece dei primi tre.",
-                "correction": "```sql\nSELECT *\nFROM customer\nORDER BY cName\nLIMIT 3;"
+                "correction": "sql\nSELECT *\nFROM customer\nORDER BY cName\nLIMIT 3;"
             },
             "89": {
                 "name": "LIMIT errato",
-                "description": "La clausola `LIMIT` è usata con un valore errato.",
+                "description": "La clausola LIMIT è usata con un valore errato.",
                 "example": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 10;",
                 "explanation": "La query non soddisfa la richiesta dei dati perché elenca i primi 10 clienti invece dei primi 3.",
                 "correction": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 3;"
             },
             "90": {
                 "name": "OFFSET errato",
-                "description": "La clausola `OFFSET` è usata con un valore errato.",
+                "description": "La clausola OFFSET è usata con un valore errato.",
                 "example": "SELECT *\nFROM customer\nORDER BY cName\nOFFSET 10;",
                 "explanation": "La query usa un valore di offset errato pari a 10, saltando più clienti del previsto. La richiesta dei dati richiede di saltare solo i primi 5 clienti.",
                 "correction": "SELECT *\nFROM customer\nORDER BY cName\nOFFSET 5;"
@@ -1583,28 +1583,28 @@
                 "name": "Funzione errata",
                 "description": "Per l'operazione prevista viene usata una funzione errata, producendo risultati inattesi.",
                 "example": "SELECT SUM(age) FROM customer;",
-                "explanation": "L'esercizio richiede di calcolare l'età media dei clienti, ma la query usa la funzione `SUM` invece di `AVG`, ottenendo l'età totale anziché l'età media.",
+                "explanation": "L'esercizio richiede di calcolare l'età media dei clienti, ma la query usa la funzione SUM invece di AVG, ottenendo l'età totale anziché l'età media.",
                 "correction": "SELECT AVG(age) FROM customer;"
             },
             "92": {
                 "name": "DISTINCT come parametro di funzione dove non applicabile",
                 "description": "DISTINCT viene usato all'interno di una funzione dove non è appropriato o necessario.",
                 "example": "SELECT COUNT(DISTINCT age)\nFROM customer;",
-                "explanation": "`DISTINCT` fa sì che `COUNT` conti solo le età uniche. Più clienti con la stessa età vengono contati come uno solo.",
+                "explanation": "DISTINCT fa sì che COUNT conti solo le età uniche. Più clienti con la stessa età vengono contati come uno solo.",
                 "correction": "SELECT COUNT(age)\nFROM customer;"
             },
             "93": {
                 "name": "DISTINCT mancante nel parametro della funzione",
-                "description": "`DISTINCT` manca all'interno di una funzione dove è richiesto per evitare che valori ripetuti vengano contati più volte.",
+                "description": "DISTINCT manca all'interno di una funzione dove è richiesto per evitare che valori ripetuti vengano contati più volte.",
                 "example": "SELECT COUNT(city)\nFROM customer;",
-                "explanation": "La query conta tutte le occorrenze nella colonna `city`, inclusi i duplicati. Se più clienti provengono dalla stessa città, verranno contati più volte, e questo non soddisfa la richiesta di contare città univoche.",
+                "explanation": "La query conta tutte le occorrenze nella colonna city, inclusi i duplicati. Se più clienti provengono dalla stessa città, verranno contati più volte, e questo non soddisfa la richiesta di contare città univoche.",
                 "correction": "SELECT COUNT(DISTINCT city)\nFROM customer;"
             },
             "94": {
                 "name": "Colonna errata come parametro di funzione",
                 "description": "Come parametro di una funzione viene usata una colonna errata, producendo risultati non voluti.",
                 "example": "SELECT AVG(quantity)\nFROM inventory;",
-                "explanation": "La query calcola la media della colonna `quantity` invece della colonna `unit_price`, che non è quanto specificato dalla richiesta dei dati. Questo produce un calcolo errato del prezzo unitario medio.",
+                "explanation": "La query calcola la media della colonna quantity invece della colonna unit_price, che non è quanto specificato dalla richiesta dei dati. Questo produce un calcolo errato del prezzo unitario medio.",
                 "correction": "SELECT AVG(unit_price)\nFROM inventory;"
             },
             "95": {
@@ -1616,170 +1616,170 @@
             },
             "96": {
                 "name": "DISTINCT non necessario nella clausola SELECT",
-                "description": "`DISTINCT` viene usato in una clausola `SELECT` dove non possono verificarsi duplicati, aggiungendo complessità inutile.",
+                "description": "DISTINCT viene usato in una clausola SELECT dove non possono verificarsi duplicati, aggiungendo complessità inutile.",
                 "example": "SELECT DISTINCT cID, cName\nFROM customer;",
-                "explanation": "La colonna `cID` è una chiave primaria, quindi ogni valore è univoco. Per questo motivo usare `DISTINCT` è ridondante, dato che nel risultato non possono esserci righe duplicate.",
+                "explanation": "La colonna cID è una chiave primaria, quindi ogni valore è univoco. Per questo motivo usare DISTINCT è ridondante, dato che nel risultato non possono esserci righe duplicate.",
                 "correction": "SELECT cID, cName\nFROM customer;"
             },
             "97": {
                 "name": "Riferimento a tabella non necessario",
                 "description": "Una tabella viene collegata solo per accedere a un valore già disponibile come chiave esterna.",
                 "example": "SELECT i.sID, p.pID\nFROM inventory i\nJOIN product p ON i.pID = p.pID;",
-                "explanation": "In questa query, la tabella `product` viene collegata per accedere alla colonna `pID`, che è già disponibile nella tabella `inventory` come chiave esterna. Il join è inutile e può essere omesso senza influire sul risultato della query.",
+                "explanation": "In questa query, la tabella product viene collegata per accedere alla colonna pID, che è già disponibile nella tabella inventory come chiave esterna. Il join è inutile e può essere omesso senza influire sul risultato della query.",
                 "correction": "SELECT i.sID, i.pID\nFROM inventory i;"
             },
             "98": {
                 "name": "Nome di correlazione inutilizzato",
                 "description": "Per una tabella viene definito un nome di correlazione (alias) che però non è usato nella query.",
                 "example": "SELECT cName\nFROM customer AS c;",
-                "explanation": "La query definisce un nome di correlazione `c` per la tabella `customer`, ma non lo usa in alcun punto della query. Questo aggiunge complessità inutile senza alcun beneficio.",
+                "explanation": "La query definisce un nome di correlazione c per la tabella customer, ma non lo usa in alcun punto della query. Questo aggiunge complessità inutile senza alcun beneficio.",
                 "correction": "SELECT cName\nFROM customer;"
             },
             "99": {
                 "name": "Le tabelle contengono gli stessi dati",
                 "description": "La query fa riferimento a due tabelle che contengono sempre gli stessi dati.",
                 "example": "SELECT *\nFROM\n    customer a\n    JOIN customer b ON a.cID = b.cID;",
-                "explanation": "La query unisce la tabella customer con sé stessa sulla colonna `cID`, che è una chiave primaria. Poiché ogni `cID` è univoco, il join abbinerà sempre ogni cliente a sé stesso, producendo dati identici da entrambe le tabelle. Questa ridondanza aggiunge complessità inutile senza alcun beneficio.",
+                "explanation": "La query unisce la tabella customer con sé stessa sulla colonna cID, che è una chiave primaria. Poiché ogni cID è univoco, il join abbinerà sempre ogni cliente a sé stesso, producendo dati identici da entrambe le tabelle. Questa ridondanza aggiunge complessità inutile senza alcun beneficio.",
                 "correction": "SELECT *\nFROM customer;"
             },
             "100": {
                 "name": "Nome di correlazione identico al nome della tabella",
                 "description": "La query definisce un nome di correlazione (alias) per una tabella uguale al nome originale della tabella, rendendo l'alias ridondante.",
                 "example": "SELECT *\nFROM customer AS customer;",
-                "explanation": "La query definisce un nome di correlazione (alias) `customer` per la tabella `customer`, identico al nome originale della tabella. Questa ridondanza aggiunge complessità inutile senza alcun beneficio.",
+                "explanation": "La query definisce un nome di correlazione (alias) customer per la tabella customer, identico al nome originale della tabella. Questa ridondanza aggiunge complessità inutile senza alcun beneficio.",
                 "correction": "SELECT *\nFROM customer;"
             },
             "101": {
                 "name": "Operatore di confronto inutilmente generico",
                 "description": "Un operatore usato per un confronto può essere sostituito da uno più specifico senza cambiare la logica.",
                 "example": "SELECT *\nFROM customer\nWHERE age >= (\n    SELECT MAX(age)\n    FROM customer\n);",
-                "explanation": "La query è pensata per trovare il cliente più anziano. Tuttavia, la parte `>=` dell'operatore è inutile perché nessun cliente può essere più anziano dell'età massima. Usare l'operatore più specifico `=` rende la query più chiara ed efficiente.",
+                "explanation": "La query è pensata per trovare il cliente più anziano. Tuttavia, la parte >= dell'operatore è inutile perché nessun cliente può essere più anziano dell'età massima. Usare l'operatore più specifico = rende la query più chiara ed efficiente.",
                 "correction": "SELECT *\nFROM customer\nWHERE age = (\n    SELECT MAX(age)\n    FROM customer\n);"
             },
             "102": {
                 "name": "LIKE senza caratteri jolly",
-                "description": "L'operatore `LIKE` viene usato senza alcun carattere jolly, risultando equivalente a un semplice confronto di uguaglianza.",
+                "description": "L'operatore LIKE viene usato senza alcun carattere jolly, risultando equivalente a un semplice confronto di uguaglianza.",
                 "example": "SELECT *\nFROM customer\nWHERE cName LIKE 'John';",
-                "explanation": "La query usa l'operatore `LIKE` per confrontare la colonna `cName` con la stringa 'John' senza alcun carattere jolly (come `%` o `_`). Questo significa che `LIKE` sta funzionando come un semplice confronto di uguaglianza, e in questo contesto non ce n'è bisogno.",
+                "explanation": "La query usa l'operatore LIKE per confrontare la colonna cName con la stringa 'John' senza alcun carattere jolly (come % o _). Questo significa che LIKE sta funzionando come un semplice confronto di uguaglianza, e in questo contesto non ce n'è bisogno.",
                 "correction": "SELECT *\nFROM customer\nWHERE cName = 'John';"
             },
             "103": {
                 "name": "SELECT inutilmente complicata nella sottoquery EXISTS",
-                "description": "La clausola `SELECT` in una sottoquery `EXISTS` restituisce più di una colonna, cosa non necessaria perché `EXISTS` verifica solo l'esistenza di righe.",
+                "description": "La clausola SELECT in una sottoquery EXISTS restituisce più di una colonna, cosa non necessaria perché EXISTS verifica solo l'esistenza di righe.",
                 "example": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT s.sID, s.sName\n    FROM store s\n    WHERE c.cName = s.sName\n);",
-                "explanation": "La sottoquery `EXISTS` è pensata per trovare clienti che hanno lo stesso nome di uno store. Tuttavia, la clausola `SELECT` restituisce più colonne di store, cosa non necessaria perché `EXISTS` verifica solo se viene restituita almeno una riga.",
+                "explanation": "La sottoquery EXISTS è pensata per trovare clienti che hanno lo stesso nome di uno store. Tuttavia, la clausola SELECT restituisce più colonne di store, cosa non necessaria perché EXISTS verifica solo se viene restituita almeno una riga.",
                 "correction": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT 1\n    FROM store s\n    WHERE c.cName = s.sName\n);"
             },
             "104": {
                 "name": "IN/EXISTS sostituibile con un confronto",
-                "description": "Una sottoquery che usa `IN` o `EXISTS` può essere semplificata in un confronto diretto.",
+                "description": "Una sottoquery che usa IN o EXISTS può essere semplificata in un confronto diretto.",
                 "example": "SELECT *\nFROM customer\nWHERE cID IN (SELECT cID FROM customer WHERE age < 18);",
-                "explanation": "La query è pensata per trovare clienti con meno di 18 anni. Tuttavia, usa una sottoquery con `IN`, che può essere semplificata in un confronto diretto. Poiché `cID` è un identificatore univoco, possiamo confrontare direttamente l'età senza bisogno di una sottoquery.",
+                "explanation": "La query è pensata per trovare clienti con meno di 18 anni. Tuttavia, usa una sottoquery con IN, che può essere semplificata in un confronto diretto. Poiché cID è un identificatore univoco, possiamo confrontare direttamente l'età senza bisogno di una sottoquery.",
                 "correction": "SELECT * FROM customer WHERE age < 18;"
             },
             "105": {
                 "name": "Funzione aggregata non necessaria",
                 "description": "Viene usata una funzione aggregata su un singolo valore.",
                 "example": "SELECT MAX(age) FROM customer WHERE cID = 123;",
-                "explanation": "La query recupera l'età di uno specifico cliente con `cID = 123`. Poiché la clausola `WHERE` filtra i risultati a una sola riga, usare la funzione aggregata `MAX` è inutile, dato che c'è un solo valore da restituire.",
+                "explanation": "La query recupera l'età di uno specifico cliente con cID = 123. Poiché la clausola WHERE filtra i risultati a una sola riga, usare la funzione aggregata MAX è inutile, dato che c'è un solo valore da restituire.",
                 "correction": "SELECT age\nFROM customer\nWHERE cID = 123;"
             },
             "106": {
                 "name": "DISTINCT non necessario in funzione aggregata",
-                "description": "`DISTINCT` viene usato dentro una funzione aggregata dove tutti i valori sono già univoci, rendendolo ridondante.",
+                "description": "DISTINCT viene usato dentro una funzione aggregata dove tutti i valori sono già univoci, rendendolo ridondante.",
                 "example": "SELECT COUNT(DISTINCT cID)\nFROM customer;",
-                "explanation": "La colonna `cID` è una chiave primaria, quindi ogni valore è univoco. Per questo motivo usare `DISTINCT` all'interno della funzione `COUNT` non cambia il risultato, dato che non possono esserci ID duplicati da contare.",
+                "explanation": "La colonna cID è una chiave primaria, quindi ogni valore è univoco. Per questo motivo usare DISTINCT all'interno della funzione COUNT non cambia il risultato, dato che non possono esserci ID duplicati da contare.",
                 "correction": "SELECT COUNT(cID)\nFROM customer;"
             },
             "107": {
                 "name": "Argomento di COUNT non necessario",
-                "description": "`COUNT` viene usato con un nome di colonna specifico invece di `COUNT(*)` o `COUNT(1)` quando si contano colonne non nullable.",
+                "description": "COUNT viene usato con un nome di colonna specifico invece di COUNT(*) o COUNT(1) quando si contano colonne non nullable.",
                 "example": "SELECT COUNT(cID)\nFROM customer;",
-                "explanation": "La colonna `cID` è la chiave primaria della tabella `customer` e quindi non può contenere valori `NULL`. Per questo motivo, usare `COUNT(cID)` equivale a `COUNT(*)`, perché verranno contate tutte le righe. In questo caso `COUNT(*)` è più diretto ed efficiente.",
+                "explanation": "La colonna cID è la chiave primaria della tabella customer e quindi non può contenere valori NULL. Per questo motivo, usare COUNT(cID) equivale a COUNT(*), perché verranno contate tutte le righe. In questo caso COUNT(*) è più diretto ed efficiente.",
                 "correction": "SELECT COUNT(*)\nFROM customer;"
             },
             "108": {
                 "name": "GROUP BY non necessario nella sottoquery EXISTS",
-                "description": "Una clausola `GROUP BY` viene usata in una sottoquery `EXISTS` dove non serve, dato che `EXISTS` verifica solo l'esistenza di righe.",
+                "description": "Una clausola GROUP BY viene usata in una sottoquery EXISTS dove non serve, dato che EXISTS verifica solo l'esistenza di righe.",
                 "example": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT 1\n    FROM store s\n    WHERE c.cName = s.sName\n    GROUP BY s.city\n);",
-                "explanation": "La clausola `GROUP BY` nella sottoquery `EXISTS` è inutile perché `EXISTS` verifica solo se la sottoquery restituisce almeno una riga. Il raggruppamento non influisce su questo controllo e aggiunge complessità inutile alla query.",
+                "explanation": "La clausola GROUP BY nella sottoquery EXISTS è inutile perché EXISTS verifica solo se la sottoquery restituisce almeno una riga. Il raggruppamento non influisce su questo controllo e aggiunge complessità inutile alla query.",
                 "correction": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT 1\n    FROM store s\n    WHERE c.cName = s.sName\n);"
             },
             "109": {
                 "name": "GROUP BY con gruppi singleton",
-                "description": "`GROUP BY` viene usato su gruppi che contengono ciascuno una sola riga, rendendo il raggruppamento non necessario.",
+                "description": "GROUP BY viene usato su gruppi che contengono ciascuno una sola riga, rendendo il raggruppamento non necessario.",
                 "example": "SELECT cID, AVG(age)\nFROM customer\nGROUP BY cID;",
-                "explanation": "La query raggruppa i clienti per il loro identificatore univoco `cID`, il che significa che ogni gruppo conterrà un solo cliente. Poiché in ogni gruppo c'è una sola riga, la clausola `GROUP BY` non serve a nulla e lo stesso risultato può essere ottenuto senza raggruppamento.",
+                "explanation": "La query raggruppa i clienti per il loro identificatore univoco cID, il che significa che ogni gruppo conterrà un solo cliente. Poiché in ogni gruppo c'è una sola riga, la clausola GROUP BY non serve a nulla e lo stesso risultato può essere ottenuto senza raggruppamento.",
                 "correction": "SELECT cID, age\nFROM customer;"
             },
             "110": {
                 "name": "GROUP BY con un solo gruppo",
-                "description": "`GROUP BY` viene usato in modo da produrre un solo gruppo, rendendo il raggruppamento non necessario.",
+                "description": "GROUP BY viene usato in modo da produrre un solo gruppo, rendendo il raggruppamento non necessario.",
                 "example": "SELECT AVG(age)\nFROM customer\nWHERE city = 'Genoa'\nGROUP BY city;",
-                "explanation": "La query raggruppa i clienti per città, ma la clausola `WHERE` filtra i risultati includendo solo i clienti di Genova. Questo significa che nel risultato ci sarà un solo gruppo (Genova), rendendo la clausola `GROUP BY` inutile. Lo stesso risultato può essere ottenuto senza raggruppamento, dato che interessa solo l'età media dei clienti di Genova.",
+                "explanation": "La query raggruppa i clienti per città, ma la clausola WHERE filtra i risultati includendo solo i clienti di Genova. Questo significa che nel risultato ci sarà un solo gruppo (Genova), rendendo la clausola GROUP BY inutile. Lo stesso risultato può essere ottenuto senza raggruppamento, dato che interessa solo l'età media dei clienti di Genova.",
                 "correction": "SELECT AVG(age)\nFROM customer\nWHERE city = 'Genoa';"
             },
             "111": {
                 "name": "GROUP BY sostituibile con DISTINCT",
-                "description": "Tutte le colonne di `GROUP BY` sono anche nella clausola `SELECT` senza alcuna funzione aggregata, quindi `DISTINCT` è un'alternativa più semplice.",
+                "description": "Tutte le colonne di GROUP BY sono anche nella clausola SELECT senza alcuna funzione aggregata, quindi DISTINCT è un'alternativa più semplice.",
                 "example": "SELECT city, street\nFROM customer\nGROUP BY city, street;",
-                "explanation": "La query raggruppa i clienti per `city` e `street`, ma non esegue alcuna aggregazione. Poiché tutte le colonne di `GROUP BY` sono anche nella clausola `SELECT` senza funzioni aggregate, lo stesso risultato può essere ottenuto con `DISTINCT`, che in questo caso è più semplice ed efficiente.",
+                "explanation": "La query raggruppa i clienti per city e street, ma non esegue alcuna aggregazione. Poiché tutte le colonne di GROUP BY sono anche nella clausola SELECT senza funzioni aggregate, lo stesso risultato può essere ottenuto con DISTINCT, che in questo caso è più semplice ed efficiente.",
                 "correction": "SELECT DISTINCT cName, cID FROM customer;"
             },
             "112": {
                 "name": "UNION sostituibile con OR",
-                "description": "Due istruzioni `SELECT` combinate con `UNION` selezionano gli stessi dati dalla stessa tabella e hanno condizioni mutuamente esclusive. In questi casi, `UNION` può essere sostituito da una singola istruzione `SELECT` con una condizione `OR`.",
+                "description": "Due istruzioni SELECT combinate con UNION selezionano gli stessi dati dalla stessa tabella e hanno condizioni mutuamente esclusive. In questi casi, UNION può essere sostituito da una singola istruzione SELECT con una condizione OR.",
                 "example": "SELECT cID, cName\nFROM customer\nWHERE age < 18\nUNION\nSELECT cID, cName\nFROM customer\nWHERE age > 30;",
-                "explanation": "Le due query recuperano nomi di clienti da gruppi di età disgiunti (minori di 18 anni e maggiori di 30 anni). Poiché non c'è sovrapposizione tra questi due gruppi, lo stesso risultato può essere ottenuto con una singola query usando una condizione `OR`, che è più efficiente e più facile da leggere.",
+                "explanation": "Le due query recuperano nomi di clienti da gruppi di età disgiunti (minori di 18 anni e maggiori di 30 anni). Poiché non c'è sovrapposizione tra questi due gruppi, lo stesso risultato può essere ottenuto con una singola query usando una condizione OR, che è più efficiente e più facile da leggere.",
                 "correction": "SELECT cID, cName\nFROM customer\nWHERE\n    age < 18\n    OR age > 30;"
             },
             "113": {
                 "name": "Colonna non necessaria in ORDER BY",
-                "description": "Nella clausola `ORDER BY` è inclusa una colonna che non influisce sull'ordinamento dei risultati a causa di dipendenze funzionali.",
+                "description": "Nella clausola ORDER BY è inclusa una colonna che non influisce sull'ordinamento dei risultati a causa di dipendenze funzionali.",
                 "example": "SELECT cID, cName\nFROM customer\nORDER BY cID, cName;",
-                "explanation": "La query ordina i risultati sia per `cID` sia per `cName`. Tuttavia, poiché `cID` è una chiave primaria, identifica univocamente ogni riga. Per questo motivo, ordinare per `cName` dopo `cID` non cambia l'ordine dei risultati e risulta inutile.",
+                "explanation": "La query ordina i risultati sia per cID sia per cName. Tuttavia, poiché cID è una chiave primaria, identifica univocamente ogni riga. Per questo motivo, ordinare per cName dopo cID non cambia l'ordine dei risultati e risulta inutile.",
                 "correction": "SELECT cID, cName\nFROM customer\nORDER BY cID;"
             },
             "114": {
                 "name": "ORDER BY in sottoquery",
-                "description": "Una clausola `ORDER BY` è usata in una sottoquery dove non influisce sul risultato finale.",
+                "description": "Una clausola ORDER BY è usata in una sottoquery dove non influisce sul risultato finale.",
                 "example": "SELECT city\nFROM customer\nWHERE city IN (\n    SELECT city\n    FROM store\n    ORDER BY city\n);",
-                "explanation": "La query principale recupera città dalla tabella `customer` che sono presenti nell'elenco di città restituito dalla sottoquery. L'ordine delle città nel risultato della sottoquery non influisce su quali città vengano incluse nell'output finale, rendendo la clausola `ORDER BY` inutile in questo contesto.",
+                "explanation": "La query principale recupera città dalla tabella customer che sono presenti nell'elenco di città restituito dalla sottoquery. L'ordine delle città nel risultato della sottoquery non influisce su quali città vengano incluse nell'output finale, rendendo la clausola ORDER BY inutile in questo contesto.",
                 "correction": "SELECT city\nFROM customer\nWHERE city IN (\n    SELECT city\n    FROM store\n);"
             },
             "115": {
                 "name": "HAVING inefficiente",
-                "description": "Una condizione nella clausola `HAVING` non dipende da funzioni aggregate e può essere spostata nella clausola `WHERE`.",
+                "description": "Una condizione nella clausola HAVING non dipende da funzioni aggregate e può essere spostata nella clausola WHERE.",
                 "example": "SELECT age, COUNT(*)\nFROM customer\nGROUP BY age\nHAVING age IS NOT NULL;",
-                "explanation": "La clausola HAVING viene usata per filtrare gruppi in base a condizioni aggregate. Tuttavia, la condizione `age IS NOT NULL` non dipende da aggregazioni e può essere applicata prima del raggruppamento, in modo più efficiente.",
+                "explanation": "La clausola HAVING viene usata per filtrare gruppi in base a condizioni aggregate. Tuttavia, la condizione age IS NOT NULL non dipende da aggregazioni e può essere applicata prima del raggruppamento, in modo più efficiente.",
                 "correction": "SELECT age, COUNT(*)\nFROM customer\nWHERE age IS NOT NULL\nGROUP BY age;"
             },
             "116": {
                 "name": "UNION inefficiente",
-                "description": "Un'operazione `UNION` può essere sostituita da `UNION ALL` senza cambiare il risultato, migliorando le prestazioni.",
+                "description": "Un'operazione UNION può essere sostituita da UNION ALL senza cambiare il risultato, migliorando le prestazioni.",
                 "example": "SELECT city \nFROM customer\nWHERE city < 'M'\nUNION\nSELECT city\nFROM store\nWHERE city > 'M';",
-                "explanation": "La query combina città dalle tabelle `customer` e `store` usando `UNION`, che elimina le righe duplicate. Tuttavia, le condizioni nelle clausole `WHERE` garantiscono che non ci siano città sovrapposte tra i due insiemi (città minori di 'M' da `customer` e città maggiori di 'M' da `store`). Di conseguenza non ci sono duplicati da eliminare e usare `UNION ALL` produrrebbe lo stesso risultato in modo più efficiente.",
+                "explanation": "La query combina città dalle tabelle customer e store usando UNION, che elimina le righe duplicate. Tuttavia, le condizioni nelle clausole WHERE garantiscono che non ci siano città sovrapposte tra i due insiemi (città minori di 'M' da customer e città maggiori di 'M' da store). Di conseguenza non ci sono duplicati da eliminare e usare UNION ALL produrrebbe lo stesso risultato in modo più efficiente.",
                 "correction": "SELECT city \nFROM customer\nWHERE city < 'M'\nUNION ALL\nSELECT city\nFROM store\nWHERE city > 'M';"
             },
             "117": {
                 "name": "La condizione nella sottoquery può essere spostata all'esterno",
                 "description": "Una condizione in una sottoquery fa riferimento solo a valori della query esterna e può essere spostata nella clausola esterna.",
                 "example": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT 1\n    FROM store s\n    WHERE\n        s.sName = c.cName\n        AND c.age > 18\n    );",
-                "explanation": "La condizione `c.age > 18` nella sottoquery fa riferimento solo alla tabella `customer` della query esterna. Per questo motivo può essere spostata nella clausola `WHERE` esterna, migliorando la leggibilità della query e potenzialmente anche le prestazioni.",
+                "explanation": "La condizione c.age > 18 nella sottoquery fa riferimento solo alla tabella customer della query esterna. Per questo motivo può essere spostata nella clausola WHERE esterna, migliorando la leggibilità della query e potenzialmente anche le prestazioni.",
                 "correction": "SELECT cName\nFROM customer c\nWHERE\n    c.age > 18\n    AND EXISTS (\n        SELECT 1\n        FROM store s\n        WHERE s.sName = c.cName\n    );"
             },
             "118": {
                 "name": "OUTER JOIN sostituibile con INNER JOIN",
-                "description": "L'uso di una condizione `WHERE` sulla tabella destra di una `LEFT OUTER JOIN` la trasforma di fatto in una `INNER JOIN`.",
+                "description": "L'uso di una condizione WHERE sulla tabella destra di una LEFT OUTER JOIN la trasforma di fatto in una INNER JOIN.",
                 "example": "SELECT s.cName, t.sName\nFROM\n    customer c\n    LEFT OUTER JOIN store s ON c.cID = s.sID\nWHERE s.city = 'Genoa';",
-                "explanation": "La query usa una `LEFT OUTER JOIN` per unire le tabelle `customer` e `store`, ma la clausola `WHERE` rimuove tutti i valori `NULL` dalla tabella di destra, il che significa che verranno restituite solo righe corrispondenti. Questo trasforma di fatto la `LEFT OUTER JOIN` in una `INNER JOIN`, rendendo l'uso di `LEFT OUTER JOIN` non necessario in questo contesto.",
+                "explanation": "La query usa una LEFT OUTER JOIN per unire le tabelle customer e store, ma la clausola WHERE rimuove tutti i valori NULL dalla tabella di destra, il che significa che verranno restituite solo righe corrispondenti. Questo trasforma di fatto la LEFT OUTER JOIN in una INNER JOIN, rendendo l'uso di LEFT OUTER JOIN non necessario in questo contesto.",
                 "correction": "SELECT c.cName, s.sName\nFROM\n    customer c\n    INNER JOIN store s ON c.cID = s.sID\nWHERE s.city = 'Genoa';"
             },
             "119": {
                 "name": "CTE inutilizzata",
                 "description": "Nella query è definita una Common Table Expression (CTE) che però non viene referenziata né usata nella query principale o in eventuali sottoquery.",
                 "example": "WITH cte AS (\n    SELECT cID, cName\n    FROM customer\n)\n\nSELECT cName\nFROM customer;",
-                "explanation": "La CTE chiamata `cte` è definita ma non viene mai usata nella query principale. Questo aggiunge complessità inutile alla query senza fornire alcun beneficio.",
+                "explanation": "La CTE chiamata cte è definita ma non viene mai usata nella query principale. Questo aggiunge complessità inutile alla query senza fornire alcun beneficio.",
                 "correction": "SELECT cName\nFROM customer;"
             }
         }
