@@ -47,13 +47,13 @@ function LearningStatsMessages({ datasetId = null, exerciseId = null, isTeacher 
     return (
         <ObservedOnce onFirstVisible={fetchData}>
             {messagesTotal === 0 ? (
-                <p className="text-muted" style={{ fontSize: '1.2rem' }}>
+                <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                     {t(`components.learningStats.messages.empty.${role}`)}
                 </p>
             ) : (
-                <Row className="mb-4">
-                    <Col xs={6}>
-                        <Card style={{ height: '100%' }}>
+                <Row className="learning-stats-message-layout g-4 mb-4">
+                    <Col lg={7}>
+                        <Card className="learning-stats-panel">
                             <Card.Header>
                                 <Card.Title>{t(`components.learningStats.messages.title_help.${role}`)}</Card.Title>
                                 <Card.Subtitle className="text-muted">
@@ -61,18 +61,27 @@ function LearningStatsMessages({ datasetId = null, exerciseId = null, isTeacher 
                                 </Card.Subtitle>
                             </Card.Header>
                             <Card.Body>
-                                <Row>
+                                <div className="learning-stats-message-summary">
+                                    <div className="learning-stats-message-metric">
+                                        <div>
+                                            <strong>{t('components.learningStats.messages.list_labels.total')}</strong>
+                                        </div>
+                                        <span>{messagesTotal}</span>
+                                    </div>
+                                    <div className="learning-stats-message-metric">
+                                        <div>
+                                            <strong>{t('components.learningStats.messages.list_labels.select')}</strong>
+                                        </div>
+                                        <span>{messagesSelect}</span>
+                                    </div>
+                                </div>
+                                <Row className="g-3">
                                     <Col>
-                                        <strong>{t(`components.learningStats.messages.list_title.${role}`)}</strong>
-                                        <ul style={{ paddingLeft: '1.2em', marginBottom: '0.5rem' }}>
-                                            <li>{t('components.learningStats.messages.list_labels.total')}: {messagesTotal}</li>
-                                            <li>{t('components.learningStats.messages.list_labels.select')}: {messagesSelect}</li>
-                                        </ul>
-                                    </Col>
-                                    <Col>
-                                        <strong>{t(`components.learningStats.messages.chart_title.${role}`)}</strong>
-                                        <div style={{ width: '100%', height: '90px', overflow: 'hidden' }}>
-                                            <ResponsiveContainer width="100%" height={140}>
+                                        <div className="learning-stats-donut-card">
+                                            <div className="learning-stats-donut-card__title">
+                                                {t(`components.learningStats.messages.chart_title.${role}`)}
+                                            </div>
+                                            <ResponsiveContainer width="100%" height={140} style={{marginBottom: '-50px'}}>
                                                 <PieChart>
                                                     <Pie
                                                         data={messagesBreakdownData}
@@ -94,15 +103,15 @@ function LearningStatsMessages({ datasetId = null, exerciseId = null, isTeacher 
                                                     />
                                                 </PieChart>
                                             </ResponsiveContainer>
-                                        </div>
-                                        <div className="text-center text-muted" style={{ fontSize: '0.9rem' }}>
-                                            <span style={{ color: '#0d6efd', fontWeight: 'bold' }}>
-                                                {t('components.learningStats.messages.understanding_results')}
-                                            </span>: {(messagesSuccessRate * 100).toFixed(0)}%
-                                            <br />
-                                            <span style={{ color: '#ffc107', fontWeight: 'bold' }}>
-                                                {t('components.learningStats.messages.understanding_errors')}
-                                            </span>: {(messagesErrorRate * 100).toFixed(0)}%
+                                            <div className="text-center text-muted" style={{ fontSize: '0.9rem' }}>
+                                                <span style={{ color: '#0d6efd', fontWeight: 'bold' }}>
+                                                    {t('components.learningStats.messages.understanding_results')}
+                                                </span>: {(messagesSuccessRate * 100).toFixed(0)}%
+                                                <br />
+                                                <span style={{ color: '#ffc107', fontWeight: 'bold' }}>
+                                                    {t('components.learningStats.messages.understanding_errors')}
+                                                </span>: {(messagesErrorRate * 100).toFixed(0)}%
+                                            </div>
                                         </div>
                                     </Col>
                                 </Row>
@@ -110,12 +119,8 @@ function LearningStatsMessages({ datasetId = null, exerciseId = null, isTeacher 
                         </Card>
                     </Col>
 
-                    <Col style={{ textAlign: 'center', placeContent: 'center' }}>
-                        <i className="far fa-handshake text-secondary" style={{ fontSize: '5rem' }}></i>
-                    </Col>
-
-                    <Col xs={4}>
-                        <Card style={{ height: '100%' }}>
+                    <Col lg={5}>
+                        <Card className="learning-stats-panel">
                             <Card.Header>
                                 <Card.Title>{t(`components.learningStats.messages.title_feedback.${role}`)}</Card.Title>
                                 <Card.Subtitle className="text-muted">
@@ -123,28 +128,31 @@ function LearningStatsMessages({ datasetId = null, exerciseId = null, isTeacher 
                                 </Card.Subtitle>
                             </Card.Header>
                             <Card.Body>
-                                <ResponsiveContainer width="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={messagesFeedbackData}
-                                            dataKey="value"
-                                            innerRadius={35}
-                                            outerRadius={70}
-                                            startAngle={90}
-                                            endAngle={-270}
-                                        >
-                                            <Cell fill='#20c997' />
-                                            <Cell fill='#f8f9fa' />
-                                        </Pie>
-                                        <Tooltip
-                                            formatter={(value, name) => [value === 1 ? `${value} time` : `${value} times`, name]}
-                                            wrapperStyle={{ zIndex: 1000 }}
-                                        />
-                                        <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
-                                            {(messagesFeedbackRate * 100).toFixed(0)}%
-                                        </text>
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                <div className="learning-stats-message-feedback">
+                                    <i className="far fa-handshake text-success" style={{ fontSize: '2rem' }}></i>
+                                    <ResponsiveContainer width="100%" height={220}>
+                                        <PieChart>
+                                            <Pie
+                                                data={messagesFeedbackData}
+                                                dataKey="value"
+                                                innerRadius={35}
+                                                outerRadius={70}
+                                                startAngle={90}
+                                                endAngle={-270}
+                                            >
+                                                <Cell fill='#20c997' />
+                                                <Cell fill='#f8f9fa' />
+                                            </Pie>
+                                            <Tooltip
+                                                formatter={(value, name) => [value === 1 ? `${value} time` : `${value} times`, name]}
+                                                wrapperStyle={{ zIndex: 1000 }}
+                                            />
+                                            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
+                                                {(messagesFeedbackRate * 100).toFixed(0)}%
+                                            </text>
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </Card.Body>
                         </Card>
                     </Col>

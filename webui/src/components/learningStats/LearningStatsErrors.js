@@ -217,13 +217,13 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
     return (
         <ObservedOnce onFirstVisible={fetchData}>
             {!hasAnyErrors ? (
-                <p className="text-muted" style={{ fontSize: '1.2rem' }}>
+                <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                     {t(`components.learningStats.errors.empty.${role}`)}
                 </p>
             ) : (
                 <>
-                    <div className="d-flex justify-content-start align-items-center mb-3">
-                        <label className="me-2 text-muted" htmlFor="error-query-goal-filter">
+                    <div className="learning-stats-filter mb-3">
+                        <label className="text-muted" htmlFor="error-query-goal-filter">
                             {t('components.learningStats.errors.query_goal.label')}
                         </label>
                         <select
@@ -238,15 +238,15 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                         </select>
                     </div>
                     {!hasErrors ? (
-                        <p className="text-muted" style={{ fontSize: '1.2rem' }}>
+                        <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                             {t(`components.learningStats.errors.empty.${role}`)}
                         </p>
                     ) : (
                         <>
-                            <Row className="mb-4">
+                            <Row className="g-4 mb-4">
                                 {/* PIE */}
                                 <Col>
-                                    <Card style={{ height: '100%' }}>
+                                    <Card className="learning-stats-panel">
                                         <Card.Header>
                                             <Card.Title>{t('components.learningStats.errors.kind_title')}</Card.Title>
                                             <Card.Subtitle className="text-muted">
@@ -276,7 +276,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
 
                                 {/* TIMELINE */}
                                 <Col>
-                                    <Card style={{ height: '100%' }}>
+                                    <Card className="learning-stats-panel">
                                         <Card.Header>
                                             <Card.Title>{t(`components.learningStats.errors.timeline_title.${role}`)}</Card.Title>
                                             <Card.Subtitle className="text-muted">
@@ -347,7 +347,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                             <Row className="mb-4">
                                 {/* BAR */}
                                 <Col>
-                                    <Card style={{ height: '100%' }}>
+                                    <Card className="learning-stats-panel">
                                         <Card.Header>
                                             <Card.Title>{t('components.learningStats.errors.common_title')}</Card.Title>
                                             <Card.Subtitle className="text-muted">

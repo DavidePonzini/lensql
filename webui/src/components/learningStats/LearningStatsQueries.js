@@ -57,21 +57,27 @@ function LearningStatsQueries({ datasetId = null, exerciseId = null, isTeacher =
     return (
         <ObservedOnce onFirstVisible={fetchData}>
             {queriesTotal === 0 ? (
-                <p className="text-muted" style={{ fontSize: '1.2rem' }}>
+                <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                     {t(`components.learningStats.queries.empty.${role}`)}
                 </p>
             ) : (
                 <>
-                    <Row className="mb-4">
-                        <Col xs={4}>
-                            <Card style={{ height: '100%' }}>
+                    <Row className="g-4 mb-4">
+                        <Col lg={4}>
+                            <Card className="learning-stats-panel">
                                 <Card.Header>
                                     <Card.Title>{t(`components.learningStats.queries.title.${role}`)}</Card.Title>
                                 </Card.Header>
                                 <Card.Body>
-                                    <div>
-                                        <strong>{t('components.learningStats.queries.stats.distinct')}:</strong> {queriesUnique}<br />
-                                        <strong>{t('components.learningStats.queries.stats.total')}:</strong> {queriesTotal}
+                                    <div className="learning-stats-kpis">
+                                        <div className="learning-stats-kpi">
+                                            <span className="learning-stats-kpi__label">{t('components.learningStats.queries.stats.distinct')}</span>
+                                            <span className="learning-stats-kpi__value">{queriesUnique}</span>
+                                        </div>
+                                        <div className="learning-stats-kpi">
+                                            <span className="learning-stats-kpi__label">{t('components.learningStats.queries.stats.total')}</span>
+                                            <span className="learning-stats-kpi__value">{queriesTotal}</span>
+                                        </div>
                                     </div>
                                     <div className="mt-2 text-muted" style={{ fontSize: '0.9rem' }}>
                                         {t('components.learningStats.queries.stats.note')}
@@ -80,72 +86,82 @@ function LearningStatsQueries({ datasetId = null, exerciseId = null, isTeacher =
                             </Card>
                         </Col>
 
-                        <Col>
-                            <Card style={{ height: '100%' }}>
+                        <Col lg={8}>
+                            <Card className="learning-stats-panel">
                                 <Card.Header>
                                     <Card.Title>{t('components.learningStats.queries.success_title')}</Card.Title>
                                 </Card.Header>
                                 <Card.Body>
-                                    <Row>
+                                    <Row className="g-3">
                                         <Col>
-                                            <div className="text-center fw-bold" style={{ fontSize: '1.2rem' }}>
-                                                {t('components.learningStats.queries.select_label')}
+                                            <div className="learning-stats-donut-card">
+                                                <div className="learning-stats-donut-card__title">
+                                                    {t('components.learningStats.queries.select_label')}
+                                                </div>
+                                                <ResponsiveContainer width="100%" height={110}>
+                                                    <PieChart>
+                                                        <Pie
+                                                            data={querySuccessDataSelect}
+                                                            dataKey="value"
+                                                            innerRadius={25}
+                                                            outerRadius={50}
+                                                            startAngle={90}
+                                                            endAngle={-270}
+                                                        >
+                                                            <Cell fill="#198754" />
+                                                            <Cell fill="#dc3545" />
+                                                        </Pie>
+                                                        <Tooltip
+                                                            formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]}
+                                                            wrapperStyle={{ zIndex: 1000 }}
+                                                        />
+                                                        <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
+                                                            {queriesTotalSelect === 0 ?
+                                                                0 :
+                                                                (queriesSuccessSelect / queriesTotalSelect * 100).toFixed(0)
+                                                            }%
+                                                        </text>
+                                                    </PieChart>
+                                                </ResponsiveContainer>
+                                                <div className="learning-stats-donut-card__meta">
+                                                    {queriesSuccessSelect}/{queriesTotalSelect}
+                                                </div>
                                             </div>
-                                            <ResponsiveContainer width="100%" height={100}>
-                                                <PieChart>
-                                                    <Pie
-                                                        data={querySuccessDataSelect}
-                                                        dataKey="value"
-                                                        innerRadius={25}
-                                                        outerRadius={50}
-                                                        startAngle={90}
-                                                        endAngle={-270}
-                                                    >
-                                                        <Cell fill="#198754" />
-                                                        <Cell fill="#dc3545" />
-                                                    </Pie>
-                                                    <Tooltip
-                                                        formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]}
-                                                        wrapperStyle={{ zIndex: 1000 }}
-                                                    />
-                                                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
-                                                        {queriesTotalSelect === 0 ?
-                                                            0 :
-                                                            (queriesSuccessSelect / queriesTotalSelect * 100).toFixed(0)
-                                                        }%
-                                                    </text>
-                                                </PieChart>
-                                            </ResponsiveContainer>
                                         </Col>
                                         <Col>
-                                            <div className="text-center fw-bold" style={{ fontSize: '1.2rem' }}>
-                                                {t('components.learningStats.queries.all_label')}
+                                            <div className="learning-stats-donut-card">
+                                                <div className="learning-stats-donut-card__title">
+                                                    {t('components.learningStats.queries.all_label')}
+                                                </div>
+                                                <ResponsiveContainer width="100%" height={110}>
+                                                    <PieChart>
+                                                        <Pie
+                                                            data={querySuccessDataAll}
+                                                            dataKey="value"
+                                                            innerRadius={25}
+                                                            outerRadius={50}
+                                                            startAngle={90}
+                                                            endAngle={-270}
+                                                        >
+                                                            <Cell fill="#198754" />
+                                                            <Cell fill="#dc3545" />
+                                                        </Pie>
+                                                        <Tooltip
+                                                            formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]}
+                                                            wrapperStyle={{ zIndex: 1000 }}
+                                                        />
+                                                        <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
+                                                            {queriesTotal === 0 ?
+                                                                0 :
+                                                                (queriesSuccess / queriesTotal * 100).toFixed(0)
+                                                            }%
+                                                        </text>
+                                                    </PieChart>
+                                                </ResponsiveContainer>
+                                                <div className="learning-stats-donut-card__meta">
+                                                    {queriesSuccess}/{queriesTotal}
+                                                </div>
                                             </div>
-                                            <ResponsiveContainer width="100%" height={100}>
-                                                <PieChart>
-                                                    <Pie
-                                                        data={querySuccessDataAll}
-                                                        dataKey="value"
-                                                        innerRadius={25}
-                                                        outerRadius={50}
-                                                        startAngle={90}
-                                                        endAngle={-270}
-                                                    >
-                                                        <Cell fill="#198754" />
-                                                        <Cell fill="#dc3545" />
-                                                    </Pie>
-                                                    <Tooltip
-                                                        formatter={(value, name) => [value === 1 ? `${value} query` : `${value} queries`, name]}
-                                                        wrapperStyle={{ zIndex: 1000 }}
-                                                    />
-                                                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="bold">
-                                                        {queriesTotal === 0 ?
-                                                            0 :
-                                                            (queriesSuccess / queriesTotal * 100).toFixed(0)
-                                                        }%
-                                                    </text>
-                                                </PieChart>
-                                            </ResponsiveContainer>
                                         </Col>
                                     </Row>
                                 </Card.Body>
@@ -155,7 +171,7 @@ function LearningStatsQueries({ datasetId = null, exerciseId = null, isTeacher =
 
                     <Row className="mb-4">
                         <Col>
-                            <Card>
+                            <Card className="learning-stats-panel">
                                 <Card.Header>
                                     <Card.Title>{t(`components.learningStats.queries.chart_title.${role}`)}</Card.Title>
                                     <Card.Subtitle className="text-muted">
