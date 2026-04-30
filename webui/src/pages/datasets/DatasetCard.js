@@ -81,7 +81,7 @@ function DatasetCard({
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${datasetId}.json`;
+        link.download = `${title}.json`;
         document.body.appendChild(link);
         link.click();
         link.remove();

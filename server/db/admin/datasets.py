@@ -18,12 +18,9 @@ class ExerciseJSON:
     difficulty: int | None
     error: int | None
     learning_objectives: list[str]
-    created_by: str | None
-
 
 @dataclass(frozen=True)
 class DatasetJSON:
-    dataset_id: str
     title: str
     description: str
     dataset_str: str
@@ -250,7 +247,6 @@ class Dataset:
         dataset_query = database.sql.SQL(
         '''
             SELECT
-                id,
                 name,
                 description,
                 dataset,
@@ -278,7 +274,6 @@ class Dataset:
                 e.is_hidden,
                 e.generation_difficulty,
                 e.generation_error,
-                e.created_by,
                 COALESCE(
                     ARRAY(
                         SELECT hlo.objective_id
@@ -301,13 +296,12 @@ class Dataset:
 
         dataset_row = dataset_rows[0]
         return DatasetJSON(
-            dataset_id=dataset_row[0],
-            title=dataset_row[1],
-            description=dataset_row[2],
-            dataset_str=dataset_row[3] or '',
-            search_path=dataset_row[4],
-            dbms=dataset_row[5],
-            domain=dataset_row[6],
+            title=dataset_row[0],
+            description=dataset_row[1],
+            dataset_str=dataset_row[2] or '',
+            search_path=dataset_row[3],
+            dbms=dataset_row[4],
+            domain=dataset_row[5],
             exercises=[
                 ExerciseJSON(
                     title=row[0],
@@ -316,8 +310,7 @@ class Dataset:
                     is_hidden=row[3],
                     difficulty=row[4],
                     error=row[5],
-                    created_by=row[6],
-                    learning_objectives=list(row[7] or []),
+                    learning_objectives=list(row[6] or []),
                 )
                 for row in exercise_rows
             ],
@@ -342,7 +335,7 @@ class Dataset:
         for exercise in dataset.exercises:
             created_exercise = Exercise.create(
                 title=exercise.title,
-                user=User(exercise.created_by or admin_username),
+                user=admin_user,
                 dataset_id=created_dataset.dataset_id,
                 request=exercise.request,
                 solutions=exercise.solutions,
@@ -363,7 +356,6 @@ class Dataset:
         parsed_payload: dict[str, Any] = json.loads(payload)
         return Dataset.load(
             DatasetJSON(
-                dataset_id=parsed_payload['dataset_id'],
                 title=parsed_payload['title'],
                 description=parsed_payload['description'],
                 dataset_str=parsed_payload.get('dataset_str', ''),
@@ -379,7 +371,6 @@ class Dataset:
                         difficulty=exercise.get('difficulty'),
                         error=exercise.get('error'),
                         learning_objectives=list(exercise.get('learning_objectives', [])),
-                        created_by=exercise.get('created_by'),
                     )
                     for exercise in parsed_payload.get('exercises', [])
                 ],

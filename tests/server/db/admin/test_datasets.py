@@ -8,7 +8,6 @@ def test_dump_json_serializes_dataset_and_exercises(mocker):
         'server.db.admin.datasets.db.execute_and_fetch',
         side_effect=[
             [[
-                'ds1',
                 'Dataset title',
                 'Dataset description',
                 'SELECT 1;',
@@ -23,7 +22,6 @@ def test_dump_json_serializes_dataset_and_exercises(mocker):
                 True,
                 3,
                 7,
-                'teacher',
                 ['LO1', 'LO2'],
             ]],
         ],
@@ -33,7 +31,6 @@ def test_dump_json_serializes_dataset_and_exercises(mocker):
 
     assert fetch.call_count == 2
     assert dumped == {
-        'dataset_id': 'ds1',
         'title': 'Dataset title',
         'description': 'Dataset description',
         'dataset_str': 'SELECT 1;',
@@ -48,7 +45,6 @@ def test_dump_json_serializes_dataset_and_exercises(mocker):
             'difficulty': 3,
             'error': 7,
             'learning_objectives': ['LO1', 'LO2'],
-            'created_by': 'teacher',
         }],
     }
 
@@ -66,7 +62,6 @@ def test_load_json_creates_dataset_and_exercises(mocker):
     create_exercise.return_value = created_exercise
 
     dataset = Dataset.load_json(json.dumps({
-        'dataset_id': 'ignored-source-id',
         'title': 'Imported dataset',
         'description': 'Imported description',
         'dataset_str': 'SELECT 1;',
@@ -81,7 +76,6 @@ def test_load_json_creates_dataset_and_exercises(mocker):
             'difficulty': 5,
             'error': 9,
             'learning_objectives': ['LO1', 'LO2'],
-            'created_by': 'teacher',
         }],
     }))
 
@@ -112,7 +106,7 @@ def test_load_json_creates_dataset_and_exercises(mocker):
         'difficulty': 5,
         'error': 9,
     }
-    assert exercise_kwargs['user'].username == 'teacher'
+    assert exercise_kwargs['user'].username == 'lens'
     created_exercise.set_hidden.assert_called_once_with(True)
     created_exercise.set_learning_objective.assert_any_call('LO1')
     created_exercise.set_learning_objective.assert_any_call('LO2')

@@ -52,6 +52,7 @@ function DatasetList() {
             return;
         }
 
+        joinedDatasetIdRef.current = result.dataset_id;
         getDatasets();
     }
 
