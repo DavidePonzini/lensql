@@ -104,13 +104,6 @@ CREATE TABLE dataset_members (
 );
 
 
-CREATE TABLE errors (
-    id INTEGER PRIMARY KEY,
-    category VARCHAR(255) NOT NULL,
-    subcategory VARCHAR(255) NOT NULL,
-    error VARCHAR(255) NOT NULL
-);
-
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
     dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -189,7 +182,7 @@ CREATE TABLE query_context_columns_unique (
 CREATE TABLE has_error(
     id SERIAL PRIMARY KEY,
     query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    error_id INTEGER NOT NULL REFERENCES errors(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    error_id INTEGER NOT NULL,
     details TEXT[] DEFAULT NULL
 );
 
