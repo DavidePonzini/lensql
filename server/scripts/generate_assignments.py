@@ -116,7 +116,23 @@ def generate_assignment(
 
 def print_error_list() -> None:
     for e in SqlErrors:
-        dav_tools.messages.message(e.value, e.name, text_min_len=[5], additional_text_options=[[dav_tools.messages.TextFormat.Style.BOLD]])
+        if e.definition.is_deprecated:
+            dav_tools.messages.message(
+                e.value, e.definition.name,
+                text_min_len=[5],
+                default_text_options=[
+                    dav_tools.messages.TextFormat.Style.DIM,
+                ],
+                additional_text_options=[[
+                    dav_tools.messages.TextFormat.Style.BOLD,
+                ]])
+        else:
+            dav_tools.messages.message(
+                e.value, e.definition.name,
+                text_min_len=[5],
+                additional_text_options=[[
+                    dav_tools.messages.TextFormat.Style.BOLD,
+                ]])
 
 def select_errors_to_target() -> list[tuple[SqlErrors, DifficultyLevel]]:
     '''Prompt user to select which errors to target from the error stats.'''
@@ -144,7 +160,7 @@ def select_errors_to_target() -> list[tuple[SqlErrors, DifficultyLevel]]:
 if __name__ == '__main__':
     dav_tools.argument_parser.add_argument('-i', '--input', help='Use this dataset as a template, instead of generating a new one')
     dav_tools.argument_parser.add_argument('-o', '--output', help='Generate exercises in this dataset. If not provided, a new dataset will be created')
-    dav_tools.argument_parser.add_argument('--dialect', help='SQL dialect to use for generated exercises (default: postgres)', default='postgres')
+    dav_tools.argument_parser.add_argument('--dialect', help='SQL dialect to use for generated exercises (default: postgresql)', default='postgresql')
     dav_tools.argument_parser.add_argument('--domain', help='Optional domain to filter exercises by')
     dav_tools.argument_parser.add_argument('--language', help='Language to use for generated exercises (default: en)', default='en', choices=['en', 'it'])
     dav_tools.argument_parser.parse_args()
