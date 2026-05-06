@@ -950,837 +950,877 @@
         },
         "errors": {
             "1": {
-                        "name": "Ambiguous column",
-                        "description": "When using multiple tables in a query, a column present in more than one table is referenced without specifying which table it belongs to.",
-                        "example": "SELECT city\nFROM customer, store;",
-                        "explanation": "Both tables contain a column named city. Without qualifying the table, the database cannot determine which city column to use.",
-                        "correction": "SELECT customer.city\nFROM customer, store;"
+                "name": "Omitting correlation names",
+                "description": "When using multiple tables in a query, a column present in more than one table is referenced without specifying which table it belongs to.",
+                "example": "SELECT id FROM students, teachers;",
+                "explanation": "Both tables contain a column named 'id'. Without specifying the table, the database cannot determine which 'id' to use.",
+                "correction": "SELECT students.id FROM students, teachers;"
             },
             "2": {
-                        "name": "Ambiguous function",
-                        "description": "Multiple functions with the same name exist, and the query does not specify which one to use.",
-                        "example": "CREATE FUNCTION my_function(interval) RETURNS text AS $$\n    SELECT 'Interval';\n$$ LANGUAGE sql;\n\nCREATE FUNCTION my_function(time) RETURNS text AS $$\n    SELECT 'Time';\n$$ LANGUAGE sql;\n\nSELECT my_function(NULL);",
-                        "explanation": "There are two functions named my_function, one that takes an interval and another that takes a time. The query does not specify which function to use, leading to ambiguity.",
-                        "correction": "SELECT my_function(NULL::interval);"
+                "name": "Ambiguous column",
+                "description": "When using multiple tables in a query, a column present in more than one table is referenced without specifying which table it belongs to.",
+                "example": "SELECT id FROM students, teachers;",
+                "explanation": "Both tables contain a column named 'id'. Without specifying the table, the database cannot determine which 'id' to use.",
+                "correction": "SELECT students.id FROM students, teachers;"
             },
             "3": {
-                        "name": "Undefined column",
-                        "description": "The query references a column that does not exist in the specified table(s).",
-                        "example": "SELECT credit_card\nFROM customer;",
-                        "explanation": "The table customer does not contain a column named credit_card.",
-                        "correction": "SELECT cName\nFROM customer;"
+                "name": "Ambiguous function",
+                "description": "Multiple functions with the same name exist, and the query does not specify which one to use.",
+                "example": "CREATE FUNCTION my_function(interval) RETURNS text AS $$ SELECT 'Interval'; $$ LANGUAGE sql;\nCREATE FUNCTION my_function(time) RETURNS text AS $$ SELECT 'Time'; $$ LANGUAGE sql;\n\nSELECT my_function(NULL);",
+                "explanation": "There are two functions named 'my_function', one that takes an interval and another that takes a time. The query does not specify which function to use, leading to ambiguity.",
+                "correction": "SELECT my_function(NULL::interval);"
             },
             "4": {
-                        "name": "Undefined function",
-                        "description": "The query references a function that does not exist or is not defined.",
-                        "example": "SELECT CAPSLOCK(cName)\nFROM customer;",
-                        "explanation": "The function CAPSLOCK does not exist in the database.",
-                        "correction": "SELECT UPPER(cName)\nFROM customer;"
+                "name": "Undefined column",
+                "description": "The query references a column that does not exist in the specified table(s).",
+                "example": "SELECT credit_card FROM students;",
+                "explanation": "The table students does not contain a column named 'credit_card'.",
+                "correction": "SELECT name FROM students;"
             },
             "5": {
-                        "name": "Undefined parameter",
-                        "description": "The query references a parameter that does not exist or is not defined. Also, placeholder parameters are used incorrectly.",
-                        "example": "SELECT ?\nFROM customer\nWHERE cID = :param;",
-                        "explanation": "The query uses placeholder parameters instead of actual values. Even though this can be valid syntax in prepared statements, it is not in regular queries.",
-                        "correction": "SELECT cName\nFROM customer\nWHERE cID = 1;"
+                "name": "Undefined function",
+                "description": "The query references a function that does not exist or is not defined.",
+                "example": "SELECT CAPSLOCK(name) FROM students;",
+                "explanation": "The function CAPSLOCK does not exist in the database.",
+                "correction": "SELECT UPPER(name) FROM students;"
             },
             "6": {
-                        "name": "Undefined object",
-                        "description": "The query references a table that does not exist or is not defined.",
-                        "example": "SELECT *\nFROM cats;",
-                        "explanation": "The table cats does not exist in the database.",
-                        "correction": "SELECT *\nFROM customer;"
+                "name": "Undefined parameter",
+                "description": "The query references a parameter that does not exist or is not defined. Also, placeholder parameters are used incorrectly.",
+                "example": "SELECT ? FROM students WHERE id = :param;",
+                "explanation": "The query uses placeholder parameters instead of actual values. This is valid syntax in prepared statements, but not in regular queries.",
+                "correction": "SELECT name FROM students WHERE id = 1;"
             },
             "7": {
-                        "name": "Invalid schema name",
-                        "description": "The query references a schema that does not exist or is not defined.",
-                        "example": "SELECT *\nFROM shop.customer;",
-                        "explanation": "The schema shop does not exist in the database. In this example, the customer table resides in the public schema.",
-                        "correction": "SELECT *\nFROM public.customer;"
+                "name": "Undefined object",
+                "description": "The query references a table that does not exist or is not defined.",
+                "example": "SELECT * FROM cats;",
+                "explanation": "The table cats does not exist in the database.",
+                "correction": "SELECT * FROM students;"
             },
             "8": {
-                        "name": "Misspellings",
-                        "description": "The query contains misspelled table names, column names, or other identifiers.",
-                        "example": "SELECT *\nFROM costumer;",
-                        "explanation": "The table costumer does not exist in the database. It is a misspelling of customer.",
-                        "correction": "SELECT *\nFROM customer;"
+                "name": "Invalid schema name",
+                "description": "The query references a schema that does not exist or is not defined.",
+                "example": "SELECT * FROM school.students;",
+                "explanation": "The schema school does not exist in the database. In this example, the students table resides in the public schema.",
+                "correction": "SELECT * FROM public.students;"
             },
             "9": {
-                        "name": "Synonyms",
-                        "description": "The query uses synonyms or alternative names for tables or columns that do not exist.",
-                        "example": "SELECT *\nFROM clients;",
-                        "explanation": "The table clients does not exist in this schema. It is used as a synonym for customer, which is the correct table name.",
-                        "correction": "SELECT *\nFROM customer;"
+                "name": "Misspellings",
+                "description": "The query contains misspelled table names, column names, or other identifiers.",
+                "example": "SELECT * FROM studnets;",
+                "explanation": "The table studnets does not exist in the database. It is a misspelling of 'students'.",
+                "correction": "SELECT * FROM students;"
             },
             "10": {
-                        "name": "Omitting quotes around character data",
-                        "description": "Character data values are not enclosed in quotes, which is required for string literals.",
-                        "example": "SELECT *\nFROM customer\nWHERE cName = John;",
-                        "explanation": "Character data values must be enclosed in single quotes (') to be recognized as string literals.",
-                        "correction": "SELECT *\nFROM customer\nWHERE cName = 'John';"
+                "name": "Synonyms",
+                "description": "The query uses synonyms or alternative names for tables or columns that do not exist.",
+                "example": "SELECT * FROM pupils;",
+                "explanation": "The table pupils does not exist in the database. It is a synonym for 'students', which is the correct table name.",
+                "correction": "SELECT * FROM students;"
             },
             "11": {
-                        "name": "Failure to specify column name twice",
-                        "description": "When using multiple conditions on the same column, the column name is not specified for each condition.",
-                        "example": "SELECT *\nFROM customer\nWHERE age > 18 AND < 25;",
-                        "explanation": "Each condition in the WHERE clause must explicitly specify the column cName it applies to.",
-                        "correction": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND age < 25;"
+                "name": "Omitting quotes around character data",
+                "description": "Character data values are not enclosed in quotes, which is required for string literals.",
+                "example": "SELECT * FROM students WHERE name = John;",
+                "explanation": "Character data values must be enclosed in single quotes to be recognized as string literals.",
+                "correction": "SELECT * FROM students WHERE name = 'John';"
             },
             "12": {
-                        "name": "IS where not applicable",
-                        "description": "The IS operator is used for comparisons on values other than NULL or boolean expressions.",
-                        "example": "SELECT * FROM\ncustomer\nWHERE age IS 18;",
-                        "explanation": "The IS operator should only be used for checking NULL values or boolean expressions (e.g., IS TRUE, IS FALSE). For other comparisons, use standard comparison operators like =, <>, >, <, >=, <=.",
-                        "correction": "SELECT *\nFROM customer\nWHERE age = 18;"
+                "name": "Failure to specify column name twice",
+                "description": "When using multiple conditions on the same column, the column name is not specified for each condition.",
+                "example": "SELECT * FROM students WHERE age > 18 AND < 25;",
+                "explanation": "Each condition in the WHERE clause must explicitly specify the column name it applies to.",
+                "correction": "SELECT * FROM students WHERE age > 18 AND age < 25;"
             },
             "13": {
-                        "name": "Data type mismatch",
-                        "description": "The query uses incompatible data types in an operation or comparison.",
-                        "example": "SELECT *\nFROM customer\nWHERE cName = 7;",
-                        "explanation": "The condition in the WHERE clause compares a string column (cName) with an integer value (7), which is not valid.",
-                        "correction": "SELECT *\nFROM customer\nWHERE cName = 'John';"
+                "name": "Data type mismatch",
+                "description": "The query uses incompatible data types in an operation or comparison.",
+                "example": "SELECT * FROM students WHERE name = 7;",
+                "explanation": "The condition in the WHERE clause compares a string column (name) with an integer value (7), which is not valid.",
+                "correction": "SELECT * FROM students WHERE name = 'John';"
             },
             "14": {
-                        "name": "Using aggregate function outside SELECT or HAVING",
-                        "description": "An aggregate function is used in a part of the query where it is not allowed, such as WHERE or GROUP BY.",
-                        "example": "SELECT city\nFROM customer\nWHERE AVG(age) > 18;",
-                        "explanation": "Aggregate functions can only be used in the SELECT clause, or the HAVING clause when grouping results. This query is attempting to use AVG in the WHERE clause, which is not allowed.",
-                        "correction": "SELECT city\nFROM customer\nGROUP BY city\nHAVING AVG(age) > 18;"
+                "name": "Using aggregate function outside SELECT or HAVING",
+                "description": "An aggregate function is used in a part of the query where it is not allowed, such as WHERE or GROUP BY.",
+                "example": "SELECT * FROM students WHERE AVG(score) > 80;",
+                "explanation": "Aggregate functions can only be used in the SELECT clause or the HAVING clause when grouping results. This query is attempting to use AVG in the WHERE clause, which is not allowed.",
+                "correction": "SELECT * FROM students GROUP BY class HAVING AVG(score) > 80;"
             },
             "15": {
-                        "name": "Aggregate functions cannot be nested",
-                        "description": "Aggregate functions cannot be nested within each other in a query.",
-                        "example": "SELECT SUM(AVG(age))\nFROM customer\nGROUP BY city;",
-                        "explanation": "This query attempts to nest the AVG function inside the SUM function, which is not allowed. Instead, you can use a subquery to first calculate the average scores per group and then sum those averages.",
-                        "correction": "SELECT SUM(age)\nFROM (\n    SELECT AVG(age) AS age\n    FROM customer\n    GROUP BY city\n) AS avg_ages;"
+                "name": "Grouping error: aggregate functions cannot be nested",
+                "description": "Aggregate functions cannot be nested within each other in a query.",
+                "example": "SELECT SUM(AVG(score)) FROM students GROUP BY class;",
+                "explanation": "This query attempts to nest the AVG function inside the SUM function, which is not allowed. Instead, you can use a subquery to first calculate the average scores per group and then sum those averages.",
+                "correction": "SELECT SUM(score) FROM (SELECT AVG(score) AS score FROM students GROUP BY class) AS avg_scores;"
             },
             "16": {
-                        "name": "Extraneous or omitted grouping column",
-                        "description": "When using GROUP BY, all non-aggregated columns in the SELECT clause must be included in the GROUP BY clause. Only aggregated columns or columns included in the GROUP BY clause can be referenced in the HAVING clause.",
-                        "example": "SELECT cName, AVG(unit_price)\nFROM customer\nGROUP BY city;",
-                        "explanation": "The query selects the column cName which is neither aggregated nor included in the GROUP BY clause. This leads to ambiguity about which cName to return for each group. To fix this, either include cName in theGROUP BY clause or remove it from the SELECT clause.",
-                        "correction": "SELECT city, AVG(unit_price)\nFROM customer\nGROUP BY city;"
+                "name": "Grouping error: extraneous or omitted grouping column",
+                "description": "When using GROUP BY, all non-aggregated columns in the SELECT clause must be included in the GROUP BY clause. Only aggregated columns or columns included in the GROUP BY clause can be referenced in the HAVING clause.",
+                "example": "SELECT name, AVG(score) FROM students GROUP BY class;",
+                "explanation": "The query selects the column 'name' which is neither aggregated nor included in the GROUP BY clause. This leads to ambiguity about which 'name' to return for each group. To fix this, either include 'name' in the GROUP BY clause or remove it from the SELECT clause.",
+                "correction": "SELECT class, AVG(score) FROM students GROUP BY class;"
             },
             "17": {
-                        "name": "Strange HAVING: HAVING without GROUP BY",
-                        "description": "The query uses a HAVING clause without a corresponding GROUP BY clause.",
-                        "example": "SELECT *\nFROM customer HAVING AVG(age) > 18;",
-                        "explanation": "The HAVING clause is used to filter grouped results and should always be used in conjunction with a GROUP BY clause.",
-                        "correction": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city\nHAVING AVG(age) > 18;"
+                "name": "Strange HAVING: HAVING without GROUP BY",
+                "description": "The query uses a HAVING clause without a corresponding GROUP BY clause.",
+                "example": "SELECT * FROM students HAVING AVG(score) > 80;",
+                "explanation": "The HAVING clause is used to filter grouped results and should always be used in conjunction with a GROUP BY clause.",
+                "correction": "SELECT class, AVG(score) FROM students GROUP BY class HAVING AVG(score) > 80;"
             },
             "18": {
-                        "name": "Too many columns in subquery",
-                        "description": "A subquery returns more columns than expected in the context where it is used.",
-                        "example": "SELECT *\nFROM inventory\nWHERE sID IN (\n    SELECT *\n    FROM store\n    WHERE sName = 'Coop'\n);",
-                        "explanation": "The subquery in the WHERE clause must return exactly one column to compare with inventory.sID. Returning all store columns causes a column-count mismatch.",
-                        "correction": "sql\nSELECT *\nFROM inventory\nWHERE sID IN (\n    SELECT sID\n    FROM store\n    WHERE sName = 'Coop'\n);"
+                "name": "Confusing function with function parameter",
+                "description": "A function is confused with its parameter, leading to incorrect query syntax or logic.",
+                "example": "SELECT (COUNT) course FROM students;",
+                "explanation": "The query incorrectly uses parentheses around the function name COUNT, which makes it look like a parameter rather than a function call. The correct syntax is to use COUNT without parentheses around it.",
+                "correction": "SELECT COUNT(course) FROM students;"
             },
             "19": {
-                        "name": "Missing quantifier",
-                        "description": "A comparison is performed with a subquery that can possibly return multiple values, regardless of the data currently present in the database.",
-                        "example": "SELECT *\nFROM inventory\nWHERE unit_price >= (\n    SELECT unit_price\n    FROM product\n    NATURAL JOIN inventory\n    WHERE pName = 'Banana'\n);",
-                        "explanation": "The value of unit_price is directly compared to the result of the subquery.  This works fine only if the subquery returns a single value (i.e. the product table contains only one entry whose cName is *'Banana'*). However, if the table is later updated, and a new product with the same cName is added, the query becomes invalid.  This problem can be solved by using a quantifier in the comparison (ANY/ALL).",
-                        "correction": "SELECT *\nFROM inventory\nWHERE unit_price >= ANY(\n    SELECT unit_price\n    FROM product\n    NATURAL JOIN inventory\n    WHERE pName = 'Banana'\n);"
+                "name": "Using WHERE twice",
+                "description": "The query contains multiple WHERE clauses, which is not allowed.",
+                "example": "SELECT * FROM students WHERE age > 18 WHERE grade = 'A';",
+                "explanation": "A query can only have one WHERE clause. Combine multiple conditions using logical operators like AND or OR.",
+                "correction": "SELECT * FROM students WHERE age > 18 AND grade = 'A';"
             },
             "20": {
-                        "name": "Confusing function with function parameter",
-                        "description": "A function is confused with its parameter, leading to incorrect query syntax or logic.",
-                        "example": "SELECT (COUNT) pName\nFROM customer;",
-                        "explanation": "The query incorrectly uses parentheses around the function name COUNT, which makes it look like a parameter rather than a function call. The correct syntax is to use COUNT without parentheses around it.",
-                        "correction": "SELECT COUNT(pName)\nFROM customer;"
+                "name": "Omitting the FROM clause",
+                "description": "The query is missing the FROM clause and does not select a constant value.",
+                "example": "SELECT name WHERE age > 18;",
+                "explanation": "The FROM clause is required in a SELECT statement to specify the table from which to retrieve data.",
+                "correction": "SELECT name FROM students WHERE age > 18;"
             },
             "21": {
-                        "name": "Using WHERE twice",
-                        "description": "The query contains multiple WHERE clauses, which is not allowed.",
-                        "example": "SELECT *\nFROM customer\nWHERE age > 18\nWHERE city = 'Genoa';",
-                        "explanation": "A query can only have one WHERE clause. Combine multiple conditions using logical operators like AND or OR.",
-                        "correction": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';"
+                "name": "Comparison with NULL",
+                "description": "The query uses a comparison with NULL using operators like = or != instead of IS NULL or IS NOT NULL.",
+                "example": "SELECT * FROM students WHERE name = NULL;",
+                "explanation": "When checking for NULL values, use IS NULL or IS NOT NULL instead of standard comparison operators.",
+                "correction": "SELECT * FROM students WHERE name IS NULL;"
             },
             "22": {
-                        "name": "Omitting the FROM clause",
-                        "description": "The query is missing the FROM clause and does not select a constant value.",
-                        "example": "SELECT cName\nWHERE age > 18;",
-                        "explanation": "The FROM clause is required in a SELECT statement to specify the table from which to retrieve data.",
-                        "correction": "SELECT cName\nFROM customer\nWHERE age > 18;"
+                "name": "Omitting the semicolon",
+                "description": "The query is missing the terminating semicolon at the end of the statement.",
+                "example": "SELECT * FROM students",
+                "explanation": "SQL standard requires each statement to end with a semicolon (;). Make sure to include it at the end of your queries.",
+                "correction": "SELECT * FROM students;"
             },
             "23": {
-                        "name": "Comparison with NULL",
-                        "description": "The query uses a comparison with NULL using operators like = or != instead of IS NULL or IS NOT NULL.",
-                        "example": "SELECT *\nFROM customer\nWHERE age = NULL;",
-                        "explanation": "When checking for NULL values, use IS NULL or IS NOT NULL instead of standard comparison operators.",
-                        "correction": "SELECT *\nFROM customer\nWHERE age IS NULL;"
+                "name": "Date time field overflow",
+                "description": "An invalid date or time value is used in the query.",
+                "example": "SELECT * FROM events WHERE event_date = '2024-02-33';",
+                "explanation": "The date '2024-02-33' is invalid because a month cannot have 33 days. Ensure that date and time values are valid according to the calendar.",
+                "correction": "SELECT * FROM events WHERE event_date = '2024-02-28';"
             },
             "24": {
-                        "name": "Omitting the semicolon",
-                        "description": "The query is missing the terminating semicolon at the end of the statement.",
-                        "example": "SELECT *\nFROM customer",
-                        "explanation": "SQL standard requires each statement to end with a semicolon (;). Make sure to include it at the end of your queries.",
-                        "correction": "SELECT *\nFROM customer;"
+                "name": "Duplicate clause",
+                "description": "A clause is repeated in the query, such as multiple WHERE or ORDER BY clauses.",
+                "example": "SELECT * FROM students ORDER BY age ORDER BY name;",
+                "explanation": "This query is invalid because it contains two ORDER BY clauses. Each clause should only appear once in a query.",
+                "correction": "SELECT * FROM students ORDER BY age, name;"
             },
             "25": {
-                        "name": "Date time field overflow",
-                        "description": "An invalid date or time value is used in the query.",
-                        "example": "SELECT *\nFROM events\nWHERE date = '2024-02-33';",
-                        "explanation": "The date '2024-02-33' is invalid because a month cannot have 33 days.",
-                        "correction": "SELECT *\nFROM events\nWHERE date = '2024-02-28';"
+                "name": "Using an undefined correlation name",
+                "description": "The query references a correlation name (alias) that has not been defined.",
+                "example": "SELECT s2.name FROM students AS s;",
+                "explanation": "This query renames the students table to 's' but then tries to reference it as 's2', which is not defined.",
+                "correction": "SELECT s.name FROM students AS s;"
             },
             "26": {
-                        "name": "Duplicate clause",
-                        "description": "A clause is repeated in the query, such as multiple WHERE or ORDER BY clauses.",
-                        "example": "SELECT *\nFROM customer\nORDER BY cName\nORDER BY cID;",
-                        "explanation": "This query is invalid because it contains two ORDER BY clauses. Each clause should only appear once in a query.",
-                        "correction": "SELECT *\nFROM customer\nORDER BY cName, cID;"
+                "name": "Too many columns in subquery",
+                "description": "A subquery returns more columns than expected in the context where it is used.",
+                "example": "SELECT * FROM students WHERE id IN (SELECT * FROM teachers);",
+                "explanation": "The subquery in the WHERE clause is expected to return a single column of values to compare against the id column in the outer query. However, it returns all columns from the teachers table, leading to a mismatch.",
+                "correction": "SELECT * FROM students WHERE id IN (SELECT id FROM teachers);"
             },
             "27": {
-                        "name": "Using an undefined correlation name",
-                        "description": "The query references a correlation name (alias) that has not been defined.",
-                        "example": "SELECT c2.cName\nFROM customer AS c;",
-                        "explanation": "This query renames the customer table to c but then tries to reference it as c2, which is not defined.",
-                        "correction": "SELECT c.cName\nFROM customer AS c;"
+                "name": "Confusing table names with column names",
+                "description": "A table name is used where a column name is expected, or vice versa.",
+                "example": "SELECT name.students FROM students, teachers;",
+                "explanation": "This query tries the access a column called 'students' from the 'name' table, which does not exist. The correct syntax is to specify the table name followed by the column name.",
+                "correction": "SELECT students.name FROM students, teachers;"
             },
             "28": {
-                        "name": "Confusing table names with column names",
-                        "description": "A table name is used where a column name is expected, or vice versa.",
-                        "example": "SELECT city.customer\nFROM customer;",
-                        "explanation": "This query tries to access a column called customer from the city table, which does not exist. The correct syntax is to specify the table name followed by the column name.",
-                        "correction": "SELECT customer.city\nFROM customer;"
+                "name": "Restriction in SELECT clause",
+                "description": "",
+                "example": "SELECT fee > 10 FROM customers;",
+                "explanation": "",
+                "correction": ""
             },
             "29": {
-                        "name": "Confusing the order of keywords (e.g., FROM customer SELECT fee)",
-                        "description": "Keywords in the SQL statement are in the wrong order.",
-                        "example": "FROM customer\nSELECT cName;",
-                        "explanation": "Ensure that SQL keywords are in the correct order: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT, OFFSET.",
-                        "correction": "SELECT cName\nFROM customer;"
+                "name": "Projection in WHERE clause",
+                "description": "Multiple columns are listed in the WHERE clause instead of a boolean expression.",
+                "example": "SELECT * FROM students WHERE firstname, surname;",
+                "explanation": "This query incorrectly lists multiple columns in the WHERE clause, instead of a condition that evaluates to true or false. The WHERE clause should contain a boolean expression that filters the rows based on specified criteria.",
+                "correction": "SELECT * FROM students WHERE firstname = 'John' AND surname = 'Doe';"
             },
             "30": {
-                        "name": "Confusing the syntax of keywords (e.g., LIKE ('A,' 'B'))",
-                        "description": "Each SQL keyword has a specific syntax that must be followed.",
-                        "example": "SELECT *\nFROM customer\nWHERE age BETWEEN 18;",
-                        "explanation": "The BETWEEN operator requires two values to define the range: a lower bound and an upper bound.",
-                        "correction": "SELECT *\nFROM customer\nWHERE age BETWEEN 18 AND 25;"
+                "name": "Confusing the order of keywords",
+                "description": "Keywords in the SQL statement are in the wrong order.",
+                "example": "FROM students SELECT name;",
+                "explanation": "Ensure that SQL keywords are in the correct order: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT, OFFSET.",
+                "correction": "SELECT name FROM students;"
             },
             "31": {
-                        "name": "Omitting commas",
-                        "description": "When listing multiple columns or values, commas are missing between them.",
-                        "example": "SELECT cID city street\nFROM customer;",
-                        "explanation": "This query is missing commas between the column names in the SELECT clause. Ensure that each column name is separated by a comma.",
-                        "correction": "SELECT cID, city, street\nFROM customer;"
+                "name": "Confusing the logic of keywords",
+                "description": "The wrong keyword is used for the intended operation, such as using GROUP BY instead of ORDER BY.",
+                "example": "ORDER name FROM students;",
+                "explanation": "This query mixes up the SELECT and ORDER BY keywords. The correct syntax is to first SELECT the columns and then ORDER the results.",
+                "correction": "SELECT name FROM students ORDER BY name;"
             },
             "32": {
-                        "name": "Unmatched brackets",
-                        "description": "Curly and square brackets are used instead of parentheses, or parentheses are unmatched.",
-                        "example": "SELECT *\nFROM customer\nWHERE cID > ((15 + 18) * 2) / (7 + 3;",
-                        "explanation": "All opening parentheses must have a corresponding closing parenthesis.",
-                        "correction": "SELECT *\nFROM customer\nWHERE cID > ((15 + 18) * 2) / (7 + 3);"
+                "name": "Confusing the syntax of keywords",
+                "description": "Each SQL keyword has a specific syntax that must be followed.",
+                "example": "SELECT * FROM students WHERE age BETWEEN 18;",
+                "explanation": "The BETWEEN operator requires two values to define the range: a lower bound and an upper bound.",
+                "correction": "SELECT * FROM students WHERE age BETWEEN 18 AND 25;"
             },
             "33": {
-                        "name": "Curly or square brackets",
-                        "description": "Curly and square brackets are used instead of parentheses.",
-                        "example": "SELECT *\nFROM customer\nWHERE age > [(15 + 18) * 2] / (7 + 3);",
-                        "explanation": "Only parentheses ( \"(\" and \")\" ) are allowed for grouping expressions in SQL.",
-                        "correction": "SELECT *\nFROM customer\nWHERE age > ((15 + 18) * 2) / (7 + 3);"
+                "name": "Omitting commas",
+                "description": "When listing multiple columns or values, commas are missing between them.",
+                "example": "SELECT firstname lastname age FROM students;",
+                "explanation": "This query is missing commas between the column names in the SELECT clause. Ensure that each column name is separated by a comma.",
+                "correction": "SELECT firstname, lastname, age FROM students;"
             },
             "34": {
-                        "name": "Nonstandard keywords or standard keywords in wrong context",
-                        "description": "The query uses invalid keywords or standard keywords in inappropriate contexts.",
-                        "example": "SELECT *\nFROM customer\nSORT BY cName;",
-                        "explanation": "The correct keyword for sorting results in SQL is ORDER BY, not SORT BY.",
-                        "correction": "SELECT *\nFROM customer\nORDER BY cName;"
+                "name": "Curly, square or unmatched brackets",
+                "description": "Curly and square brackets are used instead of parentheses, or parentheses are unmatched.",
+                "example": "SELECT * FROM students WHERE age > [(15 + 18) * 2] / (7 + 3;",
+                "explanation": "Use only parentheses () for grouping expressions in SQL, and ensure that all opening parentheses have a corresponding closing parenthesis.",
+                "correction": "SELECT * FROM students WHERE age > ((15 + 18) * 2) / (7 + 3);"
             },
             "35": {
-                        "name": "Nonstandard operators (e.g., &&, \\|\\| or ==)",
-                        "description": "The query uses operators that are not part of the standard SQL syntax, such as &&, ||, or == instead of AND, OR, or =.",
-                        "example": "SELECT *\nFROM customer\nWHERE\n    cID == 18\n    && city == 'A';",
-                        "explanation": "The operators == and &&, although common in programming languages, are not valid in SQL. Use = and AND instead.",
-                        "correction": "SELECT *\nFROM customer\nWHERE\n    cID = 18\n    AND city = 'A';"
+                "name": "IS where not applicable",
+                "description": "The IS operator is used for comparisons on values other than NULL or boolean expressions.",
+                "example": "SELECT * FROM students WHERE age IS 18;",
+                "explanation": "The IS operator should only be used for checking NULL values or boolean expressions (e.g., IS TRUE, IS FALSE). For other comparisons, use standard comparison operators like =, <>, >, <, >=, <=.",
+                "correction": "SELECT * FROM students WHERE age = 18;"
             },
             "36": {
-                        "name": "Additional semicolon",
-                        "description": "An extra semicolon is present in the query, which can lead to syntax errors.",
-                        "example": "SELECT *\nFROM customer;;",
-                        "explanation": "Ensure that there is only one semicolon at the end of the SQL statement.",
-                        "correction": "SELECT *\nFROM customer;"
+                "name": "Nonstandard keywords or standard keywords in wrong context",
+                "description": "The query uses invalid keywords or standard keywords in inappropriate contexts.",
+                "example": "SELECT * FROM students SORT BY name;",
+                "explanation": "The correct keyword for sorting results in SQL is ORDER BY, not SORT BY.",
+                "correction": "SELECT * FROM students ORDER BY name;"
             },
             "37": {
-                        "name": "Different tuples in set operation",
-                        "description": "Two queries combined with a set operation (UNION/INTERSECT/EXCEPT) return tuples with different cardinalities.",
-                        "example": "SELECT city\nFROM customer\nUNION\nSELECT city, street\nFROM store;",
-                        "explanation": "The former SELECT returns a single column (city), while the latter returns two columns (city and street). Set operations require both results to have the same number of columns.",
-                        "correction": "SELECT city\nFROM customer\nUNION\nSELECT city\nFROM store;"
+                "name": "Nonstandard operators",
+                "description": "The query uses operators that are not part of the standard SQL syntax, such as &&, ||, or == instead of AND, OR, or =.",
+                "example": "SELECT * FROM students WHERE age == 18 && grade == 'A';",
+                "explanation": "Use standard SQL operators for logical and comparison operations: AND, OR, =, <>, >, <, >=, <=. Other operators, although common in programming languages, are not valid in SQL.",
+                "correction": "SELECT * FROM students WHERE age = 18 AND grade = 'A';"
             },
             "38": {
-                        "name": "Implied, tautological or inconsistent expression",
-                        "description": "Query contains expressions that are always true, always false, or logically redundant.",
-                        "example": "SELECT *\nFROM customer\nWHERE\n    age > 30\n    AND age > 25\n    AND cName = cName;",
-                        "explanation": "The expression age > 30 AND age > 25 is redundant because if age is greater than 30, it is inherently greater than 25. Additionally, the condition cName = cName is always true for all rows.  Simplifying the query to remove these redundancies will improve clarity and performance, without altering its logic.",
-                        "correction": "SELECT *\nFROM customer\nWHERE age > 25;"
+                "name": "Additional semicolon",
+                "description": "An extra semicolon is present in the query, which can lead to syntax errors.",
+                "example": "SELECT * FROM students;;",
+                "explanation": "Ensure that there is only one semicolon at the end of the SQL statement.",
+                "correction": "SELECT * FROM students;"
             },
             "39": {
-                        "name": "DISTINCT in SUM or AVG",
-                        "description": "Using DISTINCT within SUM or AVG means that only unique values are summed or averaged, which is almost never the intended behavior.",
-                        "example": "SELECT AVG(DISTINCT age)\nFROM customer;",
-                        "explanation": "This query first considers all the unique customer ages (each value is counted only once) and then calculates the average of those unique ages. If there are 200 customer aged 20 and 1 customer aged 30, the average will be (20 + 30) / 2 = 25, which does not accurately reflect the average age of all customers.",
-                        "correction": "SELECT AVG(age)\nFROM customer;"
+                "name": "AND instead of OR (empty result table)",
+                "description": "Query uses AND where OR is needed, resulting always in an empty result set.",
+                "example": "SELECT * FROM students WHERE age < 18 AND age > 25;",
+                "explanation": "The condition age < 18 AND age > 25 is attempting to find students who are both younger than 18 and older than 25 at the same time, which is impossible. Use OR to find students who meet either condition.",
+                "correction": "SELECT * FROM students WHERE age < 18 OR age > 25;"
             },
             "40": {
-                        "name": "DISTINCT that might remove important duplicates",
-                        "description": "Using DISTINCT removes duplicate rows from the result set, which may inadvertently exclude important data.",
-                        "example": "SELECT DISTINCT cName\nfrom customer\nWHERE city = 'Genoa';",
-                        "explanation": "If multiple customer share the same name and live in Genoa, using DISTINCT will return only one instance of that name, potentially omitting other customers with the same name who also live in the same city. This could lead to incomplete or misleading results.",
-                        "correction": "SELECT cName\nfrom customer\nWHERE city = 'Genoa';"
+                "name": "Implied, tautological or inconsistent expression",
+                "description": "Query contains expressions that are always true, always false, or logically redundant.",
+                "example": "SELECT * FROM students WHERE age > 10 AND age > 5 AND name = name;",
+                "explanation": "The expression age > 10 AND age > 5 is redundant because if age is greater than 10, it is inherently greater than 5. Additionally, the condition name = name is always true for all rows. Simplifying the query to remove these redundancies will improve clarity and performance.",
+                "correction": "SELECT * FROM students WHERE age > 10;"
             },
             "41": {
-                        "name": "Mixing a >0 with IS NOT NULL or empty string with NULL",
-                        "description": "Using > 0 or = '' to check for non-null values instead of IS NOT NULL or IS NULL.",
-                        "example": "SELECT *\nFROM customer\nWHERE street = '';",
-                        "explanation": "This query erroneously attempts to find customers for whom we don't know in which street they live, by checking for an empty string in the street column. However, this query actually selects customers who live in a street named '' *(empty string)*.",
-                        "correction": "SELECT *\nFROM customer\nWHERE street IS NULL;"
+                "name": "DISTINCT in SUM or AVG",
+                "description": "Using DISTINCT within SUM or AVG means that only unique values are summed or averaged, which is almost never the intended behavior.",
+                "example": "SELECT AVG(DISTINCT age) FROM students;",
+                "explanation": "This query first considers all the unique students ages (each value is counted only once) and then calculates the average of those unique ages. If there are 200 students aged 20 and 1 student aged 30, the average will be (20 + 30) / 2 = 25, which does not accurately reflect the average age of all students.",
+                "correction": "SELECT AVG(age) FROM students;"
             },
             "42": {
-                        "name": "NULL in IN/ANY/ALL subquery",
-                        "description": "Using nullable values in IN, ANY, or ALL subqueries can lead to unexpected results due to the way NULLs are handled in SQL.",
-                        "example": "SELECT *\nFROM customer\nWHERE city IN (\n    SELECT city\n    FROM store\n);",
-                        "explanation": "This query attempts to find customers whose city appears in the store table. However, if the subquery returns NULL values, the IN condition can evaluate to UNKNOWN, causing matching rows to be excluded unexpectedly.",
-                        "correction": "SELECT *\nFROM customer\nWHERE city IN (\n    SELECT city\n    FROM store\n    WHERE city IS NOT NULL\n);"
+                "name": "DISTINCT that might remove important duplicates",
+                "description": "Using DISTINCT removes duplicate rows from the result set, which may inadvertently exclude important data.",
+                "example": "SELECT DISTINCT name from students WHERE grade = 'A';",
+                "explanation": "If multiple students share the same name and have received an 'A' grade, using DISTINCT will return only one instance of that name, potentially omitting other students with the same name who also earned an 'A'. This could lead to incomplete or misleading results.",
+                "correction": "SELECT name from students WHERE grade = 'A';"
             },
             "43": {
-                        "name": "Join condition on unmatchable column",
-                        "description": "A join condition is performed on columns that cannot logically match, resulting in an empty result set.",
-                        "example": "SELECT *\nFROM\n    store s\n    JOIN inventory i ON s.sID = i.unit_price;",
-                        "explanation": "This query attempts to join the store and inventory tables based on the condition that a stores's sID equals the inventory's unit_price. Since sID and unit_price are fundamentally different types of data, this join condition is illogical and will likely result in no matching rows.",
-                        "correction": "SELECT *\nFROM\n    store s\n    JOIN inventory i ON s.sID = i.sID;"
+                "name": "Wildcards without LIKE",
+                "description": "Wildcards such as % or _ are used with = instead of LIKE, resulting in a literal comparison rather than a pattern match.",
+                "example": "SELECT * FROM students WHERE name = 'J%n';",
+                "explanation": "This query selects all students whose name is exactly 'J%n', including the percent sign, rather than matching names that start with 'J' and end with 'n' with any characters in between.",
+                "correction": "SELECT * FROM students WHERE name LIKE 'J%n';"
             },
             "44": {
-                        "name": "Many duplicates",
-                        "description": "The query returns many times the same values, making the results difficult to interpret.",
-                        "example": "SELECT city\nFROM customer;",
-                        "explanation": "This query aims to find all the cities where customers live. However, if multiple customers live in the same city, that city will appear multiple times in the result set, leading to redundancy and making it harder to analyze the data.",
-                        "correction": "SELECT DISTINCT city\nFROM customer;"
+                "name": "Incorrect wildcard: using _ instead of % or using, e.g., *",
+                "description": "Wildcards are used incorrectly in pattern matching, such as using _ when % is needed, or using non-standard wildcards like *.",
+                "example": "SELECT * FROM students WHERE name LIKE 'J*n';",
+                "explanation": "The query uses the non-standard wildcard * instead of the SQL standard wildcard %. The * character is not recognized by LIKE for pattern matching in SQL and is instead treated as a literal character.",
+                "correction": "SELECT * FROM students WHERE name LIKE 'J%n';"
             },
             "45": {
-                        "name": "Constant column output",
-                        "description": "A column in the output has the same constant value for all rows.",
-                        "example": "SELECT cName, city\nWHERE city = 'Genoa'\nFROM customer;",
-                        "explanation": "The city column does not provide any useful information because it has the same value (*'Genoa'*) for all customer in the result set. This redundancy can clutter the output and make it harder to focus on relevant data.",
-                        "correction": "SELECT cName\nFROM customer\nWHERE city = 'Genoa';"
+                "name": "Mixing a > 0 with IS NOT NULL or empty string with NULL",
+                "description": "Using > 0 or = '' to check for non-null values instead of IS NOT NULL or IS NULL.",
+                "example": "SELECT * FROM students WHERE test_score = '';",
+                "explanation": "This query erroneously attempts to find students who haven't taken the test by checking for an empty string in the test_score column. However, this query actually selects students who have taken the test and have been assigned a score of '' (empty string).",
+                "correction": "SELECT * FROM students WHERE test_score IS NULL;"
             },
             "46": {
-                        "name": "Duplicate column output",
-                        "description": "Multiple columns in the output always contain identical values.",
-                        "example": "SELECT cID, cName, cName\nFROM customer;",
-                        "explanation": "The query selects the cName column twice, resulting in duplicate data in the output. This redundancy can confuse users and make it harder to interpret the results.",
-                        "correction": "SELECT cID, cName\nFROM customer;"
+                "name": "NULL in IN/ANY/ALL subquery",
+                "description": "Using nullable values in IN, ANY, or ALL subqueries can lead to unexpected results due to the way NULLs are handled in SQL.",
+                "example": "SELECT * FROM students WHERE age IN (SELECT age FROM teachers);",
+                "explanation": "This query attempts to find students who have the same age as any teacher. However, if the subquery returns any NULL values, the entire IN condition evaluates to UNKNOWN for those rows, which means they will not be included in the result set. This can lead to missing data if there are NULL ages in the teachers table.",
+                "correction": "SELECT * FROM students WHERE age IN (SELECT age FROM teachers WHERE age IS NOT NULL);"
             },
             "47": {
-                        "name": "AND instead of OR",
-                        "description": "Query uses AND where OR is needed.",
-                        "example": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';",
-                        "explanation": "This query finds customers older than 18 who live in Genoa. However, this does not match the data demand. In this case, OR should have been used instead of AND.",
-                        "correction": "SELECT *\nFROM customer\nWHERE \n    age > 18\n    OR city = 'Genoa';"
+                "name": "Join on incorrect column (matches impossible)",
+                "description": "A join is performed on columns that cannot logically match, resulting in an empty result set.",
+                "example": "SELECT * FROM students JOIN teachers ON students.age = teachers.salary;",
+                "explanation": "This query attempts to join the students and teachers tables based on the condition that a student's age equals a teacher's salary. Since age and salary are fundamentally different types of data, this join condition is illogical and will likely result in no matching rows.",
+                "correction": "SELECT * FROM students JOIN teachers ON students.class_id = teachers.class_id;"
             },
             "48": {
-                        "name": "OR instead of AND",
-                        "description": "Query uses OR where AND is needed.",
-                        "example": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    OR city = 'Genoa';",
-                        "explanation": "This query finds customers who are older than 18, as well as those who live in Genoa, regardless of their age. However, this does not match the data demand. In this case, AND should have been used instead of OR.",
-                        "correction": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';"
+                "name": "Omitting a join",
+                "description": "A join condition is missing or incomplete, leading to a Cartesian product or incorrect results.",
+                "example": "SELECT class.name, teacher.name FROM classes, teachers;",
+                "explanation": "This query retrieves all combinations of classes and teachers without specifying how they are related. This results in a Cartesian product, where every class is paired with every teacher, which is not the intended outcome.",
+                "correction": "SELECT class.name, teacher.name FROM classes, teachers WHERE classes.teacher_id = teachers.id;"
             },
             "49": {
-                        "name": "Extraneous NOT operator",
-                        "description": "A logical condition uses NOT where it is not needed, leading to incorrect results.",
-                        "example": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND NOT city = 'Genoa';",
-                        "explanation": "This query is intended to find customers who are older than 18 and live in Genoa. However, the NOT operator negates the city condition, resulting in customers who are older than 18 but do not live in Genoa.",
-                        "correction": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';"
+                "name": "Many duplicates",
+                "description": "The query returns many times the same values, making the results difficult to interpret.",
+                "example": "SELECT city FROM students;",
+                "explanation": "This query aims to find all the cities where students live. However, if multiple students live in the same city, that city will appear multiple times in the result set, leading to redundancy and making it harder to analyze the data.",
+                "correction": "SELECT DISTINCT city FROM students;"
             },
             "50": {
-                        "name": "Missing NOT operator",
-                        "description": "A logical condition is missing a NOT operator, leading to incorrect results.",
-                        "example": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';",
-                        "explanation": "This query is intended to find customers who are older than 18 and do not live in Genoa. However, without the NOT operator, it returns customers who are older than 18 and live in Genoa.",
-                        "correction": "SELECT *\nFROM customer\nWHERE\n    age > 18\n    AND NOT city = 'Genoa';"
+                "name": "Constant column output",
+                "description": "A column in the output has the same constant value for all rows.",
+                "example": "SELECT name, country WHERE country = 'IT' FROM students;",
+                "explanation": "The country column does not provide any useful information because it has the same value ('IT') for all students in the result set. This redundancy can clutter the output and make it harder to focus on relevant data.",
+                "correction": "SELECT name FROM students WHERE country = 'IT';"
             },
             "51": {
-                        "name": "Substituting existence negation with <>",
-                        "description": "The query uses <> to check for non-existence instead of NOT IN or NOT EXISTS.",
-                        "example": "SELECT *\nFROM store s\nWHERE EXISTS (\n    SELECT 1\n    FROM inventory i\n    WHERE\n        i.sID = s.sID\n        AND i.unit_price <> 5\n);",
-                        "explanation": "This query uses <> to check for inventory items that do not cost 5, but it does not correctly enforce the condition that there should be no inventory items that cost 5. Instead, it checks if there exists at least one inventory item that does not cost 5, which is not the intended logic. The correct approach is to use NOT EXISTS to ensure that there are no inventory items with a unit price of 5 for each store.",
-                        "correction": "SELECT *\nFROM store s\nWHERE NOT EXISTS (\n    SELECT 1\n    FROM inventory i\n    WHERE\n        i.sID = s.sID\n        AND i.unit_price = 5\n);"
+                "name": "Duplicate column output",
+                "description": "Multiple columns in the output always contain identical values.",
+                "example": "SELECT first_name, last_name, first_name FROM students;",
+                "explanation": "The query selects the first_name column twice, resulting in duplicate data in the output. This redundancy can confuse users and make it harder to interpret the results.",
+                "correction": "SELECT first_name, last_name FROM students;"
             },
             "52": {
-                        "name": "Incorrect comparison operator or incorrect value compared",
-                        "description": "A condition uses the wrong comparison operator or compares against an incorrect value, leading to unintended results.",
-                        "example": "SELECT *\nFROM customer\nWHERE age < 18;",
-                        "explanation": "The query uses the < operator instead of >, which results in listing customers who are younger than 18 instead of those who are older.",
-                        "correction": "SELECT *\nFROM customer\nWHERE age > 18;"
+                "name": "OR instead of AND",
+                "description": "A condition uses OR where AND is needed, leading to broader results than intended.",
+                "example": "SELECT * FROM students WHERE age > 18 OR grade = 'A';",
+                "explanation": "This query is supposed to find students who are older than 18 and have received an 'A' grade. However, using OR means that it will return all students who are either older than 18 or have an 'A' grade.",
+                "correction": "SELECT * FROM students WHERE age > 18 AND grade = 'A';"
             },
             "53": {
-                        "name": "Incorrect table reference",
-                        "description": "The query references the wrong table, leading to incorrect or unexpected results.",
-                        "example": "SELECT DISTINCT city\nFROM store;",
-                        "explanation": "The query references the store table instead of the customer table, which is where the city information for customers is stored. As a result, it retrieves cities from the store table rather than from the customer table, which does not meet the data demand.",
-                        "correction": "SELECT DISTINCT city\nFROM customer;"
+                "name": "Extraneous NOT operator",
+                "description": "A condition uses NOT where it is not needed, leading to incorrect results.",
+                "example": "SELECT * FROM students WHERE age > 18 AND NOT grade = 'A';",
+                "explanation": "This query is intended to find students who are older than 18 and have received an 'A' grade. However, the NOT operator negates the grade condition, resulting in students who are older than 18 but have not received an 'A' grade.",
+                "correction": "SELECT * FROM students WHERE age > 18 AND grade = 'A';"
             },
             "54": {
-                        "name": "Missing table reference",
-                        "description": "The query references fewer tables than necessary, leading to incomplete results.",
-                        "example": "SELECT sID\nFROM store;",
-                        "explanation": "The query only references the store table, which does not contain information about inventory. As a result, it fails to identify which stores have items in inventory, leading to incomplete results.",
-                        "correction": "SELECT sID\nFROM\n    store\n    NATURAL JOIN inventory;"
+                "name": "Missing NOT operator",
+                "description": "A condition is missing a NOT operator, leading to incorrect results.",
+                "example": "SELECT * FROM students WHERE age > 18 AND grade = 'A';",
+                "explanation": "This query is intended to find students who are older than 18 and have not received an 'A' grade. However, without the NOT operator, it returns students who have received an 'A' grade.",
+                "correction": "SELECT * FROM students WHERE age > 18 AND NOT grade = 'A';"
             },
             "55": {
-                        "name": "Extraneous table reference",
-                        "description": "The query references more tables than necessary, leading to incorrect or unexpected results.",
-                        "example": "SELECT cName\nFROM customer, store;",
-                        "explanation": "The query references both the customer and store tables, but the data demand only requires information from the customer table. The inclusion of the store table creates a Cartesian product, resulting in multiple rows for each customer name, which is not the intended outcome.",
-                        "correction": "SELECT cName\nFROM customer;"
+                "name": "Substituting existence negation with <>",
+                "description": "The query uses <> to check for non-existence instead of NOT IN or NOT EXISTS.",
+                "example": "SELECT * FROM students WHERE id <> (SELECT student_id FROM graduates);",
+                "explanation": "This query attempts to find students who are not graduates by using the <> operator. However, this query actually returns students whose id is not equal to the single value returned by the subquery, which is not the intended behavior. To correctly find students who are not graduates, use NOT IN or NOT EXISTS.",
+                "correction": "SELECT * FROM students WHERE id NOT IN (SELECT student_id FROM graduates);"
             },
             "56": {
-                        "name": "Join condition on incorrect column",
-                        "description": "A join condition uses the wrong column, leading to incorrect or unexpected results.",
-                        "example": "SELECT *\nFROM store s\nJOIN inventory i ON s.sID = i.pID;",
-                        "explanation": "The query attempts to join the store and inventory tables using the condition s.sID = i.pID. However, sID is the store ID and pID is the product ID, so this condition does not correctly relate the two tables. As a result, the query will not return the intended results of listing stores along with their inventory.",
-                        "correction": "SELECT *\nFROM store s\nJOIN inventory i ON s.sID = i.sID;"
+                "name": "Putting NOT in front of incorrect IN/EXISTS",
+                "description": "When multiple IN/EXISTS subqueries are used, NOT is applied to the wrong one, leading to incorrect results.",
+                "example": "SELECT * FROM students WHERE id NOT IN (SELECT student_id FROM graduates) AND id IN (SELECT student_id FROM enrolled);",
+                "explanation": "This query is intended to find students who are enrolled but not graduates. However, the NOT operator is applied to the first IN subquery, which checks for graduates, instead of the second IN subquery, which checks for enrolled students. This results in incorrect filtering of the students.",
+                "correction": "SELECT * FROM students WHERE id IN (SELECT student_id FROM enrolled) AND id NOT IN (SELECT student_id FROM graduates);"
             },
             "57": {
-                        "name": "Join condition with incorrect comparison operator",
-                        "description": "A join condition uses the wrong comparison operator, leading to incorrect or unexpected results.",
-                        "example": "SELECT c1.cID, c2.cID\nFROM customer c1\nJOIN customer c2 ON c1.city <> c2.city;",
-                        "explanation": "The query attempts to find pairs of customers who live in the same city, but it uses the <> operator, which means \"not equal\". As a result, it retrieves pairs of customers who live in different cities instead of those who live in the same city.",
-                        "correction": "SELECT c1.cID, c2.cID\nFROM customer c1\nJOIN customer c2 ON c1.city = c2.city;"
+                "name": "Incorrect comparison operator or incorrect value compared",
+                "description": "A condition uses the wrong comparison operator or compares against an incorrect value, leading to unintended results.",
+                "example": "SELECT * FROM students WHERE age >= 25;",
+                "explanation": "This query is intended to find students who are 18 years old or older. However, the wrong age value is used in the comparison, resulting in only students who are 25 years old or older being returned.",
+                "correction": "SELECT * FROM students WHERE age >= 18;"
             },
             "58": {
-                        "name": "Omitting a join condition",
-                        "description": "A query references multiple tables but does not include the necessary join conditions to connect them, leading to incomplete or incorrect results.",
-                        "example": "SELECT *\nFROM\n    store,\n    inventory\nWHERE\n    city = 'Genoa';",
-                        "explanation": "This query does not include any join conditions to connect the store and inventory tables. As a result, it produces a Cartesian product of the two tables filtered only by the city condition on the store table. This means that it will return all combinations of stores in Genoa with all inventory items, regardless of whether those items are actually in those stores.",
-                        "correction": "SELECT *\nFROM\n    store\n    NATURAL JOIN inventory\nWHERE\n    city = 'Genoa';"
+                "name": "Join on incorrect table",
+                "description": "The query refences the wrong table, leading to incorrect or unexpected results.",
+                "example": "SELECT name FROM teachers;",
+                "explanation": "This query is intended to retrieve the names of students, but it mistakenly references the teachers table instead of the students table.",
+                "correction": "SELECT name FROM students;"
             },
             "59": {
-                        "name": "Condition on OUTER JOIN",
-                        "description": "Using a JOIN ON condition on the left table of a LEFT OUTER JOIN affects only the right table, which can lead to unexpected results.",
-                        "example": "SELECT *\nFROM\n    customer c\n    LEFT OUTER JOIN store s ON s.city = c.city AND s.sName = 'Coop';",
-                        "explanation": "The condition s.sName = 'Coop' is applied in the ON clause and affects how rows match on the right side. If a store's name does not satisfy the condition, the row can still appear with NULL values, which is not the intended behavior. To filter rows, the condition should be placed in the WHERE clause.",
-                        "correction": "SELECT *\nFROM\n    customer c\n    LEFT OUTER JOIN store s ON s.city = c.city\nWHERE s.sName = 'Coop';"
+                "name": "Join when join needs to be omitted",
+                "description": "The query references more tables than necessary, leading to incorrect or unexpected results.",
+                "example": "SELECT name FROM students, teachers WHERE ...;",
+                "explanation": "This query is intended to retrieve the names of students that meet certain criteria, but it unnecessarily joins the teachers table, which is not needed for this purpose. This can lead to incorrect results if there are multiple teachers associated with a student or if there are no matching teachers.",
+                "correction": "SELECT name FROM students WHERE ...;"
             },
             "60": {
-                        "name": "Improper nesting of expressions",
-                        "description": "Expressions are not properly nested with parentheses, leading to incorrect evaluation order.",
-                        "example": "SELECT *\nFROM customer\nWHERE age + 5 * 2 > 30;",
-                        "explanation": "In this query, the multiplication operator has a higher precedence than the addition operator. As a result, 5 * 2 is evaluated first, giving 10, and then age + 10 is evaluated. This is not the intended calculation. The correct evaluation should be (age + 5) * 2, which requires proper nesting with parentheses.",
-                        "correction": "SELECT *\nFROM customer\nWHERE (age + 5) * 2 > 30;"
+                "name": "Join on incorrect column (matches possible)",
+                "description": "A join condition uses the wrong column, leading to incorrect or unexpected results.",
+                "example": "SELECT students.name FROM students JOIN teachers ON students.class_id = teachers.favourite_number;",
+                "explanation": "This query is intended to retrieve the names of students who are associated with specific teachers. However, the join condition uses the favourite_number column from the teachers table, which is not logically related to the class_id column from the students table. This can lead to incorrect or unexpected results, as the join may match students with unrelated teachers based on arbitrary favourite numbers.",
+                "correction": "SELECT students.name FROM students JOIN teachers ON students.class_id = teachers.class_id;"
             },
             "61": {
-                        "name": "Improper nesting of subqueries",
-                        "description": "Subqueries are nested improperly, leading to a different evaluation order than intended.",
-                        "example": "SELECT *\nFROM store s\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM inventory i\n  WHERE i.sID = s.sID\n    AND EXISTS (\n      SELECT 1\n      FROM product p\n      WHERE p.pID = i.pID\n        AND p.suffix = 'XL'\n    )\n);",
-                        "explanation": "This query is intended to enforce two separate conditions: the store has inventory rows, and none of those rows refers to a product with suffix XL. Nesting EXISTS inside NOT EXISTS leads to selecting stores that do not have any inventory rows at all, which is not the intended outcome. The correct approach is to use two separate EXISTS conditions at the same level.",
-                        "correction": "SELECT *\nFROM store s\nWHERE EXISTS (\n  SELECT 1\n  FROM inventory i\n  WHERE i.sID = s.sID\n)\nAND NOT EXISTS (\n  SELECT 1\n  FROM inventory i\n  JOIN product p ON p.pID = i.pID\n  WHERE i.sID = s.sID\n    AND p.suffix = 'XL'\n);"
+                "name": "Join with incorrect comparison operator",
+                "description": "A join condition uses the wrong comparison operator, leading to incorrect or unexpected results.",
+                "example": "SELECT students.name FROM students JOIN teachers ON students.class_id > teachers.class_id;",
+                "explanation": "This query is intended to retrieve the names of students who are associated with specific teachers. However, the join condition uses the > operator, which checks for a greater-than relationship between students.class_id and teachers.class_id. This is not the intended behavior, as the join should be based on equality to correctly associate students with their teachers.",
+                "correction": "SELECT students.name FROM students JOIN teachers ON students.class_id = teachers.class_id;"
             },
             "62": {
-                        "name": "Extraneous quotes",
-                        "description": "A column name is enclosed in quotes, effectively turning it into a string literal.",
-                        "example": "SELECT *\nFROM customer c, store s\nWHERE c.city = 's.city';",
-                        "explanation": "In this query, the condition c.city = 's.city' compares the city column of the customer table to the string literal 's.city', which is not correct. To compare the city column of both tables, the quotes around s.city must be removed.",
-                        "correction": "SELECT *\nFROM customer c, store s\nWHERE c.city = s.city;"
+                "name": "Missing join",
+                "description": "The query refences less tables than necessary, leading to incomplete results.",
+                "example": "SELECT students.name FROM students WHERE ...;",
+                "explanation": "This query is intended to retrieve the names of students who are associated with specific teachers. However, it does not include a join with the teachers table, which is necessary to filter students based on their associated teachers. As a result, the query may return incomplete results or fail to apply the intended filtering criteria.",
+                "correction": "SELECT students.name FROM students, teachers WHERE ...;"
             },
             "63": {
-                        "name": "Missing expression",
-                        "description": "A logical expression required by the data demand is missing from the query.",
-                        "example": "SELECT cName\nFROM customer\nWHERE age > 18;",
-                        "explanation": "The query only checks for customers older than 18 but does not filter for customers living in Genoa.",
-                        "correction": "SELECT cName\nFROM customer\nWHERE \n    age > 18\n    AND city = 'Genoa';"
+                "name": "Improper nesting of expressions",
+                "description": "Expressions are not properly nested with parentheses, leading to incorrect evaluation order.",
+                "example": "SELECT * FROM students WHERE age + 5 * 2 > 30;",
+                "explanation": "This query is intended to find students whose age plus 5, multiplied by 2, is greater than 30. However, without proper parentheses, the multiplication operator (*) has a higher precedence than addition (+), leading to an incorrect evaluation order.",
+                "correction": "SELECT * FROM students WHERE (age + 5) * 2 > 30;"
             },
             "64": {
-                        "name": "Extraneous expression",
-                        "description": "A logical expression not required by the data demand is present in the query.",
-                        "example": "SELECT sID\nFROM store\nWHERE\n    sName = 'Coop'\n    AND city = 'Genoa';",
-                        "explanation": "The query lists all Coop stores located in Genoa, which is not what the data demand required. The extraneous condition city = 'Genoa' should be removed.",
-                        "correction": "SELECT sID\nFROM store\nWHERE sName = 'Coop';"
+                "name": "Improper nesting of subqueries",
+                "description": "Subqueries are nested improperly, leading to a different evaluation order than intended.",
+                "example": "SELECT * FROM students s WHERE id NOT EXISTS (SELECT * FROM graduates g WHERE g.student_id = s.id AND EXISTS (SELECT * FROM tutors t WHERE t.student_id = s.id));",
+                "explanation": "This query is intended to find students who are not graduates and have tutors. However, the nesting of the EXISTS subquery within the NOT EXISTS subquery returns students who are not graduates or have tutors, but not both.",
+                "correction": "SELECT * FROM students s WHERE NOT EXISTS (SELECT * FROM graduates g WHERE g.student_id = s.id) AND EXISTS (SELECT * FROM tutors t WHERE t.student_id = s.id);"
             },
             "65": {
-                        "name": "Expression on incorrect column",
-                        "description": "A logical expression required by the data demand is present in the query, but on the wrong column.",
-                        "example": "SELECT sID\nFROM store\nWHERE street = 'Coop';",
-                        "explanation": "The condition = 'Coop' is correct, but it should be applied on the sName column, instead of the street column.",
-                        "correction": "SELECT sID\nFROM store\nWHERE sName = 'Coop';"
+                "name": "Extraneous quotes",
+                "description": "A column name is enclosed in quotes, effectively turning it into a string literal.",
+                "example": "SELECT * FROM students WHERE name = 'supervisor_name';",
+                "explanation": "This query is intended to find students who have the same name as their supervisor. However, by enclosing supervisor_name in quotes, it returns students whose name is literally 'supervisor_name', rather than comparing it to the value in the supervisor_name column.",
+                "correction": "SELECT * FROM students WHERE name = supervisor_name;"
             },
             "66": {
-                        "name": "Expression in incorrect clause",
-                        "description": "A correct logical expression is present in the WRONG clause (i.e. WHERE instead of HAVING, or vice versa).",
-                        "example": "SELECT city, AVG(age)\nFROM customer\nWHERE age < 30\nGROUP BY city;",
-                        "explanation": "This query answers the following data demand: *List the average age of customers for each city. Consider only customers younger than 30.*  To correctly satisfy the data demand, the condition age < 30 must be moved to the HAVING clause, since it must apply on the grouping result instead of individual rows.",
-                        "correction": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city\nHAVING AVG(age) < 30;"
+                "name": "Missing expression"
             },
             "67": {
-                        "name": "Wildcards without LIKE",
-                        "description": "Wildcards such as % or _ are used with = instead of LIKE, resulting in a literal comparison rather than a pattern match.",
-                        "example": "SELECT *\nFROM customer\nWHERE cName = 'J%n';",
-                        "explanation": "This query selects all customer whose name is exactly J%n, including the percent sign, rather than matching names that start with 'J' and end with 'n'.",
-                        "correction": "SELECT *\nFROM customer\nWHERE cName LIKE 'J%n';"
+                "name": "Expression on incorrect column"
             },
             "68": {
-                        "name": "Wrong wildcard",
-                        "description": "The wrong wildcard is used in a LIKE pattern. For example, using % instead of _ to match a single character, or vice versa.",
-                        "example": "SELECT *\nFROM customer\nWHERE cName LIKE 'J%n';",
-                        "explanation": "This query uses the % wildcard, which matches any sequence of characters (including zero characters), instead of the _ wildcard, which matches exactly one character. As a result, this query will return customers whose names start with 'J' and end with 'n', regardless of how many characters are in between, which does not satisfy the data demand.",
-                        "correction": "SELECT *\nFROM customer\nWHERE cName LIKE 'J_n';"
+                "name": "Extraneous expression"
             },
             "69": {
-                        "name": "Invalid wildcard",
-                        "description": "Invalid wildcard characters are used in pattern matching instead of the standard SQL wildcards, such as using * instead of % or using ? instead of _.",
-                        "example": "SELECT *\nFROM customer\nWHERE cName LIKE 'J*n';",
-                        "explanation": "The query uses the * wildcard to match any sequence of characters, which is common in other programming languages but not in SQL. In SQL, the % wildcard is used for pattern matching. As a result, the query does not return any results because it is looking for names that literally contain 'J*n' instead of names that start with 'J' and end with 'n'.",
-                        "correction": "SELECT *\nFROM customer\nWHERE cName LIKE 'J%n';"
+                "name": "Expression in incorrect clause"
             },
             "70": {
-                        "name": "Extraneous column in SELECT",
-                        "description": "A column is included in the SELECT clause that is not expected or needed for the intended result.",
-                        "example": "SELECT cID, cName, street\nFROM customer;",
-                        "explanation": "The data demand requires only the IDs and names of customers, but the query also includes the street column in the SELECT clause. This adds unnecessary data to the result set.",
-                        "correction": "SELECT cID, cName\nFROM customer;"
+                "name": "Extraneous column in SELECT",
+                "description": "A column is included in the SELECT clause that is not expected or needed for the intended result.",
+                "example": "SELECT name, age, address FROM students;",
+                "explanation": "The exercise requires only the names and ages of students, but the query also includes the address column in the SELECT clause. This adds unnecessary data to the result set.",
+                "correction": "SELECT name, age FROM students;"
             },
             "71": {
-                        "name": "Missing column from SELECT",
-                        "description": "A required column is missing from the SELECT clause.",
-                        "example": "SELECT cName\nFROM customer;",
-                        "explanation": "The exercise requires both the names and ages of customer, but the query only selects the former.",
-                        "correction": "SELECT cName, age\nFROM customer;"
+                "name": "Missing column from SELECT",
+                "description": "A required column is missing from the SELECT clause.",
+                "example": "SELECT name FROM students;",
+                "explanation": "The exercise requires both the names and ages of students, but the query only selects the name column, omitting the age column.",
+                "correction": "SELECT name, age FROM students;"
             },
             "72": {
-                        "name": "Missing DISTINCT from SELECT",
-                        "description": "A DISTINCT keyword is missing from the SELECT clause, leading to duplicate rows in the result set where uniqueness is required by the exercise.",
-                        "example": "SELECT city\nFROM customer;",
-                        "explanation": "The query retrieves the cities of all customers, but it does not use DISTINCT, which means that if multiple customers live in the same city, that city will appear multiple times in the result set. This does not meet the data demand for listing unique cities.",
-                        "correction": "SELECT DISTINCT city\nFROM customer;"
+                "name": "Missing DISTINCT from SELECT",
+                "description": "A DISTINCT keyword is missing from the SELECT clause, leading to duplicate rows in the result set where uniqueness is required by the exercise.",
+                "example": "SELECT city FROM students;",
+                "explanation": "The exercise requires a list of unique cities where students live. However, the query does not include the DISTINCT keyword, resulting in duplicate city names in the output.",
+                "correction": "SELECT DISTINCT city FROM students;"
             },
             "73": {
-                        "name": "Missing AS from SELECT",
-                        "description": "A column presents a different name from what is required by the exercise, due to the absence of an AS alias.",
-                        "example": "SELECT cName\nFROM customer;",
-                        "explanation": "The query retrieves the names of all customers, but it does not label the output column as name, which is required by the data demand.",
-                        "correction": "SELECT cName AS name\nFROM customer;"
+                "name": "Missing AS from SELECT",
+                "description": "A column presents a different name from what is required by the exercise, due to the absence of an AS alias.",
+                "example": "SELECT name FROM students;",
+                "explanation": "The exercise requires the output column to be labeled as 'student_name', but the query does not use an AS alias to rename the column.",
+                "correction": "SELECT name AS student_name FROM students;"
             },
             "74": {
-                        "name": "Missing column from ORDER BY clause",
-                        "description": "A required column is missing from the ORDER BY clause.",
-                        "example": "SELECT cName, age\nFROM customer\nORDER BY cName;",
-                        "explanation": "The query retrieves the names and ages of all customers but only orders the results by cName.  Customers with the same name are unsorted within their group.",
-                        "correction": "SELECT cName, age\nFROM customer\nORDER BY cName, age;"
+                "name": "Missing column from ORDER BY clause",
+                "description": "A required column is missing from the ORDER BY clause.",
+                "example": "SELECT name, age FROM students ORDER BY name;",
+                "explanation": "The exercise requires the results to be ordered by both name and age. However, the query only orders the results by name, omitting age from the ORDER BY clause.",
+                "correction": "SELECT name, age FROM students ORDER BY name, age;"
             },
             "75": {
-                        "name": "Incorrect column in ORDER BY clause",
-                        "description": "An incorrect column is used in the ORDER BY clause, leading to results being sorted in an unintended manner.",
-                        "example": "SELECT *\nFROM customer\nORDER BY city;",
-                        "explanation": "The query orders the results by the city column instead of the cName column, which is not what the data demand specifies. This results in customers being sorted by their city rather than their names.",
-                        "correction": "SELECT *\nFROM customer\nORDER BY cName;"
+                "name": "Incorrect column in ORDER BY clause",
+                "description": "An incorrect column is used in the ORDER BY clause, leading to results being sorted in an unintended manner.",
+                "example": "SELECT name, age FROM students ORDER BY city;",
+                "explanation": "The exercise requires the results to be ordered by name, but the query incorrectly orders the results by city instead.",
+                "correction": "SELECT name, age FROM students ORDER BY name;"
             },
             "76": {
-                        "name": "Incorrect ordering of rows",
-                        "description": "The ORDER BY clause sorts the results in the wrong order (ascending instead of descending, or vice versa).",
-                        "example": "SELECT cName\nFROM customer\nORDER BY cID;",
-                        "explanation": "The exercise requires the results to be ordered by cName in descending order, but the query sorts the results in ascending order instead.",
-                        "correction": "SELECT cName\nFROM customer\nORDER BY cName DESC;"
+                "name": "Extraneous ORDER BY clause",
+                "description": "An ORDER BY clause is included in the query when the exercise does not require any specific ordering of the results.",
+                "example": "SELECT name, age FROM students ORDER BY name;",
+                "explanation": "Remove the ORDER BY clause if you do not need to order rows",
+                "correction": "SELECT name, age FROM students;"
             },
             "77": {
-                        "name": "Missing WHERE clause",
-                        "description": "A WHERE clause is missing from the query when the data demand requires filtering of results based on specific conditions.",
-                        "example": "SELECT cName\nFROM customer;",
-                        "explanation": "The query does not satisfy its data demand, since it does not include a WHERE clause to filter the results based on the specified conditions of age and city. As a result, it returns the names of all customers, regardless of their age or city of residence, which is not what the data demand specifies.",
-                        "correction": "SELECT cName\nFROM customer\nWHERE\n    age > 18\n    AND city = 'Genoa';"
+                "name": "Incorrect ordering of rows",
+                "description": "The ORDER BY clause sorts the results in the wrong order (ascending instead of descending, or vice versa).",
+                "example": "SELECT name, age FROM students ORDER BY age ASC;",
+                "explanation": "The exercise requires the results to be ordered by age in descending order, but the query sorts the results in ascending order instead.",
+                "correction": "SELECT name, age FROM students ORDER BY age DESC;"
             },
             "78": {
-                        "name": "Missing GROUP BY clause",
-                        "description": "A GROUP BY clause is missing from the query when the data demand requires aggregation of results based on one or more columns.",
-                        "example": "SELECT AVG(age)\nFROM customer;",
-                        "explanation": "The query calculates the average age of all customers but does not group the results by city. As a result, it returns a single average age for all customers, not for each city.",
-                        "correction": "SELECT AVG(age)\nFROM customer\nGROUP BY city;"
+                "name": "DISTINCT as function parameter where not applicable",
+                "description": "DISTINCT is used within a function where it is not appropriate or necessary.",
+                "example": "SELECT COUNT(DISTINCT supervisor) FROM students;",
+                "explanation": "The exercise expects the total number of students who have a supervisor assigned, but the DISTICT keyword causes the COUNT function to count only unique supervisors, which is not the intended behavior.",
+                "correction": "SELECT COUNT(supervisor) FROM students;"
             },
             "79": {
-                        "name": "Missing HAVING clause",
-                        "description": "A HAVING clause is missing from the query when the data demand requires filtering of grouped results based on an aggregate condition.",
-                        "example": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city;",
-                        "explanation": "The query calculates the average age of customers for each city but does not include a HAVING clause to filter the results based on the condition that the average age should be greater than 30. As a result, it returns the average age for all cities, not just those where the average age exceeds 30.",
-                        "correction": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city\nHAVING AVG(age) > 30;"
+                "name": "Missing DISTINCT from function parameter",
+                "description": "DISTINCT is missing within a function where it is required to ensure unique values are considered.",
+                "example": "SELECT COUNT(supervisor) FROM students;",
+                "explanation": "The exercise requires counting the number of supervisors assigned to students, counting each supervisor only once, regardless of how many students they supervise. However, the query counts all supervisor entries, including duplicates.",
+                "correction": "SELECT COUNT(DISTINCT supervisor) FROM students;"
             },
             "80": {
-                        "name": "Missing ORDER BY clause",
-                        "description": "An ORDER BY clause is missing from the query when the data demand requires the results to be sorted in a specific order.",
-                        "example": "SELECT *\nFROM customer;",
-                        "explanation": "The query does not satisfy its data demand, since it does not include an ORDER BY clause to sort the results in alphabetical order by customer name.",
-                        "correction": "SELECT *\nFROM customer\nORDER BY cName;"
+                "name": "Incorrect function",
+                "description": "An incorrect function is used for the intended operation, leading to unexpected results.",
+                "example": "SELECT SUM(age) FROM students;",
+                "explanation": "The exercise requires calculating the average age of students, but the query uses the SUM function instead of AVG, resulting in the total age rather than the average.",
+                "correction": "SELECT AVG(age) FROM students;"
             },
             "81": {
-                        "name": "Missing LIMIT clause",
-                        "description": "The LIMIT clause is missing from the query when the data demand requires limiting the number of rows returned in the result set.",
-                        "example": "SELECT *\nFROM customer;",
-                        "explanation": "The query retrieves all customers from the database, but it does not include a LIMIT clause to restrict the number of rows returned to 10, as required by the data demand.",
-                        "correction": "SELECT *\nFROM customer\nLIMIT 10;"
+                "name": "Incorrect column as function parameter",
+                "description": "An incorrect column is used as a parameter for a function, leading to unintended results.",
+                "example": "SELECT EXTRACT(month FROM birthdate) FROM students;",
+                "explanation": "The exercise asks for the month the students graduated, but the query extracts the month of their birthdate instead.",
+                "correction": "SELECT EXTRACT(month FROM graduation_date) FROM students;"
             },
             "82": {
-                        "name": "Missing OFFSET clause",
-                        "description": "The OFFSET clause is missing from the query when the data demand requires skipping a certain number of rows before starting to return results.",
-                        "example": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 3;",
-                        "explanation": "The query doesn't satisfy its data demand, since it lists the first three customers instead of the second, third and fourth customers. The OFFSET clause is needed to skip the first customer.",
-                        "correction": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 3\nOFFSET 1;"
+                "name": "Unnecessary complication",
+                "description": "The query is more complex than necessary to achieve the intended result.",
+                "example": "SELECT name FROM students WHERE age > 36 / 2 OR age = 9 * (12 - 2);",
+                "explanation": "The exercise requires selecting students at least 18 years old. However, the query uses unnecessary arithmetic operations to express the age condition, making it more complicated than needed.",
+                "correction": "SELECT name FROM students WHERE age >= 18;"
             },
             "83": {
-                        "name": "Extraneous WHERE clause",
-                        "description": "A WHERE clause is included in the query when the data demand does not require any filtering of results.",
-                        "example": "SELECT cName\nFROM customer\nWHERE city = 'Genoa';",
-                        "explanation": "The data demand is to list the names of all customers, regardless of their city. The inclusion of the WHERE clause filters the results to only include customers from Genoa, which is not what the data demand specifies. This results in an incomplete list of customer names.",
-                        "correction": "SELECT cName\nFROM customer;"
+                "name": "Unnecessary DISTINCT in SELECT clause",
+                "description": "DISTINCT is used on a SELECT clause where duplicate values cannot occur, adding unnecessary complexity.",
+                "example": "SELECT DISTINCT id, name FROM students;",
+                "explanation": "The id column is a primary key, meaning each value is unique. Therefore, using DISTINCT is redundant since there cannot be any duplicate rows in the result set based on the id column.",
+                "correction": "SELECT id, name FROM students;"
             },
             "84": {
-                        "name": "Extraneous GROUP BY clause",
-                        "description": "A GROUP BY clause is included in the query when the data demand does not require any aggregation or grouping of the results.",
-                        "example": "SELECT AVG(age)\nFROM customer\nGROUP BY city;",
-                        "explanation": "The query groups customers by city and calculates the average age for each city. However, the data demand is to list the average age of all customers, not grouped by city.",
-                        "correction": "SELECT AVG(age)\nFROM customer;"
+                "name": "Unnecessary join",
+                "description": "A table is joined just to access a value which is already available as a foreign key.",
+                "example": "SELECT s.id, t.id FROM students s JOIN teachers t ON s.supervisor_id = t.id;",
+                "explanation": "The exercise requires selecting the student IDs along with their supervisor IDs. However, the query unnecessarily joins the teachers table to retrieve the supervisor IDs, which are already available in the students table as foreign keys.",
+                "correction": "SELECT id, supervisor_id FROM students;"
             },
             "85": {
-                        "name": "Extraneous HAVING clause",
-                        "description": "A HAVING clause is included in the query when the data demand does not require any filtering of grouped results.",
-                        "example": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city\nHAVING AVG(age) > 30;",
-                        "explanation": "The query uses a HAVING clause to filter groups of customers based on their average age. However, the data demand is to list the average age of all customers, not to filter groups. The HAVING clause is extraneous in this context.",
-                        "correction": "SELECT city, AVG(age)\nFROM customer\nGROUP BY city;"
+                "name": "Unused correlation name",
+                "description": "A correlation name (alias) is defined for a table but not used in the query.",
+                "example": "SELECT name FROM students s;",
+                "explanation": "The query defines a correlation name 's' for the students table but does not use it anywhere in the query. This adds unnecessary complexity without any benefit.",
+                "correction": "SELECT name FROM students;"
             },
             "86": {
-                        "name": "Extraneous ORDER BY clause",
-                        "description": "An ORDER BY clause is included in the query when the data demand does not require any specific ordering of the results.",
-                        "example": "SELECT *\nFROM customer\nORDER BY cName;",
-                        "explanation": "The data demand does not specify any ordering for the results, so including an ORDER BY clause is unnecessary and adds complexity to the query.",
-                        "correction": "SELECT *\nFROM customer;"
+                "name": "Correlation names are always identical",
+                "description": "The query references two tables that always contain the same data.",
+                "example": "SELECT a.name, b.name FROM students a JOIN students b ON a.id = b.id;",
+                "explanation": "The query joins the students table with itself on the id column, which is a primary key. Since each id is unique, the join will always pair each student with themselves, resulting in identical data from both tables. This redundancy adds unnecessary complexity without any benefit.",
+                "correction": "SELECT name FROM students;"
+            },
+            "86bis": {
+                "name": "Redundant correlation name",
+                "description": "The query defines a correlation name (alias) for a table that is the same as the original table name, making the alias redundant.",
+                "example": "SELECT students.name FROM students AS students students;",
+                "explanation": "The query defines a correlation name 'students' for the students table, which is identical to the original table name. This redundancy adds unnecessary complexity without any benefit.",
+                "correction": "SELECT students.name FROM students;"
             },
             "87": {
-                        "name": "Extraneous LIMIT clause",
-                        "description": "The LIMIT clause is included in the query when the data demand does not require restricting the number of results returned.",
-                        "example": "SELECT *\nFROM customer\nLIMIT 10;",
-                        "explanation": "The query doesn't satisfy its data demand, since it lists only 10 customers instead of all those present in the database.",
-                        "correction": "SELECT *\nFROM customer;"
+                "name": "Unnecessarily general comparison operator",
+                "description": "An operator used for a comparison can be replaced by a more specific one without changing the logic.",
+                "example": "SELECT * FROM students WHERE age >= (SELECT MAX(age) FROM students);",
+                "explanation": "The query is intended to find the oldest students. However, the \">\" part of the operator is unnecessary because no student can be older than the maximum age. Using the more specific \"=\" operator makes the query clearer and more efficient.",
+                "correction": "SELECT * FROM students WHERE age = (SELECT MAX(age) FROM students);"
             },
             "88": {
-                        "name": "Extraneous OFFSET clause",
-                        "description": "The OFFSET clause is included in the query when the data demand does not require skipping any rows in the result set.",
-                        "example": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 3\nOFFSET 1;",
-                        "explanation": "The query doesn't satisfy its data demand, since it lists customers the second, third and fourth customers, instead of the first three.",
-                        "correction": "sql\nSELECT *\nFROM customer\nORDER BY cName\nLIMIT 3;"
+                "name": "LIKE without wildcards",
+                "description": "The LIKE operator is used without any wildcard characters, making it equivalent to a simple equality comparison.",
+                "example": "SELECT * FROM students WHERE name LIKE 'John';",
+                "explanation": "The query uses the LIKE operator to compare the name column to 'John' without any wildcard characters. This makes the LIKE operator unnecessary, as it behaves the same way as the = operator in this case.",
+                "correction": "SELECT * FROM students WHERE name = 'John';"
             },
             "89": {
-                        "name": "Incorrect LIMIT",
-                        "description": "The LIMIT clause is used with an incorrect value.",
-                        "example": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 10;",
-                        "explanation": "The query doesn't satisfy its data demand, since it lists the first 10 customers instead of the first 3 customers.",
-                        "correction": "SELECT *\nFROM customer\nORDER BY cName\nLIMIT 3;"
+                "name": "Unnecessarily complicated SELECT in EXISTS subquery",
+                "description": "The SELECT clause in an EXISTS subquery returns more than a single column, which is unnecessary since EXISTS only checks for the existence of rows.",
+                "example": "SELECT name FROM students s WHERE EXISTS (SELECT id, name FROM teachers t WHERE t.name = s.name);",
+                "explanation": "The EXISTS subquery is intended to find students who have the same name as any teacher. However, the SELECT clause in the subquery returns both id and name columns, which is unnecessary because EXISTS only checks for the existence of rows that meet the condition. Returning multiple columns adds unnecessary complexity without any benefit.",
+                "correction": "SELECT name FROM students s WHERE EXISTS (SELECT 1 FROM teachers t WHERE t.name = s.name);"
             },
             "90": {
-                        "name": "Incorrect OFFSET",
-                        "description": "The OFFSET clause is used with an incorrect value.",
-                        "example": "SELECT *\nFROM customer\nORDER BY cName\nOFFSET 10;",
-                        "explanation": "The query uses an incorrect offset value of 10, which skips more customers than intended. The data demand requires skipping only the first 5 customers.",
-                        "correction": "SELECT *\nFROM customer\nORDER BY cName\nOFFSET 5;"
+                "name": "IN/EXISTS can be replaced by comparison",
+                "description": "A subuery using IN or EXISTS can be simplified to a direct comparison.",
+                "example": "SELECT * FROM students WHERE id NOT IN (SELECT id FROM students WHERE age < 18);",
+                "explanation": "The query finds students who are 18 years old or older by selecting those whose IDs are not in the set of IDs of students younger than 18. This can be simplified by checking the age directly, which is more straightforward and efficient.",
+                "correction": "SELECT * FROM students WHERE age >= 18;"
             },
             "91": {
-                        "name": "Incorrect function",
-                        "description": "An incorrect function is used for the intended operation, leading to unexpected results.",
-                        "example": "SELECT SUM(age) FROM customer;",
-                        "explanation": "The exercise requires calculating the average age of customers, but the query uses the SUM function instead of AVG, resulting in the total age rather than the average age.",
-                        "correction": "SELECT AVG(age) FROM customer;"
+                "name": "Unnecessary aggregate function",
+                "description": "An aggregate function is used on a single value.",
+                "example": "SELECT MAX(age) FROM students WHERE id = 123;",
+                "explanation": "The query retrieves the age of a specific student with id 123. Since the WHERE clause filters the results to a single row, using the MAX aggregate function is unnecessary, as there is only one value to return.",
+                "correction": "SELECT age FROM students WHERE id = 123;"
             },
             "92": {
-                        "name": "DISTINCT as function parameter where not applicable",
-                        "description": "DISTINCT is used within a function where it is not appropriate or necessary.",
-                        "example": "SELECT COUNT(DISTINCT age)\nFROM customer;",
-                        "explanation": "DISTINCT causes COUNT to count unique ages only. Multiple customers with the same age are counted as one.",
-                        "correction": "SELECT COUNT(age)\nFROM customer;"
+                "name": "Unnecessary DISTINCT in aggregate function",
+                "description": "DISTINCT is used within an aggregate function where all values are already unique, making it redundant.",
+                "example": "SELECT COUNT(DISTINCT id) FROM students;",
+                "explanation": "The id column is a primary key, meaning each value is unique. Therefore, using DISTINCT within the COUNT function doesn't change the result, as there cannot be any duplicate ids to count.",
+                "correction": "SELECT COUNT(id) FROM students;"
             },
             "93": {
-                        "name": "Missing DISTINCT from function parameter",
-                        "description": "DISTINCT is missing within a function where it is required to ensure repeated values are not counted multiple times.",
-                        "example": "SELECT COUNT(city)\nFROM customer;",
-                        "explanation": "The query counts all entries in the city column, including duplicates. If multiple customers are from the same city, they will be counted multiple times, which does not meet the data demand for counting unique cities.",
-                        "correction": "SELECT COUNT(DISTINCT city)\nFROM customer;"
+                "name": "Unnecessary argument of COUNT",
+                "description": "COUNT is used with a specific column name instead of using COUNT(*) or COUNT(1) when counting non-nullable columns.",
+                "example": "SELECT COUNT(name) FROM students;",
+                "explanation": "The name column is defined as NOT NULL, meaning it cannot contain any NULL values. Therefore, using COUNT(name) is equivalent to COUNT(*), as all rows will be counted. Using COUNT(*) is more straightforward and efficient in this case.",
+                "correction": "SELECT COUNT(*) FROM students;"
             },
             "94": {
-                        "name": "Incorrect column as function parameter",
-                        "description": "An incorrect column is used as a parameter for a function, leading to unintended results.",
-                        "example": "SELECT AVG(quantity)\nFROM inventory;",
-                        "explanation": "The query calculates the average of the quantity column instead of the unit_price column, which is not what the data demand specifies. This results in an incorrect calculation of the average unit price.",
-                        "correction": "SELECT AVG(unit_price)\nFROM inventory;"
+                "name": "Unnecessary GROUP BY in EXISTS subquery",
+                "description": "A GROUP BY clause is used in an EXISTS subquery where it is not needed, as EXISTS only checks for the existence of rows.",
+                "example": "SELECT name FROM students s WHERE EXISTS (SELECT 1 FROM teachers t GROUP BY t.name HAVING t.name = s.name);",
+                "explanation": "The EXISTS subquery is intended to find students who have the same name as any teacher. However, the GROUP BY clause is unnecessary because EXISTS only checks for the existence of rows that meet the condition. Using GROUP BY adds unnecessary complexity without any benefit.",
+                "correction": "SELECT name FROM students s WHERE EXISTS (SELECT 1 FROM teachers t WHERE t.name = s.name);"
             },
             "95": {
-                        "name": "Unnecessary complication",
-                        "description": "The query is more complex than necessary to achieve the intended result.  This is an umbrella category for various types of unnecessary complications in SQL queries that do not fit into more specific categories.",
-                        "example": "SELECT cName\nFROM customer\nWHERE\n    age > 36 / 2\n    OR age = 9 * (12 - 2);",
-                        "explanation": "The exercise requires selecting customer at least 18 years old. However, the query uses unnecessary arithmetic operations to express the age condition, making it more complicated than needed.",
-                        "correction": "SELECT cName\nFROM customer\nWHERE age >= 18;"
+                "name": "GROUP BY with singleton groups",
+                "description": "GROUP BY is used on groups that each contain only a single row, making the grouping unnecessary.",
+                "example": "SELECT id, AVG(age) FROM students GROUP BY id;",
+                "explanation": "The query groups the students by their id, which is a primary key. Since each id is unique, each group will contain only a single row. Therefore, using GROUP BY is unnecessary, as it does not change the result set.",
+                "correction": "SELECT id, age FROM students;"
             },
             "96": {
-                        "name": "Unnecessary DISTINCT in SELECT clause",
-                        "description": "DISTINCT is used on a SELECT clause where duplicate values cannot occur, adding unnecessary complexity.",
-                        "example": "SELECT DISTINCT cID, cName\nFROM customer;",
-                        "explanation": "The cID column is a primary key, meaning each value is unique. Therefore, using DISTINCT is redundant since there cannot be any duplicate rows in the result set.",
-                        "correction": "SELECT cID, cName\nFROM customer;"
+                "name": "GROUP BY with only a single group",
+                "description": "GROUP BY is used in a way that results in only a single group, making the grouping unnecessary.",
+                "example": "SELECT AVG(age) FROM students WHERE country = 'IT' GROUP BY country;",
+                "explanation": "The query groups the students by country after filtering for those in 'IT'. Since all remaining rows belong to the same country, there is only a single group. Therefore, using GROUP BY is unnecessary, as it does not change the result set.",
+                "correction": "SELECT AVG(age) FROM students WHERE country = 'IT';"
             },
             "97": {
-                        "name": "Unnecessary table reference",
-                        "description": "A table is joined just to access a value which is already available as a foreign key.",
-                        "example": "SELECT i.sID, p.pID\nFROM inventory i\nJOIN product p ON i.pID = p.pID;",
-                        "explanation": "In this query, the product table is joined to access the pID column, which is already available in the inventory table as a foreign key. The join is unnecessary and can be omitted without affecting the result of the query.",
-                        "correction": "SELECT i.sID, i.pID\nFROM inventory i;"
+                "name": "GROUP BY can be replaced with DISTINCT",
+                "description": "All GROUP BY columns are also in the SELECT clause without any aggregate functions, making DISTINCT a simpler alternative.",
+                "example": "SELECT name, age FROM students GROUP BY name, age;",
+                "explanation": "The query groups the students by their name and age, but does not use any aggregate functions. Since the SELECT clause only includes the grouped columns, using DISTINCT is a simpler and more efficient way to achieve the same result.",
+                "correction": "SELECT DISTINCT name, age FROM students;"
             },
             "98": {
-                        "name": "Unused correlation name",
-                        "description": "A correlation name (alias) is defined for a table but not used in the query.",
-                        "example": "SELECT cName\nFROM customer AS c;",
-                        "explanation": "The query defines a correlation name c for the customer table but does not use it anywhere in the query. This adds unnecessary complexity without any benefit.",
-                        "correction": "SELECT cName\nFROM customer;"
+                "name": "UNION can be replaced by OR",
+                "description": "Two SELECT statements combined with UNION can be simplified to a single SELECT with an OR condition.",
+                "example": "SELECT name FROM students WHERE age < 18 UNION SELECT name FROM students WHERE grade = 'A';",
+                "explanation": "The query retrieves the names of students who are either younger than 18 or have received an 'A' grade. This can be simplified by using a single SELECT statement with an OR condition in the WHERE clause, which is more straightforward and efficient.",
+                "correction": "SELECT name FROM students WHERE age < 18 OR grade = 'A';"
             },
             "99": {
-                        "name": "Tables have the same data",
-                        "description": "The query references two tables that always contain the same data.",
-                        "example": "SELECT *\nFROM\n    customer a\n    JOIN customer b ON a.cID = b.cID;",
-                        "explanation": "The query joins the customer table with itself on the cID column, which is a primary key. Since each cID is unique, the join will always pair each customer with themselves, resulting in identical data from both tables. This redundancy adds unnecessary complexity without any benefit.",
-                        "correction": "SELECT *\nFROM customer;"
+                "name": "Unnecessary column in ORDER BY clause",
+                "description": "A column is included in the ORDER BY clause that does not affect the ordering of the results due to functional dependencies.",
+                "example": "SELECT id, name FROM students ORDER BY id, name;",
+                "explanation": "The query orders the results by both id and name. However, since id is a primary key, it uniquely identifies each row. Therefore, ordering by name after id does not change the order of the results, making it unnecessary.",
+                "correction": "SELECT id, name FROM students ORDER BY id;"
             },
             "100": {
-                        "name": "Correlation name identical to table name",
-                        "description": "The query defines a correlation name (alias) for a table that is the same as the original table name, making the alias redundant.",
-                        "example": "SELECT *\nFROM customer AS customer;",
-                        "explanation": "The query defines a correlation name (alias) customer for the customer table, which is identical to the original table name. This redundancy adds unnecessary complexity without any benefit.",
-                        "correction": "SELECT *\nFROM customer;"
+                "name": "ORDER BY in subquery",
+                "description": "An ORDER BY clause is used in a subquery where it does not affect the final result set.",
+                "example": "SELECT name FROM students WHERE name IN (SELECT name FROM teachers ORDER BY name);",
+                "explanation": "The query retrieves the names of students who have the same name as any teacher. However, the ORDER BY clause in the subquery is unnecessary, as the order of rows in a subquery does not impact the final result set of the outer query.",
+                "correction": "SELECT name FROM students WHERE name IN (SELECT name FROM teachers);"
             },
             "101": {
-                        "name": "Unnecessarily general comparison operator",
-                        "description": "An operator used for a comparison can be replaced by a more specific one without changing the logic.",
-                        "example": "SELECT *\nFROM customer\nWHERE age >= (\n    SELECT MAX(age)\n    FROM customer\n);",
-                        "explanation": "The query is intended to find the oldest customer. However, the >= part of the operator is unnecessary because no customer can be older than the maximum age. Using the more specific = operator makes the query clearer and more efficient.",
-                        "correction": "SELECT *\nFROM customer\nWHERE age = (\n    SELECT MAX(age)\n    FROM customer\n);"
+                "name": "Inefficient HAVING",
+                "description": "A condition in the HAVING clause does not depend on aggregate functions and can be moved to the WHERE clause.",
+                "example": "SELECT supervisor, COUNT(*) FROM students GROUP BY supervisor HAVING supervisor IS NOT NULL;",
+                "explanation": "The HAVING clause is used to filter groups based on aggregate conditions. However, the condition 'supervisor IS NOT NULL' does not depend on any aggregate functions and can be applied before grouping. Moving this condition to the WHERE clause improves query efficiency by reducing the number of rows that need to be grouped.",
+                "correction": "SELECT supervisor, COUNT(*) FROM students WHERE supervisor IS NOT NULL GROUP BY supervisor;"
             },
             "102": {
-                        "name": "LIKE without wildcards",
-                        "description": "The LIKE operator is used without any wildcard characters, making it equivalent to a simple equality comparison.",
-                        "example": "SELECT *\nFROM customer\nWHERE cName LIKE 'John';",
-                        "explanation": "The query uses the LIKE operator to compare the cName column to the string 'John' without any wildcard characters (such as % or _). This means that the LIKE operator is functioning as a simple equality comparison, and there is no need for it in this context.",
-                        "correction": "SELECT *\nFROM customer\nWHERE cName = 'John';"
+                "name": "Inefficient UNION",
+                "description": "A UNION operation can be replaced by UNION ALL without changing the result set, improving performance.",
+                "example": "SELECT name FROM students WHERE age < 18 UNION SELECT name FROM students WHERE age > 30;",
+                "explanation": "The two queries retrieve names of students from disjoint age groups (younger than 18 and older than 30). Since there is no overlap between these two groups, using UNION ALL is more efficient as it does not perform the additional step of removing duplicates, which is unnecessary in this case.",
+                "correction": "SELECT name FROM students WHERE age < 18 UNION ALL SELECT name FROM students WHERE age > 30;"
             },
             "103": {
-                        "name": "Unnecessarily complicated SELECT in EXISTS subquery",
-                        "description": "The SELECT clause in an EXISTS subquery returns more than a single column, which is unnecessary since EXISTS only checks for the existence of rows.",
-                        "example": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT s.sID, s.sName\n    FROM store s\n    WHERE c.cName = s.sName\n);",
-                        "explanation": "The EXISTS subquery is intended to find customers who have the same name as a store. However, the SELECT clause returns multiple store columns, which is unnecessary because EXISTS only checks whether at least one row is returned.",
-                        "correction": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT 1\n    FROM store s\n    WHERE c.cName = s.sName\n);"
+                "name": "Condition in the subquery can be moved up",
+                "description": "A condition in the subquery refences only values from the outer query and can be moved to the outer WHERE clause.",
+                "example": "SELECT name FROM students s WHERE EXISTS (SELECT 1 FROM teachers t WHERE t.name = s.name AND s.age > 18);",
+                "explanation": "The condition 's.age > 18' in the subquery only references the outer query's table 'students'. Therefore, it can be moved to the outer WHERE clause, which can improve query readability and potentially performance.",
+                "correction": "SELECT name FROM students s WHERE s.age > 18 AND EXISTS (SELECT 1 FROM teachers t WHERE t.name = s.name);"
             },
             "104": {
-                        "name": "IN/EXISTS can be replaced by comparison",
-                        "description": "A subuery using IN or EXISTS can be simplified to a direct comparison.",
-                        "example": "SELECT *\nFROM customer\nWHERE cID IN (SELECT cID FROM customer WHERE age < 18);",
-                        "explanation": "The query is intended to find customers who are younger than 18. However, it uses a subquery with IN, which can be simplified to a direct comparison. Since cID is a unique identifier, we can directly compare the age without needing a subquery.",
-                        "correction": "SELECT * FROM customer WHERE age < 18;"
+                "name": "Condition on left table in LEFT OUTER JOIN",
+                "description": "Using a JOIN ON condition on the left table of a LEFT OUTER JOIN affects only the right table, which can lead to unexpected results.",
+                "example": "SELECT s.name, t.name FROM students s LEFT OUTER JOIN teachers t ON s.supervisor_id = t.id AND s.age > 18;",
+                "explanation": "The condition 's.age > 18' is applied only on the right table. If a student is younger than 18, the join will still include that student with NULL values for the teacher columns, which is not the internted behavior. To filter students based on age, the condition should be placed in the WHERE clause instead.",
+                "correction": "SELECT s.name, t.name FROM students s LEFT OUTER JOIN teachers t ON s.supervisor_id = t.id WHERE s.age > 18;"
             },
             "105": {
-                        "name": "Unnecessary aggregate function",
-                        "description": "An aggregate function is used on a single value.",
-                        "example": "SELECT MAX(age) FROM customer WHERE cID = 123;",
-                        "explanation": "The query retrieves the age of a specific customer with cID = 123. Since the WHERE clause filters the results to a single row, using the MAX aggregate function is unnecessary, as there will only be one value to return.",
-                        "correction": "SELECT age\nFROM customer\nWHERE cID = 123;"
+                "name": "OUTER JOIN can be replaced by INNER JOIN",
+                "description": "Using a WHERE condition on the right table of a LEFT OUTER JOIN effectively turns it into an INNER JOIN.",
+                "example": "SELECT s.name, t.name FROM students s LEFT OUTER JOIN teachers t ON s.supervisor_id = t.id WHERE t.department = 'Math';",
+                "explanation": "The WHERE condition 't.department = 'Math'' filters out any rows where there is no matching teacher, which negates the purpose of the LEFT OUTER JOIN. In this case, an INNER JOIN is more appropriate and efficient.",
+                "correction": "SELECT s.name, t.name FROM students s INNER JOIN teachers t ON s.supervisor_id = t.id WHERE t.department = 'Math';"
             },
             "106": {
-                        "name": "Unnecessary DISTINCT in aggregate function",
-                        "description": "DISTINCT is used within an aggregate function where all values are already unique, making it redundant.",
-                        "example": "SELECT COUNT(DISTINCT cID)\nFROM customer;",
-                        "explanation": "The cID column is a primary key, meaning each value is unique. Therefore, using DISTINCT within the COUNT function doesn't change the result, as there cannot be any duplicate ids to count.",
-                        "correction": "SELECT COUNT(cID)\nFROM customer;"
+                "name": "Missing quantifier",
+                "description": "A comparison is performed with a subquery that can possibly return multiple values, regardless of the data currently present in the database.",
+                "example": "SELECT name FROM students WHERE age > (SELECT age FROM teachers WHERE name = 'Smith');",
+                "explanation": "The query is intended to find students who are older than a specific teacher named 'Smith'. However, if there are multiple teachers with the name 'Smith', the subquery will return multiple age values, leading to an error. To fix this, a quantifier such as ANY or ALL should be used to specify how to compare the student's age with the multiple values returned by the subquery.",
+                "correction": "SELECT name FROM students WHERE age > ANY (SELECT age FROM teachers WHERE name = 'Smith');"
             },
             "107": {
-                        "name": "Unnecessary argument of COUNT",
-                        "description": "COUNT is used with a specific column name instead of using COUNT(*) or COUNT(1) when counting non-nullable columns.",
-                        "example": "SELECT COUNT(cID)\nFROM customer;",
-                        "explanation": "The cID column is the primary key of the customer table and as such it cannot contain any NULL values. Therefore, using COUNT(cID) is equivalent to COUNT(*), as all rows will be counted. Using COUNT(*) is more straightforward and efficient in this case.",
-                        "correction": "SELECT COUNT(*)\nFROM customer;"
+                "name": "Unmatched brackets",
+                "description": "The query contains brackets that are not properly matched, leading to a syntax error.",
+                "example": "SELECT name FROM students WHERE (age > 18;",
+                "explanation": "Ensure that all opening parentheses have a corresponding closing parenthesis. In this case, the opening parenthesis before 'age > 18' does not have a matching closing parenthesis, which causes a syntax error.",
+                "correction": "SELECT name FROM students WHERE (age > 18);"
             },
             "108": {
-                        "name": "Unnecessary GROUP BY in EXISTS subquery",
-                        "description": "A GROUP BY clause is used in an EXISTS subquery where it is not needed, as EXISTS only checks for the existence of rows.",
-                        "example": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT 1\n    FROM store s\n    WHERE c.cName = s.sName\n    GROUP BY s.city\n);",
-                        "explanation": "The GROUP BY clause in the EXISTS subquery is unnecessary because EXISTS only checks whether at least one row is returned by the subquery. The grouping does not affect the existence check and adds unnecessary complexity to the query.",
-                        "correction": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT 1\n    FROM store s\n    WHERE c.cName = s.sName\n);"
+                "name": "Curly or square brackets",
+                "description": "The query uses curly braces {} or square brackets [] instead of parentheses (), leading to a syntax error.",
+                "example": "SELECT name FROM students WHERE age > [(15 + 18) * 2] / (7 + 3);",
+                "explanation": "Use only parentheses () for grouping expressions in SQL. Curly braces {} and square brackets [] are not valid for this purpose and will result in a syntax error.",
+                "correction": "SELECT name FROM students WHERE age > ((15 + 18) * 2) / (7 + 3);"
             },
             "109": {
-                        "name": "GROUP BY with singleton groups",
-                        "description": "GROUP BY is used on groups that each contain only a single row, making the grouping unnecessary.",
-                        "example": "SELECT cID, AVG(age)\nFROM customer\nGROUP BY cID;",
-                        "explanation": "The query groups customers by their unique identifier cID, which means that each group will contain only one customer. Since there is only one row in each group, the GROUP BY clause does not serve any purpose, and the same result can be achieved without grouping.",
-                        "correction": "SELECT cID, age\nFROM customer;"
+                "name": "Different tuples in set operation",
+                "description": "The SELECT statements combined with a set operation (UNION, INTERSECT, EXCEPT) return a different number of columns.",
+                "example": "SELECT name FROM students UNION SELECT name, age FROM teachers",
+                "explanation": "When using set operations like UNION, INTERSECT, or EXCEPT, the SELECT statements must return the same number of columns with compatible data types.",
+                "correction": "SELECT name FROM students UNION SELECT name FROM teachers"
             },
             "110": {
-                        "name": "GROUP BY with only a single group",
-                        "description": "GROUP BY is used in a way that results in only a single group, making the grouping unnecessary.",
-                        "example": "SELECT AVG(age)\nFROM customer\nWHERE city = 'Genoa'\nGROUP BY city;",
-                        "explanation": "The query groups customers by city, but the WHERE clause filters the results to only include customers from Genoa. This means that there will be only one group (Genoa) in the result, making the GROUP BY clause unnecessary. The same result can be achieved without grouping, as we are only interested in the average age of customers from Genoa.",
-                        "correction": "SELECT AVG(age)\nFROM customer\nWHERE city = 'Genoa';"
+                "name": "Wrong wildcard",
+                "description": "The query uses an incorrect wildcard character in a LIKE pattern.",
+                "example": "SELECT name FROM students WHERE name LIKE 'J_n';",
+                "explanation": "In SQL, the '%' wildcard matches any sequence of characters, while the '_' wildcard matches any single character. If the intention is to match names that start with 'J' and end with 'n', the correct pattern should be 'J%n'. If the intention is to match names that start with 'J', followed by any single character, and then end with 'n', the correct pattern should be 'J_n'.",
+                "correction": "SELECT name FROM students WHERE name LIKE 'J%n';"
             },
             "111": {
-                        "name": "GROUP BY can be replaced with DISTINCT",
-                        "description": "All GROUP BY columns are also in the SELECT clause without any aggregate functions, making DISTINCT a simpler alternative.",
-                        "example": "SELECT city, street\nFROM customer\nGROUP BY city, street;",
-                        "explanation": "The query groups customers by city and street, but it does not perform any aggregation. Since all GROUP BY columns are also in the SELECT clause without any aggregate functions, the same result can be achieved using DISTINCT, which is simpler and more efficient in this case.",
-                        "correction": "SELECT DISTINCT cName, cID FROM customer;"
+                "name": "Invalid wildcard",
+                "description": "The query uses a common character instead of a valid wildcard.",
+                "example": "SELECT name FROM students WHERE name LIKE 'J*n' OR name LIKE 'T?m';",
+                "explanation": "In SQL, the '%' wildcard matches any sequence of characters, while the '_' wildcard matches any single character. Other characters, even if commonly used in other languages, behave as regular characters in LIKE patterns.",
+                "correction": "SELECT name FROM students WHERE name LIKE 'J%n' OR name LIKE 'T_m';"
             },
             "112": {
-                        "name": "UNION can be replaced by OR",
-                        "description": "Two SELECT statements combined with UNION select the same data from the same table and have mutually exclusive conditions. In such cases, the UNION can be replaced by a single SELECT statement with an OR condition.",
-                        "example": "SELECT cID, cName\nFROM customer\nWHERE age < 18\nUNION\nSELECT cID, cName\nFROM customer\nWHERE age > 30;",
-                        "explanation": "The two queries retrieve names of customer from disjoint age groups (younger than 18 and older than 30). Since there is no overlap between these two groups, the same result can be achieved with a single query using an OR condition, which is more efficient and easier to read.",
-                        "correction": "SELECT cID, cName\nFROM customer\nWHERE\n    age < 18\n    OR age > 30;"
+                "name": "Missing WHERE clause",
+                "description": "A WHERE clause is missing in the query when the exercise requires filtering of rows.",
+                "example": "SELECT name, age FROM students;",
+                "explanation": "Use a WHERE clause to filter rows.",
+                "correction": "SELECT name, age FROM students WHERE age > 18;"
             },
             "113": {
-                        "name": "Unnecessary column in ORDER BY clause",
-                        "description": "A column is included in the ORDER BY clause that does not affect the ordering of the results due to functional dependencies.",
-                        "example": "SELECT cID, cName\nFROM customer\nORDER BY cID, cName;",
-                        "explanation": "The query orders the results by both cID and cName. However, since cID is a primary key, it uniquely identifies each row. Therefore, ordering by cName after cID does not change the order of the results, making it unnecessary.",
-                        "correction": "SELECT cID, cName\nFROM customer\nORDER BY cID;"
+                "name": "Missing GROUP BY clause",
+                "description": "A GROUP BY clause is missing in the query when the exercise requires grouping.",
+                "example": "SELECT name, COUNT(*) FROM students;",
+                "explanation": "Use a GROUP BY clause to group rows.",
+                "correction": "SELECT name, COUNT(*) FROM students GROUP BY name;"
             },
             "114": {
-                        "name": "ORDER BY in subquery",
-                        "description": "An ORDER BY clause is used in a subquery where it does not affect the final result set.",
-                        "example": "SELECT city\nFROM customer\nWHERE city IN (\n    SELECT city\n    FROM store\n    ORDER BY city\n);",
-                        "explanation": "The main query retrieves cities from the customer table that are present in the list of cities returned by the subquery. The order of cities in the subquery's result does not affect which cities are included in the final output, making the ORDER BY clause unnecessary in this context.",
-                        "correction": "SELECT city\nFROM customer\nWHERE city IN (\n    SELECT city\n    FROM store\n);"
+                "name": "Missing HAVING clause",
+                "description": "A HAVING clause is missing in the query when the exercise requires filtering of grouped rows.",
+                "example": "SELECT name, COUNT(*) FROM students GROUP BY name;",
+                "explanation": "Use a HAVING clause to filter grouped rows.",
+                "correction": "SELECT name, COUNT(*) FROM students GROUP BY name HAVING COUNT(*) > 1;"
             },
             "115": {
-                        "name": "Inefficient HAVING",
-                        "description": "A condition in the HAVING clause does not depend on aggregate functions and can be moved to the WHERE clause.",
-                        "example": "SELECT age, COUNT(*)\nFROM customer\nGROUP BY age\nHAVING age IS NOT NULL;",
-                        "explanation": "The HAVING clause is used to filter groups based on aggregate conditions. However, the condition age IS NOT NULL does not depend on aggregation and can be applied before grouping, which is more efficient.",
-                        "correction": "SELECT age, COUNT(*)\nFROM customer\nWHERE age IS NOT NULL\nGROUP BY age;"
+                "name": "Missing ORDER BY clause",
+                "description": "An ORDER BY clause is missing in the query when the exercise requires a specific ordering of the results.",
+                "example": "SELECT name, age FROM students;",
+                "explanation": "Use an ORDER BY clause to order the results.",
+                "correction": "SELECT name, age FROM students ORDER BY name;"
             },
             "116": {
-                        "name": "Inefficient UNION",
-                        "description": "A UNION operation can be replaced by UNION ALL without changing the result set, improving performance.",
-                        "example": "SELECT city \nFROM customer\nWHERE city < 'M'\nUNION\nSELECT city\nFROM store\nWHERE city > 'M';",
-                        "explanation": "The query combines cities from the customer and store tables using UNION, which eliminates duplicate rows. However, the conditions in the WHERE clauses ensure that there will be no overlapping cities between the two sets (cities less than 'M' from customer and cities greater than 'M' from store). Therefore, there are no duplicates to eliminate, and using UNION ALL would yield the same result more efficiently.",
-                        "correction": "SELECT city \nFROM customer\nWHERE city < 'M'\nUNION ALL\nSELECT city\nFROM store\nWHERE city > 'M';"
+                "name": "Missing LIMIT clause",
+                "description": "A LIMIT clause is missing in the query when the exercise requires limiting the number of returned rows.",
+                "example": "SELECT name, age FROM students ORDER BY name;",
+                "explanation": "Use a LIMIT clause to limit the number of returned rows.",
+                "correction": "SELECT name, age FROM students ORDER BY name LIMIT 10;"
             },
             "117": {
-                        "name": "Condition in the subquery can be moved up",
-                        "description": "A condition in a subquery references only values from the outer query and can be moved to the outer clause.",
-                        "example": "SELECT cName\nFROM customer c\nWHERE EXISTS (\n    SELECT 1\n    FROM store s\n    WHERE\n        s.sName = c.cName\n        AND c.age > 18\n    );",
-                        "explanation": "The condition c.age > 18 in the subquery only references the outer query's table customer. Therefore, it can be moved to the outer WHERE clause, which can improve query readability and potentially performance.",
-                        "correction": "SELECT cName\nFROM customer c\nWHERE\n    c.age > 18\n    AND EXISTS (\n        SELECT 1\n        FROM store s\n        WHERE s.sName = c.cName\n    );"
+                "name": "Missing OFFSET clause",
+                "description": "An OFFSET clause is missing in the query when the exercise requires skipping a number of returned rows.",
+                "example": "SELECT name, age FROM students ORDER BY name LIMIT 10;",
+                "explanation": "Use an OFFSET clause to skip a number of returned rows.",
+                "correction": "SELECT name, age FROM students ORDER BY name LIMIT 10 OFFSET 5;"
             },
             "118": {
-                        "name": "OUTER JOIN can be replaced by INNER JOIN",
-                        "description": "Using a WHERE condition on the right table of a LEFT OUTER JOIN effectively turns it into an INNER JOIN.",
-                        "example": "SELECT s.cName, t.sName\nFROM\n    customer c\n    LEFT OUTER JOIN store s ON c.cID = s.sID\nWHERE s.city = 'Genoa';",
-                        "explanation": "The query uses a LEFT OUTER JOIN to join the customer and store tables, but the WHERE clause removes any NULL values from the right table, which means that only matching rows will be returned. This effectively turns the LEFT OUTER JOIN into an INNER JOIN, making the use of LEFT OUTER JOIN unnecessary in this context.",
-                        "correction": "SELECT c.cName, s.sName\nFROM\n    customer c\n    INNER JOIN store s ON c.cID = s.sID\nWHERE s.city = 'Genoa';"
+                "name": "Extraneous WHERE clause",
+                "description": "A WHERE clause is included in the query when the exercise does not require any specific filtering of rows.",
+                "example": "SELECT name, age FROM students WHERE age > 18;",
+                "explanation": "Remove the WHERE clause when you do not need to filter rows.",
+                "correction": "SELECT name, age FROM students;"
             },
             "119": {
-                        "name": "Unused CTE",
-                        "description": "A Common Table Expression (CTE) is defined in the query but not referenced or used in the main query or any subqueries.",
-                        "example": "WITH cte AS (\n    SELECT cID, cName\n    FROM customer\n)\n\nSELECT cName\nFROM customer;",
-                        "explanation": "The CTE named cte is defined but never used in the main query. This adds unnecessary complexity to the query without providing any benefit.",
-                        "correction": "SELECT cName\nFROM customer;"
+                "name": "Extraneous GROUP BY clause",
+                "description": "A GROUP BY clause is included in the query when the exercise does not require any specific grouping of rows.",
+                "example": "SELECT name, COUNT(*) FROM students GROUP BY name;",
+                "explanation": "Remove the GROUP BY clause when you do not need to group rows.",
+                "correction": "SELECT name, COUNT(*) FROM students;"
+            },
+            "120": {
+                "name": "Extraneous HAVING clause",
+                "description": "A HAVING clause is included in the query when the exercise does not require any specific filtering of grouped rows.",
+                "example": "SELECT name, COUNT(*) FROM students GROUP BY name HAVING COUNT(*) > 1;",
+                "explanation": "Remove the HAVING clause when you do not need to filter grouped rows.",
+                "correction": "SELECT name, COUNT(*) FROM students GROUP BY name;"
+            },
+            "121": {
+                "name": "Extraneous LIMIT clause",
+                "description": "A LIMIT clause is included in the query when the exercise does not require any specific limiting of returned rows.",
+                "example": "SELECT name, age FROM students ORDER BY name;",
+                "explanation": "Remove the LIMIT clause when you do not need to limit the number of returned rows.",
+                "correction": "SELECT name, age FROM students ORDER BY name;"
+            },
+            "122": {
+                "name": "Extraneous OFFSET clause",
+                "description": "An OFFSET clause is included in the query when the exercise does not require skipping any returned rows.",
+                "example": "SELECT name, age FROM students ORDER BY name LIMIT 10;",
+                "explanation": "Remove the OFFSET clause when you do not need to skip any returned rows.",
+                "correction": "SELECT name, age FROM students ORDER BY name LIMIT 10;"
+            },
+            "123": {
+                "name": "Incorrect LIMIT",
+                "description": "The LIMIT clause specifies an incorrect number of rows to return.",
+                "example": "SELECT name, age FROM students ORDER BY age ASC LIMIT 5;",
+                "explanation": "Adjust the LIMIT clause to specify the correct number of rows to return.",
+                "correction": "SELECT name, age FROM students ORDER BY age ASC LIMIT 10;"
+            },
+            "124": {
+                "name": "Incorrect OFFSET",
+                "description": "The OFFSET clause specifies an incorrect number of rows to skip.",
+                "example": "SELECT name, age FROM students ORDER BY age ASC LIMIT 10 OFFSET 5;",
+                "explanation": "Adjust the OFFSET clause to specify the correct number of rows to skip.",
+                "correction": "SELECT name, age FROM students ORDER BY age ASC LIMIT 10 OFFSET 0;"
+            },
+            "125": {
+                "name": "Correlation name identical to table name",
+                "description": "A correlation name (alias) is defined for a table that is the same as the original table name, making the alias redundant.",
+                "example": "SELECT name FROM students students;",
+                "explanation": "Remove the correlation name (alias) when it is the same as the original table name.",
+                "correction": "SELECT name FROM students;"
+            },
+            "126": {
+                "name": "Unused CTE",
+                "description": "A Common Table Expression (CTE) is defined but not used in the query.",
+                "example": "WITH cte AS (SELECT * FROM students) SELECT * FROM students;",
+                "explanation": "Remove the unused CTE when it is not needed in the query.",
+                "correction": "SELECT * FROM students;"
             }
         }
     }
