@@ -37,9 +37,19 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
     // ----------------------------------------------------------------------
     const allErrors = data?.errors || [];
     const selectedGoalValue = selectedQueryGoal === 'submitted' ? 'CHECK_SOLUTION' : 'FOCUSED';
-    const dataErrors = allErrors.filter(
-        ({ query_goal }) => selectedQueryGoal === 'all' || query_goal === selectedGoalValue
-    );
+    const dataErrors = selectedQueryGoal === 'all'
+        ? Object.values(allErrors.reduce((acc, row) => {
+            const existing = acc[row.error_id];
+
+            if (existing) {
+                existing.count += row.count;
+                return acc;
+            }
+
+            acc[row.error_id] = { ...row };
+            return acc;
+        }, {}))
+        : allErrors.filter(({ query_goal }) => query_goal === selectedGoalValue);
     const dataTimeline = (data?.timeline || []).filter(
         ({ query_goal }) => selectedQueryGoal === 'all' || query_goal === selectedGoalValue
     );
