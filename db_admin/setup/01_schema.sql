@@ -178,7 +178,6 @@ CREATE TABLE query_context_columns_unique (
     columns TEXT[] NOT NULL
 );
 
-
 CREATE TABLE has_error(
     id SERIAL PRIMARY KEY,
     query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
