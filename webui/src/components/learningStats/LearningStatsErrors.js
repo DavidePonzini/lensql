@@ -44,62 +44,33 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
         ({ query_goal }) => selectedQueryGoal === 'all' || query_goal === selectedGoalValue
     );
 
-    // ----------------------------------------------------------------------
-    // CATEGORY MAPPING
-    // ----------------------------------------------------------------------
-    const SYNTAX_ERROR_IDS = [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-        21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37
-    ];
-    const SEMANTIC_ERROR_IDS = [38, 39, 40, 41, 42, 43, 44, 45, 46];
-    const LOGIC_ERROR_IDS = [
-        47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64,
-        65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82,
-        83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94
-    ];
-    const COMPLICATION_ERROR_IDS = [
-        95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109,
-        110, 111, 112, 113, 114, 115, 116, 117, 118, 119
-    ];
-
-    const CATEGORY_BY_ERROR_ID = new Map([
-        ...SYNTAX_ERROR_IDS.map(id => [id, 'syn']),
-        ...SEMANTIC_ERROR_IDS.map(id => [id, 'sem']),
-        ...LOGIC_ERROR_IDS.map(id => [id, 'log']),
-        ...COMPLICATION_ERROR_IDS.map(id => [id, 'com']),
-    ]);
-
-    function categoryOf(id) {
-        return CATEGORY_BY_ERROR_ID.get(id) || 'com';
-    }
-
     const CATEGORY_COLOR = {
-        syn: '#d9534f',
-        sem: '#fd7e14',
-        log: '#0d6efd',
-        com: '#198754',
+        SYN: '#d9534f',
+        SEM: '#fd7e14',
+        LOG: '#0d6efd',
+        COM: '#198754',
     };
 
     const CATEGORY_DESC = {
-        syn: t('errors.categories.syn.description'),
-        sem: t('errors.categories.sem.description'),
-        log: t('errors.categories.log.description'),
-        com: t('errors.categories.com.description'),
+        SYN: t('errors.categories.syn.description'),
+        SEM: t('errors.categories.sem.description'),
+        LOG: t('errors.categories.log.description'),
+        COM: t('errors.categories.com.description'),
     };
 
     // ----------------------------------------------------------------------
     // PIE DATA
     // ----------------------------------------------------------------------
-    const categoryCounts = { syn: 0, sem: 0, log: 0, com: 0 };
-    for (const { error_id, count } of dataErrors) {
-        categoryCounts[categoryOf(error_id)] += count;
+    const categoryCounts = { SYN: 0, SEM: 0, LOG: 0, COM: 0 };
+    for (const { error_id, count, category } of dataErrors) {
+        categoryCounts[category] += count;
     }
 
     const categoryData = [
-        { cat: 'syn', name: t('errors.categories.syn.name'), value: categoryCounts.syn },
-        { cat: 'sem', name: t('errors.categories.sem.name'), value: categoryCounts.sem },
-        { cat: 'log', name: t('errors.categories.log.name'), value: categoryCounts.log },
-        { cat: 'com', name: t('errors.categories.com.name'), value: categoryCounts.com },
+        { cat: 'SYN', name: t('errors.categories.syn.name'), value: categoryCounts.SYN },
+        { cat: 'SEM', name: t('errors.categories.sem.name'), value: categoryCounts.SEM },
+        { cat: 'LOG', name: t('errors.categories.log.name'), value: categoryCounts.LOG },
+        { cat: 'COM', name: t('errors.categories.com.name'), value: categoryCounts.COM },
     ];
 
     // Remove categories with zero count
@@ -114,11 +85,11 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
     // ----------------------------------------------------------------------
     const perErrorData = [...dataErrors]
         .sort((a, b) => b.count - a.count)
-        .map(({ error_id, count }) => ({
+        .map(({ error_id, count, category }) => ({
             id: error_id,
             count,
             name: t(`errors.errors.${error_id}.name`),
-            cat: categoryOf(error_id),
+            cat: category,
         }));
 
     const hasAnyErrors = allErrors.length > 0;
@@ -130,11 +101,11 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
     const timelineMap = {};
 
     for (const row of dataTimeline) {
-        const cat = categoryOf(row.error_id);
+        const cat = row.category;
         const dateKey = new Date(row.date).toISOString().split('T')[0];
 
         if (!timelineMap[dateKey]) {
-            timelineMap[dateKey] = { date: dateKey, syn: 0, sem: 0, log: 0, com: 0 };
+            timelineMap[dateKey] = { date: dateKey, SYN: 0, SEM: 0, LOG: 0, COM: 0 };
         }
         timelineMap[dateKey][cat] += row.count;
     }
@@ -142,16 +113,16 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
     // convert to array + percentages
     const timelineData = Object.values(timelineMap)
         .map(row => {
-            const total = row.syn + row.sem + row.log + row.com;
+            const total = row.SYN + row.SEM + row.LOG + row.COM;
             if (total === 0)
                 return row;
 
             return {
                 ...row,
-                syn: (row.syn / total) * 100,
-                sem: (row.sem / total) * 100,
-                log: (row.log / total) * 100,
-                com: (row.com / total) * 100,
+                SYN: (row.SYN / total) * 100,
+                SEM: (row.SEM / total) * 100,
+                LOG: (row.LOG / total) * 100,
+                COM: (row.COM / total) * 100,
                 dateFormatted: new Date(row.date).toLocaleDateString(locale, {
                     month: 'short',
                     day: 'numeric'
@@ -316,7 +287,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                                                             return [`${value.toFixed(1)}%`, label];
                                                         }}
                                                         itemSorter={(entry) => {
-                                                            const ORDER = { com: 1, log: 2, sem: 3, syn: 4 };
+                                                            const ORDER = { com: 1, log: 2, sem: 3, SYN: 4 };
                                                             return ORDER[entry.dataKey];
                                                         }}
                                                         wrapperStyle={{ zIndex: 1000 }}
@@ -326,34 +297,34 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
 
                                                     <Area
                                                         type="linear"
-                                                        dataKey="syn"
+                                                        dataKey="SYN"
                                                         stackId="1"
-                                                        stroke={CATEGORY_COLOR.syn}
-                                                        fill={CATEGORY_COLOR.syn}
+                                                        stroke={CATEGORY_COLOR.SYN}
+                                                        fill={CATEGORY_COLOR.SYN}
                                                         fillOpacity={0.35}
                                                     />
                                                     <Area
                                                         type="linear"
-                                                        dataKey="sem"
+                                                        dataKey="SEM"
                                                         stackId="1"
-                                                        stroke={CATEGORY_COLOR.sem}
-                                                        fill={CATEGORY_COLOR.sem}
+                                                        stroke={CATEGORY_COLOR.SEM}
+                                                        fill={CATEGORY_COLOR.SEM}
                                                         fillOpacity={0.35}
                                                     />
                                                     <Area
                                                         type="linear"
-                                                        dataKey="log"
+                                                        dataKey="LOG"
                                                         stackId="1"
-                                                        stroke={CATEGORY_COLOR.log}
-                                                        fill={CATEGORY_COLOR.log}
+                                                        stroke={CATEGORY_COLOR.LOG}
+                                                        fill={CATEGORY_COLOR.LOG}
                                                         fillOpacity={0.35}
                                                     />
                                                     <Area
                                                         type="linear"
-                                                        dataKey="com"
+                                                        dataKey="COM"
                                                         stackId="1"
-                                                        stroke={CATEGORY_COLOR.com}
-                                                        fill={CATEGORY_COLOR.com}
+                                                        stroke={CATEGORY_COLOR.COM}
+                                                        fill={CATEGORY_COLOR.COM}
                                                         fillOpacity={0.35}
                                                     />
                                                 </AreaChart>

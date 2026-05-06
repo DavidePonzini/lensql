@@ -3,6 +3,7 @@ from dav_tools import database
 from .connection import db, SCHEMA
 from ... import gamification
 from ...gamification.rewards import Badges
+from sql_error_taxonomy import SqlErrors
 
 import bcrypt
 import re
@@ -1121,6 +1122,7 @@ class User:
                 {
                     'query_goal': row[0],
                     'error_id': row[1],
+                    'category': SqlErrors(int(row[1])).definition.category,
                     'count': int(row[2]),
                 } for row in result
             ],
@@ -1266,6 +1268,7 @@ class User:
                 'date': row[0],
                 'query_goal': row[1],
                 'error_id': int(row[2]),
+                'category': SqlErrors(int(row[2])).definition.category,
                 'count': int(row[3]),
             } for row in result
         ]            
