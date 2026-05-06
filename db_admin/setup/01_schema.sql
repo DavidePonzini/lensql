@@ -114,7 +114,7 @@ CREATE TABLE exercises (
     created_by VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE SET NULL, -- allows to keep exercises even if the creator is deleted
     created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
     generation_difficulty INTEGER DEFAULT NULL,
-    generation_error INTEGER DEFAULT NULL REFERENCES errors(id) ON UPDATE CASCADE ON DELETE CASCADE
+    generation_error INTEGER DEFAULT NULL
 );
 
 CREATE TABLE learning_objectives (

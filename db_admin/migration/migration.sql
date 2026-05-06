@@ -90,18 +90,6 @@ INSERT INTO lensql.dataset_members(
     joined_ts
 FROM dataset_members;
 
-INSERT INTO lensql.errors(
-    id,
-    category,
-    subcategory,
-    error
-) SELECT 
-    id,
-    category,
-    subcategory,
-    error
-FROM errors;
-
 INSERT INTO lensql.exercises(
     id,
     dataset_id,
