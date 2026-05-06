@@ -1,6 +1,7 @@
 import dav_tools
 import sql_assignment_generator
-from sql_assignment_generator import SqlErrors, DifficultyLevel
+from sql_error_taxonomy import SqlErrors, SqlErrorCategory
+from sql_assignment_generator import DifficultyLevel
 from server.db.admin import Dataset, Exercise, User
 from server.db.users import get_database
 from datetime import datetime
@@ -116,23 +117,32 @@ def generate_assignment(
 
 def print_error_list() -> None:
     for e in SqlErrors:
-        if e.definition.is_deprecated:
-            dav_tools.messages.message(
-                e.value, e.definition.name,
-                text_min_len=[5],
-                default_text_options=[
-                    dav_tools.messages.TextFormat.Style.DIM,
-                ],
-                additional_text_options=[[
-                    dav_tools.messages.TextFormat.Style.BOLD,
-                ]])
+
+        if e.definition.category is SqlErrorCategory.SYNTAX:
+            color = dav_tools.messages.TextFormat.Color.RED
+        elif e.definition.category is SqlErrorCategory.SEMANTIC:
+            color = dav_tools.messages.TextFormat.Color.YELLOW
+        elif e.definition.category is SqlErrorCategory.LOGICAL:
+            color = dav_tools.messages.TextFormat.Color.CYAN
+        elif e.definition.category is SqlErrorCategory.COMPLICATION:
+            color = dav_tools.messages.TextFormat.Color.GREEN
         else:
-            dav_tools.messages.message(
-                e.value, e.definition.name,
-                text_min_len=[5],
-                additional_text_options=[[
-                    dav_tools.messages.TextFormat.Style.BOLD,
-                ]])
+            color = dav_tools.messages.TextFormat.Color.PURPLE
+
+        if e.definition.is_deprecated:
+            default_text_options = [dav_tools.messages.TextFormat.Style.DIM]
+        else:
+            default_text_options = [color]
+
+
+        dav_tools.messages.message(
+            e.value, e.definition.category, e.definition.name,
+            text_min_len=[5, 5],
+            default_text_options=default_text_options,
+            additional_text_options=[
+                [dav_tools.messages.TextFormat.Style.BOLD],
+                [dav_tools.messages.TextFormat.Style.BOLD],
+            ])
 
 def select_errors_to_target() -> list[tuple[SqlErrors, DifficultyLevel]]:
     '''Prompt user to select which errors to target from the error stats.'''
