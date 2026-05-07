@@ -1,6 +1,8 @@
 from server.db.users import get_database
 from server.db.admin import User
 
+from tqdm import tqdm
+
 import dav_tools
 
 if __name__ == '__main__':
@@ -9,7 +11,7 @@ if __name__ == '__main__':
 
     dbms = dav_tools.argument_parser.args.dbms
 
-    for user in User.list_all():
+    for user in tqdm(User.list_all(), desc="Processing users"):
         db = get_database(user.username, dbms)
         db.start_container()
         print(db.hostname)
