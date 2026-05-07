@@ -77,7 +77,8 @@ if __name__ == '__main__':
     remaining_exercises = [exercise for exercise in template_exercises if exercise not in exercises_found]
     random_exercises = random.sample(template_exercises, k=max(0, exercises_amount - len(exercises_found)))
 
-    dav_tools.messages.warning(f'Adding {len(random_exercises)} random exercises for user "{user.username}".')
+    if len(random_exercises) > 0:
+        dav_tools.messages.warning(f'Adding {len(random_exercises)} random exercises for user "{user.username}".')
     for exercise in random_exercises:
         exercises_found.add(exercise)
 
