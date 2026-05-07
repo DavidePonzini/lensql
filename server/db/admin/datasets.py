@@ -512,6 +512,9 @@ class Dataset:
     def can_remove_participant(self, user: User) -> bool:
         '''Check if a user can leave a dataset. User cannot leave if they are a teacher and the dataset has at least one exercise, one student or one query assigned to it.'''
 
+        # Allow leaving even for teachers
+        return True
+
         if not self.has_owner(user):
             return True
 
