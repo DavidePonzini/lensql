@@ -705,6 +705,44 @@ class Dataset:
                 solutions=exercise.solutions,
             )
 
+    def list_all_exercises(self) -> list[Exercise]:
+        '''Get all exercises in a dataset, including hidden ones.'''
+
+        query = database.sql.SQL(
+        '''
+            SELECT
+                e.id,
+                e.title,
+                e.is_hidden,
+                e.request,
+                e.solutions,
+                e.generation_difficulty
+            FROM
+                {schema}.exercises e
+            WHERE
+                e.dataset_id = {dataset_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            dataset_id=database.sql.Placeholder('dataset_id')
+        )
+
+        result = db.execute_and_fetch(query, {
+            'dataset_id': self.dataset_id
+        })
+
+        return [
+            Exercise(
+                exercise_id=row[0],
+                dataset_id=self.dataset_id,
+                title=row[1],
+                is_hidden=row[2],
+                request=row[3],
+                solutions=json.loads(row[4]),
+                difficulty=row[5],
+                all_properties_loaded=True
+            ) for row in result
+        ]
+
     def list_exercises(self, user: User) -> list[Exercise]:
         '''Get all exercises assigned to a user in a dataset. Includes hidden exercises if the user is a teacher.'''
 

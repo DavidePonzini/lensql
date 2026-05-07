@@ -70,7 +70,7 @@ if __name__ == '__main__':
     old_count = 0
     new_count = 0
 
-    for query in tqdm(list_queries(), ncols=80):
+    for query in tqdm(list_queries(), ncols=100):
         old_errors = query.errors
         try:
             errors = detect_errors(query)
