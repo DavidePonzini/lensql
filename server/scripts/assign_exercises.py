@@ -26,6 +26,7 @@ if __name__ == '__main__':
     dav_tools.argument_parser.add_argument('--allowed-goals', nargs='*', choices=['FOCUSED', 'CHECK_SOLUTION'], default=['FOCUSED', 'CHECK_SOLUTION'], help='Only consider queries with these goals for error extraction')
     dav_tools.argument_parser.add_argument('-d', '--dataset-name', help='Name of the new dataset')
     dav_tools.argument_parser.add_argument('-p', '--exercise-prefix', help='Prefix for the shuffled exercise titles', default='Exercise ')
+    dav_tools.argument_parser.add_argument('--dry-run', action='store_true', help='Perform a dry run without actually assigning exercises')
     dav_tools.argument_parser.parse_args()
 
     user = User(dav_tools.argument_parser.args.username)
@@ -73,6 +74,12 @@ if __name__ == '__main__':
     for exercise in random.choices(template_exercises, k=6-len(remaining_exercises)):
         dav_tools.messages.warning(f'Adding random exercise "{exercise.title}" ({exercise.error} / {exercise.difficulty}) to fill the dataset.')
         exercises_found.append(exercise)
+
+    if dav_tools.argument_parser.args.dry_run:
+        dav_tools.messages.info('Dry run complete. The following exercises would be assigned:')
+        for exercise in exercises_found:
+            dav_tools.messages.info(f'- {exercise.title} (Error: {exercise.error}, Difficulty: {exercise.difficulty})')
+        exit(0)
 
     dataset = Dataset.create(
         title=dav_tools.argument_parser.args.dataset_name or template_dataset.name,
