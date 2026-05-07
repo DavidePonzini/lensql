@@ -25,22 +25,26 @@ def reset_query_type(query: Query, current_query_type: str, query_goal: str) -> 
     if current_query_type == 'BUILTIN' and query_goal == 'BUILTIN':
         return 'BUILTIN'
     else:
-        new_query_type = SQLCode(query.sql_string).query_type
+        q = SQLCode(query.sql_string)
+        new_query_type = q.query_type
+        new_query_goal = q.query_goal
 
     update_query = database.sql.SQL(
         '''
             UPDATE {schema}.queries
-            SET query_type = {query_type}
+            SET query_type = {query_type}, query_goal = {query_goal}
             WHERE id = {query_id}
         '''
     ).format(
         schema=database.sql.Identifier(SCHEMA),
         query_type=database.sql.Placeholder('query_type'),
+        query_goal=database.sql.Placeholder('query_goal'),
         query_id=database.sql.Placeholder('query_id')
     )
 
     db.execute(update_query, {
         'query_type': new_query_type,
+        'query_goal': new_query_goal,
         'query_id': query.query_id,
     })
 

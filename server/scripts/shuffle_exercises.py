@@ -13,16 +13,6 @@ if __name__ == '__main__':
     dav_tools.argument_parser.parse_args()
 
     dataset = Dataset(dav_tools.argument_parser.args.dataset)
+    dataset.shuffle(dav_tools.argument_parser.args.prefix)
 
-    all_exercises = dataset.list_all_exercises()
-    random.shuffle(all_exercises)
-
-    for i, exercise in enumerate(tqdm(all_exercises, ncols=100), start=1):
-        new_title = f"{dav_tools.argument_parser.args.prefix}{i}"
-        exercise.update(
-            title=new_title,
-            request=exercise.request,
-            solutions=exercise.solutions,
-        )
-
-    dav_tools.messages.success(f"Shuffled {len(all_exercises)} exercises in dataset '{dataset.dataset_id}'")
+    dav_tools.messages.success(f"Shuffled exercises in dataset '{dataset.dataset_id}'")

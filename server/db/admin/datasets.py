@@ -716,7 +716,8 @@ class Dataset:
                 e.is_hidden,
                 e.request,
                 e.solutions,
-                e.generation_difficulty
+                e.generation_difficulty,
+                e.generation_error
             FROM
                 {schema}.exercises e
             WHERE
@@ -739,6 +740,7 @@ class Dataset:
                 request=row[3],
                 solutions=json.loads(row[4]),
                 difficulty=row[5],
+                error=row[6],
                 all_properties_loaded=True
             ) for row in result
         ]

@@ -1,5 +1,6 @@
 from dav_tools import database
 import json
+from sql_error_taxonomy import SqlErrors
 
 from .connection import db, SCHEMA
 from .users import User
@@ -14,6 +15,7 @@ class Exercise:
                  request: str | None = None,
                  solutions: list[str] | None = None,
                  difficulty: int | None = None,
+                 error: int | None = None,
                  learning_objectives: list[str] | None = None,
                  all_properties_loaded: bool = False
                 ) -> None:
@@ -27,6 +29,7 @@ class Exercise:
         self._request = request
         self._solutions = solutions
         self._difficulty = difficulty
+        self._error = error
         self._learning_objectives = learning_objectives
     
     # region Properties
@@ -93,6 +96,18 @@ class Exercise:
             self._load_properties()
 
         return self._difficulty
+    
+    @property
+    def error(self) -> SqlErrors | None:
+        '''Get the SQL error associated with the exercise'''
+
+        if not self._properties_loaded:
+            self._load_properties()
+
+        if self._error is None:
+            return None
+
+        return SqlErrors(self._error)
 
     @property
     def learning_objectives(self) -> list[str]:
@@ -253,7 +268,8 @@ class Exercise:
                 e.is_hidden,
                 e.request,
                 e.solutions,
-                e.generation_difficulty
+                e.generation_difficulty,
+                e.generation_error
             FROM
                 {schema}.exercises e
             WHERE
@@ -277,6 +293,7 @@ class Exercise:
         self._request = row[3]
         self._solutions = json.loads(row[4])
         self._difficulty = row[5]
+        self._error = row[6]
 
     @staticmethod
     def create(title: str, *,

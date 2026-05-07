@@ -1272,6 +1272,52 @@ class User:
                 'count': int(row[3]),
             } for row in result
         ]            
+    
+    def get_error_occurrencies(self, dataset_ids: list[str] = [], *, allowed_query_goals: list[str] = ['FOCUSED', 'CHECK_SOLUTION']) -> list[tuple[SqlErrors, int]]:
+        '''Get the most common errors for a user, optionally filtered by dataset IDs'''
+
+        if not dataset_ids:
+            dataset_filter = database.sql.SQL('')
+            params = {
+                'username': self.username,
+                'allowed_query_goals': allowed_query_goals
+            }
+        else:
+            dataset_filter = database.sql.SQL('AND dataset_id = ANY({dataset_ids})').format(
+                dataset_ids=database.sql.Placeholder('dataset_ids')
+            )
+            params = {
+                'username': self.username,
+                'allowed_query_goals': allowed_query_goals,
+                'dataset_ids': dataset_ids,
+            }
+
+        query = database.sql.SQL(
+            '''
+                SELECT
+                    error_id,
+                    SUM(occurrences) AS occurrences
+                FROM
+                    {schema}.v_stats_errors_by_user
+                WHERE
+                    username = {username}
+                    AND query_goal = ANY({allowed_query_goals})
+                    {dataset_filter}
+                GROUP BY
+                    error_id
+                ORDER BY
+                    occurrences DESC
+            '''
+        ).format(
+            schema=database.sql.Identifier(SCHEMA),
+            username=database.sql.Placeholder('username'),
+            allowed_query_goals=database.sql.Placeholder('allowed_query_goals'),
+            dataset_filter=dataset_filter
+        )
+
+        result = db.execute_and_fetch(query, params)
+
+        return [(SqlErrors(int(row[0])), int(row[1])) for row in result]
     # endregion
 
     # region Datasets
@@ -1352,3 +1398,24 @@ class User:
             'url': url,
             'event': event
         })
+
+    # endregion
+
+    # region Misc
+    @staticmethod
+    def list_all() -> list['User']:
+        '''List all users in the system'''
+
+        query = database.sql.SQL('''
+            SELECT username
+            FROM {schema}.users
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA)
+        )
+
+        result = db.execute_and_fetch(query)
+
+        return [User(row[0]) for row in result]
+
+
+    # endregion
