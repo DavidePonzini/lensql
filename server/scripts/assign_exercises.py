@@ -24,10 +24,11 @@ ADMIN_USER = User('lens')
 if __name__ == '__main__':
     dav_tools.argument_parser.add_argument('username', help='Username of the user to assign exercises to')
     dav_tools.argument_parser.add_argument('dataset', help='ID of the dataset containing exercises to assign')
-    dav_tools.argument_parser.add_argument('--allowed-datasets', nargs='*', help='Only consider queries from these datasets for error extraction')
-    dav_tools.argument_parser.add_argument('--allowed-goals', nargs='*', choices=['FOCUSED', 'CHECK_SOLUTION'], default=['FOCUSED', 'CHECK_SOLUTION'], help='Only consider queries with these goals for error extraction')
     dav_tools.argument_parser.add_argument('-d', '--dataset-name', help='Name of the new dataset')
     dav_tools.argument_parser.add_argument('-p', '--exercise-prefix', help='Prefix for the shuffled exercise titles', default='Exercise ')
+    dav_tools.argument_parser.add_argument('--allowed-datasets', nargs='*', help='Only consider queries from these datasets for error extraction')
+    dav_tools.argument_parser.add_argument('--allowed-goals', nargs='*', choices=['FOCUSED', 'CHECK_SOLUTION'], default=['FOCUSED', 'CHECK_SOLUTION'], help='Only consider queries with these goals for error extraction')
+    dav_tools.argument_parser.add_argument('--exercises-amount', type=int, default=12, help='Number of exercises to assign')
     dav_tools.argument_parser.add_argument('--dry-run', action='store_true', help='Perform a dry run without actually assigning exercises')
     dav_tools.argument_parser.parse_args()
 
@@ -35,22 +36,20 @@ if __name__ == '__main__':
     template_dataset = Dataset(dav_tools.argument_parser.args.dataset)
     template_exercises = template_dataset.list_all_exercises()
 
+    exercises_amount = dav_tools.argument_parser.args.exercises_amount
+
     if len(template_exercises) == 0:
-        dav_tools.messages.critical_error('No exercises found, or the exercise don\'t target a specific error.')
+        dav_tools.messages.critical_error('No exercises found, or the exercises don\'t target a specific error.')
 
     error_patterns = user.get_error_occurrencies(
         dataset_ids=dav_tools.argument_parser.args.allowed_datasets,
         allowed_query_goals=dav_tools.argument_parser.args.allowed_goals
     )
 
-    if len(error_patterns) == 0:
-        dav_tools.messages.critical_error(f'No error patterns found for user "{user.username}" with the given filters.')
-
     # dav_tools.messages.debug(f'Extracted {len(error_patterns)} error patterns for user "{user.username}".')
 
     # Sort error patterns by frequency in descending order
     error_patterns = sorted(error_patterns, key=lambda x: x[1], reverse=True)
-
 
     exercises_found:set[Exercise] = set()
     exercises_not_found: set[tuple[SqlErrors, DifficultyLevel]] = set()
@@ -65,20 +64,22 @@ if __name__ == '__main__':
             # dav_tools.messages.warning(f'No exercise found for error "{error.definition.name}" ({error.value}) at {difficulty.name} difficulty.')
 
     for error_pattern, count in error_patterns:
-        if len(exercises_found) < 6:
+        if len(exercises_found) < exercises_amount // 2:
             find_exercise(error_pattern, DifficultyLevel.EASY)
             find_exercise(error_pattern, DifficultyLevel.MEDIUM)
-        elif len(exercises_found) < 12:
+        elif len(exercises_found) < exercises_amount:
             find_exercise(error_pattern, DifficultyLevel.MEDIUM)
             find_exercise(error_pattern, DifficultyLevel.HARD)
         else:
             break
     
-    # # add random exercises from the template dataset until we have 12 exercises in total
-    # remaining_exercises = [exercise for exercise in template_exercises if exercise not in exercises_found]
-    # for exercise in random.choices(template_exercises, k=12-len(remaining_exercises)):
-    #     dav_tools.messages.warning(f'Adding random exercise "{exercise.title}" ({exercise.error} / {exercise.difficulty}) to fill the dataset.')
-    #     exercises_found.add(exercise)
+    # add random exercises from the template dataset until we have exercises_amount exercises in total
+    remaining_exercises = [exercise for exercise in template_exercises if exercise not in exercises_found]
+    random_exercises = random.sample(template_exercises, k=max(0, exercises_amount - len(exercises_found)))
+
+    dav_tools.messages.warning(f'Adding {len(random_exercises)} random exercises for user "{user.username}".')
+    for exercise in random_exercises:
+        exercises_found.add(exercise)
 
     if len(exercises_found) == 0:
         dav_tools.messages.critical_error(f'No suitable exercises found for user "{user.username}".')
