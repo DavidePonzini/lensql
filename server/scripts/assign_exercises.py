@@ -33,10 +33,16 @@ if __name__ == '__main__':
     template_dataset = Dataset(dav_tools.argument_parser.args.dataset)
     template_exercises = template_dataset.list_all_exercises()
 
+    if len(template_exercises) == 0:
+        dav_tools.messages.critical_error('No exercises found, or the exercise don\'t target a specific error.')
+
     error_patterns = user.get_error_occurrencies(
         dataset_ids=dav_tools.argument_parser.args.allowed_datasets,
         allowed_query_goals=dav_tools.argument_parser.args.allowed_goals
     )
+
+    if len(error_patterns) == 0:
+        dav_tools.messages.critical_error('No error patterns found for the user with the given filters.')
 
     dav_tools.messages.info(f'Extracted {len(error_patterns)} error patterns.')
 
@@ -65,22 +71,24 @@ if __name__ == '__main__':
             find_exercise(error_pattern, DifficultyLevel.HARD)
         else:
             break
+    
+    # # add random exercises from the template dataset until we have 12 exercises in total
+    # remaining_exercises = [exercise for exercise in template_exercises if exercise not in exercises_found]
+    # for exercise in random.choices(template_exercises, k=12-len(remaining_exercises)):
+    #     dav_tools.messages.warning(f'Adding random exercise "{exercise.title}" ({exercise.error} / {exercise.difficulty}) to fill the dataset.')
+    #     exercises_found.append(exercise)
 
     if len(exercises_found) == 0:
-        dav_tools.messages.critical_error('No exercises found for the user\'s error patterns.')
-    
-    # add random exercises from the template dataset until we have 6 exercises in total
-    remaining_exercises = [exercise for exercise in template_exercises if exercise not in exercises_found]
-    for exercise in random.choices(template_exercises, k=6-len(remaining_exercises)):
-        dav_tools.messages.warning(f'Adding random exercise "{exercise.title}" ({exercise.error} / {exercise.difficulty}) to fill the dataset.')
-        exercises_found.append(exercise)
+        dav_tools.messages.critical_error('No exercises found for the extracted error patterns.')
 
+    # if dry run, print the exercises that would be assigned and exit
     if dav_tools.argument_parser.args.dry_run:
-        dav_tools.messages.info('Dry run complete. The following exercises would be assigned:')
+        dav_tools.messages.success('Dry run complete. The following exercises would be assigned:')
         for exercise in exercises_found:
-            dav_tools.messages.info(f'- {exercise.title} (Error: {exercise.error}, Difficulty: {exercise.difficulty})')
+            print(f'    - {exercise.title} (Error: {exercise.error}, Difficulty: {exercise.difficulty})')
         exit(0)
 
+    # Create a new dataset for the user and assign the found exercises to it
     dataset = Dataset.create(
         title=dav_tools.argument_parser.args.dataset_name or template_dataset.name,
         description=template_dataset.description,

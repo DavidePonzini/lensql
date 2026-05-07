@@ -1283,7 +1283,7 @@ class User:
                 'allowed_query_goals': allowed_query_goals
             }
         else:
-            dataset_filter = database.sql.SQL('AND dataset_id = ANY({dataset_ids})').format(
+            dataset_filter = database.sql.SQL('AND e.dataset_id = ANY({dataset_ids})').format(
                 dataset_ids=database.sql.Placeholder('dataset_ids')
             )
             params = {
@@ -1295,16 +1295,19 @@ class User:
         query = database.sql.SQL(
             '''
                 SELECT
-                    error_id,
-                    SUM(occurrences) AS occurrences
+                    he.error_id,
+                    COUNT(*) AS occurrences
                 FROM
-                    {schema}.v_stats_errors_by_user
+                    {schema}.has_error he
+                    JOIN {schema}.queries q ON q.id = he.query_id
+                    JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+                    JOIN {schema}.exercises e ON e.id = qb.exercise_id
                 WHERE
-                    username = {username}
-                    AND query_goal = ANY({allowed_query_goals})
+                    qb.username = {username}
+                    AND q.query_goal = ANY({allowed_query_goals})
                     {dataset_filter}
                 GROUP BY
-                    error_id
+                    he.error_id
                 ORDER BY
                     occurrences DESC
             '''
