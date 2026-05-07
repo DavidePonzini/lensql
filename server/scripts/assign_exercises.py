@@ -78,13 +78,15 @@ if __name__ == '__main__':
     #     dav_tools.messages.warning(f'Adding random exercise "{exercise.title}" ({exercise.error} / {exercise.difficulty}) to fill the dataset.')
     #     exercises_found.append(exercise)
 
-    if len(exercises_found) == 0:
+    exercises_found_no_reps = set(exercises_found)  # Remove duplicates, if any
+
+    if len(exercises_found_no_reps) == 0:
         dav_tools.messages.critical_error(f'No suitable exercises found for user "{user.username}".')
 
     # if dry run, print the exercises that would be assigned and exit
     if dav_tools.argument_parser.args.dry_run:
         dav_tools.messages.success(f'Dry run complete. The following exercises would be assigned to user "{user.username}":')
-        for exercise in exercises_found:
+        for exercise in exercises_found_no_reps:
             print(f'    - {exercise.title} (Error: {exercise.error}, Difficulty: {exercise.difficulty})')
         exit(0)
 
@@ -98,7 +100,7 @@ if __name__ == '__main__':
         dbms=template_dataset.dbms,
     )
     
-    for exercise in exercises_found:
+    for exercise in exercises_found_no_reps:
         Exercise.create(
             title=exercise.title,
             user=ADMIN_USER,
@@ -112,4 +114,4 @@ if __name__ == '__main__':
     dataset.add_participant(user)
     dataset.shuffle(dav_tools.argument_parser.args.exercise_prefix)
 
-    dav_tools.messages.success(f'Assigned {len(exercises_found)} exercises to "{user.username}". Dataset ID: {dataset.dataset_id}')
+    dav_tools.messages.success(f'Assigned {len(exercises_found_no_reps)} exercises to "{user.username}". Dataset ID: {dataset.dataset_id}')
