@@ -42,9 +42,9 @@ if __name__ == '__main__':
     )
 
     if len(error_patterns) == 0:
-        dav_tools.messages.critical_error('No error patterns found for the user with the given filters.')
+        dav_tools.messages.critical_error(f'No error patterns found for user "{user.username}" with the given filters.')
 
-    dav_tools.messages.info(f'Extracted {len(error_patterns)} error patterns.')
+    dav_tools.messages.info(f'Extracted {len(error_patterns)} error patterns for user "{user.username}".')
 
     # Sort error patterns by frequency in descending order
     error_patterns = sorted(error_patterns, key=lambda x: x[1], reverse=True)
@@ -79,11 +79,11 @@ if __name__ == '__main__':
     #     exercises_found.append(exercise)
 
     if len(exercises_found) == 0:
-        dav_tools.messages.critical_error('No exercises found for the extracted error patterns.')
+        dav_tools.messages.critical_error(f'No suitable exercises found for user "{user.username}".')
 
     # if dry run, print the exercises that would be assigned and exit
     if dav_tools.argument_parser.args.dry_run:
-        dav_tools.messages.success('Dry run complete. The following exercises would be assigned:')
+        dav_tools.messages.success(f'Dry run complete. The following exercises would be assigned to user "{user.username}":')
         for exercise in exercises_found:
             print(f'    - {exercise.title} (Error: {exercise.error}, Difficulty: {exercise.difficulty})')
         exit(0)
