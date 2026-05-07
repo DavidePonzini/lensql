@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
 
     exercises_found:set[Exercise] = set()
-    exercises_not_found: set[tuple[SqlErrors, DifficultyLevel]] = []
+    exercises_not_found: set[tuple[SqlErrors, DifficultyLevel]] = set()
 
     def find_exercise(error: SqlErrors, difficulty: DifficultyLevel):
         exercise = find_exercise_for_error(template_exercises, error, difficulty)
