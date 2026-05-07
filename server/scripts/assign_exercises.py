@@ -50,16 +50,16 @@ if __name__ == '__main__':
     error_patterns = sorted(error_patterns, key=lambda x: x[1], reverse=True)
 
 
-    exercises_found:list[Exercise] = []
-    exercises_not_found: list[tuple[SqlErrors, DifficultyLevel]] = []
+    exercises_found:set[Exercise] = set()
+    exercises_not_found: set[tuple[SqlErrors, DifficultyLevel]] = []
 
     def find_exercise(error: SqlErrors, difficulty: DifficultyLevel):
         exercise = find_exercise_for_error(template_exercises, error, difficulty)
         if exercise is not None:
-            exercises_found.append(exercise)
+            exercises_found.add(exercise)
             # dav_tools.messages.debug(f'Found "{exercise.title}" for error "{error.definition.name}" ({error.value}) at {difficulty.name} difficulty.')
         else:
-            exercises_not_found.append((error, difficulty))
+            exercises_not_found.add((error, difficulty))
             # dav_tools.messages.warning(f'No exercise found for error "{error.definition.name}" ({error.value}) at {difficulty.name} difficulty.')
 
     for error_pattern, count in error_patterns:
@@ -76,17 +76,15 @@ if __name__ == '__main__':
     # remaining_exercises = [exercise for exercise in template_exercises if exercise not in exercises_found]
     # for exercise in random.choices(template_exercises, k=12-len(remaining_exercises)):
     #     dav_tools.messages.warning(f'Adding random exercise "{exercise.title}" ({exercise.error} / {exercise.difficulty}) to fill the dataset.')
-    #     exercises_found.append(exercise)
+    #     exercises_found.add(exercise)
 
-    exercises_found_no_reps = set(exercises_found)  # Remove duplicates, if any
-
-    if len(exercises_found_no_reps) == 0:
+    if len(exercises_found) == 0:
         dav_tools.messages.critical_error(f'No suitable exercises found for user "{user.username}".')
 
     # if dry run, print the exercises that would be assigned and exit
     if dav_tools.argument_parser.args.dry_run:
         dav_tools.messages.success(f'Dry run complete. The following exercises would be assigned to user "{user.username}":')
-        for exercise in exercises_found_no_reps:
+        for exercise in exercises_found:
             print(f'    - {exercise.title} (Error: {exercise.error}, Difficulty: {exercise.difficulty})')
         exit(0)
 
@@ -100,7 +98,7 @@ if __name__ == '__main__':
         dbms=template_dataset.dbms,
     )
     
-    for exercise in exercises_found_no_reps:
+    for exercise in exercises_found:
         Exercise.create(
             title=exercise.title,
             user=ADMIN_USER,
@@ -114,4 +112,4 @@ if __name__ == '__main__':
     dataset.add_participant(user)
     dataset.shuffle(dav_tools.argument_parser.args.exercise_prefix)
 
-    dav_tools.messages.success(f'Assigned {len(exercises_found_no_reps)} exercises to "{user.username}". Dataset ID: {dataset.dataset_id}')
+    dav_tools.messages.success(f'Assigned {len(exercises_found)} exercises to "{user.username}". Dataset ID: {dataset.dataset_id}')
