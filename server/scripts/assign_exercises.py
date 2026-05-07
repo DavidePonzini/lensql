@@ -1,3 +1,5 @@
+import sys
+
 from server.db.admin import Dataset, Exercise, User
 from sql_error_taxonomy import SqlErrors
 from sql_assignment_generator import DifficultyLevel
@@ -85,7 +87,7 @@ if __name__ == '__main__':
     if dav_tools.argument_parser.args.dry_run:
         dav_tools.messages.success(f'Dry run complete. The following exercises would be assigned to user "{user.username}":')
         for exercise in exercises_found:
-            print(f'    - {exercise.title} (Error: {exercise.error}, Difficulty: {exercise.difficulty})')
+            print(f'    - {exercise.title} (Error: {exercise.error}, Difficulty: {exercise.difficulty})', file=sys.stderr)
         exit(0)
 
     # Create a new dataset for the user and assign the found exercises to it
