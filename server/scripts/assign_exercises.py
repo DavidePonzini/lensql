@@ -44,7 +44,7 @@ if __name__ == '__main__':
     if len(error_patterns) == 0:
         dav_tools.messages.critical_error(f'No error patterns found for user "{user.username}" with the given filters.')
 
-    dav_tools.messages.info(f'Extracted {len(error_patterns)} error patterns for user "{user.username}".')
+    # dav_tools.messages.debug(f'Extracted {len(error_patterns)} error patterns for user "{user.username}".')
 
     # Sort error patterns by frequency in descending order
     error_patterns = sorted(error_patterns, key=lambda x: x[1], reverse=True)
@@ -57,7 +57,7 @@ if __name__ == '__main__':
         exercise = find_exercise_for_error(template_exercises, error, difficulty)
         if exercise is not None:
             exercises_found.append(exercise)
-            dav_tools.messages.info(f'Found "{exercise.title}" for error "{error.definition.name}" ({error.value}) at {difficulty.name} difficulty.')
+            # dav_tools.messages.debug(f'Found "{exercise.title}" for error "{error.definition.name}" ({error.value}) at {difficulty.name} difficulty.')
         else:
             exercises_not_found.append((error, difficulty))
             # dav_tools.messages.warning(f'No exercise found for error "{error.definition.name}" ({error.value}) at {difficulty.name} difficulty.')
