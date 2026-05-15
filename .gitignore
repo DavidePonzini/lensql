@@ -4,6 +4,7 @@ test.py
 venv/
 .ipynb_checkpoints/
 .env
+.codex
 
 # documentation
 docs/_build
