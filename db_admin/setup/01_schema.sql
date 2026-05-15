@@ -45,6 +45,14 @@ END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
 -- Tables -------------------------------------------------------------------------------------------------------
+
+CREATE TABLE lab_hours (
+    start_ts TIMESTAMP NOT NULL,
+    end_ts TIMESTAMP NOT NULL,
+    lab_name TEXT,
+    PRIMARY KEY (start_ts, end_ts)
+);
+
 CREATE TABLE users (
     username VARCHAR(255) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
