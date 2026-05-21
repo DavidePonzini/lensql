@@ -201,7 +201,20 @@
     "pages": {
         "admin": {
             "title": "Admin page",
-            "empty": "No content here"
+            "add_user": {
+                "title": "Add User to Dataset",
+                "dataset_label": "Dataset ID",
+                "dataset_placeholder": "Enter dataset ID",
+                "username_label": "Username",
+                "username_placeholder": "Enter username",
+                "is_owner_label": "Add as owner",
+                "submit": "Add User",
+                "success": "User added successfully!",
+                "error_admin": "Only admins can add users to datasets.",
+                "error_dataset": "Dataset does not exist.",
+                "error_user": "User does not exist.",
+                "error_general": "An error occurred while adding the user."
+            }
         },
         "cookies": {
             "title": "Cookie Policy",

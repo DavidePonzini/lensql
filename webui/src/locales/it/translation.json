@@ -200,8 +200,21 @@
     },
     "pages": {
         "admin": {
-            "title": "Pagina di amministrazione",
-            "empty": "Nessun contenuto disponibile"
+            "title": "Pagina Admin",
+            "add_user": {
+                "title": "Aggiungi Utente a Dataset",
+                "dataset_label": "ID Dataset",
+                "dataset_placeholder": "Inserisci ID dataset",
+                "username_label": "Nome Utente",
+                "username_placeholder": "Inserisci nome utente",
+                "is_owner_label": "Aggiungi come proprietario",
+                "submit": "Aggiungi Utente",
+                "success": "Utente aggiunto con successo!",
+                "error_admin": "Solo gli admin possono aggiungere utenti ai dataset.",
+                "error_dataset": "Dataset non trovato.",
+                "error_user": "Utente non trovato.",
+                "error_general": "Si è verificato un errore durante l'aggiunta dell'utente."
+            }
         },
         "cookies": {
             "title": "Cookie Policy",

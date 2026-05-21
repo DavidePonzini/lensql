@@ -212,6 +212,35 @@ def set_owner():
     return responses.response(True)
 
 
+@bp.route('/add-user', methods=['POST'])
+@jwt_required()
+def add_user_to_dataset():
+    '''Admin endpoint to add a user to a dataset with optional owner status.'''
+    admin_user = db.admin.User(get_jwt_identity())
+
+    if not admin_user.is_admin:
+        return responses.response(False, message=_('You do not have permission to perform this action.'))
+
+    data = request.get_json()
+    dataset_id = data['dataset_id']
+    username = data['username']
+    is_owner = data.get('is_owner', False)
+
+    dataset = db.admin.Dataset(dataset_id)
+    target_user = db.admin.User(username)
+
+    if not dataset.exists():
+        return responses.response(False, message=_('Dataset does not exist.'))
+
+    if not target_user.exists():
+        return responses.response(False, message=_('User does not exist.'))
+
+    dataset.add_participant(target_user)
+    dataset.set_owner_status(target_user, is_owner)
+
+    return responses.response(True)
+
+
 @bp.route('/members/<dataset_id>', methods=['GET'])
 @jwt_required()
 def get_members(dataset_id):
