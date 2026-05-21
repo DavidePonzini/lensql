@@ -18,6 +18,6 @@ class QueryResultMessage(QueryResult):
         return self._result
     
     @property
-    def result_text(self) -> dict:
+    def result_text(self) -> str:
         return self._result
         

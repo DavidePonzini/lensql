@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import copy
 
 from ..code import SQLCode
 
@@ -19,7 +20,7 @@ class QueryResult(ABC):
         self.data_type = data_type
         '''The type of data returned by the query.'''
 
-        self.notices = notices
+        self.notices = copy.deepcopy(notices)       # NOTE: copy is necessary to avoid resetting when running other queries on the same connection
         '''Any notices or warnings generated during query execution.'''
 
         self.query_id: int | None = None
