@@ -45,7 +45,6 @@ function Admin() {
 
             if (response.success) {
                 setMessage({ type: 'success', text: t('pages.admin.add_user.success') });
-                setFormData({ dataset_id: '', username: '', is_owner: false });
             } else {
                 const errorMessage = response.message || t('pages.admin.add_user.error_general');
                 setMessage({ type: 'danger', text: errorMessage });
