@@ -3,7 +3,7 @@ from dav_tools import database
 from .connection import db, SCHEMA
 from ... import gamification
 from ...gamification.rewards import Badges
-from sql_error_taxonomy import SqlErrors
+from sqlerrors import SqlErrors
 
 import bcrypt
 import re

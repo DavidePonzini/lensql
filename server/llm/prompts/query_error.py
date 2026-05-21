@@ -1,5 +1,5 @@
 from server.sql import SQLCode
-from sql_error_categorizer import DetectedError, SqlErrors
+from sqlchecker import DetectedError, SqlErrors
 from . import util
 
 def explain_error(code: str, exception: str, *, sql_language='PostgreSQL'):

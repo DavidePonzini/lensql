@@ -1,9 +1,6 @@
 '''Sfhuffle exercise order in a dataset.'''
 
 import dav_tools
-import random
-from tqdm import tqdm
-
 from server.db.admin import Dataset
 
 

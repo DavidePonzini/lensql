@@ -1,5 +1,5 @@
 from dav_tools import database, messages
-from sql_error_categorizer import build_catalog, get_errors, detectors, DetectedError
+from sqlchecker import build_catalog, get_errors, detectors, DetectedError
 
 from server.db.admin import Query, Dataset
 from server.db.admin.connection import db, SCHEMA

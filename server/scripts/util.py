@@ -1,5 +1,5 @@
-from sql_error_taxonomy import SqlErrors, SqlErrorCategory
-from sql_assignment_generator import DifficultyLevel
+from sqlerrors import SqlErrors, SqlErrorCategory
+from sqlexercise import DifficultyLevel
 
 import dav_tools
 

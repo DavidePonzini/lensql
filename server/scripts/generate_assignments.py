@@ -1,7 +1,7 @@
 import dav_tools
-import sql_assignment_generator
-from sql_error_taxonomy import SqlErrors, SqlErrorCategory
-from sql_assignment_generator import DifficultyLevel
+import sqlexercise
+from sqlerrors import SqlErrors, SqlErrorCategory
+from sqlexercise import DifficultyLevel
 from server.db.admin import Dataset, Exercise, User
 from server.db.users import get_database
 from datetime import datetime
@@ -32,7 +32,7 @@ def generate_assignment(
     db = get_database(admin_user.username, dbms)
     db.get_connection() # Ensure we can connect to the database before proceeding
 
-    assignment = sql_assignment_generator.generate_assignment(
+    assignment = sqlexercise.generate_assignment(
         errors=errors,
         db_host=db.hostname,
         db_port=db.port,

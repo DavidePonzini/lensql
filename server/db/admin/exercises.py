@@ -1,6 +1,6 @@
 from dav_tools import database
 import json
-from sql_error_taxonomy import SqlErrors
+from sqlerrors import SqlErrors
 
 from .connection import db, SCHEMA
 from .users import User

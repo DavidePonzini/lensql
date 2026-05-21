@@ -5,7 +5,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server import db, llm, gamification
 from .util import responses
-from ..sql import SQLCode
 from server.gamification import NOT_ENOUGH_COINS_MESSAGE
 
 from flask_babel import _

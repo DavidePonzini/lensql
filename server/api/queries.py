@@ -4,7 +4,7 @@ from flask import Blueprint, request
 import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_babel import _
-from sql_error_categorizer import detectors, get_errors, build_catalog
+from sqlchecker import detectors, get_errors, build_catalog
 
 from server import db, gamification
 from server.sql.code import SQLCode

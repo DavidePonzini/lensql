@@ -1,8 +1,8 @@
 import sys
 
 from server.db.admin import Dataset, Exercise, User
-from sql_error_taxonomy import SqlErrors
-from sql_assignment_generator import DifficultyLevel
+from sqlerrors import SqlErrors
+from sqlexercise import DifficultyLevel
 import random
 
 import dav_tools

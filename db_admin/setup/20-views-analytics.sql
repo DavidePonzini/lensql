@@ -100,10 +100,38 @@ SELECT
     e.title,
     e.generation_error,
     e.generation_difficulty,
+    he.error_id,
+    COUNT(he.error_id) AS error_count
+FROM
+    exercises e
+    JOIN datasets d ON d.id = e.dataset_id
+    JOIN query_batches qb ON qb.exercise_id = e.id
+    JOIN queries q ON q.batch_id = qb.id
+    JOIN has_error he ON q.id = he.query_id
+WHERE
+    e.generation_error IS NOT NULL
+    AND e.generation_difficulty IS NOT NULL
+GROUP BY
+    d.name,
+    e.dataset_id,
+    e.id,
+    e.title,
+    e.generation_error,
+    e.generation_difficulty,
+    he.error_id;
+
+CREATE OR REPLACE VIEW v_generated_exercises_expected_errors AS
+SELECT
+    d.name AS dataset_name,
+    e.dataset_id,
+    e.id AS exercise_id,
+    e.title,
+    e.generation_error,
+    e.generation_difficulty,
     CASE WHEN COUNT(he.error_id) = 0
-            THEN NULL
-            ELSE (COUNT(he.error_id) FILTER (WHERE he.error_id = e.generation_error))::float / COUNT(he.error_id)
-        END AS expected_error_rate
+        THEN NULL
+        ELSE (COUNT(he.error_id) FILTER (WHERE he.error_id = e.generation_error))::float / COUNT(he.error_id)
+    END AS expected_error_rate
 FROM
     exercises e
     JOIN datasets d ON d.id = e.dataset_id
@@ -119,10 +147,7 @@ GROUP BY
     e.id,
     e.title,
     e.generation_error,
-    e.generation_difficulty
-ORDER BY
-    d.name,
-    substring(e.title from '\d+')::int;
+    e.generation_difficulty;
 
 CREATE OR REPLACE VIEW v_exercise_solution_attempts AS
 WITH first_solution_ts AS (     -- users who solved the exercise and when they solved it for the first time
@@ -238,3 +263,30 @@ WHERE
     first_success.ts - LEAST(first_visit.ts, first_query.ts) < INTERVAL '2 hours'
 GROUP BY
     first_visit.exercise_id, first_visit.username;
+
+
+
+
+
+select
+    qb.username,
+    he.error_id,
+    case when count(*) filter (where qb.ts < p2.min) = 0
+        then null
+        else (count(distinct he.query_id) FILTER (where qb.ts < p2.min))::float / count(*) filter (where qb.ts < p2.min)
+        end pre,
+    case when count(*) filter (where qb.ts > p2.max) = 0
+        then null
+    else (count(distinct he.query_id) FILTER (where qb.ts > p2.max))::float / count(*) filter (where qb.ts > p2.max)
+        end post
+from
+    queries q
+    join query_batches qb on qb.id = q.batch_id
+    join pratica2 p2 on p2.username = qb.username
+    left join has_error he on he.query_id = q.id
+where
+    q.query_goal = 'CHECK_SOLUTION'
+group by
+    qb.username,
+    he.error_id
+order by 1, 3 desc;

@@ -1,5 +1,5 @@
 from server import db
-from sql_error_categorizer import DetectedError, SqlErrors
+from sqlchecker import DetectedError, SqlErrors
 
 from dav_tools import messages
 

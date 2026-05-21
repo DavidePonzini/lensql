@@ -1,5 +1,5 @@
 from . import prompts, format, chatgpt
-from sql_error_categorizer import DetectedError
+from sqlchecker import DetectedError
 
 def explain_error_message(code: str, exception: str) -> str:
     answer = chatgpt.generate_answer(

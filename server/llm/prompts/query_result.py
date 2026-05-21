@@ -2,7 +2,7 @@ from server.sql import SQLCode
 from . import util
 import sqlscope
 
-from sql_error_categorizer import DetectedError
+from sqlchecker import DetectedError
 
 def describe_my_query(code: str, *, sql_language='PostgreSQL'):
     query = SQLCode(code)
