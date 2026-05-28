@@ -96,6 +96,8 @@ class Database(ABC):
                     query=statement if builtin_name is None else SQLCode(builtin_name, builtin=True),
                     notices=conn.notices if conn is not None and conn.is_open() else []
                 )
+
+                return
     # endregion
 
     # region Connections
