@@ -172,8 +172,10 @@ class PostgresqlMetadataQueries(MetadataQueries):
                 FROM information_schema.table_constraints tc
                 JOIN information_schema.key_column_usage kcu
                 ON tc.constraint_name = kcu.constraint_name
+                AND tc.constraint_schema = kcu.constraint_schema
                 JOIN information_schema.constraint_column_usage ccu
                 ON tc.constraint_name = ccu.constraint_name
+                AND tc.constraint_schema = ccu.constraint_schema
                 WHERE tc.constraint_type = 'FOREIGN KEY'
             ) fk ON fk.table_schema = cols.table_schema
                 AND fk.table_name = cols.table_name
