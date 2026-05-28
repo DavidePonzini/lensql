@@ -84,20 +84,18 @@ class Database(ABC):
 
                 self._persist_current_search_path(conn)
             except SQLException as e:
-                if conn is None:
-                    return # cannot rollback if no connection
-                if not conn.is_open():
-                    return # cannot rollback if connection is closed
-
-                try:
-                    conn.rollback()
-                except Exception as e2:     # catch all to avoid handling each DB exception separately
-                    dav_tools.messages.error(f'Error rolling back connection for db "{self.dbname}": {e2}')
+                if conn is not None and conn.is_open():
+                    # can only rollback if connection is open
+                    try:
+                        conn.rollback()
+                    except Exception as e2:     # catch all to avoid handling each DB exception separately
+                        dav_tools.messages.error(f'Error rolling back connection for db "{self.dbname}": {e2}')
                 
                 yield QueryResultError(
                     exception=e,
                     query=statement if builtin_name is None else SQLCode(builtin_name, builtin=True),
-                    notices=conn.notices)
+                    notices=conn.notices if conn is not None and conn.is_open() else []
+                )
     # endregion
 
     # region Connections
