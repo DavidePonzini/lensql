@@ -174,7 +174,9 @@ CREATE TABLE query_context_columns (
     foreign_key_schema TEXT DEFAULT NULL,
     foreign_key_table TEXT DEFAULT NULL,
     foreign_key_column TEXT DEFAULT NULL,
-    is_nullable BOOLEAN NOT NULL
+    is_nullable BOOLEAN NOT NULL,
+
+    UNIQUE (query_id, schema_name, table_name, column_name)
 );
 
 CREATE TABLE query_context_columns_unique (
@@ -191,6 +193,13 @@ CREATE TABLE has_error(
     query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
     error_id INTEGER NOT NULL,
     details TEXT[] DEFAULT NULL
+);
+
+CREATE TABLE errors(
+    id INTEGER PRIMARY KEY,
+    category VARCHAR(255) NOT NULL,
+    subcategory VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE messages (
