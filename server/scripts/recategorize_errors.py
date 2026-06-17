@@ -1,4 +1,10 @@
-from dav_tools import database, messages
+import argparse
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import multiprocessing
+import os
+import sys
+
+from dav_tools import database, messages, argument_parser
 from sqlchecker import build_catalog, get_errors, detectors, DetectedError
 
 from server.db.admin import Query, Dataset
@@ -7,11 +13,13 @@ from server.db.admin.connection import db, SCHEMA
 from tqdm import tqdm
 
 
-DETECTORS = [
+SerializedError = tuple[int, list[str]]
+
+DETECTORS: list[type[detectors.BaseDetector]] = [
     detectors.SyntaxErrorDetector,
-    detectors.SemanticErrorDetector,
-    detectors.LogicalErrorDetector,
-    detectors.ComplicationDetector,
+    # detectors.SemanticErrorDetector,
+    # detectors.LogicalErrorDetector,
+    # detectors.ComplicationDetector,
 ]
 
 def detect_errors(query: Query) -> list[DetectedError]:
@@ -48,6 +56,14 @@ def delete_existing_errors(query: Query) -> None:
         'query_id': query.query_id
     })
 
+def log_errors(query_id: int, errors: list[SerializedError]) -> None:
+    for error_id, details in errors:
+        db.insert(SCHEMA, 'has_error', {
+            'query_id': query_id,
+            'error_id': error_id,
+            'details': details
+        })
+
 def list_queries() -> list[Query]:
     query = database.sql.SQL(
         '''
@@ -63,27 +79,79 @@ def list_queries() -> list[Query]:
 
     return [Query(row[0]) for row in result]
 
+def process_query(query_id: int) -> tuple[int, int, list[SerializedError], str | None]:
+    query = Query(query_id)
 
-if __name__ == '__main__':
-    import sys
-    
+    try:
+        old_count = len(query.errors)
+        errors = detect_errors(query)
+    except Exception as e:
+        return query_id, 0, [], str(e)
+
+    return query_id, old_count, [
+        (error.error.value, [str(v) for v in error.data])
+        for error in errors
+    ], None
+
+def recategorize_errors(query_ids: list[int], jobs: int) -> tuple[int, int]:
     old_count = 0
     new_count = 0
 
-    for query in tqdm(list_queries(), ncols=100):
-        old_errors = query.errors
-        try:
-            errors = detect_errors(query)
-        except Exception as e:
-            print(file=sys.stderr)
-            messages.error(f'Error processing query {query.query_id}: {e}')
-            continue
+    if jobs <= 1:
+        results = (process_query(query_id) for query_id in query_ids)
+        iterator = tqdm(results, total=len(query_ids), ncols=100)
 
-        old_count += len(old_errors)
-        new_count += len(errors)
+        for query_id, query_old_count, errors, error in iterator:
+            if error is not None:
+                print(file=sys.stderr)
+                messages.error(f'Error processing query {query_id}: {error}')
+                continue
 
-        delete_existing_errors(query)
-        query.log_errors(errors)
+            old_count += query_old_count
+            new_count += len(errors)
+
+            query = Query(query_id)
+            delete_existing_errors(query)
+            log_errors(query_id, errors)
+
+        return old_count, new_count
+
+    context = multiprocessing.get_context('spawn')
+    with ProcessPoolExecutor(max_workers=jobs, mp_context=context) as executor:
+        futures = [
+            executor.submit(process_query, query_id)
+            for query_id in query_ids
+        ]
+
+        for future in tqdm(as_completed(futures), total=len(futures), ncols=100):
+            query_id, query_old_count, errors, error = future.result()
+            if error is not None:
+                print(file=sys.stderr)
+                messages.error(f'Error processing query {query_id}: {error}')
+                continue
+
+            old_count += query_old_count
+            new_count += len(errors)
+
+            query = Query(query_id)
+            delete_existing_errors(query)
+            log_errors(query_id, errors)
+
+    return old_count, new_count
+
+
+if __name__ == '__main__':
+    argument_parser.add_argument(
+        '-j', '--jobs',
+        type=int,
+        default=os.cpu_count() or 1,
+        help='number of worker processes to use'
+    )
+
+    argument_parser.parse_args()
+
+    query_ids = [query.query_id for query in list_queries()]
+    old_count, new_count = recategorize_errors(query_ids, argument_parser.args.jobs)
 
     messages.info(f'Detected {old_count} -> {new_count} errors total.')
     

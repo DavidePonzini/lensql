@@ -1,5 +1,5 @@
 sqlerrors>=2.0.0
-sqlchecker>=0.3.1
+sqlchecker>=0.3.3
 sqlexercise>=0.3.0
 sqlscope>=1.0.16
 dav_tools>=0.4.19
