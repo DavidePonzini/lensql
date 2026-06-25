@@ -274,21 +274,30 @@ GROUP BY
     first_visit.exercise_id, first_visit.username;
 
 
-CREATE OR REPLACE VIEW v_solution_errors AS
+CREATE OR REPLACE VIEW v_invalid_errors AS
 SELECT
     q.id AS query_id,
     qb.exercise_id,
     qb.username,
     he.error_id,
     e.category,
-    e.name
+    e.name,
+    he.details
 FROM
-    exercise_solutions es
-    JOIN queries q ON es.id = q.id
+    queries q
     JOIN query_batches qb ON q.batch_id = qb.id
     LEFT JOIN has_error he ON q.id = he.query_id
     LEFT JOIN errors e ON he.error_id = e.id
+    LEFT JOIN exercise_solutions es ON es.id = q.id
 WHERE
-    es.is_correct = TRUE;
+    (   -- queries that executed but have a syntax error
+        q.success IS TRUE
+        AND e.category = '1.SYN'
+        AND e.id <> 22  -- 22: omitted semicolon
+    ) OR (  -- correct solutions that have a semantic or logical error
+        es.is_correct IS TRUE
+        AND e.category IN ('2.SEM', '3.LOG')
+    )
+ORDER BY error_id, query_id;
 
 COMMIT;
