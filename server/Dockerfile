@@ -11,6 +11,10 @@ ENV PYTHONPATH=/app
 COPY requirements.txt ./
 RUN pip install -r requirements.txt --no-cache-dir
 
+# Overridden dependencies
+COPY requirements/ ./requirements
+RUN pip install requirements/*.whl --no-cache-dir --force-reinstall
+
 COPY . /app/server/
 
 # Ports
