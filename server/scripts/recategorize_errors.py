@@ -11,6 +11,7 @@ from server.db.admin import Query, Dataset
 from server.db.admin.connection import db, SCHEMA
 
 from tqdm import tqdm
+NCOLS = 80
 
 
 SerializedError = tuple[int, list[str]]
@@ -99,7 +100,7 @@ def recategorize_errors(query_ids: list[int], jobs: int) -> tuple[int, int]:
 
     if jobs <= 1:
         results = (process_query(query_id) for query_id in query_ids)
-        iterator = tqdm(results, total=len(query_ids), ncols=100)
+        iterator = tqdm(results, total=len(query_ids), dynamic_ncols=True)
 
         for query_id, query_old_count, errors, error in iterator:
             if error is not None:
@@ -113,6 +114,7 @@ def recategorize_errors(query_ids: list[int], jobs: int) -> tuple[int, int]:
             query = Query(query_id)
             delete_existing_errors(query)
             log_errors(query_id, errors)
+            iterator.set_postfix_str(f'errors: {(new_count - old_count):+d}')
 
         return old_count, new_count
 
@@ -123,19 +125,22 @@ def recategorize_errors(query_ids: list[int], jobs: int) -> tuple[int, int]:
             for query_id in query_ids
         ]
 
-        for future in tqdm(as_completed(futures), total=len(futures), ncols=100):
-            query_id, query_old_count, errors, error = future.result()
-            if error is not None:
-                print(file=sys.stderr)
-                messages.error(f'Error processing query {query_id}: {error}')
-                continue
 
-            old_count += query_old_count
-            new_count += len(errors)
+        with tqdm(as_completed(futures), total=len(futures), dynamic_ncols=True) as progress:
+            for future in progress:
+                query_id, query_old_count, errors, error = future.result()
+                if error is not None:
+                    print(file=sys.stderr)
+                    messages.error(f'Error processing query {query_id}: {error}')
+                    continue
 
-            query = Query(query_id)
-            delete_existing_errors(query)
-            log_errors(query_id, errors)
+                old_count += query_old_count
+                new_count += len(errors)
+
+                query = Query(query_id)
+                delete_existing_errors(query)
+                log_errors(query_id, errors)
+                progress.set_postfix_str(f'errors: {(new_count - old_count):+d}')
 
     return old_count, new_count
 
