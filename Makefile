@@ -12,7 +12,7 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors stress_start stress_stop maintenance maintenance_stop logs
+.PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors stress_start stress_stop maintenance maintenance_stop logs copy_local_libs
 
 prod: stop_app locales_compile test
 	export PORT=$(PORT) && docker compose --profile prod up -d --build
@@ -83,6 +83,12 @@ clean:
 	find . -type d -name '__pycache__' -print0 | xargs -0 rm -r || true
 	rm -f server/messages.pot
 	find server/locales -name '*.mo' -delete
+
+copy_local_libs:
+	cd ../sqlscope && make build
+	cp ../sqlscope/dist/*.whl server/requirements/
+	cd ../sqlchecker && make build
+	cp ../sqlchecker/dist/*.whl server/requirements/
 
 stress_start:
 	for i in `seq 1 $(STRESS_COUNT)`; do docker run --rm -d --env MYSQL_RANDOM_ROOT_PASSWORD=true --name "test_mysql_$$i" mysql --innodb-use-native-aio=0; done
