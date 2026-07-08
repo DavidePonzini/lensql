@@ -15,3 +15,6 @@ ADD CONSTRAINT uq_query_context_columns UNIQUE (query_id, schema_name, table_nam
 
 -- clean up `"$user", public` schema references
 UPDATE queries SET search_path = 'public' WHERE search_path = '"$user", public';
+
+-- clean up escaping issues in search_path
+UPDATE queries set search_path = RIGHT(LEFT(search_path, -1), -1) WHERE search_path LIKE '"%"';
