@@ -59,6 +59,23 @@ class PostgresqlDatabase(Database):
 
     def _get_connection(self, autocommit: bool = True) -> PostgresqlConnection:
         return PostgresqlConnection(host=self.hostname, port=self.port, autocommit=autocommit)
+    
+    def get_search_path(self) -> str:
+        result = super().get_search_path()
 
+        # Additional logic to handle PostgreSQL-specific search path behavior
+
+        # remove $user from the search path (default value, not used by lensql)
+        # using ', ' prevents removing $user if it's the only value in the search path
+        result = result.replace('"$user", ', '')
+
+        # postgres automatically adds double quotes around the search path if it special characters or spaces, so we need to remove them to get the actual search path
+        if result.startswith('"') and result.endswith('"'):
+            result = result[1:-1]
+
+        # actual double quotes in the search path are escaped with double quotes, so we need to replace them with single quotes to get the actual search path
+        result = result.replace('""', '"')
+
+        return result
 
         
