@@ -83,6 +83,9 @@ class PostgresqlDatabase(Database):
         return result
 
     def get_system_catalog(self) -> Catalog:
-        dir = Path(__file__).parent
+        this_dir = Path(__file__).parent
 
-        return load_catalog(f'{dir}/system_catalog.json')
+        return load_catalog(f'{this_dir}/system_catalog.json')
+    
+    def get_system_search_path(self) -> str:
+        return 'pg_catalog,'

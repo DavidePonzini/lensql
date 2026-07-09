@@ -62,8 +62,3 @@ class MySQLDatabase(Database):
     def _get_connection(self, autocommit: bool = True) -> MySQLConnection:
         return MySQLConnection(host=self.hostname, port=self.port, autocommit=autocommit)
     
-    def get_system_catalog(self) -> Catalog:
-        dir = Path(__file__).parent
-
-        return load_catalog(f'{dir}/system_catalog.json')
-

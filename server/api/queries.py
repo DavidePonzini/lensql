@@ -118,6 +118,7 @@ def run_query():
                 )
 
                 system_catalog = database.get_system_catalog()
+                system_search_path = database.get_system_search_path()
 
                 catalog = user_catalog.merge(system_catalog)
 
@@ -125,7 +126,7 @@ def run_query():
                     query_str=query_result.query.query,
                     solutions=exercise_solutions,
                     catalog=catalog,
-                    search_path=search_path,
+                    search_path=f'{system_search_path}{search_path}',
                     solution_search_path=exercise_search_path,
                     detectors=DETECTORS,
                     debug=False,

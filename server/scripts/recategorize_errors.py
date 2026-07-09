@@ -1,5 +1,6 @@
 import argparse
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from dataclasses import dataclass
 import multiprocessing
 import os
 import sys
@@ -18,7 +19,12 @@ NCOLS = 80
 
 SerializedError = tuple[int, list[str]]
 
-SYSTEM_CATALOGS: dict[str, Catalog] = {}
+@dataclass
+class DBInfo:
+    catalog: Catalog
+    search_path: str
+
+DB_INFO_CACHE: dict[str, DBInfo] = {}
 
 DETECTORS: list[type[detectors.BaseDetector]] = [
     detectors.SyntaxErrorDetector,
@@ -37,16 +43,20 @@ def detect_errors(query: Query) -> list[DetectedError]:
         unique_constraints_info=context_unique_constraints
     )
     # use SYSTEM_CATALOGS to cache system catalogs for each dbms type
-    if dataset.dbms not in SYSTEM_CATALOGS:
-        SYSTEM_CATALOGS[dataset.dbms] = get_database('lens', dataset.dbms).get_system_catalog()
-    system_catalog = SYSTEM_CATALOGS[dataset.dbms]
+    if dataset.dbms not in DB_INFO_CACHE:
+        DB_INFO_CACHE[dataset.dbms] = DBInfo(
+            catalog=get_database('lens', dataset.dbms).get_system_catalog(),
+            search_path=get_database('lens', dataset.dbms).get_system_search_path()
+        )
+    system_catalog = DB_INFO_CACHE[dataset.dbms].catalog
+    system_search_path = DB_INFO_CACHE[dataset.dbms].search_path
     catalog = user_catalog.merge(system_catalog)
 
     return get_errors(
                     query_str=query.sql_string,
                     solutions=query.query_batch.exercise.solutions,
                     catalog=catalog,
-                    search_path=query.search_path,
+                    search_path=f'{system_search_path}{query.search_path}',
                     solution_search_path=dataset.search_path,
                     detectors=DETECTORS
                 )

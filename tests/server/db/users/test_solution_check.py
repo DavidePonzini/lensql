@@ -77,10 +77,6 @@ class _SolutionCheckDatabase(Database):
     def _get_connection(self, autocommit: bool = True):
         raise NotImplementedError
     
-    def get_system_catalog(self):
-        return Catalog()
-
-
 def _dataset(query: str, columns: list[Column], rows: list[list[object]]):
     return QueryResultDataset(
         result=pd.DataFrame(rows, columns=[column.name for column in columns]),

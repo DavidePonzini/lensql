@@ -73,10 +73,6 @@ class _TestDatabase(Database):
     def _get_connection(self, autocommit: bool = True):
         raise NotImplementedError
     
-    def get_system_catalog(self):
-        return Catalog()
-
-
 def _dataset(rows):
     return QueryResultDataset(
         result=pd.DataFrame(rows, columns=['name']),

@@ -471,9 +471,13 @@ class Database(ABC):
     # endregion
 
     # region Error checking
-    @abstractmethod
     def get_system_catalog(self) -> Catalog:
         '''Returns the system catalog for the database.'''
 
         return Catalog()
+
+    def get_system_search_path(self) -> str:
+        '''Returns the system search path to prefix to the actual search path'''
+        
+        return ''
     # endregion
