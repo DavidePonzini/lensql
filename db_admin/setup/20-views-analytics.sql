@@ -294,10 +294,24 @@ WHERE
         q.success IS TRUE
         AND e.category = '1.SYN'
         AND e.id <> 22  -- 22: omitted semicolon
+        AND e.id <> 38  -- 38: additional semicolon
     ) OR (  -- correct solutions that have a semantic or logical error
         es.is_correct IS TRUE
         AND e.category IN ('2.SEM', '3.LOG')
     )
 ORDER BY error_id, query_id;
 
+CREATE OR REPLACE VIEW v_invalid_errors_count AS
+SELECT
+    error_id,
+    category,
+    name,
+    COUNT(*) AS count
+FROM
+    v_invalid_errors
+GROUP BY
+    error_id, category, name
+ORDER BY
+    error_id;
+    
 COMMIT;
