@@ -112,10 +112,14 @@ def run_query():
                     unique_columns=context_unique_columns
                 )
 
-                catalog = build_catalog(
+                user_catalog = build_catalog(
                     columns_info=context_columns,
                     unique_constraints_info=context_unique_columns
                 )
+
+                system_catalog = database.get_system_catalog()
+
+                catalog = user_catalog.merge(system_catalog)
 
                 errors = get_errors(
                     query_str=query_result.query.query,

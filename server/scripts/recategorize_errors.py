@@ -6,15 +6,19 @@ import sys
 
 from dav_tools import database, messages, argument_parser
 from sqlchecker import build_catalog, get_errors, detectors, DetectedError
+from sqlscope import Catalog
 
 from server.db.admin import Query, Dataset
 from server.db.admin.connection import db, SCHEMA
+from server.db.users import get_database
 
 from tqdm import tqdm
 NCOLS = 80
 
 
 SerializedError = tuple[int, list[str]]
+
+SYSTEM_CATALOGS: dict[str, Catalog] = {}
 
 DETECTORS: list[type[detectors.BaseDetector]] = [
     detectors.SyntaxErrorDetector,
@@ -28,10 +32,15 @@ def detect_errors(query: Query) -> list[DetectedError]:
 
     dataset = Dataset(query.query_batch.exercise.dataset_id)
 
-    catalog = build_catalog(
+    user_catalog = build_catalog(
         columns_info=context_columns,
         unique_constraints_info=context_unique_constraints
     )
+    # use SYSTEM_CATALOGS to cache system catalogs for each dbms type
+    if dataset.dbms not in SYSTEM_CATALOGS:
+        SYSTEM_CATALOGS[dataset.dbms] = get_database('lens', dataset.dbms).get_system_catalog()
+    system_catalog = SYSTEM_CATALOGS[dataset.dbms]
+    catalog = user_catalog.merge(system_catalog)
 
     return get_errors(
                     query_str=query.sql_string,

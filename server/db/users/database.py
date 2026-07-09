@@ -17,7 +17,7 @@ from docker.models.containers import Container
 from abc import ABC, abstractmethod
 from typing import Iterable
 from flask_babel import _
-from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
+from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo, Catalog
 
 PROJECT_NAME = os.getenv('PROJECT_NAME', 'lensql')
 
@@ -468,3 +468,12 @@ class Database(ABC):
 
         # If none of the solutions were correct, return the first incorrect result
         return results[0].to_result()
+    # endregion
+
+    # region Error checking
+    @abstractmethod
+    def get_system_catalog(self) -> Catalog:
+        '''Returns the system catalog for the database.'''
+
+        return Catalog()
+    # endregion

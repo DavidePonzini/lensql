@@ -4,6 +4,7 @@ import pytest
 from server.db.users.database import Database
 from server.sql import Column, SQLCode
 from server.sql.result import QueryResultDataset, QueryResultMessage
+from sqlscope import Catalog
 
 
 class _BuiltinQueries:
@@ -75,6 +76,9 @@ class _SolutionCheckDatabase(Database):
 
     def _get_connection(self, autocommit: bool = True):
         raise NotImplementedError
+    
+    def get_system_catalog(self):
+        return Catalog()
 
 
 def _dataset(query: str, columns: list[Column], rows: list[list[object]]):

@@ -1,5 +1,7 @@
+
 import pandas as pd
 
+from sqlscope import Catalog
 from server.db.users.database import Database
 from server.sql.code import SQLCode
 from server.sql.result import Column, QueryResultDataset, QueryResultMessage
@@ -70,6 +72,9 @@ class _TestDatabase(Database):
 
     def _get_connection(self, autocommit: bool = True):
         raise NotImplementedError
+    
+    def get_system_catalog(self):
+        return Catalog()
 
 
 def _dataset(rows):

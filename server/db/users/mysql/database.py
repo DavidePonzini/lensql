@@ -1,3 +1,5 @@
+from sqlscope.catalog import Catalog
+
 from .data_types import DATA_TYPES
 from .connection import MySQLConnection
 from .queries import MySQLBuiltinQueries, MySQLMetadataQueries
@@ -7,6 +9,8 @@ import dav_tools
 import os
 import docker
 from docker.models.containers import Container
+from sqlscope import Catalog, load_catalog
+from pathlib import Path
 
 NETWORK_NAME = os.getenv('DB_USERS_NETWORK', 'db_users')
 
@@ -57,3 +61,9 @@ class MySQLDatabase(Database):
 
     def _get_connection(self, autocommit: bool = True) -> MySQLConnection:
         return MySQLConnection(host=self.hostname, port=self.port, autocommit=autocommit)
+    
+    def get_system_catalog(self) -> Catalog:
+        dir = Path(__file__).parent
+
+        return load_catalog(f'{dir}/system_catalog.json')
+

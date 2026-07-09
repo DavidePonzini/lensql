@@ -1,4 +1,6 @@
 
+from sqlscope.catalog import Catalog
+
 from server.db.users.queries import BuiltinQueries, MetadataQueries
 
 from .data_types import DATA_TYPES
@@ -10,6 +12,8 @@ import dav_tools
 import os
 import docker
 from docker.models.containers import Container
+from sqlscope import Catalog, load_catalog
+from pathlib import Path
 
 NETWORK_NAME = os.getenv('DB_USERS_NETWORK', 'db_users')
 
@@ -78,4 +82,7 @@ class PostgresqlDatabase(Database):
 
         return result
 
-        
+    def get_system_catalog(self) -> Catalog:
+        dir = Path(__file__).parent
+
+        return load_catalog(f'{dir}/system_catalog.json')
