@@ -192,7 +192,8 @@ CREATE TABLE has_error(
     id SERIAL PRIMARY KEY,
     query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
     error_id INTEGER NOT NULL,
-    details TEXT[] DEFAULT NULL
+    details TEXT[] DEFAULT NULL,
+    true_positive BOOLEAN DEFAULT NULL,
 );
 
 CREATE TABLE errors(
