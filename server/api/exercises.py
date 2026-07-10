@@ -191,6 +191,18 @@ def init_dataset():
     dataset = db.admin.Dataset(exercise.dataset_id)
     dataset_str = dataset.dataset_str
 
+    # Log the initialization of the dataset for the exercise
+    batch = db.admin.QueryBatch.log(user, exercise)
+    db.admin.Query.log(
+        query_batch=batch,
+        sql_string='INIT DATASET',
+        search_path='BUILTIN',
+        success=True,
+        result='',
+        query_type='BUILTIN',
+        query_goal='BUILTIN',
+    )
+
     def generate_results() -> Iterable[str]:
         database = db.users.get_database(user.username, dataset.dbms)
         for query_result in database.execute_sql(dataset_str, strip_comments=False):
