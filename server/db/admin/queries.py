@@ -376,7 +376,7 @@ class Query:
                 schema_name=row[0],
                 table_name=row[1],
                 constraint_type=row[2],
-                columns=str(row[3]),
+                columns=f'{{{",".join(row[3])}}}',      # NOTE: quick fix, should probably return it as a list. Changes cascade up to sqlscope.catalog.build_from_postgresql, etc.
             ) for row in unique_results
         ]
 
