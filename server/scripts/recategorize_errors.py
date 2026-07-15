@@ -113,9 +113,29 @@ def process_query(query_id: int) -> tuple[int, int, list[SerializedError], str |
         for error in errors
     ], None
 
-def recategorize_errors(query_ids: list[int], jobs: int) -> tuple[int, int]:
+def recategorize_errors(query_ids: list[int], jobs: int, start: int | None, end: int | None) -> tuple[int, int]:
     old_count = 0
     new_count = 0
+
+    if start:
+        if start > max(query_ids):
+            messages.error(f'Start query ID {start} is greater than the maximum query ID {max(query_ids)}.')
+            return old_count, new_count
+        if start not in query_ids:
+            old_start = start
+            start = min((q for q in query_ids if q >= start), default=None)
+            messages.warning(f'Start query ID {old_start} is not in the list of query IDs. Starting at ID {start}.')
+
+    if end:
+        if end < min(query_ids):
+            messages.error(f'End query ID {end} is less than the minimum query ID {min(query_ids)}.')
+            return old_count, new_count
+        if end not in query_ids:
+            old_end = end
+            end = max((q for q in query_ids if q <= end), default=None)
+            messages.warning(f'End query ID {old_end} is not in the list of query IDs. Ending at ID {end}.')
+
+    query_ids = [q for q in query_ids if (start is None or q >= start) and (end is None or q <= end)]
 
     if jobs <= 1:
         results = (process_query(query_id) for query_id in query_ids)
@@ -164,18 +184,33 @@ def recategorize_errors(query_ids: list[int], jobs: int) -> tuple[int, int]:
     return old_count, new_count
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':    
     argument_parser.add_argument(
         '-j', '--jobs',
         type=int,
         default=os.cpu_count() or 1,
         help='number of worker processes to use'
     )
+    argument_parser.add_argument(
+        '--start',
+        type=int,
+        help='query ID to start from (inclusive)'
+    )
+    argument_parser.add_argument(
+        '--end',
+        type=int,
+        help='query ID to end at (inclusive)'
+    )
 
     argument_parser.parse_args()
 
     query_ids = [query.query_id for query in list_queries()]
-    old_count, new_count = recategorize_errors(query_ids, argument_parser.args.jobs)
+    old_count, new_count = recategorize_errors(
+        query_ids=query_ids,
+        jobs=argument_parser.args.jobs,
+        start=argument_parser.args.start,
+        end=argument_parser.args.end
+    )
 
     messages.info(f'Detected {old_count} -> {new_count} errors total.')
     

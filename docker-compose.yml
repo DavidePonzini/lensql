@@ -25,6 +25,7 @@ services:
     depends_on:
       - webui
       - server
+      
   nginx_maintenance:
     image: davideponzini/maintenance
     container_name: ${COMPOSE_PROJECT_NAME}_nginx_maintenance

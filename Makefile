@@ -54,6 +54,9 @@ setup:
 recategorize_errors:
 	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/scripts/recategorize_errors.py
 
+bash:
+	docker exec -it $(COMPOSE_PROJECT_NAME)_server bash
+
 psql:
 	docker exec -it $(COMPOSE_PROJECT_NAME)_db_admin psql -U postgres
 
