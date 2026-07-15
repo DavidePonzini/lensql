@@ -23,6 +23,11 @@ UPDATE queries set search_path = RIGHT(LEFT(search_path, -1), -1) WHERE search_p
 update queries set search_path = 'p_260411' where id between 13692 and 13710;
 update queries set search_path = 'unicorsi' where id in (
     16156,
+    20886,
+    20901,
+    20951,
+    21266,
+    21271,
     23457,
     24713,
     24714,
@@ -33,6 +38,7 @@ update queries set search_path = 'unicorsi' where id in (
     24719,
     24720,
     28408,
+    28493,
     -1
 );
 
