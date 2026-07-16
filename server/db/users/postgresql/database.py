@@ -88,4 +88,4 @@ class PostgresqlDatabase(Database):
         return load_catalog(f'{this_dir}/system_catalog.json')
     
     def get_system_search_path(self) -> str:
-        return 'pg_catalog,'
+        return 'pg_temp_0,pg_catalog,'
