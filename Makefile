@@ -88,10 +88,10 @@ clean:
 	find server/locales -name '*.mo' -delete
 
 copy_local_libs:
-	cd ../sqlscope && make build
-	cp ../sqlscope/dist/*.whl server/requirements/
-	cd ../sqlchecker && make build
-	cp ../sqlchecker/dist/*.whl server/requirements/
+	cd ../lensql_sqlscope && make build
+	cp ../lensql_sqlscope/dist/*.whl server/requirements/
+	cd ../lensql_sqlchecker && make build
+	cp ../lensql_sqlchecker/dist/*.whl server/requirements/
 
 stress_start:
 	for i in `seq 1 $(STRESS_COUNT)`; do docker run --rm -d --env MYSQL_RANDOM_ROOT_PASSWORD=true --name "test_mysql_$$i" mysql --innodb-use-native-aio=0; done
