@@ -41,27 +41,3 @@ update queries set search_path = 'unicorsi' where id in (
     28493,
     -1
 );
-
--- true positives (respects postgres but not SQL standard)
-update has_error set true_positive = true where id in (
-    556297,
-    556298,
-    556303,
-    556304,
-    556321,
-    556322,
-    556356,
-    556357,
-    555411,
-    555412,
-    567628,
-    567634,
-    567635,
-    567652,
-    567653,
-    567687,
-    567688,
-    566761,
-    566762,
-    -1
-);

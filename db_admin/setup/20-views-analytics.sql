@@ -291,16 +291,14 @@ FROM
     LEFT JOIN errors e ON he.error_id = e.id
     LEFT JOIN exercise_solutions es ON es.id = q.id
 WHERE
-    he.true_positive IS NOT TRUE AND (
-        (   -- queries that executed but have a syntax error
-            q.success IS TRUE
-            AND e.category = '1.SYN'
-            AND e.id <> 22  -- 22: omitted semicolon
-            AND e.id <> 38  -- 38: additional semicolon
-        ) OR (  -- correct solutions that have a semantic or logical error
-            es.is_correct IS TRUE
-            AND e.category IN ('2.SEM', '3.LOG')
-        )
+    (   -- queries that executed but have a syntax error
+        q.success IS TRUE
+        AND e.category = '1.SYN'
+        AND e.id <> 22  -- 22: omitted semicolon
+        AND e.id <> 38  -- 38: additional semicolon
+    ) OR (  -- correct solutions that have a semantic or logical error
+        es.is_correct IS TRUE
+        AND e.category IN ('2.SEM', '3.LOG')
     )
 ORDER BY error_id, query_id;
 
