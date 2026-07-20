@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-VENV=./venv
+VENV=.venv
 REQUIREMENTS_SERVER=server/requirements.txt
 
 COMPOSE_PROJECT_NAME=$(subst .,,$(notdir $(patsubst %/,%,$(CURDIR))))
@@ -73,7 +73,6 @@ locales_extract: $(VENV)
 
 locales_compile: $(VENV)
 	$(VENV_BIN)/pybabel compile -d server/locales
-	
 
 $(VENV):
 	python -m venv $(VENV)

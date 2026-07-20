@@ -1,7 +1,7 @@
 dist/
 __pycache__/
 test.py
-venv/
+.venv/
 .ipynb_checkpoints/
 .env
 .codex
