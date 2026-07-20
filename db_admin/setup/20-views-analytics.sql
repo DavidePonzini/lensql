@@ -307,14 +307,20 @@ ORDER BY error_id, query_id;
 CREATE OR REPLACE VIEW v_invalid_errors_count AS
 SELECT
     error_id,
-    category,
+    CASE
+        WHEN GROUPING(error_id) = 1 THEN 'Total'
+        ELSE category
+    END AS category,
     name,
     COUNT(*) AS count
 FROM
     v_invalid_errors
-GROUP BY
-    error_id, category, name
+GROUP BY GROUPING SETS (
+    (error_id, category, name),
+    ()
+)
 ORDER BY
+    GROUPING(error_id),
     error_id;
     
 COMMIT;
