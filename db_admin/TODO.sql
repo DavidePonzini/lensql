@@ -19,6 +19,9 @@ UPDATE queries SET search_path = 'public' WHERE search_path = '"$user", public';
 -- clean up escaping issues in search_path
 UPDATE queries set search_path = RIGHT(LEFT(search_path, -1), -1) WHERE search_path LIKE '"%"';
 
+-- rename DBMS: 'postgresql' to 'postgres'
+UPDATE datasets set dbms = 'postgres' WHERE dbms = 'postgresql';
+
 -- fix incorrect search_path due to dataset initialization
 update queries set search_path = 'p_260411' where id between 13692 and 13710;
 update queries set search_path = 'unicorsi' where id in (
