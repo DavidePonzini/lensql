@@ -1,6 +1,7 @@
 import json
 
 from server.db.admin.datasets import Dataset
+from sqlscope import Dialect
 
 
 def test_dump_json_serializes_dataset_and_exercises(mocker):
@@ -12,7 +13,7 @@ def test_dump_json_serializes_dataset_and_exercises(mocker):
                 'Dataset description',
                 'SELECT 1;',
                 'public',
-                'postgresql',
+                Dialect.POSTGRES.value,
                 'analytics',
             ]],
             [[
@@ -35,7 +36,7 @@ def test_dump_json_serializes_dataset_and_exercises(mocker):
         'description': 'Dataset description',
         'dataset_str': 'SELECT 1;',
         'search_path': 'public',
-        'dbms': 'postgresql',
+        'dbms': Dialect.POSTGRES.value,
         'domain': 'analytics',
         'exercises': [{
             'title': 'Exercise title',
@@ -66,7 +67,7 @@ def test_load_json_creates_dataset_and_exercises(mocker):
         'description': 'Imported description',
         'dataset_str': 'SELECT 1;',
         'search_path': 'public',
-        'dbms': 'postgresql',
+        'dbms': Dialect.POSTGRES.value,
         'domain': 'analytics',
         'exercises': [{
             'title': 'Imported exercise',
@@ -86,7 +87,7 @@ def test_load_json_creates_dataset_and_exercises(mocker):
         dataset_str='SELECT 1;',
         domain='analytics',
         search_path='public',
-        dbms='postgresql',
+        dbms=Dialect.POSTGRES.value,
     )
     created_dataset.add_participant.assert_called_once()
     assert created_dataset.add_participant.call_args.args[0].username == 'lens'

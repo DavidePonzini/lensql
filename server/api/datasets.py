@@ -7,6 +7,7 @@ from flask import Blueprint, current_app, request
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_babel import _
+from sqlscope import Dialect
 
 from server import db, gamification
 from .util import responses
@@ -64,7 +65,7 @@ class DatasetsAPI(MethodView):
         description = data['description']
         dataset_str = data['dataset']
         dataset_search_path = data['search_path'] or 'public'   # Handle empty string
-        dbms = data['dbms']
+        dbms = Dialect(data['dbms'])
 
         dataset = db.admin.Dataset.create(
             title=title,
@@ -89,7 +90,7 @@ class DatasetsAPI(MethodView):
         description = data['description']
         dataset_str = data['dataset']
         dataset_search_path = data['search_path'] or 'public'   # Handle empty string
-        dbms = data['dbms']
+        dbms = Dialect(data['dbms'])
 
         dataset = db.admin.Dataset(dataset_id)
         if not dataset.has_owner(user):
@@ -127,7 +128,7 @@ def get_dataset(dataset_id):
         'description': dataset.description,
         'dataset_str': dataset.dataset_str,
         'search_path': dataset.search_path,
-        'dbms': dataset.dbms,
+        'dbms': dataset.dbms.value,
     }
 
     return responses.response(True, data=result)

@@ -2,6 +2,7 @@ import dav_tools
 import sqlexercise
 from sqlerrors import SqlErrors, SqlErrorCategory
 from sqlexercise import DifficultyLevel
+from sqlscope import Dialect
 from server.db.admin import Dataset, Exercise, User
 from server.db.users import get_database
 from datetime import datetime
@@ -18,18 +19,12 @@ def generate_assignment(
     input_dataset_str: str | None = None,
     input_exercise_count: int = 0,
     domain: str | None = None,
-    sql_dialect: str = 'postgres',
+    dialect: Dialect = Dialect.POSTGRES,
     language: str = 'en',
 ) -> Dataset:
     '''Generate SQL assignments based on specified SQL errors and difficulty levels.'''
 
-    # Map 'postgres' to 'postgresql' for consistency with database entries
-    if sql_dialect == 'postgres':
-        dbms = 'postgresql'
-    else:
-        dbms = sql_dialect
-
-    db = get_database(admin_user.username, dbms)
+    db = get_database(admin_user.username, dialect)
     db.get_connection() # Ensure we can connect to the database before proceeding
 
     assignment = sqlexercise.generate_assignment(
@@ -38,7 +33,7 @@ def generate_assignment(
         db_port=db.port,
         db_user=db.admin_username,
         db_password='password',
-        sql_dialect=sql_dialect,
+        sql_dialect=dialect,
         language=language,
         dataset_str=input_dataset_str,
         domain=domain,
@@ -81,7 +76,7 @@ def generate_assignment(
             dataset_str=dataset_str,
             domain=domain,
             search_path=schema_name,
-            dbms=dbms,
+            dbms=dialect,
         )
     else:
         # Use existing dataset
@@ -163,7 +158,7 @@ if __name__ == '__main__':
         input_dataset_str=input_dataset_str,
         input_exercise_count=input_exercise_count,
         domain=domain,
-        sql_dialect=sql_dialect,
+        dialect=sql_dialect,
         language=language
     )
 

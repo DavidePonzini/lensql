@@ -7,7 +7,7 @@ import sys
 
 from dav_tools import database, messages, argument_parser
 from sqlchecker import build_catalog, get_errors, detectors, DetectedError
-from sqlscope import Catalog
+from sqlscope import Catalog, Dialect
 
 from server.db.admin import Query, Dataset
 from server.db.admin.connection import db, SCHEMA
@@ -24,7 +24,7 @@ class DBInfo:
     catalog: Catalog
     search_path: str
 
-DB_INFO_CACHE: dict[str, DBInfo] = {}
+DB_INFO_CACHE: dict[Dialect, DBInfo] = {}
 
 DETECTORS: list[type[detectors.BaseDetector]] = [
     detectors.SyntaxErrorDetector,
@@ -58,7 +58,8 @@ def detect_errors(query: Query) -> list[DetectedError]:
                     catalog=catalog,
                     search_path=f'{system_search_path}{query.search_path}',
                     solution_search_path=dataset.search_path,
-                    detectors=DETECTORS
+                    detectors=DETECTORS,
+                    dialect=dataset.dbms
                 )
 
 def delete_existing_errors(query: Query) -> None:

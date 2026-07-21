@@ -86,11 +86,13 @@ clean:
 	rm -f server/messages.pot
 	find server/locales -name '*.mo' -delete
 
-copy_local_libs:
+install_local_libs: $(VENV)
 	cd ../lensql_sqlscope && make build
-	cp ../lensql_sqlscope/dist/*.whl server/requirements/
 	cd ../lensql_sqlchecker && make build
+	cp ../lensql_sqlscope/dist/*.whl server/requirements/
 	cp ../lensql_sqlchecker/dist/*.whl server/requirements/
+
+	$(VENV_BIN)/python -m pip install --force-reinstall --no-deps server/requirements/*.whl
 
 stress_start:
 	for i in `seq 1 $(STRESS_COUNT)`; do docker run --rm -d --env MYSQL_RANDOM_ROOT_PASSWORD=true --name "test_mysql_$$i" mysql --innodb-use-native-aio=0; done

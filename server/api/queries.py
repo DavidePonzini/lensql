@@ -128,6 +128,7 @@ def run_query():
                     catalog=catalog,
                     search_path=f'{system_search_path}{search_path}',
                     solution_search_path=exercise_search_path,
+                    dialect=dataset.dbms,
                     detectors=DETECTORS,
                     debug=False,
                 )
@@ -336,6 +337,7 @@ def check_solution():
         catalog=catalog,
         search_path=search_path,
         solution_search_path=dataset.search_path,
+        dialect=dataset.dbms,
         detectors=DETECTORS,
         debug=False,
     )

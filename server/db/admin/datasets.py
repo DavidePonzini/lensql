@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 from dav_tools import database
 from .connection import db, SCHEMA
+from sqlscope import Dialect
 
 from .users import User
 from .exercises import Exercise
@@ -40,7 +41,7 @@ class Dataset:
         description: str | None = None,
         dataset_str: str | None = None,
         search_path: str | None = None,
-        dbms: str | None = None
+        dbms: Dialect | None = None
     ) -> None:
         self.dataset_id = dataset_id
 
@@ -117,7 +118,7 @@ class Dataset:
         return self._dataset_str
     
     @property
-    def dbms(self) -> str:
+    def dbms(self) -> Dialect:
         '''Get the DBMS of the dataset'''
 
         if self._dbms is None:
@@ -138,9 +139,9 @@ class Dataset:
             if len(result) == 0:
                 raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
 
-            self._dbms = result[0][0] or ''
+            self._dbms = Dialect(result[0][0]) if result[0][0] else Dialect.POSTGRES
         
-        return self._dbms
+        return Dialect(self._dbms)
 
     @property
     def domain(self) -> str | None:
@@ -211,7 +212,7 @@ class Dataset:
         domain: str | None = None,
         dataset_id: str | None = None,
         search_path: str | None = None,
-        dbms: str,
+        dbms: Dialect,
     ) -> 'Dataset':
         '''Create a new dataset, optionally with a specified ID'''
 
@@ -223,7 +224,7 @@ class Dataset:
                 'dataset': dataset_str.strip() or None,
                 'domain': domain,
                 'search_path': search_path,
-                'dbms': dbms,
+                'dbms': dbms.value,
             }, ['id'])
         else:
             result = db.insert(SCHEMA, 'datasets', {
@@ -232,7 +233,7 @@ class Dataset:
                 'dataset': dataset_str.strip() or None,
                 'domain': domain,
                 'search_path': search_path,
-                'dbms': dbms,
+                'dbms': dbms.value,
             }, ['id'])
 
         assert result is not None and len(result) > 0, 'Failed to create dataset'
@@ -300,7 +301,7 @@ class Dataset:
             description=dataset_row[1],
             dataset_str=dataset_row[2] or '',
             search_path=dataset_row[3],
-            dbms=dataset_row[4],
+            dbms=Dialect(dataset_row[4]),
             domain=dataset_row[5],
             exercises=[
                 ExerciseJSON(
@@ -327,7 +328,7 @@ class Dataset:
             dataset_str=dataset.dataset_str,
             domain=dataset.domain,
             search_path=dataset.search_path,
-            dbms=dataset.dbms or 'postgresql',
+            dbms=Dialect(dataset.dbms) or Dialect.POSTGRES,
         )
         created_dataset.add_participant(admin_user)
         created_dataset.set_owner_status(admin_user, True)
@@ -383,7 +384,7 @@ class Dataset:
 
         return json.dumps(asdict(self.dump()), indent=2, ensure_ascii=False)
 
-    def update(self, title: str, description: str, dataset_str: str, search_path: str | None = None, dbms: str | None = None) -> None:
+    def update(self, title: str, description: str, dataset_str: str, search_path: str | None = None, dbms: Dialect | None = None) -> None:
         '''Update an existing dataset'''
 
         query = database.sql.SQL(
@@ -394,7 +395,7 @@ class Dataset:
                 description = {description},
                 dataset = {dataset},
                 search_path = {search_path},
-                dbms = {dbms}
+                dbms = {dbms.value}
             WHERE id = {dataset_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
@@ -412,7 +413,7 @@ class Dataset:
             'dataset_id': self.dataset_id,
             'dataset': dataset_str.strip() or None,
             'search_path': search_path,
-            'dbms': dbms,
+            'dbms': dbms.value if dbms else None,
         })
 
     def delete(self) -> None:

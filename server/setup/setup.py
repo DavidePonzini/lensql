@@ -1,5 +1,6 @@
 from server import db
 from sqlchecker import DetectedError, SqlErrors
+from sqlscope import Dialect
 
 from dav_tools import messages
 
@@ -24,7 +25,7 @@ if __name__ == '__main__':
             'name': 'Explore SQL',
             'description': 'Sandbox environment to explore SQL queries without restrictions.',
             'search_path': 'public',
-            'dbms': 'postgresql',
+            'dbms': Dialect.POSTGRES,
             'exercises': [
                 {
                     'name': 'Explore SQL',
@@ -39,7 +40,7 @@ if __name__ == '__main__':
             'name': 'Sample Dataset: Miedema',
             'description': 'A sample dataset for practicing queries.',
             'search_path': 'miedema',
-            'dbms': 'postgresql',
+            'dbms': Dialect.POSTGRES,
             'exercises': [
                 {
                     'name': 'Exercise 1',

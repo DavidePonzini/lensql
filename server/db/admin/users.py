@@ -4,6 +4,7 @@ from .connection import db, SCHEMA
 from ... import gamification
 from ...gamification.rewards import Badges
 from sqlerrors import SqlErrors
+from sqlscope import Dialect
 
 import bcrypt
 import re
@@ -1372,7 +1373,7 @@ class User:
             'title': row[1],
             'description': row[2],
             'search_path': row[3],
-            'dbms': row[4],
+            'dbms': Dialect(row[4]),
             'is_owner': bool(row[5]),
             'joined_ts': row[6],
             'participants': int(row[7]),
