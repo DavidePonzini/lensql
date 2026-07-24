@@ -188,6 +188,17 @@ CREATE TABLE query_context_columns_unique (
     columns TEXT[] NOT NULL
 );
 
+CREATE TABLE query_context_functions (
+    id SERIAL PRIMARY KEY,
+    query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    schema_name TEXT NOT NULL,
+    function_name TEXT NOT NULL,
+    argument_types TEXT[] NOT NULL,
+    return_type TEXT NOT NULL,
+
+    UNIQUE (query_id, schema_name, function_name, argument_types)
+);
+
 CREATE TABLE has_error(
     id SERIAL PRIMARY KEY,
     query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,

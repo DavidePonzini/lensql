@@ -1,6 +1,6 @@
 from dav_tools import database
 from sqlchecker import DetectedError, SqlErrors
-from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo
+from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo, CatalogFunctionInfo
 
 from .connection import db, SCHEMA
 from .users import User
@@ -327,7 +327,11 @@ class Query:
                 'columns': column.columns,
             })
 
-    def get_context(self) -> tuple[list[CatalogColumnInfo], list[CatalogUniqueConstraintInfo]]:
+    def get_context(self) -> tuple[
+        list[CatalogColumnInfo],
+        list[CatalogUniqueConstraintInfo],
+        list[CatalogFunctionInfo],
+    ]:
         '''Get context for a query.'''
 
         # Get columns
@@ -380,7 +384,29 @@ class Query:
             ) for row in unique_results
         ]
 
-        return columns, unique_columns
+        # Get functions
+        functions_query = database.sql.SQL('''
+            SELECT schema_name, function_name, arguments, return_type, kind
+            FROM {schema}.query_context_functions
+            WHERE query_id = {query_id}
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            query_id=database.sql.Placeholder('query_id')
+        )
+        functions_results = db.execute_and_fetch(functions_query, {
+            'query_id': self.query_id
+        })
+        functions = [
+            CatalogFunctionInfo(
+                schema_name=row[0],
+                function_name=row[1],
+                arguments=row[2],
+                return_type=row[3],
+                kind=row[4]
+            ) for row in functions_results
+        ]
+
+        return columns, unique_columns, functions
 
     def log_solution_attempt(self, is_correct: bool) -> None:
         '''Log a solution attempt for an exercise'''

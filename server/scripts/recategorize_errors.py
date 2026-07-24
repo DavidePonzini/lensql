@@ -34,19 +34,20 @@ DETECTORS: list[type[detectors.BaseDetector]] = [
 ]
 
 def detect_errors(query: Query) -> list[DetectedError]:
-    context_columns, context_unique_constraints = query.get_context()
+    context_columns, context_unique_constraints, context_functions = query.get_context()
 
     dataset = Dataset(query.query_batch.exercise.dataset_id)
 
     user_catalog = build_catalog(
         columns_info=context_columns,
-        unique_constraints_info=context_unique_constraints
+        unique_constraints_info=context_unique_constraints,
+        functions_info=context_functions,
     )
     # use SYSTEM_CATALOGS to cache system catalogs for each dbms type
     if dataset.dbms not in DB_INFO_CACHE:
         DB_INFO_CACHE[dataset.dbms] = DBInfo(
             catalog=get_database('lens', dataset.dbms).get_system_catalog(),
-            search_path=get_database('lens', dataset.dbms).get_system_search_path()
+            search_path=get_database('lens', dataset.dbms).get_system_search_path(),
         )
     system_catalog = DB_INFO_CACHE[dataset.dbms].catalog
     system_search_path = DB_INFO_CACHE[dataset.dbms].search_path
