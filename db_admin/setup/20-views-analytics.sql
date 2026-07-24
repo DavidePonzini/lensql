@@ -279,7 +279,6 @@ SELECT
     q.id AS query_id,
     qb.exercise_id,
     qb.username,
-    he.id AS detection_id,
     he.error_id,
     e.category,
     e.name,

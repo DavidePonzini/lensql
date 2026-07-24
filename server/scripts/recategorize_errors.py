@@ -194,12 +194,12 @@ if __name__ == '__main__':
         help='number of worker processes to use'
     )
     argument_parser.add_argument(
-        '--start',
+        '-s', '--start',
         type=int,
         help='query ID to start from (inclusive)'
     )
     argument_parser.add_argument(
-        '--end',
+        '-e', '--end',
         type=int,
         help='query ID to end at (inclusive)'
     )

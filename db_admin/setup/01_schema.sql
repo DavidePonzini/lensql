@@ -193,10 +193,11 @@ CREATE TABLE query_context_functions (
     query_id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE,
     schema_name TEXT NOT NULL,
     function_name TEXT NOT NULL,
-    argument_types TEXT[] NOT NULL,
+    arguments TEXT[] NOT NULL,
     return_type TEXT NOT NULL,
+    kind TEXT NOT NULL,
 
-    UNIQUE (query_id, schema_name, function_name, argument_types)
+    UNIQUE (query_id, schema_name, function_name, arguments)
 );
 
 CREATE TABLE has_error(
