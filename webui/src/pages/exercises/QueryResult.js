@@ -7,7 +7,7 @@ import './QueryResult.css';
 
 const QueryResult = forwardRef(({ result, isBuiltin, queryId, query, success, isMessage, notices }, ref) => {
     const { t } = useTranslation();
-    
+
     return (
         <div
             className={`query-result alert ${success ? isBuiltin ? 'alert-secondary' : 'alert-primary' : 'alert-danger'}`}
@@ -55,7 +55,9 @@ const QueryResult = forwardRef(({ result, isBuiltin, queryId, query, success, is
                 isMessage ? (
                     <pre>{result}</pre>
                 ) : (
-                    <div dangerouslySetInnerHTML={{ __html: result }} />
+                    <div className="table-responsive">
+                        <div dangerouslySetInnerHTML={{ __html: result }} />
+                    </div>
                 )
             }
 
