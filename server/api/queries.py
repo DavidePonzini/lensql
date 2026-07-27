@@ -322,6 +322,7 @@ def check_solution():
 
     context_columns = database.get_columns()
     unique_columns = database.get_unique_columns()
+    functions = database.get_functions()
 
     query.log_context(
         columns=context_columns,
@@ -330,7 +331,8 @@ def check_solution():
 
     catalog = build_catalog(
         columns_info=context_columns,
-        unique_constraints_info=unique_columns
+        unique_constraints_info=unique_columns,
+        functions_info=functions,
     )
 
     errors = get_errors(
