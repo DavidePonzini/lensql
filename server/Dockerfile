@@ -13,7 +13,9 @@ RUN pip install -r requirements.txt --no-cache-dir
 
 # Overridden dependencies
 COPY requirements/ ./requirements
-RUN pip install requirements/*.whl --no-cache-dir --force-reinstall --no-deps
+RUN if ls requirements/*.whl >/dev/null 2>&1; then \
+        pip install requirements/*.whl --no-cache-dir --force-reinstall --no-deps; \
+    fi
 
 COPY . /app/server/
 
