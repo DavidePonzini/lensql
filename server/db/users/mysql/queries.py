@@ -253,3 +253,40 @@ class MySQLMetadataQueries(MetadataQueries):
                 tc.constraint_name,
                 tc.constraint_type;
         '''
+
+    @staticmethod
+    def get_functions() -> str:
+        return '''
+            SELECT
+                r.routine_schema AS schema_name,
+                r.routine_name AS name,
+                (
+                    SELECT GROUP_CONCAT(
+                        CONCAT_WS(
+                            ' ',
+                            p.parameter_mode,
+                            p.parameter_name,
+                            p.dtd_identifier
+                        )
+                        ORDER BY p.ordinal_position
+                        SEPARATOR ', '
+                    )
+                    FROM information_schema.parameters AS p
+                    WHERE p.specific_schema = r.routine_schema
+                    AND p.specific_name = r.specific_name
+                    AND p.ordinal_position > 0
+                ) AS arguments,
+                CASE
+                    WHEN r.routine_type = 'FUNCTION'
+                        THEN r.dtd_identifier
+                    ELSE NULL
+                END AS return_type,
+                r.routine_type AS function_type
+            FROM information_schema.routines AS r
+            WHERE r.routine_schema NOT IN (
+                'information_schema',
+                'mysql',
+                'performance_schema',
+                'sys'
+            )
+        '''

@@ -211,3 +211,23 @@ class PostgresqlMetadataQueries(MetadataQueries):
                 kcu.constraint_name,
                 tc.constraint_type;
         '''
+
+    @staticmethod
+    def get_functions() -> str:
+        return '''
+            SELECT
+                n.nspname AS schema_name,
+                p.proname AS name,
+                pg_get_function_identity_arguments(p.oid) AS arguments,
+                pg_get_function_result(p.oid) AS return_type,
+                CASE p.prokind
+                    WHEN 'f' THEN 'FUNCTION'
+                    WHEN 'p' THEN 'PROCEDURE'
+                    WHEN 'a' THEN 'AGGREGATE'
+                    WHEN 'w' THEN 'WINDOW'
+                END AS function_type
+            FROM pg_proc AS p
+            JOIN pg_namespace AS n
+                ON n.oid = p.pronamespace
+            WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
+        '''

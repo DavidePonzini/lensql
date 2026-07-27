@@ -62,3 +62,9 @@ class MetadataQueries(ABC):
     def get_unique_columns() -> str:
         '''Lists unique columns.'''
         pass
+
+    @staticmethod
+    @abstractmethod
+    def get_functions() -> str:
+        '''Lists all functions.'''
+        pass

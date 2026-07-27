@@ -104,6 +104,7 @@ def run_query():
 
             context_columns = database.get_columns()
             context_unique_columns = database.get_unique_columns()
+            context_functions = database.get_functions()
 
             # Log context and errors for SELECT queries
             if query_result.query.query_type == 'SELECT':
@@ -114,7 +115,8 @@ def run_query():
 
                 user_catalog = build_catalog(
                     columns_info=context_columns,
-                    unique_constraints_info=context_unique_columns
+                    unique_constraints_info=context_unique_columns,
+                    functions_info=context_functions
                 )
 
                 system_catalog = database.get_system_catalog()

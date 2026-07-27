@@ -17,7 +17,7 @@ from docker.models.containers import Container
 from abc import ABC, abstractmethod
 from typing import Iterable
 from flask_babel import _
-from sqlscope.catalog import CatalogColumnInfo, CatalogUniqueConstraintInfo, Catalog
+from sqlscope.catalog import Catalog, CatalogColumnInfo, CatalogUniqueConstraintInfo, CatalogFunctionInfo
 
 PROJECT_NAME = os.getenv('PROJECT_NAME', 'lensql')
 
@@ -336,6 +336,22 @@ class Database(ABC):
                 table_name=row[1],
                 constraint_type=row[2],
                 columns=row[3]
+            )
+            for row in result
+        ]
+
+    def get_functions(self) -> list[CatalogFunctionInfo]:
+        '''Lists functions.'''
+
+        result = self.connect().execute_sql_raw(self.metadata_queries.get_functions())
+
+        return [
+            CatalogFunctionInfo(
+                schema_name=row[0],
+                function_name=row[1],
+                arguments=row[2],
+                return_type=row[3],
+                kind=row[4],
             )
             for row in result
         ]
