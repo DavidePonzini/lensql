@@ -77,6 +77,7 @@ def test_check_solution_returns_rewards_and_logs_context(authenticated_client, m
         check_query_solution=lambda **kwargs: fake_check,
         get_columns=lambda: ['columns'],
         get_unique_columns=lambda: ['unique_columns'],
+        get_functions=lambda: ['functions'],
     )
     fake_batch = SimpleNamespace()
     fake_query = SimpleNamespace(
