@@ -12,7 +12,7 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors stress_start stress_stop maintenance maintenance_stop logs copy_local_libs
+.PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors stress_start stress_stop maintenance maintenance_stop logs install_local_libs
 
 prod: stop_app locales_compile test
 	export PORT=$(PORT) && docker compose --profile prod up -d --build
