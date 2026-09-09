@@ -28,9 +28,9 @@ DB_INFO_CACHE: dict[Dialect, DBInfo] = {}
 
 DETECTORS: list[type[detectors.BaseDetector]] = [
     detectors.SyntaxErrorDetector,
-    # detectors.SemanticErrorDetector,
-    # detectors.LogicalErrorDetector,
-    # detectors.ComplicationDetector,
+    detectors.SemanticErrorDetector,
+    detectors.LogicalErrorDetector,
+    detectors.ComplicationDetector,
 ]
 
 def detect_errors(query: Query) -> list[DetectedError]:
