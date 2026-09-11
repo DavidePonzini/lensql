@@ -12,7 +12,7 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors stress_start stress_stop maintenance maintenance_stop logs install_local_libs
+.PHONY: $(VENV)_upgrade dev prod stop stop_app stop_user_dbs setup psql active_users dump clean locales_extract locales_compile recategorize_errors stress_start stress_stop maintenance maintenance_stop logs install_local_libs recategorize_goals test bash
 
 prod: stop_app locales_compile test
 	export PORT=$(PORT) && docker compose --profile prod up -d --build
@@ -53,6 +53,10 @@ setup:
 
 recategorize_errors:
 	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/scripts/recategorize_errors.py
+
+recategorize_goals:
+	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/scripts/recategorize_goals.py
+
 
 bash:
 	docker exec -it $(COMPOSE_PROJECT_NAME)_server bash

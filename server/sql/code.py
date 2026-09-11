@@ -166,7 +166,7 @@ class SQLCode:
             return QueryGoal.UNKNOWN.value
 
         # If the query is a SELECT * without WHERE/GROUP BY/HAVING, it's likely exploratory
-        if not main_select.where and not main_select.group_by and not main_select.having:
+        if not main_select.where and not main_select.group_by and not main_select.having and main_select.is_select_all:
             return QueryGoal.EXPLORATORY.value
 
         return QueryGoal.FOCUSED.value
