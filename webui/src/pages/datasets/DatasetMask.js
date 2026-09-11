@@ -15,7 +15,7 @@ function DatasetMask({
     const { t } = useTranslation();
 
     if (dbms == '') {
-        setDbms('postgresql');
+        setDbms('postgres');
     }
 
     const tips = t('pages.datasets.dataset_mask.tips', { returnObjects: true });
@@ -81,7 +81,7 @@ function DatasetMask({
                     value={dbms}
                     onChange={(e) => setDbms(e.target.value)}
                 >
-                    <option value="postgresql">PostgreSQL</option>
+                    <option value="postgres">PostgreSQL</option>
                     <option value="mysql">MySQL</option>
                     <option disabled value="sqlite">SQLite</option>
                     <option disabled value="sqlserver">SQL Server</option>
