@@ -16,9 +16,9 @@ function Register() {
     const [passwordError, setPasswordError] = useState('');
     const [isPasswordValid, setIsPasswordValid] = useState(false);
 
-    const [schoolInput, setSchoolInput] = useState('');
-    const [schoolError, setSchoolError] = useState('');
-    const [isSchoolValid, setIsSchoolValid] = useState(false);
+    const [institutionInput, setInstitutionInput] = useState('');
+    const [institutionError, setInstitutionError] = useState('');
+    const [isInstitutionValid, setIsInstitutionValid] = useState(false);
 
     const [isTeacherInput, setIsTeacherInput] = useState(false);
     const [agreeLogging, setAgreeLogging] = useState(false);
@@ -64,15 +64,15 @@ function Register() {
         }
     }
 
-    function checkSchool(school) {
-        setSchoolInput(school);
-        if (!school) {
-            setIsSchoolValid(false);
-            setSchoolError(t('pages.register.schoolRequired'));
+    function checkInstitution(institution) {
+        setInstitutionInput(institution);
+        if (!institution) {
+            setIsInstitutionValid(false);
+            setInstitutionError(t('pages.register.institutionRequired'));
             return false;
         }
-        setIsSchoolValid(true);
-        setSchoolError('');
+        setIsInstitutionValid(true);
+        setInstitutionError('');
         return true;
     }
 
@@ -95,7 +95,7 @@ function Register() {
                 body: JSON.stringify({
                     username: usernameInput,
                     password: passwordInput,
-                    school: schoolInput,
+                    school: institutionInput,
                     is_teacher: isTeacherInput,
                 })
             });
@@ -196,20 +196,20 @@ function Register() {
                                     </div>
                                 </div>
 
-                                {/* School */}
+                                {/* Institution */}
                                 <div className="form-outline mb-4">
-                                    <label className="form-label" htmlFor="register-school">
-                                        {t('pages.register.school')}
+                                    <label className="form-label" htmlFor="register-institution">
+                                        {t('pages.register.institution')}
                                     </label>
                                     <input
                                         type="text"
-                                        id="register-school"
-                                        className={`form-control form-control-lg ${schoolError ? 'is-invalid' : ''}`}
-                                        placeholder={t('pages.register.schoolPlaceholder')}
-                                        value={schoolInput}
-                                        onInput={(e) => checkSchool(e.target.value)}
+                                        id="register-institution"
+                                        className={`form-control form-control-lg ${institutionError ? 'is-invalid' : ''}`}
+                                        placeholder={t('pages.register.institutionPlaceholder')}
+                                        value={institutionInput}
+                                        onInput={(e) => checkInstitution(e.target.value)}
                                     />
-                                    {schoolError && <div className="invalid-feedback">{schoolError}</div>}
+                                    {institutionError && <div className="invalid-feedback">{institutionError}</div>}
                                 </div>
 
                                 {/* Teacher Checkbox */}
@@ -259,7 +259,7 @@ function Register() {
                                         className="btn btn-primary btn-lg btn-block w-100"
                                         type="submit"
                                         disabled={
-                                            !isUsernameValid || !isPasswordValid || !isSchoolValid || !agreeLogging
+                                            !isUsernameValid || !isPasswordValid || !isInstitutionValid || !agreeLogging
                                         }
                                     >
                                         {t('pages.register.submit')}

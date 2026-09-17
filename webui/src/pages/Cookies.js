@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 function Cookies() {
     const { t } = useTranslation();
+    const storageItems = ['authentication', 'language'];
 
     return (
         <div className="container py-4">
@@ -10,6 +11,13 @@ function Cookies() {
 
             <h4 className="mt-4">{t('pages.cookies.what_title')}</h4>
             <p>{t('pages.cookies.what_body')}</p>
+
+            <h4 className="mt-4">{t('pages.cookies.storage_title')}</h4>
+            <ul>
+                {storageItems.map((item) => (
+                    <li key={item}>{t(`pages.cookies.${item}_body`)}</li>
+                ))}
+            </ul>
 
             <h4 className="mt-4">{t('pages.cookies.how_title')}</h4>
             <p>{t('pages.cookies.how_body')}</p>
