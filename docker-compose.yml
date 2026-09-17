@@ -43,8 +43,8 @@ services:
     restart: unless-stopped
     networks:
       - default
-    ports:
-      - "3000:3000"
+    # ports:
+      # - "3000:3000"
     profiles:
       - dev
 
