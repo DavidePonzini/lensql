@@ -14,6 +14,8 @@ function DatasetAdd({ refresh, className }) {
     const [dataset, setDataset] = useState('');
     const [searchPath, setSearchPath] = useState('');
     const [dbms, setDbms] = useState('');
+    const [activityStartTs, setActivityStartTs] = useState('');
+    const [activityEndTs, setActivityEndTs] = useState('');
 
     async function handleAdd() {
         await apiRequest('/api/datasets', 'POST', {
@@ -22,6 +24,8 @@ function DatasetAdd({ refresh, className }) {
             'dataset': dataset,
             'search_path': searchPath,
             'dbms': dbms,
+            'activity_start_ts': activityStartTs ? new Date(activityStartTs).toISOString() : '',
+            'activity_end_ts': activityEndTs ? new Date(activityEndTs).toISOString() : '',
         });
 
         refresh();
@@ -58,6 +62,10 @@ function DatasetAdd({ refresh, className }) {
                 setSearchPath={setSearchPath}
                 dbms={dbms}
                 setDbms={setDbms}
+                activityStartTs={activityStartTs}
+                setActivityStartTs={setActivityStartTs}
+                activityEndTs={activityEndTs}
+                setActivityEndTs={setActivityEndTs}
             />
         </ButtonModal>
     );

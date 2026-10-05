@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from server.db.admin.datasets import Dataset
 from sqlscope import Dialect
@@ -141,3 +142,30 @@ def test_shuffle_renames_exercises_in_randomized_order(mocker):
         {'title': 'Task 2', 'request': 'Request 2', 'solutions': ['SELECT 2']},
         {'title': 'Task 3', 'request': 'Request 1', 'solutions': ['SELECT 1']},
     ]
+
+
+def test_update_persists_optional_activity_window(mocker):
+    execute = mocker.patch('server.db.admin.datasets.db.execute')
+    start = datetime(2026, 10, 1, 9)
+    end = datetime(2026, 10, 1, 11)
+
+    Dataset('ds1').update(
+        title='Dataset',
+        description='',
+        dataset_str='',
+        search_path='public',
+        dbms=Dialect.POSTGRES,
+        activity_start_ts=start,
+        activity_end_ts=end,
+    )
+
+    assert execute.call_args.args[1] == {
+        'title': 'Dataset',
+        'description': '',
+        'dataset_id': 'ds1',
+        'dataset': None,
+        'search_path': 'public',
+        'dbms': Dialect.POSTGRES.value,
+        'activity_start_ts': start,
+        'activity_end_ts': end,
+    }

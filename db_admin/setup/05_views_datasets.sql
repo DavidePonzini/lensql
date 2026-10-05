@@ -101,7 +101,7 @@ LEFT JOIN student_query_counts sqc
 
 WHERE dm.is_active = TRUE;
 
-CREATE VIEW v_generated_exercises AS
+CREATE OR REPLACE VIEW v_generated_exercises AS
 SELECT
     e.dataset_id,
     e.generation_error,
@@ -113,7 +113,7 @@ WHERE
 GROUP BY e.dataset_id, e.generation_error
 ORDER BY e.dataset_id, e.generation_error;
 
-CREATE VIEW v_dataset_completion AS
+CREATE OR REPLACE VIEW v_dataset_completion AS
 WITH solved_exercises AS (
     SELECT
         qb.username,

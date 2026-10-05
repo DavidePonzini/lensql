@@ -1,5 +1,79 @@
 import json
+from datetime import datetime, timezone
 from types import SimpleNamespace
+
+from sqlscope import Dialect
+
+
+def test_get_dataset_exposes_activity_dates_to_teachers_only(authenticated_client, mocker):
+    teacher = SimpleNamespace(username='alice', is_teacher=True)
+    dataset = SimpleNamespace(
+        exists=lambda: True,
+        has_participant=lambda user: True,
+        name='Dataset',
+        description='Description',
+        dataset_str='SELECT 1;',
+        search_path='public',
+        dbms=Dialect.POSTGRES,
+        activity_start_ts=datetime(2026, 10, 1, 9, tzinfo=timezone.utc),
+        activity_end_ts=datetime(2026, 10, 1, 11, tzinfo=timezone.utc),
+    )
+    mocker.patch('server.api.datasets.db.admin.User', return_value=teacher)
+    mocker.patch('server.api.datasets.db.admin.Dataset', return_value=dataset)
+
+    response = authenticated_client.get('/datasets/get/DS1')
+
+    assert response.get_json()['data']['activity_start_ts'] == '2026-10-01T09:00:00+00:00'
+    assert response.get_json()['data']['activity_end_ts'] == '2026-10-01T11:00:00+00:00'
+
+    teacher.is_teacher = False
+    response = authenticated_client.get('/datasets/get/DS1')
+    assert 'activity_start_ts' not in response.get_json()['data']
+    assert 'activity_end_ts' not in response.get_json()['data']
+
+
+def test_update_dataset_persists_activity_dates_for_teacher(authenticated_client, mocker):
+    teacher = SimpleNamespace(username='alice', is_teacher=True)
+    dataset = mocker.Mock()
+    dataset.has_owner.return_value = True
+    mocker.patch('server.api.datasets.db.admin.User', return_value=teacher)
+    mocker.patch('server.api.datasets.db.admin.Dataset', return_value=dataset)
+
+    response = authenticated_client.put('/datasets', json={
+        'dataset_id': 'DS1',
+        'title': 'Dataset',
+        'description': '',
+        'dataset': '',
+        'search_path': 'public',
+        'dbms': 'postgres',
+        'activity_start_ts': '2026-10-01T09:00',
+        'activity_end_ts': '',
+    })
+
+    assert response.get_json()['success'] is True
+    assert dataset.update.call_args.kwargs['activity_start_ts'] == datetime(2026, 10, 1, 9, tzinfo=timezone.utc)
+    assert dataset.update.call_args.kwargs['activity_end_ts'] is None
+
+
+def test_student_cannot_update_activity_dates(authenticated_client, mocker):
+    student = SimpleNamespace(username='alice', is_teacher=False)
+    dataset = mocker.Mock()
+    dataset.has_owner.return_value = True
+    mocker.patch('server.api.datasets.db.admin.User', return_value=student)
+    mocker.patch('server.api.datasets.db.admin.Dataset', return_value=dataset)
+
+    response = authenticated_client.put('/datasets', json={
+        'dataset_id': 'DS1',
+        'title': 'Dataset',
+        'description': '',
+        'dataset': '',
+        'search_path': 'public',
+        'dbms': 'postgres',
+        'activity_start_ts': '2026-10-01T09:00',
+    })
+
+    assert response.get_json()['success'] is False
+    dataset.update.assert_not_called()
 
 
 def test_export_dataset_returns_dump_for_owner(authenticated_client, mocker):

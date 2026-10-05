@@ -27,6 +27,27 @@ GROUP BY
 ORDER BY 
     qb.username, press_count DESC;
 
+CREATE OR REPLACE VIEW v_button_usage_per_lab AS
+SELECT
+    dataset_id,
+    username,
+    button,
+    COUNT(*) presses
+FROM
+    exercises e
+    JOIN query_batches qb ON qb.exercise_id = e.id
+    JOIN queries q ON q.batch_id = qb.id
+    JOIN messages m ON m.query_id = q.id
+GROUP BY
+    dataset_id,
+    username,
+    button
+ORDER BY
+    dataset_id,
+    username,
+    button
+;
+
 CREATE OR REPLACE VIEW v_feedbacks AS
 SELECT 
     button,

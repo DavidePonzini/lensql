@@ -44,3 +44,20 @@ update queries set search_path = 'unicorsi' where id in (
     28493,
     -1
 );
+
+
+
+
+-- ------------------------------------------
+ALTER TABLE users ALTER COLUMN registration_ts TYPE TIMESTAMPTZ;
+ALTER TABLE navigation_logs ALTER COLUMN ts TYPE TIMESTAMPTZ;
+ALTER TABLE badges ALTER COLUMN ts TYPE TIMESTAMPTZ;
+ALTER TABLE datasets ALTER COLUMN activity_start_ts TYPE TIMESTAMPTZ;
+ALTER TABLE datasets ALTER COLUMN activity_end_ts TYPE TIMESTAMPTZ;
+ALTER TABLE dataset_members ALTER COLUMN joined_ts TYPE TIMESTAMPTZ;
+ALTER TABLE exercises ALTER COLUMN created_ts TYPE TIMESTAMPTZ;
+ALTER TABLE query_batches ALTER COLUMN ts TYPE TIMESTAMPTZ;
+ALTER TABLE queries ALTER COLUMN ts TYPE TIMESTAMPTZ;
+ALTER TABLE exercise_solutions ALTER COLUMN solution_ts TYPE TIMESTAMPTZ;
+ALTER TABLE messages ALTER COLUMN ts TYPE TIMESTAMPTZ;
+ALTER TABLE messages ALTER COLUMN feedback_ts TYPE TIMESTAMPTZ;

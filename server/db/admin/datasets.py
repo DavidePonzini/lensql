@@ -1,6 +1,7 @@
 import json
 import random
 from dataclasses import asdict, dataclass
+from datetime import datetime
 from typing import Any
 from dav_tools import database
 from .connection import db, SCHEMA
@@ -41,7 +42,9 @@ class Dataset:
         description: str | None = None,
         dataset_str: str | None = None,
         search_path: str | None = None,
-        dbms: Dialect | None = None
+        dbms: Dialect | None = None,
+        activity_start_ts: datetime | None = None,
+        activity_end_ts: datetime | None = None,
     ) -> None:
         self.dataset_id = dataset_id
 
@@ -51,6 +54,8 @@ class Dataset:
         self._dataset_str = dataset_str
         self._search_path = search_path
         self._dbms = dbms
+        self._activity_start_ts = activity_start_ts
+        self._activity_end_ts = activity_end_ts
 
     # region Properties
     def _load_properties(self) -> None:
@@ -62,7 +67,9 @@ class Dataset:
                 name,
                 description,
                 dataset,
-                search_path
+                search_path,
+                activity_start_ts,
+                activity_end_ts
             FROM {schema}.datasets
             WHERE id = {dataset_id}
         ''').format(
@@ -81,6 +88,8 @@ class Dataset:
         self._description = result[0][1]
         self._dataset_str = result[0][2] or ''
         self._search_path = result[0][3]
+        self._activity_start_ts = result[0][4]
+        self._activity_end_ts = result[0][5]
 
     @property
     def name(self) -> str:
@@ -181,6 +190,22 @@ class Dataset:
             if self._search_path is None:
                 raise ValueError(f'Failed to load search path for dataset with ID {self.dataset_id}')
         return self._search_path
+
+    @property
+    def activity_start_ts(self) -> datetime | None:
+        '''Get the optional start of the dataset activity window.'''
+
+        if self._activity_start_ts is None:
+            self._load_properties()
+        return self._activity_start_ts
+
+    @property
+    def activity_end_ts(self) -> datetime | None:
+        '''Get the optional end of the dataset activity window.'''
+
+        if self._activity_end_ts is None:
+            self._load_properties()
+        return self._activity_end_ts
     # endregion
 
     # region CRUD
@@ -213,6 +238,8 @@ class Dataset:
         dataset_id: str | None = None,
         search_path: str | None = None,
         dbms: Dialect,
+        activity_start_ts: datetime | None = None,
+        activity_end_ts: datetime | None = None,
     ) -> 'Dataset':
         '''Create a new dataset, optionally with a specified ID'''
 
@@ -225,6 +252,8 @@ class Dataset:
                 'domain': domain,
                 'search_path': search_path,
                 'dbms': dbms.value,
+                'activity_start_ts': activity_start_ts,
+                'activity_end_ts': activity_end_ts,
             }, ['id'])
         else:
             result = db.insert(SCHEMA, 'datasets', {
@@ -234,13 +263,24 @@ class Dataset:
                 'domain': domain,
                 'search_path': search_path,
                 'dbms': dbms.value,
+                'activity_start_ts': activity_start_ts,
+                'activity_end_ts': activity_end_ts,
             }, ['id'])
 
         assert result is not None and len(result) > 0, 'Failed to create dataset'
 
         dataset_id = result[0][0]
 
-        return Dataset(dataset_id, name=title, description=description, dataset_str=dataset_str, search_path=search_path, dbms=dbms)
+        return Dataset(
+            dataset_id,
+            name=title,
+            description=description,
+            dataset_str=dataset_str,
+            search_path=search_path,
+            dbms=dbms,
+            activity_start_ts=activity_start_ts,
+            activity_end_ts=activity_end_ts,
+        )
 
     def dump(self) -> DatasetJSON:
         '''Dump a dataset and its exercises to a JSON-serializable structure.'''
@@ -384,7 +424,7 @@ class Dataset:
 
         return json.dumps(asdict(self.dump()), indent=2, ensure_ascii=False)
 
-    def update(self, title: str, description: str, dataset_str: str, search_path: str | None = None, dbms: Dialect | None = None) -> None:
+    def update(self, title: str, description: str, dataset_str: str, search_path: str | None = None, dbms: Dialect | None = None, activity_start_ts: datetime | None = None, activity_end_ts: datetime | None = None) -> None:
         '''Update an existing dataset'''
 
         query = database.sql.SQL(
@@ -395,7 +435,9 @@ class Dataset:
                 description = {description},
                 dataset = {dataset},
                 search_path = {search_path},
-                dbms = {dbms.value}
+                dbms = {dbms},
+                activity_start_ts = {activity_start_ts},
+                activity_end_ts = {activity_end_ts}
             WHERE id = {dataset_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
@@ -405,6 +447,8 @@ class Dataset:
             dataset=database.sql.Placeholder('dataset'),
             search_path=database.sql.Placeholder('search_path'),
             dbms=database.sql.Placeholder('dbms'),
+            activity_start_ts=database.sql.Placeholder('activity_start_ts'),
+            activity_end_ts=database.sql.Placeholder('activity_end_ts'),
         )
 
         db.execute(query, {
@@ -414,6 +458,8 @@ class Dataset:
             'dataset': dataset_str.strip() or None,
             'search_path': search_path,
             'dbms': dbms.value if dbms else None,
+            'activity_start_ts': activity_start_ts,
+            'activity_end_ts': activity_end_ts,
         })
 
     def delete(self) -> None:

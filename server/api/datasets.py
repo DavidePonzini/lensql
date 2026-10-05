@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import asdict
+from datetime import datetime, timezone
 
 from flask import Blueprint, current_app, request
 from flask.views import MethodView
@@ -13,6 +14,27 @@ from server import db, gamification
 from .util import responses
 
 bp = Blueprint('datasets', __name__)
+
+
+def _parse_activity_timestamp(value: str | None, field_name: str) -> datetime | None:
+    '''Parse an optional ISO-8601 timestamp supplied by the dataset form.'''
+
+    if not value:
+        return None
+
+    try:
+        timestamp = datetime.fromisoformat(value.replace('Z', '+00:00'))
+        return timestamp if timestamp.tzinfo else timestamp.replace(tzinfo=timezone.utc)
+    except (AttributeError, ValueError) as error:
+        raise ValueError(_('%(field)s must be a valid date and time.', field=field_name)) from error
+
+
+def _activity_timestamps(data: dict) -> tuple[datetime | None, datetime | None]:
+    start = _parse_activity_timestamp(data.get('activity_start_ts'), _('Activity start'))
+    end = _parse_activity_timestamp(data.get('activity_end_ts'), _('Activity end'))
+    if start and end and start > end:
+        raise ValueError(_('Activity start must be before activity end.'))
+    return start, end
 
 
 def _format_dataset_import_error(error: Exception) -> str:
@@ -66,6 +88,10 @@ class DatasetsAPI(MethodView):
         dataset_str = data['dataset']
         dataset_search_path = data['search_path'] or 'public'   # Handle empty string
         dbms = Dialect(data['dbms'])
+        try:
+            activity_start_ts, activity_end_ts = _activity_timestamps(data) if user.is_teacher else (None, None)
+        except ValueError as error:
+            return responses.response(False, message=str(error))
 
         dataset = db.admin.Dataset.create(
             title=title,
@@ -73,6 +99,8 @@ class DatasetsAPI(MethodView):
             dataset_str=dataset_str,
             dbms=dbms,
             search_path=dataset_search_path,
+            activity_start_ts=activity_start_ts,
+            activity_end_ts=activity_end_ts,
         )
         dataset.add_participant(user)
         dataset.set_owner_status(user, True)
@@ -96,12 +124,22 @@ class DatasetsAPI(MethodView):
         if not dataset.has_owner(user):
             return responses.response(False, message=_('You are not authorized to modify this dataset.'))
 
+        if not user.is_teacher and ('activity_start_ts' in data or 'activity_end_ts' in data):
+            return responses.response(False, message=_('Only teachers can modify activity dates.'))
+
+        try:
+            activity_start_ts, activity_end_ts = _activity_timestamps(data)
+        except ValueError as error:
+            return responses.response(False, message=str(error))
+
         dataset.update(
             title=title,
             description=description,
             dataset_str=dataset_str,
             search_path=dataset_search_path,
             dbms=dbms,
+            activity_start_ts=activity_start_ts,
+            activity_end_ts=activity_end_ts,
         )
 
         return responses.response(True)
@@ -130,6 +168,12 @@ def get_dataset(dataset_id):
         'search_path': dataset.search_path,
         'dbms': dataset.dbms.value,
     }
+
+    if user.is_teacher:
+        result.update({
+            'activity_start_ts': dataset.activity_start_ts.isoformat() if dataset.activity_start_ts else None,
+            'activity_end_ts': dataset.activity_end_ts.isoformat() if dataset.activity_end_ts else None,
+        })
 
     return responses.response(True, data=result)
 

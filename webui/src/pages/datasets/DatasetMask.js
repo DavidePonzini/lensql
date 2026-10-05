@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import useUserInfo from '../../hooks/useUserInfo';
 
 function DatasetMask({
     title,
@@ -11,8 +12,14 @@ function DatasetMask({
     setSearchPath,
     dbms,
     setDbms,
+    activityStartTs,
+    setActivityStartTs,
+    activityEndTs,
+    setActivityEndTs,
 }) {
     const { t } = useTranslation();
+    const { userInfo } = useUserInfo();
+    const isTeacher = userInfo?.isTeacher || false;
 
     if (dbms == '') {
         setDbms('postgres');
@@ -88,6 +95,29 @@ function DatasetMask({
                     <option disabled value="oracle">Oracle</option>
                 </select>
             </div>
+
+            {isTeacher && (
+                <div className="row">
+                    <div className="col-md-6 mb-3">
+                        <label className="form-label">{t('pages.datasets.dataset_mask.activity_start_label')}</label>
+                        <input
+                            type="datetime-local"
+                            className="form-control"
+                            value={activityStartTs}
+                            onChange={(e) => setActivityStartTs(e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                        <label className="form-label">{t('pages.datasets.dataset_mask.activity_end_label')}</label>
+                        <input
+                            type="datetime-local"
+                            className="form-control"
+                            value={activityEndTs}
+                            onChange={(e) => setActivityEndTs(e.target.value)}
+                        />
+                    </div>
+                </div>
+            )}
         </>
     );
 }

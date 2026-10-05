@@ -65,7 +65,9 @@ INSERT INTO lensql.datasets(
     dataset,
     domain,
     search_path,
-    dbms
+    dbms,
+    activity_start_ts,
+    activity_end_ts
 ) SELECT 
     id,
     name,
@@ -73,7 +75,9 @@ INSERT INTO lensql.datasets(
     dataset,
     domain,
     search_path,
-    dbms
+    dbms,
+    activity_start_ts,
+    activity_end_ts
 FROM datasets;
 
 INSERT INTO lensql.dataset_members(

@@ -46,13 +46,6 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 
 -- Tables -------------------------------------------------------------------------------------------------------
 
-CREATE TABLE lab_hours (
-    start_ts TIMESTAMP NOT NULL,
-    end_ts TIMESTAMP NOT NULL,
-    lab_name TEXT,
-    PRIMARY KEY (start_ts, end_ts)
-);
-
 CREATE TABLE users (
     username VARCHAR(255) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
@@ -60,7 +53,7 @@ CREATE TABLE users (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,  -- allows to deactivate users without deleting them
     is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
-    registration_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+    registration_ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     experience INTEGER NOT NULL DEFAULT 0,
     coins INTEGER NOT NULL DEFAULT 50,
     can_use_ai BOOLEAN NOT NULL DEFAULT TRUE,
@@ -72,14 +65,14 @@ CREATE TABLE navigation_logs(
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
     url TEXT NOT NULL,
     event VARCHAR(50) NOT NULL,  -- e.g. 'PAGE_VISIT', 'FOCUS', 'UNFOCUS', 'CLOSE'
-    ts TIMESTAMP NOT NULL DEFAULT NOW()
+    ts TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
 CREATE TABLE badges (
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
     badge VARCHAR(255) NOT NULL,        -- e.g. 'name.level' (in this way we can keep ts of each level achieved)
-    ts TIMESTAMP NOT NULL DEFAULT NOW(),
+    ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (username, badge)
 );
@@ -98,7 +91,9 @@ CREATE TABLE datasets (
     dataset TEXT DEFAULT NULL,
     domain VARCHAR(255) DEFAULT NULL,
     search_path TEXT NOT NULL DEFAULT 'public',
-    dbms VARCHAR(255) NOT NULL
+    dbms VARCHAR(255) NOT NULL,
+    activity_start_ts TIMESTAMPTZ DEFAULT NULL,
+    activity_end_ts TIMESTAMPTZ DEFAULT NULL,
 );
 
 CREATE TABLE dataset_members (
@@ -106,7 +101,7 @@ CREATE TABLE dataset_members (
     dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE CASCADE,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_owner BOOLEAN NOT NULL DEFAULT FALSE,
-    joined_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+    joined_ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (username, dataset_id)
 );
@@ -120,7 +115,7 @@ CREATE TABLE exercises (
     request TEXT NOT NULL,
     solutions TEXT NOT NULL DEFAULT '[]',  -- JSON array of solution strings
     created_by VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE SET NULL, -- allows to keep exercises even if the creator is deleted
-    created_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     generation_difficulty INTEGER DEFAULT NULL,
     generation_error INTEGER DEFAULT NULL
 );
@@ -139,7 +134,7 @@ CREATE TABLE has_learning_objective (
 CREATE TABLE query_batches (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
-    ts TIMESTAMP NOT NULL DEFAULT NOW(),
+    ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -152,14 +147,14 @@ CREATE TABLE queries (
     result TEXT DEFAULT NULL,
     query_type VARCHAR(50) NOT NULL,
     query_goal VARCHAR(255) DEFAULT NULL,
-    ts TIMESTAMP NOT NULL DEFAULT NOW()
+    ts TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- solutions attempted by students
 CREATE TABLE exercise_solutions (
     id INTEGER NOT NULL REFERENCES queries(id) ON UPDATE CASCADE ON DELETE CASCADE PRIMARY KEY,
     is_correct BOOLEAN,
-    solution_ts TIMESTAMP NOT NULL DEFAULT NOW()
+    solution_ts TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE query_context_columns (
@@ -220,9 +215,9 @@ CREATE TABLE messages (
     answer TEXT NOT NULL,
     button VARCHAR(255) NOT NULL,
     msg_idx INTEGER NOT NULL,
-    ts TIMESTAMP NOT NULL DEFAULT NOW(),
+    ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     feedback BOOLEAN DEFAULT NULL,
-    feedback_ts TIMESTAMP DEFAULT NULL
+    feedback_ts TIMESTAMPTZ DEFAULT NULL
 );
 
 COMMIT;

@@ -7,6 +7,14 @@ import ButtonModal from '../../components/buttons/ButtonModal';
 
 import DatasetMask from './DatasetMask';
 
+function toLocalDateTimeInput(value) {
+    if (!value) return '';
+
+    const date = new Date(value);
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+    return localDate.toISOString().slice(0, 16);
+}
+
 function DatasetUpdate({ datasetId, refresh, className }) {
     const { apiRequest } = useAuth();
     const { t } = useTranslation();
@@ -16,6 +24,8 @@ function DatasetUpdate({ datasetId, refresh, className }) {
     const [dataset, setDataset] = useState('');
     const [searchPath, setSearchPath] = useState('');
     const [dbms, setDbms] = useState('');
+    const [activityStartTs, setActivityStartTs] = useState('');
+    const [activityEndTs, setActivityEndTs] = useState('');
 
     async function handleEditDataset() {
         await apiRequest('/api/datasets', 'PUT', {
@@ -25,6 +35,8 @@ function DatasetUpdate({ datasetId, refresh, className }) {
             'dataset': dataset,
             'search_path': searchPath,
             'dbms': dbms,
+            'activity_start_ts': activityStartTs ? new Date(activityStartTs).toISOString() : '',
+            'activity_end_ts': activityEndTs ? new Date(activityEndTs).toISOString() : '',
         });
 
         refresh();
@@ -39,6 +51,8 @@ function DatasetUpdate({ datasetId, refresh, className }) {
         setDataset(result.data.dataset_str);
         setSearchPath(result.data.search_path);
         setDbms(result.data.dbms);
+        setActivityStartTs(toLocalDateTimeInput(result.data.activity_start_ts));
+        setActivityEndTs(toLocalDateTimeInput(result.data.activity_end_ts));
     }, [datasetId, apiRequest]);
 
     useEffect(() => {
@@ -71,6 +85,10 @@ function DatasetUpdate({ datasetId, refresh, className }) {
                 setSearchPath={setSearchPath}
                 dbms={dbms}
                 setDbms={setDbms}
+                activityStartTs={activityStartTs}
+                setActivityStartTs={setActivityStartTs}
+                activityEndTs={activityEndTs}
+                setActivityEndTs={setActivityEndTs}
             />
         </ButtonModal>
     );
