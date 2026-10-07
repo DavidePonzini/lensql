@@ -293,7 +293,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
 
                                                     <Tooltip
                                                         formatter={(value, name) => {
-                                                            const label = t(`errors.categories.${name}.name`);
+                                                            const label = t(`errors.categories.${name.toLowerCase()}.name`);
                                                             return [`${value.toFixed(1)}%`, label];
                                                         }}
                                                         itemSorter={(entry) => {
@@ -303,7 +303,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
                                                         wrapperStyle={{ zIndex: 1000 }}
                                                     />
 
-                                                    <Legend formatter={(v) => t(`errors.categories.${v}.name`)} />
+                                                    <Legend formatter={(v) => t(`errors.categories.${v.toLowerCase()}.name`)} />
 
                                                     <Area
                                                         type="linear"
