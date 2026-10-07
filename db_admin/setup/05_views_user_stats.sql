@@ -3,7 +3,7 @@ BEGIN;
 SET search_path TO lensql;
 
 -- Query stats
-CREATE VIEW v_stats_queries_by_exercise AS
+CREATE OR REPLACE VIEW v_stats_queries_by_exercise AS
 SELECT
     dm.dataset_id,
     qb.exercise_id,
@@ -31,7 +31,7 @@ GROUP BY
 -- CREATE INDEX ON v_stats_queries_by_exercise(exercise_id);
 -- CREATE INDEX ON v_stats_queries_by_exercise(username);
 
-CREATE VIEW v_stats_queries_by_user AS
+CREATE OR REPLACE VIEW v_stats_queries_by_user AS
 SELECT
     qb.username,
     q.query_type,
@@ -50,7 +50,7 @@ GROUP BY
 -- CREATE INDEX ON v_stats_queries_by_user(username);
 
 -- Message stats
-CREATE VIEW v_stats_messages_by_exercise AS
+CREATE OR REPLACE VIEW v_stats_messages_by_exercise AS
 SELECT
     dm.dataset_id,
     qb.exercise_id,
@@ -76,7 +76,7 @@ GROUP BY
 -- CREATE INDEX ON v_stats_messages_by_exercise(exercise_id);
 -- CREATE INDEX ON v_stats_messages_by_exercise(username);
 
-CREATE VIEW v_stats_messages_by_user AS
+CREATE OR REPLACE VIEW v_stats_messages_by_user AS
 SELECT
     qb.username,
     COUNT(m.button) AS messages,
@@ -92,7 +92,7 @@ GROUP BY
 
 -- CREATE INDEX ON v_stats_messages_by_user(username);
 
-CREATE VIEW v_stats_errors_by_exercise AS
+CREATE OR REPLACE VIEW v_stats_errors_by_exercise AS
 SELECT
     dm.dataset_id,
     qb.exercise_id,
@@ -115,7 +115,7 @@ GROUP BY
     q.query_goal,
     he.error_id;
 
-CREATE VIEW v_stats_errors_by_user AS
+CREATE OR REPLACE VIEW v_stats_errors_by_user AS
 SELECT
     qb.username,
     q.query_goal,
@@ -131,7 +131,7 @@ GROUP BY
     he.error_id;
 
 
-CREATE VIEW v_stats_error_timeline_by_exercise AS
+CREATE OR REPLACE VIEW v_stats_error_timeline_by_exercise AS
 SELECT
     dm.dataset_id,
     qb.exercise_id,
@@ -156,7 +156,7 @@ GROUP BY
     q.query_goal,
     he.error_id;
 
-CREATE VIEW v_stats_error_timeline_by_user AS
+CREATE OR REPLACE VIEW v_stats_error_timeline_by_user AS
 SELECT
     qb.username,
     DATE(q.ts) AS day,
