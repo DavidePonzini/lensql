@@ -1,6 +1,8 @@
 '''This module handles dataset-related endpoints for the API.'''
 
 import json
+import re
+from psycopg2.errors import UniqueViolation
 from dataclasses import asdict
 from datetime import datetime, timezone
 
@@ -14,6 +16,34 @@ from server import db, gamification
 from .util import responses
 
 bp = Blueprint('datasets', __name__)
+
+
+@bp.route('/rename-id', methods=['POST'])
+@jwt_required()
+def rename_dataset_id():
+    '''Allow administrators to rename any dataset, regardless of membership.'''
+    user = db.admin.User(get_jwt_identity())
+    if not user.is_admin:
+        return responses.response(False, message=_('You do not have permission to perform this action.'))
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return responses.response(False, message=_('Invalid dataset ID.'))
+    dataset_id = data.get('dataset_id')
+    new_id = data.get('new_dataset_id')
+    if not isinstance(dataset_id, str) or not dataset_id.strip() or not isinstance(new_id, str):
+        return responses.response(False, message=_('Invalid dataset ID.'))
+    new_id = new_id.strip().upper()
+    if not re.fullmatch(r'[A-Z0-9_-]+', new_id):
+        return responses.response(False, message=_('Dataset IDs may contain only letters, numbers, underscores and hyphens.'))
+
+    dataset = db.admin.Dataset(dataset_id.strip())
+    try:
+        if not dataset.rename_id(new_id):
+            return responses.response(False, message=_('Dataset does not exist.'))
+    except UniqueViolation:
+        return responses.response(False, message=_('This dataset ID is already in use.'))
+    return responses.response(True, dataset_id=new_id)
 
 
 def _parse_activity_timestamp(value: str | None, field_name: str) -> datetime | None:

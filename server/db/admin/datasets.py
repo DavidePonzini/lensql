@@ -209,6 +209,26 @@ class Dataset:
     # endregion
 
     # region CRUD
+    def rename_id(self, new_id: str) -> bool:
+        '''Rename the primary key, cascading to memberships and exercises.'''
+        query = database.sql.SQL('''
+            UPDATE {schema}.datasets SET id = {new_id}
+            WHERE id = {dataset_id}
+            RETURNING id
+        ''').format(
+            schema=database.sql.Identifier(SCHEMA),
+            new_id=database.sql.Placeholder('new_id'),
+            dataset_id=database.sql.Placeholder('dataset_id'),
+        )
+        result = db.execute_and_fetch(query, {
+            'new_id': new_id,
+            'dataset_id': self.dataset_id,
+        })
+        if not result:
+            return False
+        self.dataset_id = result[0][0]
+        return True
+
     def exists(self) -> bool:
         '''Check if a dataset exists by its ID'''
 

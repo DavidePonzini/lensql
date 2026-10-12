@@ -5,6 +5,21 @@ from server.db.admin.datasets import Dataset
 from sqlscope import Dialect
 
 
+def test_rename_id_updates_instance_after_persistence(mocker):
+    fetch = mocker.patch('server.db.admin.datasets.db.execute_and_fetch', return_value=[('NEW-ID',)])
+    dataset = Dataset('OLD')
+    assert dataset.rename_id('NEW-ID') is True
+    assert dataset.dataset_id == 'NEW-ID'
+    assert fetch.call_args.args[1] == {'dataset_id': 'OLD', 'new_id': 'NEW-ID'}
+
+
+def test_rename_missing_dataset_leaves_instance_unchanged(mocker):
+    mocker.patch('server.db.admin.datasets.db.execute_and_fetch', return_value=[])
+    dataset = Dataset('OLD')
+    assert dataset.rename_id('NEW') is False
+    assert dataset.dataset_id == 'OLD'
+
+
 def test_dump_json_serializes_dataset_and_exercises(mocker):
     fetch = mocker.patch(
         'server.db.admin.datasets.db.execute_and_fetch',

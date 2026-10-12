@@ -200,6 +200,15 @@
     },
     "pages": {
         "admin": {
+            "rename_dataset": {
+                "title": "Rename Dataset ID",
+                "current_id": "Current dataset ID",
+                "new_id": "New dataset ID",
+                "submit": "Rename ID",
+                "success": "Dataset ID changed to {{id}}.",
+                "error": "Could not rename the dataset ID.",
+                "special": "Special dataset"
+            },
             "title": "Admin page",
             "add_user": {
                 "title": "Add User to Dataset",

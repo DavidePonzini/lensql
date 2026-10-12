@@ -247,3 +247,15 @@ msgstr "your query should return this row but it does not"
 msgid "{count} rows in your query are correct"
 msgstr "{count} rows in your query are correct"
 
+
+#: server/api/datasets.py
+msgid "Invalid dataset ID."
+msgstr "Invalid dataset ID."
+
+#: server/api/datasets.py
+msgid "Dataset IDs may contain only letters, numbers, underscores and hyphens."
+msgstr "Dataset IDs may contain only letters, numbers, underscores and hyphens."
+
+#: server/api/datasets.py
+msgid "This dataset ID is already in use."
+msgstr "This dataset ID is already in use."

@@ -200,6 +200,15 @@
     },
     "pages": {
         "admin": {
+            "rename_dataset": {
+                "title": "Rinomina ID del dataset",
+                "current_id": "ID attuale del dataset",
+                "new_id": "Nuovo ID del dataset",
+                "submit": "Rinomina ID",
+                "success": "ID del dataset modificato in {{id}}.",
+                "error": "Impossibile rinominare l’ID del dataset.",
+                "special": "Dataset speciale"
+            },
             "title": "Pagina Admin",
             "add_user": {
                 "title": "Aggiungi Utente a Dataset",

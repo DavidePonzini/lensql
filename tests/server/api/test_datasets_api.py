@@ -1,8 +1,55 @@
 import json
+import pytest
+from psycopg2.errors import UniqueViolation
 from datetime import datetime, timezone
 from types import SimpleNamespace
 
 from sqlscope import Dialect
+
+
+def test_rename_dataset_id_requires_admin(authenticated_client, mocker):
+    mocker.patch('server.api.datasets.db.admin.User', return_value=SimpleNamespace(is_admin=False))
+    dataset = mocker.patch('server.api.datasets.db.admin.Dataset')
+    response = authenticated_client.post('/datasets/rename-id', json={'dataset_id': 'DS1', 'new_dataset_id': 'DS2'})
+    assert response.get_json()['success'] is False
+    dataset.assert_not_called()
+
+
+def test_admin_can_rename_any_dataset(authenticated_client, mocker):
+    mocker.patch('server.api.datasets.db.admin.User', return_value=SimpleNamespace(is_admin=True))
+    dataset = mocker.Mock()
+    dataset.rename_id.return_value = True
+    factory = mocker.patch('server.api.datasets.db.admin.Dataset', return_value=dataset)
+    response = authenticated_client.post('/datasets/rename-id', json={'dataset_id': ' special-old ', 'new_dataset_id': ' special-new '})
+    assert response.get_json()['success'] is True
+    assert response.get_json()['dataset_id'] == 'SPECIAL-NEW'
+    factory.assert_called_once_with('special-old')
+    dataset.rename_id.assert_called_once_with('SPECIAL-NEW')
+    dataset.has_owner.assert_not_called()
+    dataset.has_participant.assert_not_called()
+
+
+@pytest.mark.parametrize('new_id', ['', ' ', None, 123, 'a/b', 'a?b', 'a#b', 'a b', '..'])
+def test_rename_dataset_rejects_invalid_id(authenticated_client, mocker, new_id):
+    mocker.patch('server.api.datasets.db.admin.User', return_value=SimpleNamespace(is_admin=True))
+    dataset = mocker.patch('server.api.datasets.db.admin.Dataset')
+    response = authenticated_client.post('/datasets/rename-id', json={'dataset_id': 'DS1', 'new_dataset_id': new_id})
+    assert response.get_json()['success'] is False
+    dataset.assert_not_called()
+
+
+@pytest.mark.parametrize('outcome, message', [(False, 'does not exist'), (UniqueViolation(), 'already in use')])
+def test_rename_dataset_handles_missing_and_duplicate_ids(authenticated_client, mocker, outcome, message):
+    mocker.patch('server.api.datasets.db.admin.User', return_value=SimpleNamespace(is_admin=True))
+    dataset = mocker.Mock()
+    if isinstance(outcome, Exception):
+        dataset.rename_id.side_effect = outcome
+    else:
+        dataset.rename_id.return_value = outcome
+    mocker.patch('server.api.datasets.db.admin.Dataset', return_value=dataset)
+    response = authenticated_client.post('/datasets/rename-id', json={'dataset_id': 'DS1', 'new_dataset_id': 'DS2'})
+    assert response.get_json()['success'] is False
+    assert message in response.get_json()['message']
 
 
 def test_get_dataset_exposes_activity_dates_to_teachers_only(authenticated_client, mocker):
