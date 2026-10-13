@@ -200,6 +200,10 @@
     },
     "pages": {
         "admin": {
+            "tabs": {
+                "datasets": "Dataset",
+                "users": "Utenti"
+            },
             "change_password": {
                 "title": "Modifica password utente",
                 "password": "Nuova password",

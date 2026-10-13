@@ -36,7 +36,6 @@ function ChangeUserPassword() {
 
     return (
         <>
-            <hr className="my-4" />
             <h2>{t(`${key}.title`)}</h2>
             {message && <div role="alert" className={`alert alert-${message.type}`}>{message.text}</div>}
             <form onSubmit={submit} className="row g-3">
