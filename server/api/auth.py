@@ -19,6 +19,28 @@ from .util import responses
 bp = Blueprint('auth', __name__)
 
 
+@bp.route('/admin/change-password', methods=['POST'])
+@jwt_required()
+def admin_change_password():
+    '''Allow administrators to set a password for a named user.'''
+    admin = db.admin.User(get_jwt_identity())
+    if not admin.is_admin:
+        return responses.response(False, message=_('You do not have permission to perform this action.'))
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return responses.response(False, message=_('Username and new password are required.'))
+    username = data.get('username')
+    password = data.get('new_password')
+    if not isinstance(username, str) or not username.strip() or not isinstance(password, str) or not password:
+        return responses.response(False, message=_('Username and new password are required.'))
+    user = db.admin.User(username.strip())
+    if not user.exists():
+        return responses.response(False, message=_('User does not exist.'))
+    if not user.change_password(password):
+        return responses.response(False, message=_('Failed to reset password. Please try again.'))
+    return responses.response(True, message=_('Password reset successfully.'))
+
+
 @bp.route('/login', methods=['POST'])
 def login():
     '''Login endpoint to authenticate users and return JWT tokens.'''

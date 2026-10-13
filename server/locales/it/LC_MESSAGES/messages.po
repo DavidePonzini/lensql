@@ -259,3 +259,11 @@ msgstr "Gli ID dei dataset possono contenere solo lettere, numeri, trattini bass
 #: server/api/datasets.py
 msgid "This dataset ID is already in use."
 msgstr "Questo ID del dataset è già in uso."
+
+#: server/api/auth.py
+msgid "Username and new password are required."
+msgstr "Nome utente e nuova password sono obbligatori."
+
+#: server/api/auth.py
+msgid "Password must contain at least 8 characters, uppercase and lowercase letters, a number and a special character, and be at most 72 bytes."
+msgstr "La password deve contenere almeno 8 caratteri, lettere maiuscole e minuscole, un numero e un carattere speciale, e non superare 72 byte."

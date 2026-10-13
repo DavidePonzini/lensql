@@ -200,6 +200,13 @@
     },
     "pages": {
         "admin": {
+            "change_password": {
+                "title": "Modifica password utente",
+                "password": "Nuova password",
+                "submit": "Modifica password",
+                "success": "Password modificata per {{username}}.",
+                "error": "Impossibile modificare la password."
+            },
             "rename_dataset": {
                 "title": "Rinomina ID del dataset",
                 "current_id": "ID attuale del dataset",

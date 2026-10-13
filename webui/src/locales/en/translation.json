@@ -200,6 +200,13 @@
     },
     "pages": {
         "admin": {
+            "change_password": {
+                "title": "Change User Password",
+                "password": "New password",
+                "submit": "Change password",
+                "success": "Password changed for {{username}}.",
+                "error": "Could not change the password."
+            },
             "rename_dataset": {
                 "title": "Rename Dataset ID",
                 "current_id": "Current dataset ID",

@@ -1,4 +1,48 @@
 from types import SimpleNamespace
+import pytest
+
+
+def test_admin_password_change_requires_admin(authenticated_client, mocker):
+    factory = mocker.patch('server.api.auth.db.admin.User', return_value=SimpleNamespace(is_admin=False))
+    response = authenticated_client.post('/auth/admin/change-password', json={'username': 'bob', 'new_password': 'Strong123!'})
+    assert response.get_json()['success'] is False
+    factory.assert_called_once()
+
+
+@pytest.mark.parametrize('password', ['x', 'weak', '123', ' Strong123! ', 'A1!' + 'é' * 36])
+def test_admin_changes_named_user_password(authenticated_client, mocker, password):
+    target = mocker.Mock()
+    target.exists.return_value = True
+    target.change_password.return_value = True
+    factory = mocker.patch('server.api.auth.db.admin.User', side_effect=[SimpleNamespace(is_admin=True), target])
+    response = authenticated_client.post('/auth/admin/change-password', json={'username': ' bob ', 'new_password': password})
+    assert response.get_json()['success'] is True
+    assert factory.call_args.args == ('bob',)
+    target.change_password.assert_called_once_with(password)
+    target.can_login.assert_not_called()
+    assert 'new_password' not in response.get_json()
+
+
+@pytest.mark.parametrize('payload', [None, [], {}, {'username': '', 'new_password': 'Strong123!'},
+    {'username': 123, 'new_password': 'Strong123!'}, {'username': 'bob', 'new_password': None},
+    {'username': 'bob', 'new_password': ''}])
+def test_admin_password_change_rejects_invalid_input(authenticated_client, mocker, payload):
+    factory = mocker.patch('server.api.auth.db.admin.User', return_value=SimpleNamespace(is_admin=True))
+    response = authenticated_client.post('/auth/admin/change-password', json=payload)
+    assert response.get_json()['success'] is False
+    factory.assert_called_once()
+
+
+@pytest.mark.parametrize('exists, changed', [(False, False), (True, False)])
+def test_admin_password_change_reports_failure(authenticated_client, mocker, exists, changed):
+    target = mocker.Mock()
+    target.exists.return_value = exists
+    target.change_password.return_value = changed
+    mocker.patch('server.api.auth.db.admin.User', side_effect=[SimpleNamespace(is_admin=True), target])
+    response = authenticated_client.post('/auth/admin/change-password', json={'username': 'bob', 'new_password': 'Strong123!'})
+    assert response.get_json()['success'] is False
+    if not exists:
+        target.change_password.assert_not_called()
 
 
 def test_login_returns_error_for_invalid_credentials(client, mocker):

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PasswordInput from '../components/PasswordInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +17,6 @@ function Login() {
     const [isUsernameValid, setIsUsernameValid] = useState(false);
 
     const [passwordInput, setPasswordInput] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
     const [passwordError, setPasswordError] = useState('');
     const [isPasswordValid, setIsPasswordValid] = useState(false);
 
@@ -161,29 +161,15 @@ function Login() {
                                         {t('pages.login.password')}
                                     </label>
 
-                                    <div className="input-group">
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            id="login-password"
-                                            className={`form-control form-control-lg pe-5 ${passwordError ? 'is-invalid' : ''}`}
-                                            placeholder={t('pages.login.passwordPlaceholder')}
-                                            value={passwordInput}
-                                            onInput={(e) => checkPassword(e.target.value)}
-                                        />
-                                        <div className="input-group-text" style={{ cursor: 'pointer' }}>
-                                            <i
-                                                className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                aria-label={showPassword ? t('pages.login.hide') : t('pages.login.show')}
-                                                style={{ width: '1.5rem' }}
-                                            ></i>
-                                        </div>
-                                        {passwordError && (
-                                            <div className="invalid-feedback">
-                                                {passwordError}
-                                            </div>
-                                        )}
-                                    </div>
+                                    <PasswordInput
+                                        id="login-password"
+                                        className="form-control-lg pe-5"
+                                        placeholder={t('pages.login.passwordPlaceholder')}
+                                        value={passwordInput}
+                                        onInput={(e) => checkPassword(e.target.value)}
+                                        autoComplete="current-password"
+                                        error={passwordError}
+                                    />
                                 </div>
 
                                 <div className="pt-1 mb-4">

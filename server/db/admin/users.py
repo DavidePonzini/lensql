@@ -7,15 +7,27 @@ from sqlerrors import SqlErrors
 from sqlscope import Dialect
 
 import bcrypt
+import hashlib
 import re
 
 def _hash_password(password: str) -> str:
     '''Hash a password using bcrypt'''
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    encoded = password.encode('utf-8')
+    if len(encoded) > 72:
+        encoded = hashlib.sha256(encoded).hexdigest().encode('ascii')
+        return 'bcrypt-sha256:' + bcrypt.hashpw(encoded, bcrypt.gensalt()).decode('utf-8')
+    return bcrypt.hashpw(encoded, bcrypt.gensalt()).decode('utf-8')
 
 def _compare_hashed_password(password: str, hashed: str) -> bool:
     '''Compare a password with a hashed password'''
-    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+    encoded = password.encode('utf-8')
+    if hashed.startswith('bcrypt-sha256:'):
+        encoded = hashlib.sha256(encoded).hexdigest().encode('ascii')
+        hashed = hashed.removeprefix('bcrypt-sha256:')
+    elif len(encoded) > 72:
+        # Preserve verification of legacy bcrypt hashes made with truncation.
+        encoded = encoded[:72]
+    return bcrypt.checkpw(encoded, hashed.encode('utf-8'))
 
 class User:
     '''User data model'''

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import useAuth from '../../hooks/useAuth';
 import useUserInfo from '../../hooks/useUserInfo';
 import RenameDatasetId from './RenameDatasetId';
+import ChangeUserPassword from './ChangeUserPassword';
 
 function Admin() {
     const { t } = useTranslation();
@@ -155,6 +156,7 @@ function Admin() {
                 </div>
             </form>
             <RenameDatasetId />
+            <ChangeUserPassword />
         </div>
     );
 }

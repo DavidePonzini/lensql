@@ -1,3 +1,4 @@
+import PasswordInput from '../../components/PasswordInput';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -9,19 +10,16 @@ function ChangePassword() {
 
     // Current password
     const [currentPassword, setCurrentPassword] = useState('');
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [currentPasswordError, setCurrentPasswordError] = useState('');
     const [isCurrentValid, setIsCurrentValid] = useState(false);
 
     // New password
     const [newPassword, setNewPassword] = useState('');
-    const [showNewPassword, setShowNewPassword] = useState(false);
     const [newPasswordError, setNewPasswordError] = useState('');
     const [isNewValid, setIsNewValid] = useState(false);
 
     // Confirm password
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
     const [isConfirmValid, setIsConfirmValid] = useState(false);
 
@@ -159,32 +157,9 @@ function ChangePassword() {
                         {t('pages.profile.profile.change_password.current_password_label')}
                     </label>
 
-                    <div className="input-group">
-                        <input
-                            type={showCurrentPassword ? 'text' : 'password'}
-                            id="current-password"
-                            className={`form-control form-control-lg pe-5 ${
-                                currentPasswordError ? 'is-invalid' : ''
-                            }`}
-                            value={currentPassword}
-                            onInput={(e) => checkCurrentPassword(e.target.value)}
-                        />
-                        <div
-                            className="input-group-text"
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        >
-                            <i
-                                className={`fas ${
-                                    showCurrentPassword ? 'fa-eye-slash' : 'fa-eye'
-                                }`}
-                            />
-                        </div>
-
-                        {currentPasswordError && (
-                            <div className="invalid-feedback">{currentPasswordError}</div>
-                        )}
-                    </div>
+                    <PasswordInput id="current-password" className="form-control-lg pe-5"
+                        value={currentPassword} onInput={(e) => checkCurrentPassword(e.target.value)}
+                        autoComplete="current-password" error={currentPasswordError} />
                 </div>
 
                 {/* New password */}
@@ -193,32 +168,9 @@ function ChangePassword() {
                         {t('pages.profile.profile.change_password.new_password_label')}
                     </label>
 
-                    <div className="input-group">
-                        <input
-                            type={showNewPassword ? 'text' : 'password'}
-                            id="new-password"
-                            className={`form-control form-control-lg pe-5 ${
-                                newPasswordError ? 'is-invalid' : ''
-                            }`}
-                            value={newPassword}
-                            onInput={(e) => checkNewPassword(e.target.value)}
-                        />
-                        <div
-                            className="input-group-text"
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                        >
-                            <i
-                                className={`fas ${
-                                    showNewPassword ? 'fa-eye-slash' : 'fa-eye'
-                                }`}
-                            />
-                        </div>
-
-                        {newPasswordError && (
-                            <div className="invalid-feedback">{newPasswordError}</div>
-                        )}
-                    </div>
+                    <PasswordInput id="new-password" className="form-control-lg pe-5"
+                        value={newPassword} onInput={(e) => checkNewPassword(e.target.value)}
+                        autoComplete="new-password" error={newPasswordError} />
                 </div>
 
                 {/* Confirm password */}
@@ -227,34 +179,9 @@ function ChangePassword() {
                         {t('pages.profile.profile.change_password.confirm_new_password_label')}
                     </label>
 
-                    <div className="input-group">
-                        <input
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            id="confirm-password"
-                            className={`form-control form-control-lg pe-5 ${
-                                confirmPasswordError ? 'is-invalid' : ''
-                            }`}
-                            value={confirmPassword}
-                            onInput={(e) => checkConfirmPassword(e.target.value)}
-                        />
-                        <div
-                            className="input-group-text"
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                            <i
-                                className={`fas ${
-                                    showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'
-                                }`}
-                            />
-                        </div>
-
-                        {confirmPasswordError && (
-                            <div className="invalid-feedback">
-                                {confirmPasswordError}
-                            </div>
-                        )}
-                    </div>
+                    <PasswordInput id="confirm-password" className="form-control-lg pe-5"
+                        value={confirmPassword} onInput={(e) => checkConfirmPassword(e.target.value)}
+                        autoComplete="new-password" error={confirmPasswordError} />
                 </div>
 
                 {/* Submit */}
