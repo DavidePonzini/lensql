@@ -54,10 +54,16 @@ ORDER BY
 CREATE OR REPLACE VIEW v_query_batches_during_lab_hours AS
 SELECT
     qb.id AS batch_id,
-    lh.lab_name
+    d.id AS dataset_id,
+    d.name AS dataset_name
 FROM
     query_batches qb
-    JOIN lab_hours lh ON qb.ts >= lh.start_ts AND qb.ts <= lh.end_ts;
+    JOIN exercises e ON qb.exercise_id = e.id
+    JOIN datasets d ON e.dataset_id = d.id
+WHERE
+    d.activity_start_ts IS NOT NULL
+    AND d.activity_end_ts IS NOT NULL
+    AND qb.ts BETWEEN d.activity_start_ts AND d.activity_end_ts;
 
 CREATE OR REPLACE VIEW v_messages_per_dataset AS
 SELECT

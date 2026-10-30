@@ -93,7 +93,7 @@ CREATE TABLE datasets (
     search_path TEXT NOT NULL DEFAULT 'public',
     dbms VARCHAR(255) NOT NULL,
     activity_start_ts TIMESTAMPTZ DEFAULT NULL,
-    activity_end_ts TIMESTAMPTZ DEFAULT NULL,
+    activity_end_ts TIMESTAMPTZ DEFAULT NULL
 );
 
 CREATE TABLE dataset_members (
