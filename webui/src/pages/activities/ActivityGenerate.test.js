@@ -2,8 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ActivityGenerate from './ActivityGenerate';
 import i18n from '../../i18n';
 
-const { TextDecoder } = require('util');
-global.TextDecoder = TextDecoder;
+const { MemoryRouter, Routes, Route } = require('react-router-dom');
 function generationStream(events) {
     let read = false;
     return { getReader: () => ({
@@ -35,12 +34,14 @@ beforeEach(async () => {
     mockApiRequest.mockResolvedValue(options);
 });
 
-async function openGenerator() {
-    const refresh = jest.fn();
-    render(<ActivityGenerate refresh={refresh} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
-    await screen.findByLabelText('Activity title');
-    return refresh;
+async function openGenerator(path = '/activities/generate') {
+    render(<MemoryRouter initialEntries={[path]}><Routes>
+        <Route path="/activities/generate" element={<ActivityGenerate />} />
+        <Route path="/activities/generate/students" element={<ActivityGenerate />} />
+        <Route path="/activities/generate/students/:username" element={<ActivityGenerate />} />
+    </Routes></MemoryRouter>);
+    if (path.endsWith('/students')) await screen.findByRole('region', { name: 'Activities' });
+    else await screen.findByLabelText('Activity title');
 }
 
 test('requests easy and hard exercises for the same error and totals all credits', async () => {
@@ -51,7 +52,7 @@ test('requests easy and hard exercises for the same error and totals all credits
     expect(screen.getByText('Credits required: 5')).toBeTruthy();
     expect(screen.queryByLabelText('Solution Search Path')).toBeNull();
     mockApiRequest.mockResolvedValueOnce(generationStream([{ success: false, message: 'Test stops before generation' }]));
-    fireEvent.click(screen.getAllByRole('button', { name: 'Generate' })[1]);
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     await waitFor(() => expect(mockApiRequest).toHaveBeenCalledWith('/api/activities/generate', 'POST', expect.objectContaining({
         title: 'Practice', dataset_str: null,
         errors: [{ error_id: 2, difficulty: 1, count: 1 }, { error_id: 2, difficulty: 3, count: 3 }],
@@ -77,7 +78,7 @@ test('sends supplied dataset SQL and search path', async () => {
     fireEvent.change(screen.getByLabelText('Dataset SQL'), { target: { value: sql } });
     fireEvent.change(screen.getByLabelText('Solution Search Path'), { target: { value: 'school' } });
     mockApiRequest.mockResolvedValueOnce(generationStream([{ success: false, message: 'Test stops before generation' }]));
-    fireEvent.click(screen.getAllByRole('button', { name: 'Generate' })[1]);
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     await waitFor(() => expect(mockApiRequest).toHaveBeenCalledWith('/api/activities/generate', 'POST', expect.objectContaining({
         dataset_str: sql, search_path: 'school',
     }), { stream: true }));
@@ -119,7 +120,7 @@ test('shows live exercise counts and explains failure refunds', async () => {
             return new Promise(resolve => { finish = resolve; });
         }, releaseLock,
     }) });
-    fireEvent.click(screen.getAllByRole('button', { name: 'Generate' })[1]);
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     await screen.findByText('Exercises: 1 completed, 0 failed, 2 requested');
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('50');
     expect(screen.queryByText(/Credits for failed exercises are refunded/)).toBeNull();
@@ -129,16 +130,16 @@ test('shows live exercise counts and explains failure refunds', async () => {
 });
 
 test('warns when a partial activity is saved and refreshes the balance', async () => {
-    const refresh = await openGenerator();
+    await openGenerator();
     fireEvent.change(screen.getByLabelText('Activity title'), { target: { value: 'Practice' } });
     fireEvent.change(screen.getByLabelText('Ambiguous column — Easy'), { target: { value: '2' } });
     mockApiRequest.mockResolvedValueOnce(generationStream([
         { type: 'result', success: true, activity_id: 'PARTIAL', generated_count: 1, failed_count: 1 },
     ]));
-    fireEvent.click(screen.getAllByRole('button', { name: 'Generate' })[1]);
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     await screen.findByText('Activity created with 1 exercises. 1 exercises failed; their credits have been refunded.');
     await waitFor(() => expect(mockLoadUserInfo).toHaveBeenCalled());
-    expect(refresh).toHaveBeenCalled();
+    expect(screen.getByText('Activity created successfully.')).toBeTruthy();
 });
 
 test('unsupported errors remain visible with disabled difficulty inputs', async () => {
@@ -182,4 +183,73 @@ test('top five checkbox filters personal ranks and keeps other filters active', 
     expect(screen.queryByLabelText(`${otherName} — Easy`)).toBeNull();
     fireEvent.click(screen.getByLabelText('Only show my top 5 errors'));
     expect(screen.getByLabelText(`${otherName} — Easy`)).toBeTruthy();
+});
+
+test('student pages preserve selected activity scope and generate with enrollment', async () => {
+    const studentOptions = { ...options, student_username: 'bob', activity_ids: ['A'],
+        activities: [{ activity_id: 'A', title: 'SQL class' }],
+        errors: options.errors.map(error => ({ ...error, common_rank: error.id === 2 ? 1 : null, occurrences: 12 })),
+    };
+    mockApiRequest.mockImplementation(async (endpoint, method, body) => {
+        if (endpoint.endsWith('/generation-options')) return body?.student_username ? studentOptions : { ...options, activities: studentOptions.activities };
+        if (endpoint.endsWith('/generation-students')) return { success: true, students: ['bob'] };
+        return generationStream([{ success: true, activity_id: 'NEW', generated_count: 1, failed_count: 0 }]);
+    });
+    await openGenerator();
+    fireEvent.click(screen.getByRole('link', { name: 'From your activities' }));
+    await screen.findByLabelText('SQL class (A)');
+    fireEvent.click(screen.getByLabelText('SQL class (A)'));
+    await screen.findByRole('link', { name: 'bob' });
+    expect(screen.getByRole('link', { name: 'bob' }).getAttribute('href')).toBe('/activities/generate/students/bob?activity=A');
+    fireEvent.click(screen.getByRole('link', { name: 'bob' }));
+    await screen.findByText('bob’s #1 most common error');
+    expect(screen.getByText(/Metrics cover the selected activities: SQL class/)).toBeTruthy();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    fireEvent.change(screen.getByLabelText('Activity title'), { target: { value: 'Bob practice' } });
+    fireEvent.change(screen.getByLabelText('Ambiguous column — Easy'), { target: { value: '1' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+    await waitFor(() => expect(mockApiRequest).toHaveBeenCalledWith('/api/activities/generate', 'POST', expect.objectContaining({
+        student_username: 'bob', activity_ids: ['A'],
+    }), { stream: true }));
+    await screen.findByText('Activity created successfully.');
+    expect(screen.getByRole('link', { name: 'View activity' }).getAttribute('href')).toBe('/activities/NEW');
+});
+
+test('student generation can load directly from its URL', async () => {
+    mockApiRequest.mockResolvedValue({ ...options, student_username: 'bob', activity_ids: ['A'],
+        errors: options.errors.map(error => ({ ...error, common_rank: error.id === 2 ? 1 : null })),
+    });
+    await openGenerator('/activities/generate/students/bob?activity=A');
+    expect(mockApiRequest).toHaveBeenCalledWith('/api/activities/generation-options', 'POST', {
+        student_username: 'bob', activity_ids: ['A'],
+    });
+    expect(screen.getByText('bob’s #1 most common error')).toBeTruthy();
+    expect(screen.queryByRole('dialog')).toBeNull();
+});
+
+test('activity selection preserves the activity column and refreshes only students, ignoring stale results', async () => {
+    const rosterRequests = [];
+    mockApiRequest.mockImplementation(async endpoint => {
+        if (endpoint.endsWith('/generation-options')) return { ...options, activities: [
+            { activity_id: 'A', title: 'SQL class' }, { activity_id: 'B', title: 'Advanced SQL' },
+        ] };
+        return new Promise(resolve => rosterRequests.push(resolve));
+    });
+    await openGenerator('/activities/generate/students');
+    const activity = await screen.findByLabelText('SQL class (A)');
+    expect(screen.getByRole('region', { name: 'Activities' }).className).toBe('col-md-6');
+    expect(screen.getByRole('region', { name: 'Enrolled students' }).className).toBe('col-md-6');
+    fireEvent.click(activity);
+    await waitFor(() => expect(rosterRequests).toHaveLength(1));
+    expect(screen.getByLabelText('SQL class (A)')).toBe(activity);
+    expect(activity.checked).toBe(true);
+    fireEvent.click(screen.getByLabelText('Advanced SQL (B)'));
+    await waitFor(() => expect(rosterRequests).toHaveLength(2));
+    rosterRequests[1]({ success: true, students: ['carol'] });
+    await screen.findByRole('link', { name: 'carol' });
+    rosterRequests[0]({ success: true, students: ['stale'] });
+    await waitFor(() => expect(screen.queryByRole('link', { name: 'stale' })).toBeNull());
+    expect(mockApiRequest.mock.calls.filter(([endpoint]) => endpoint.endsWith('/generation-options'))).toHaveLength(1);
+    expect(screen.getByLabelText('SQL class (A)')).toBe(activity);
+    expect(screen.getByRole('link', { name: 'carol' }).getAttribute('href')).toContain('activity=A&activity=B');
 });

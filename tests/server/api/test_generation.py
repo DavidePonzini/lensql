@@ -140,7 +140,7 @@ def test_custom_dataset_is_forwarded(authenticated_client, mocker, user):
     assert generate.call_args.kwargs['search_path'] == 'public'
 
 
-@pytest.mark.parametrize('dataset', ['SELECT 1;', 'not valid SQL !', 123, 'x' * 2_000_001])
+@pytest.mark.parametrize('dataset', [123, 'x' * 2_000_001])
 def test_invalid_dataset_does_not_spend_credits(authenticated_client, user, dataset):
     data = {**valid_request(), 'dataset_str': dataset}
     assert authenticated_client.post('/activities/generate', json=data).get_json()['success'] is False
@@ -166,10 +166,17 @@ def test_qualified_dataset_is_accepted(authenticated_client, mocker, user):
     assert generate.call_args.kwargs['dataset_str'] == sql
 
 
-def test_multiple_dataset_schemas_do_not_spend_credits(authenticated_client, user):
-    data = {**valid_request(), 'dataset_str': 'CREATE TABLE a.item (id int); CREATE TABLE b.item (id int);'}
-    assert authenticated_client.post('/activities/generate', json=data).get_json()['success'] is False
-    user.reserve_generation_credits.assert_not_called()
+@pytest.mark.parametrize('sql', ['SELECT 1;', 'not valid SQL !',
+    'CREATE TABLE a.item (id int); CREATE TABLE b.item (id int);'])
+def test_dataset_sql_is_forwarded_without_prevalidation(authenticated_client, mocker, user, sql):
+    parser = mocker.patch('sqlexercise.assignments.Dataset.from_sql', side_effect=AssertionError('No prevalidation'))
+    generator = mocker.patch('server.generation.generate_activity', return_value='CUSTOM')
+    response = authenticated_client.post('/activities/generate', json={
+        **valid_request(), 'dataset_str': sql,
+    }).get_json()
+    assert response['success'] is True
+    assert generator.call_args.kwargs['dataset_str'] == sql
+    parser.assert_not_called()
 
 
 @pytest.mark.parametrize('search_path', [None, '', 123])
@@ -271,3 +278,86 @@ def test_generation_options_no_history_has_no_common_badges(authenticated_client
     user.list_activities.return_value = []
     response = authenticated_client.get('/activities/generation-options').get_json()
     assert not any(error['is_common'] for error in response['errors'])
+
+
+@pytest.fixture
+def student_context(mocker, user):
+    from sqlerrors import SqlErrors
+    student = mocker.Mock(username='bob')
+    error = next(error for error in SqlErrors if not error.definition.is_deprecated)
+    student.get_error_occurrencies.return_value = [(error, 12)]
+    user.list_activities.return_value = []
+    mocker.patch('server.api.activities.db.admin.User', side_effect=lambda name: user if name == 'alice' else student)
+    activity = mocker.Mock()
+    activity.has_owner.return_value = True
+    mocker.patch('server.api.activities.db.admin.Activity', return_value=activity)
+    membership = mocker.patch('server.db.admin.connection.db.execute_and_fetch', return_value=[('bob',)])
+    return student, error, activity, membership
+
+
+def test_student_metrics_are_scoped_to_selected_activities(authenticated_client, user, student_context):
+    student, error, activity, membership = student_context
+    response = authenticated_client.post('/activities/generation-options', json={
+        'student_username': 'bob', 'activity_ids': ['A', 'B'],
+    }).get_json()
+    assert response['success'] is True
+    assert response['student_username'] == 'bob'
+    student.get_error_occurrencies.assert_called_once_with(['A', 'B'])
+    user.get_error_occurrencies.assert_not_called()
+    metric = next(item for item in response['errors'] if item['id'] == error.value)
+    assert metric['common_rank'] == 1
+    assert metric['occurrences'] == 12
+    assert activity.has_owner.call_count == 2
+    assert membership.call_args.args[1] == {'ids': ['A', 'B'], 'student': 'bob'}
+
+
+@pytest.mark.parametrize('endpoint', ['/activities/generation-options', '/activities/generate'])
+def test_student_context_requires_ownership_before_metrics_or_spending(authenticated_client, user, student_context, endpoint):
+    student, error, activity, membership = student_context
+    activity.has_owner.return_value = False
+    response = authenticated_client.post(endpoint, json={
+        **valid_request(), 'student_username': 'bob', 'activity_ids': ['A'],
+    }).get_json()
+    assert response['success'] is False
+    membership.assert_not_called()
+    student.get_error_occurrencies.assert_not_called()
+    user.reserve_generation_credits.assert_not_called()
+
+
+@pytest.mark.parametrize('endpoint', ['/activities/generation-options', '/activities/generate'])
+def test_student_must_be_enrolled_in_source_activities(authenticated_client, user, student_context, endpoint):
+    student, error, activity, membership = student_context
+    membership.return_value = []
+    response = authenticated_client.post(endpoint, json={
+        **valid_request(), 'student_username': 'bob', 'activity_ids': ['A'],
+    }).get_json()
+    assert response['success'] is False
+    student.get_error_occurrencies.assert_not_called()
+    user.reserve_generation_credits.assert_not_called()
+
+
+def test_generation_for_student_charges_teacher_and_passes_enrollment(authenticated_client, mocker, user, student_context):
+    student, error, activity, membership = student_context
+    generator = mocker.patch('server.generation.generate_activity', return_value='STUDENT')
+    response = authenticated_client.post('/activities/generate', json={
+        **valid_request(), 'student_username': 'bob', 'activity_ids': ['A'],
+    }).get_json()
+    assert response['success'] is True
+    assert generator.call_args.args[0] is user
+    assert generator.call_args.kwargs['student_username'] == 'bob'
+    user.reserve_generation_credits.assert_called_once_with(3)
+    student.reserve_generation_credits.assert_not_called()
+
+
+def test_miedema_dataset_is_forwarded_without_prevalidation(authenticated_client, mocker, user):
+    from pathlib import Path
+    parser = mocker.patch('sqlexercise.assignments.Dataset.from_sql', side_effect=AssertionError('No prevalidation'))
+    generator = mocker.patch('server.generation.generate_activity', return_value='MIEDEMA')
+    sql = (Path(__file__).parents[2] / 'fixtures' / 'miedema.sql').read_text()
+    response = authenticated_client.post('/activities/generate', json={
+        **valid_request(), 'dataset_str': sql, 'search_path': 'miedema',
+    }).get_json()
+    assert response['success'] is True
+    assert generator.call_args.kwargs['dataset_str'] == sql.strip()
+    assert generator.call_args.kwargs['search_path'] == 'miedema'
+    parser.assert_not_called()

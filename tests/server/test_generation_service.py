@@ -94,3 +94,22 @@ def test_partial_generation_saves_successful_exercises(mocker):
     assert len(connection.execute.call_args_list) == 3
     connection.commit.assert_called_once()
     assert progress.call_args.args[0]['completed'] == 1
+
+
+def test_student_enrollment_is_saved_with_teacher_and_exercises(mocker):
+    from server.generation import generate_activity
+    mocker.patch('server.generation.get_database')
+    assignment = SimpleNamespace(dataset=mocker.Mock(), exercises=[generated_exercise()])
+    assignment.dataset.to_sql.return_value = 'CREATE TABLE item (id int);'
+    mocker.patch('server.generation.sqlexercise.generate_assignment', return_value=assignment)
+    connection = mocker.MagicMock()
+    connection.__enter__.return_value = connection
+    connection.fetch_one.return_value = ('STUDENT',)
+    mocker.patch('server.generation.db.connect', return_value=connection)
+    assert generate_activity(SimpleNamespace(username='alice'), [(1, 1)], title='Practice', prefix='Task ',
+                             student_username='bob') == 'STUDENT'
+    calls = connection.execute.call_args_list
+    assert calls[1].args[1]['username'] == 'alice' and 'TRUE' in str(calls[1].args[0])
+    assert calls[2].args[1]['username'] == 'bob' and 'FALSE' in str(calls[2].args[0])
+    assert all(call.kwargs['commit'] is False for call in calls)
+    connection.commit.assert_called_once()

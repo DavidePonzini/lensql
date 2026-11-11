@@ -385,15 +385,51 @@ def import_activity():
     return responses.response(True, activity_id=activity.activity_id)
 
 
-@bp.route('/generation-options', methods=['GET'])
+def _generation_student_context(user, data):
+    """Authorize student metrics and enrollment against every source activity."""
+    if not isinstance(data, dict):
+        raise ValueError(_('Select a student.'))
+    student = data.get('student_username')
+    if student is None:
+        if data.get('activity_ids'):
+            raise ValueError(_('Select a student.'))
+        return None, []
+    ids = data.get('activity_ids')
+    if not isinstance(student, str) or not re.fullmatch(r'[a-zA-Z0-9_]+', student) or student == user.username:
+        raise ValueError(_('Select a student.'))
+    if not isinstance(ids, list) or not ids or any(not isinstance(i, str) or not i for i in ids):
+        raise ValueError(_('Select at least one activity.'))
+    ids = list(dict.fromkeys(ids))
+    for activity_id in ids:
+        if not db.admin.Activity(activity_id).has_owner(user):
+            raise ValueError(_('You are not a teacher in all selected activities.'))
+    from dav_tools import database
+    from server.db.admin.connection import db as admin_db, SCHEMA
+    query = database.sql.SQL('''
+        SELECT DISTINCT username FROM {schema}.activity_members
+        WHERE activity_id = ANY(%(ids)s) AND username = %(student)s
+            AND is_active = TRUE AND is_owner = FALSE
+    ''').format(schema=database.sql.Identifier(SCHEMA))
+    if not admin_db.execute_and_fetch(query, {'ids': ids, 'student': student}):
+        raise ValueError(_('Select an enrolled student from the selected activities.'))
+    return student, ids
+
+
+@bp.route('/generation-options', methods=['GET', 'POST'])
 @jwt_required()
 def generation_options():
     from sqlexercise.error_requirements import ERROR_REQUIREMENTS_MAP
     from sqlerrors import SqlErrorCategory, SqlErrors
     user = db.admin.User(get_jwt_identity())
-    # Personal history across all activities, with no date filter. Use the same
-    # exercise-focused error occurrences as personalized assignments.
-    occurrences = user.get_error_occurrencies()
+    # Use personal history or the selected student’s source activities, with no
+    # date filter and the same error occurrences as personalized assignments.
+    try:
+        student, activity_ids = _generation_student_context(user, request.get_json(silent=True) or {})
+    except ValueError as error:
+        return responses.response(False, message=str(error))
+    metric_user = db.admin.User(student) if student else user
+    occurrences = metric_user.get_error_occurrencies(activity_ids) if student else user.get_error_occurrencies()
+    occurrence_counts = {error: count for error, count in occurrences}
     top_errors = {error: rank for rank, (error, count) in enumerate(sorted(
         ((error, count) for error, count in occurrences if not error.definition.is_deprecated and count > 0),
         key=lambda item: (-item[1], item[0].value),
@@ -401,12 +437,14 @@ def generation_options():
     errors = [
         {'id': error.value, 'name': error.definition.name,
          'category': error.definition.category.value, 'supported': error in ERROR_REQUIREMENTS_MAP,
-         'is_common': error in top_errors, 'common_rank': top_errors.get(error)}
+         'is_common': error in top_errors, 'common_rank': top_errors.get(error),
+         'occurrences': occurrence_counts.get(error, 0)}
         for error in sorted(SqlErrors, key=lambda error: error.value) if not error.definition.is_deprecated
     ]
     activities = [activity for activity in user.list_activities() if activity['is_owner']]
     categories = [{'id': category.value} for category in SqlErrorCategory]
     return responses.response(True, errors=errors, categories=categories, activities=activities,
+                              student_username=student, activity_ids=activity_ids,
                               ai_generation_credits=user.ai_generation_credits)
 
 
@@ -480,13 +518,10 @@ def generate():
                 raise ValueError()
     except (ValueError, TypeError, AttributeError):
         return responses.response(False, message=_('Select valid errors and counts (maximum 100 exercises), a title and a prefix.'))
-    if dataset_str:
-        from sqlexercise.assignments import Dataset
-        from server.generation.dataset import generation_dataset_sql
-        try:
-            Dataset.from_sql(generation_dataset_sql(dataset_str), sql_dialect='postgres')
-        except Exception:
-            return responses.response(False, message=_('Provide valid PostgreSQL dataset SQL with CREATE TABLE statements.'))
+    try:
+        student, activity_ids = _generation_student_context(user, data)
+    except ValueError as error:
+        return responses.response(False, message=str(error))
     if not user.reserve_generation_credits(len(errors) + 1):
         return responses.response(False, message=_('Insufficient generation credits.'))
     language = 'it' if request.headers.get('X-Language', '').startswith('it') else 'en'
@@ -505,7 +540,8 @@ def generate():
         try:
             activity_id = generate_activity(user, errors, title=title, prefix=prefix,
                                             dataset_str=dataset_str, search_path=search_path,
-                                            language=language, on_progress=progress)
+                                            language=language, on_progress=progress,
+                                            **({'student_username': student} if student else {}))
         except Exception:
             user.refund_generation_credits(len(errors))
             current_app.logger.exception('Activity generation failed.')

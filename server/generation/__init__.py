@@ -14,7 +14,7 @@ from .dataset import generation_dataset_sql
 from sqlglot import exp
 
 
-def generate_activity(user, errors, *, title, prefix, language='en', dataset_str=None, search_path='public', on_progress=None):
+def generate_activity(user, errors, *, title, prefix, language='en', dataset_str=None, search_path='public', on_progress=None, student_username=None):
     on_progress = on_progress or (lambda event: None)
     completed = failed = 0
     progress_lock = Lock()
@@ -76,6 +76,10 @@ def generate_activity(user, errors, *, title, prefix, language='en', dataset_str
         execute('''INSERT INTO {schema}.activity_members (username, activity_id, is_owner)
             VALUES (%(username)s, %(activity_id)s, TRUE)''',
             {'username': user.username, 'activity_id': activity_id})
+        if student_username:
+            execute('''INSERT INTO {schema}.activity_members (username, activity_id, is_owner)
+                VALUES (%(username)s, %(activity_id)s, FALSE)''',
+                {'username': student_username, 'activity_id': activity_id})
         for index, exercise in enumerate(exercises, 1):
             execute('''INSERT INTO {schema}.exercises
                 (activity_id, title, request, solutions, created_by, generation_difficulty, generation_error, is_hidden)

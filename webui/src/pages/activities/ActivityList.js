@@ -8,7 +8,7 @@ import CardList from '../../components/CardList';
 
 import ActivityCard from './ActivityCard';
 import ActivityAdd from './ActivityAdd';
-import ActivityGenerate from './ActivityGenerate';
+import { Link } from 'react-router-dom';
 
 function ActivityList() {
     const { apiRequest } = useAuth();
@@ -141,7 +141,9 @@ function ActivityList() {
                     <i className="fa fa-arrow-right-to-bracket me-1"></i>
                     {t('pages.activities.activity_list.join')}
                 </Button>
-                <ActivityGenerate refresh={getActivities} />
+                <Button as={Link} role="link" to="/activities/generate" variant="primary" className="me-2 mb-2">
+                    <i className="fa fa-wand-magic-sparkles me-1" />{t('pages.activities.generate.button')}
+                </Button>
             </div>
 
             <hr />

@@ -41,7 +41,7 @@ export default function GenerationErrors({ options, counts, setCounts, busy }) {
             <div className="col-sm-auto form-check ms-3 me-2">
                 <input id="generation-top-only" type="checkbox" className="form-check-input" checked={topOnly}
                     onChange={event => setTopOnly(event.target.checked)} />
-                <label className="form-check-label" htmlFor="generation-top-only">{t(`${key}.top_only`)}</label>
+                <label className="form-check-label" htmlFor="generation-top-only">{t(`${key}.${options.student_username ? 'student_top_only' : 'top_only'}`)}</label>
             </div>
             <div className="col-sm-auto form-check ms-3 me-2">
                 <input id="generation-hide-unsupported" type="checkbox" className="form-check-input" checked={hideUnsupported}
@@ -72,9 +72,10 @@ export default function GenerationErrors({ options, counts, setCounts, busy }) {
                             <tbody>{category.errors.map(error => <tr key={error.id} className={error.supported ? undefined : 'text-body-secondary'}>
                                 <th scope="row" className="fw-normal" style={{ minWidth: '15rem' }}>
                                     <strong>{error.id}. {error.name}</strong>
-                                    {error.common_rank && <span className="badge text-bg-primary ms-2" title={t(`${key}.common_error_help`)}>{t(`${key}.common_error`, { rank: error.common_rank })}</span>}
+                                    {error.common_rank && <span className="badge text-bg-primary ms-2" title={t(`${key}.${options.student_username ? 'student_common_help' : 'common_error_help'}`)}>{t(`${key}.${options.student_username ? 'student_common_error' : 'common_error'}`, { rank: error.common_rank, student: options.student_username })}</span>}
                                     {!error.supported && <span className="badge text-bg-secondary ms-2">{t(`${key}.unsupported`)}</span>}
                                     <p className="small text-body-secondary mb-0">{error.description}</p>
+                                    {options.student_username && <p className="small mb-0">{t(`${key}.occurrences`, { count: error.occurrences || 0 })}</p>}
                                 </th>
                                 {difficulties.map(difficulty => {
                                     const countKey = `${error.id}:${difficulty}`;

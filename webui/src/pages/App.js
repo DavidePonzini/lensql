@@ -18,6 +18,7 @@ import Profile from './profile/Profile';
 import Learning from './profile/Learning';
 import ExerciseList from './activities/ExerciseList';
 import ActivityList from './activities/ActivityList';
+import ActivityGenerate from './activities/ActivityGenerate';
 import Exercise from './exercises/Exercise';
 import Admin from './admin/Admin';
 import Tutorial from './Tutorial';
@@ -57,6 +58,9 @@ function App() {
 
                                     <Route path="activities">
                                         <Route index element={<ActivityList />} />
+                                        <Route path="generate" element={<ActivityGenerate />} />
+                                        <Route path="generate/students" element={<ActivityGenerate />} />
+                                        <Route path="generate/students/:username" element={<ActivityGenerate />} />
                                         <Route path=":activityId" element={<ExerciseList />} />
                                     </Route>
 

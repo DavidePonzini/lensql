@@ -291,3 +291,9 @@ msgstr "Generation failed. Exercise credits have been refunded; the 1-credit gen
 
 msgid "Provide valid PostgreSQL dataset SQL with CREATE TABLE statements."
 msgstr "Provide valid PostgreSQL dataset SQL with CREATE TABLE statements."
+
+msgid "Select a student."
+msgstr "Select a student."
+
+msgid "Select an enrolled student from the selected activities."
+msgstr "Select an enrolled student from the selected activities."

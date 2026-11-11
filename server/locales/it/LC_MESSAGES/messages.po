@@ -291,3 +291,9 @@ msgstr "Generazione non riuscita. I crediti degli esercizi sono stati rimborsati
 
 msgid "Provide valid PostgreSQL dataset SQL with CREATE TABLE statements."
 msgstr "Fornisci SQL PostgreSQL valido per il dataset, con istruzioni CREATE TABLE."
+
+msgid "Select a student."
+msgstr "Seleziona uno studente."
+
+msgid "Select an enrolled student from the selected activities."
+msgstr "Seleziona uno studente iscritto alle attività selezionate."

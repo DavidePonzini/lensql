@@ -1,21 +1,26 @@
-import { useState } from 'react';
-import { Button, Modal, Tabs, Tab, ProgressBar } from 'react-bootstrap';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Button, ProgressBar } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../../hooks/useAuth';
 import useUserInfo from '../../hooks/useUserInfo';
 import GenerationErrors from './GenerationErrors';
 import DatasetTips from './DatasetTips';
 
-export default function ActivityGenerate({ refresh }) {
+export default function ActivityGenerate() {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { username } = useParams();
+    const mode = location.pathname.endsWith('/students') ? 'students' : 'errors';
     const { apiRequest } = useAuth();
     const { loadUserInfo } = useUserInfo();
     const { t } = useTranslation();
     const key = 'pages.activities.generate';
-    const [show, setShow] = useState(false);
     const [options, setOptions] = useState(null);
-    const [mode, setMode] = useState('errors');
     const [counts, setCounts] = useState({});
-    const [selected, setSelected] = useState([]);
+    const selected = useMemo(() => new URLSearchParams(location.search).getAll('activity'), [location.search]);
+    const studentScope = username ? location.search : '';
+    const [studentsLoading, setStudentsLoading] = useState(false);
     const [students, setStudents] = useState(null);
     const [title, setTitle] = useState('');
     const [prefix, setPrefix] = useState('Exercise ');
@@ -23,22 +28,56 @@ export default function ActivityGenerate({ refresh }) {
     const [datasetSql, setDatasetSql] = useState('');
     const [searchPath, setSearchPath] = useState('public');
     const [busy, setBusy] = useState(false);
+    const [result, setResult] = useState(null);
     const [warning, setWarning] = useState('');
     const [progress, setProgress] = useState(null);
     const [message, setMessage] = useState('');
     const total = Object.values(counts).reduce((sum, count) => sum + Number(count || 0), 0);
     const requiredCredits = total + 1;
-    async function open() {
-        setShow(true);
+    useEffect(() => {
+        let active = true;
+        const ids = new URLSearchParams(studentScope).getAll('activity');
         setOptions(null);
-        setSelected([]);
-        setStudents(null);
+        setCounts({});
         setMessage('');
-        try {
-            const response = await apiRequest('/api/activities/generation-options');
-            if (!response.success) throw new Error(response.message);
-            setOptions(response);
-        } catch (error) { setMessage(error.message || t(`${key}.error`)); }
+        setWarning('');
+        setResult(null);
+        async function load() {
+            try {
+                const response = username
+                    ? await apiRequest('/api/activities/generation-options', 'POST', { student_username: username, activity_ids: ids })
+                    : await apiRequest('/api/activities/generation-options');
+                if (!active) return;
+                if (!response.success) throw new Error(response.message);
+                setOptions(response);
+            } catch (error) { if (active) setMessage(error.message || t(`${key}.error`)); }
+        }
+        load();
+        return () => { active = false; };
+    }, [apiRequest, studentScope, username, t]);
+    useEffect(() => {
+        let active = true;
+        setStudents(null);
+        setStudentsLoading(false);
+        if (mode !== 'students' || !selected.length) return;
+        setStudentsLoading(true);
+        setMessage('');
+        async function loadStudents() {
+            try {
+                const response = await apiRequest('/api/activities/generation-students', 'POST', { activity_ids: selected });
+                if (!active) return;
+                if (!response.success) throw new Error(response.message);
+                setStudents(response.students);
+            } catch (error) { if (active) setMessage(error.message || t(`${key}.error`)); }
+            finally { if (active) setStudentsLoading(false); }
+        }
+        loadStudents();
+        return () => { active = false; };
+    }, [apiRequest, mode, selected, t]);
+    function studentPath(student, ids = selected) {
+        const query = new URLSearchParams();
+        ids.forEach(id => query.append('activity', id));
+        return `/activities/generate/students${student ? '/' + encodeURIComponent(student) : ''}?${query}`;
     }
     async function generate(event) {
         event.preventDefault();
@@ -50,6 +89,7 @@ export default function ActivityGenerate({ refresh }) {
         try {
             const stream = await apiRequest('/api/activities/generate', 'POST', {
                 title, prefix, stream: true,
+                ...(options.student_username ? { student_username: options.student_username, activity_ids: selected } : {}),
                 dataset_str: datasetMode === 'custom' ? datasetSql : null,
                 ...(datasetMode === 'custom' ? { search_path: searchPath } : {}),
                 errors: Object.entries(counts).filter(([, count]) => Number(count) > 0)
@@ -84,45 +124,41 @@ export default function ActivityGenerate({ refresh }) {
             if (response.failed_count) {
                 setWarning(t(`${key}.partial_warning`, { completed: response.generated_count, failed: response.failed_count }));
             }
-            setShow(false);
+            setResult(response);
             setCounts({});
             setTitle('');
             setDatasetSql('');
             setDatasetMode('automatic');
-            await refresh();
             await loadUserInfo();
         } catch { setMessage(t(`${key}.error`)); }
         finally { setBusy(false); setProgress(null); }
     }
-    async function toggleActivity(id, checked) {
+    function toggleActivity(id, checked) {
         const ids = checked ? [...selected, id] : selected.filter(value => value !== id);
-        setSelected(ids);
-        setStudents(null);
-        setMessage('');
-        if (!ids.length) return;
-        setBusy(true);
-        try {
-            const response = await apiRequest('/api/activities/generation-students', 'POST', { activity_ids: ids });
-            if (response.success) setStudents(response.students);
-            else setMessage(response.message);
-        } catch { setMessage(t(`${key}.error`)); }
-        finally { setBusy(false); }
+        navigate(studentPath(null, ids), { replace: true });
     }
-    return <>
+    return <div className="container-xl pb-4">
+        <Button as={Link} role="link" to="/activities" variant="link" className="px-0 mb-2" disabled={busy}>{t(`${key}.back_activities`)}</Button>
+        <h1>{t(`${key}.page_title`)}</h1>
+        <nav className="nav nav-tabs my-3" aria-label={t(`${key}.page_title`)}>
+            <Button as={Link} role="link" to="/activities/generate" variant="link" className={`nav-link ${mode === 'errors' && !username ? 'active' : ''}`} disabled={busy}>{t(`${key}.errors`)}</Button>
+            <Button as={Link} role="link" to={studentPath(null)} variant="link" className={`nav-link ${mode === 'students' || username ? 'active' : ''}`} disabled={busy}>{t(`${key}.students_mode`)}</Button>
+        </nav>
         {warning && <div className="alert alert-warning" role="alert">{warning}</div>}
-        <Button variant="primary" className="me-2 mb-2" onClick={open}>
-            <i className="fa fa-wand-magic-sparkles me-1" />{t(`${key}.button`)}
-        </Button>
-        <Modal show={show} onHide={() => !busy && setShow(false)} size="xl" backdrop={busy ? 'static' : true} keyboard={!busy}>
-            <Modal.Header closeButton={!busy}><Modal.Title>{t(`${key}.button`)}</Modal.Title></Modal.Header>
-            <Modal.Body>
+        {result && <div className="alert alert-success" role="status">
+            <p>{t(`${key}.created`)}</p>
+            <Button as={Link} role="link" to={`/activities/${encodeURIComponent(result.activity_id)}`}>{t(`${key}.view_activity`)}</Button>
+        </div>}
                 {message && <div className="alert alert-danger" role="alert">{message}</div>}
                 {!options && !message && <p className="loading">{t(`${key}.loading`)}</p>}
-                {options && <>
+                {options && !result && <>
                     <p>{t(`${key}.balance`, { count: options.ai_generation_credits })}</p>
-                    <Tabs activeKey={mode} onSelect={value => !busy && setMode(value)} className="mb-3">
-                        <Tab eventKey="errors" title={t(`${key}.errors`)} disabled={busy}>
+                    {mode === 'errors' && <>
                             <form onSubmit={generate}>
+                                {options.student_username && <div className="alert alert-info">
+                                    <p className="mb-1">{t(`${key}.student_context`, { student: options.student_username, activities: selected.map(id => options.activities.find(activity => activity.activity_id === id)?.title || id).join(', ') })}</p>
+                                    <Button variant="link" className="p-0" disabled={busy} as={Link} role="link" to="/activities/generate">{t(`${key}.personal_metrics`)}</Button>
+                                </div>}
                                 <p>{t(`${key}.cost`)}</p>
                                 <label className="form-label" htmlFor="generation-title">{t(`${key}.title`)}</label>
                                 <input id="generation-title" className="form-control mb-3" value={title} maxLength={255} onChange={e => setTitle(e.target.value)} required disabled={busy} />
@@ -174,23 +210,29 @@ export default function ActivityGenerate({ refresh }) {
                                 </div>}
                                 </div>
                             </form>
-                        </Tab>
-                        <Tab eventKey="students" title={t(`${key}.students_mode`)} disabled={busy}>
-                            <p>{t(`${key}.students_help`)}</p>
-                            {options.activities.length === 0 && <p>{t(`${key}.no_activities`)}</p>}
-                            {options.activities.map(activity => <div className="form-check" key={activity.activity_id}>
-                                <input className="form-check-input" id={`source-${activity.activity_id}`} type="checkbox" checked={selected.includes(activity.activity_id)} disabled={busy}
-                                    onChange={e => toggleActivity(activity.activity_id, e.target.checked)} />
-                                <label className="form-check-label" htmlFor={`source-${activity.activity_id}`}>{activity.title} ({activity.activity_id})</label>
-                            </div>)}
-                            {busy && <p role="status">{t(`${key}.loading`)}</p>}
-                            {students !== null && <div className="mt-3"><h3>{t(`${key}.students`)}</h3>
-                                {students.length ? <ul>{students.map(student => <li key={student}>{student}</li>)}</ul> : <p>{t(`${key}.no_students`)}</p>}
-                            </div>}
-                        </Tab>
-                    </Tabs>
+                    </>}
+                    {mode === 'students' && <>
+                        <p>{t(`${key}.students_help`)}</p>
+                        <div className="row g-4">
+                            <section className="col-md-6" aria-labelledby="generation-activities-heading">
+                                <h2 className="h5" id="generation-activities-heading">{t(`${key}.source_activities`)}</h2>
+                                {options.activities.length === 0 && <p>{t(`${key}.no_activities`)}</p>}
+                                {options.activities.map(activity => <div className="form-check" key={activity.activity_id}>
+                                    <input className="form-check-input" id={`source-${activity.activity_id}`} type="checkbox" checked={selected.includes(activity.activity_id)} disabled={busy}
+                                        onChange={e => toggleActivity(activity.activity_id, e.target.checked)} />
+                                    <label className="form-check-label" htmlFor={`source-${activity.activity_id}`}>{activity.title} ({activity.activity_id})</label>
+                                </div>)}
+                            </section>
+                            <section className="col-md-6" aria-labelledby="generation-students-heading" aria-busy={studentsLoading}>
+                                <h2 className="h5" id="generation-students-heading">{t(`${key}.students`)}</h2>
+                                {!selected.length && <p>{t(`${key}.select_activities`)}</p>}
+                                {studentsLoading && <p role="status">{t(`${key}.loading`)}</p>}
+                                {students !== null && (students.length
+                                    ? <ul>{students.map(student => <li key={student}><Button variant="link" disabled={busy} as={Link} role="link" to={studentPath(student)}>{student}</Button></li>)}</ul>
+                                    : <p>{t(`${key}.no_students`)}</p>)}
+                            </section>
+                        </div>
+                    </>}
                 </>}
-            </Modal.Body>
-        </Modal>
-    </>;
+    </div>;
 }
