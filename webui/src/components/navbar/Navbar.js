@@ -103,13 +103,13 @@ function Navbar() {
                                 </li>
 
                                 <li className="nav-item">
-                                    <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/datasets" end>
-                                        <i className="fa-solid fa-database"></i> {t('components.navbar.nav.datasets')}
+                                    <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/activities" end>
+                                        <i className="fa-solid fa-database"></i> {t('components.navbar.nav.activities')}
                                     </NavLink>
                                 </li>
 
                                 {/* <li className="nav-item">
-                                    <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/datasets/_EXPLORE" end>
+                                    <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/activities/_EXPLORE" end>
                                         <i className="fa-solid fa-magnifying-glass-arrow-right"></i> {t('components.navbar.nav.explore_sql')}
                                     </NavLink>
                                 </li> */}

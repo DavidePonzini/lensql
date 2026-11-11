@@ -56,6 +56,7 @@ CREATE TABLE users (
     registration_ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     experience INTEGER NOT NULL DEFAULT 0,
     coins INTEGER NOT NULL DEFAULT 50,
+    ai_generation_credits INTEGER NOT NULL DEFAULT 0 CHECK (ai_generation_credits >= 0),
     can_use_ai BOOLEAN NOT NULL DEFAULT TRUE,
     last_search_path TEXT DEFAULT NULL
 );
@@ -84,11 +85,11 @@ CREATE TABLE user_unique_queries (
     PRIMARY KEY (username, query_hash)
 );
 
-CREATE TABLE datasets (
+CREATE TABLE activities (
     id TEXT PRIMARY KEY DEFAULT generate_alphanumeric_id(8),
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL DEFAULT '',
-    dataset TEXT DEFAULT NULL,
+    activity TEXT DEFAULT NULL,
     domain VARCHAR(255) DEFAULT NULL,
     search_path TEXT NOT NULL DEFAULT 'public',
     dbms VARCHAR(255) NOT NULL,
@@ -96,20 +97,20 @@ CREATE TABLE datasets (
     activity_end_ts TIMESTAMPTZ DEFAULT NULL
 );
 
-CREATE TABLE dataset_members (
+CREATE TABLE activity_members (
     username VARCHAR(255) NOT NULL REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE,
-    dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    activity_id TEXT NOT NULL REFERENCES activities(id) ON UPDATE CASCADE ON DELETE CASCADE,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_owner BOOLEAN NOT NULL DEFAULT FALSE,
     joined_ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    PRIMARY KEY (username, dataset_id)
+    PRIMARY KEY (username, activity_id)
 );
 
 
 CREATE TABLE exercises (
     id SERIAL PRIMARY KEY,
-    dataset_id TEXT NOT NULL REFERENCES datasets(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    activity_id TEXT NOT NULL REFERENCES activities(id) ON UPDATE CASCADE ON DELETE CASCADE,
     is_hidden BOOLEAN NOT NULL DEFAULT TRUE,
     title VARCHAR(255) NOT NULL,
     request TEXT NOT NULL,

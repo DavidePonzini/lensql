@@ -1,4 +1,4 @@
-'''This module handles dataset-related endpoints for the API.'''
+'''This module handles activity-related endpoints for the API.'''
 
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity

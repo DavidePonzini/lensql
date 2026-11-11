@@ -42,10 +42,10 @@ def create_app() -> Flask:
     jwt.init_app(app)
 
     # Register blueprints
-    from . import auth, datasets, exercises, messages, queries, users, navigation
+    from . import auth, activities, exercises, messages, queries, users, navigation
 
     app.register_blueprint(auth.bp, url_prefix='/auth')
-    app.register_blueprint(datasets.bp, url_prefix='/datasets')
+    app.register_blueprint(activities.bp, url_prefix='/activities')
     app.register_blueprint(exercises.bp, url_prefix='/exercises')
     app.register_blueprint(messages.bp, url_prefix='/messages')
     app.register_blueprint(queries.bp, url_prefix='/queries')

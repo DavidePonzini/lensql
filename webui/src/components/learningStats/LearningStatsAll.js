@@ -6,7 +6,7 @@ import LearningStatsMessages from "./LearningStatsMessages";
 import LearningStatsErrors from "./LearningStatsErrors";
 import "./LearningStats.css";
 
-function LearningStatsAll({ datasetId = null, exerciseId = null, isTeacher = false }) {
+function LearningStatsAll({ activityId = null, exerciseId = null, isTeacher = false }) {
     const { t } = useTranslation();
 
     return (
@@ -21,7 +21,7 @@ function LearningStatsAll({ datasetId = null, exerciseId = null, isTeacher = fal
                             {isTeacher ? t('components.learningStats.learning.queries_teacher') : t('components.learningStats.learning.queries_student')}
                         </h2>
                     </div>
-                    <LearningStatsQueries datasetId={datasetId} exerciseId={exerciseId} isTeacher={isTeacher} />
+                    <LearningStatsQueries activityId={activityId} exerciseId={exerciseId} isTeacher={isTeacher} />
                 </Card.Body>
             </Card>
 
@@ -33,7 +33,7 @@ function LearningStatsAll({ datasetId = null, exerciseId = null, isTeacher = fal
                         </span>
                         <h2 className="learning-stats-section__title">{t('components.learningStats.learning.errors')}</h2>
                     </div>
-                    <LearningStatsErrors datasetId={datasetId} exerciseId={exerciseId} isTeacher={isTeacher} />
+                    <LearningStatsErrors activityId={activityId} exerciseId={exerciseId} isTeacher={isTeacher} />
                 </Card.Body>
             </Card>
 
@@ -45,7 +45,7 @@ function LearningStatsAll({ datasetId = null, exerciseId = null, isTeacher = fal
                         </span>
                         <h2 className="learning-stats-section__title">{t('components.learningStats.learning.messages')}</h2>
                     </div>
-                    <LearningStatsMessages datasetId={datasetId} exerciseId={exerciseId} isTeacher={isTeacher} />
+                    <LearningStatsMessages activityId={activityId} exerciseId={exerciseId} isTeacher={isTeacher} />
                 </Card.Body>
             </Card>
         </div>

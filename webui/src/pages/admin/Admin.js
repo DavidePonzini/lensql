@@ -3,14 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { Tab, Tabs } from 'react-bootstrap';
 import useAuth from '../../hooks/useAuth';
 import useUserInfo from '../../hooks/useUserInfo';
-import RenameDatasetId from './RenameDatasetId';
+import RenameActivityId from './RenameActivityId';
 import ChangeUserPassword from './ChangeUserPassword';
+import GenerationCredits from './GenerationCredits';
 
 function Admin() {
     const { t } = useTranslation();
     const { apiRequest } = useAuth();
     const { userInfo } = useUserInfo();
-    const [formData, setFormData] = useState({ dataset_id: '', username: '', is_owner: false });
+    const [formData, setFormData] = useState({ activity_id: '', username: '', is_owner: false });
     const [message, setMessage] = useState({ type: '', text: '' });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -33,15 +34,15 @@ function Admin() {
             return;
         }
 
-        if (!formData.dataset_id.trim() || !formData.username.trim()) {
+        if (!formData.activity_id.trim() || !formData.username.trim()) {
             setMessage({ type: 'danger', text: 'Please fill in all fields' });
             return;
         }
 
         setIsLoading(true);
         try {
-            const response = await apiRequest('/api/datasets/add-user', 'POST', {
-                dataset_id: formData.dataset_id.trim(),
+            const response = await apiRequest('/api/activities/add-user', 'POST', {
+                activity_id: formData.activity_id.trim(),
                 username: formData.username.trim(),
                 is_owner: formData.is_owner
             });
@@ -55,7 +56,7 @@ function Admin() {
         } catch (error) {
             let errorText = t('pages.admin.add_user.error_general');
             if (error.message.includes('does not exist')) {
-                errorText = t('pages.admin.add_user.error_dataset');
+                errorText = t('pages.admin.add_user.error_activity');
             } else if (error.message.includes('User does not exist')) {
                 errorText = t('pages.admin.add_user.error_user');
             }
@@ -80,8 +81,8 @@ function Admin() {
         <div className="container-md">
             <h1>{t('pages.admin.title')}</h1>
 
-            <Tabs defaultActiveKey="datasets" id="admin-actions" className="my-4">
-                <Tab eventKey="datasets" title={t('pages.admin.tabs.datasets')}>
+            <Tabs defaultActiveKey="activities" id="admin-actions" className="my-4">
+                <Tab eventKey="activities" title={t('pages.admin.tabs.activities')}>
                     <h2>{t('pages.admin.add_user.title')}</h2>
 
                     {message.text && (
@@ -93,14 +94,14 @@ function Admin() {
 
                     <form onSubmit={handleSubmit} className="row g-3">
                         <div className="col-md-6">
-                            <label htmlFor="dataset_id" className="form-label">{t('pages.admin.add_user.dataset_label')}</label>
+                            <label htmlFor="activity_id" className="form-label">{t('pages.admin.add_user.activity_label')}</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                id="dataset_id"
-                                name="dataset_id"
-                                placeholder={t('pages.admin.add_user.dataset_placeholder')}
-                                value={formData.dataset_id}
+                                id="activity_id"
+                                name="activity_id"
+                                placeholder={t('pages.admin.add_user.activity_placeholder')}
+                                value={formData.activity_id}
                                 onChange={handleInputChange}
                                 disabled={isLoading}
                                 required
@@ -156,10 +157,11 @@ function Admin() {
                             </button>
                         </div>
                     </form>
-                    <RenameDatasetId />
+                    <RenameActivityId />
                 </Tab>
                 <Tab eventKey="users" title={t('pages.admin.tabs.users')}>
                     <ChangeUserPassword />
+                    <GenerationCredits />
                 </Tab>
             </Tabs>
         </div>

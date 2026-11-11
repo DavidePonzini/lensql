@@ -12,7 +12,7 @@ import ButtonsDatabase from "./ButtonsDatabase";
 import ButtonsExercise from "./ButtonsExercise";
 import ButtonAction from "../../components/buttons/ButtonAction";
 
-function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, hasSolution, lastQuery }) {
+function Query({ exerciseId, activityId, exerciseTitle, exerciseText, attempts, hasSolution, lastQuery }) {
     const { t } = useTranslation();
     const { apiRequest } = useAuth();
 
@@ -26,12 +26,12 @@ function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, h
     const scheduledScrollRef = useRef(null);
     const resultEndRef = useRef(null);
 
-    async function handleCreateDataset() {
+    async function handleCreateActivity() {
         setIsExecuting(true);
         setResult([]);
 
         try {
-            const stream = await apiRequest('/api/exercises/init-dataset', 'POST', {
+            const stream = await apiRequest('/api/exercises/init-activity', 'POST', {
                 'exercise_id': exerciseId,
             }, { stream: true });
 
@@ -70,7 +70,7 @@ function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, h
             }
 
         } catch (error) {
-            alert(t('pages.exercises.buttons.exercise.dataset_error'));
+            alert(t('pages.exercises.buttons.exercise.activity_error'));
             console.error('Streaming error:', error);
         } finally {
             setIsExecuting(false);
@@ -133,8 +133,8 @@ function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, h
                     <h2>{exerciseTitle}</h2>
                 </div>
                 <div className="col text-end">
-                    <NavLink to={`/datasets/${datasetId}`} className="btn btn-link mb-3">
-                        <i className="fa-solid fa-arrow-left"></i> {t('pages.exercises.query.back_to_dataset')}
+                    <NavLink to={`/activities/${activityId}`} className="btn btn-link mb-3">
+                        <i className="fa-solid fa-arrow-left"></i> {t('pages.exercises.query.back_to_activity')}
                     </NavLink>
                 </div>
             </div>
@@ -144,10 +144,10 @@ function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, h
             <ButtonAction
                 variant="secondary"
                 className="mb-3"
-                onClick={handleCreateDataset}
+                onClick={handleCreateActivity}
                 disabled={isExecuting}
             >
-                {t('pages.exercises.query.init_dataset')}
+                {t('pages.exercises.query.init_activity')}
             </ButtonAction>
 
             <SqlEditor onChange={setSqlText} value={lastQuery || ''} />
@@ -167,8 +167,8 @@ function Query({ exerciseId, datasetId, exerciseTitle, exerciseText, attempts, h
                 <div className="row">
                     <ButtonsExercise
                         exerciseId={exerciseId}
-                        datasetId={datasetId}
-                        handleCreateDataset={handleCreateDataset}
+                        activityId={activityId}
+                        handleCreateActivity={handleCreateActivity}
                         sqlText={sqlText}
                         attempts={attempts}
                         hasSolution={hasSolution}

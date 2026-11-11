@@ -35,7 +35,7 @@ def run_query():
     data = request.get_json()
     query_str = data['query_str']
     excercise = db.admin.Exercise(data['exercise_id'])
-    dataset = db.admin.Dataset(excercise.dataset_id)
+    activity = db.admin.Activity(excercise.activity_id)
 
     rewards = []
     badges = []
@@ -79,7 +79,7 @@ def run_query():
 
     user.add_rewards(rewards=rewards, badges=badges)
     exercise_solutions = excercise.solutions
-    exercise_search_path = db.admin.Dataset(excercise.dataset_id).search_path
+    exercise_search_path = db.admin.Activity(excercise.activity_id).search_path
     
     def generate_results():
         yield json.dumps({
@@ -87,7 +87,7 @@ def run_query():
             'badges': [badge.to_dict() for badge in badges],
         }) + '\n'  # Important: one JSON object per line
 
-        database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+        database = db.users.get_database(dbname=user.username, dbms=activity.dbms)
         for query_result in database.execute_sql(query_str=query_str):
             search_path = database.get_search_path()
 
@@ -130,7 +130,7 @@ def run_query():
                     catalog=catalog,
                     search_path=f'{system_search_path}{search_path}',
                     solution_search_path=exercise_search_path,
-                    dialect=dataset.dbms,
+                    dialect=activity.dbms,
                     detectors=DETECTORS,
                     debug=False,
                 )
@@ -181,9 +181,9 @@ def show_search_path():
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    dataset = db.admin.Dataset(exercise.dataset_id)
+    activity = db.admin.Activity(exercise.activity_id)
     
-    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+    database = db.users.get_database(dbname=user.username, dbms=activity.dbms)
     result = database.builtin_show_search_path()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -196,9 +196,9 @@ def list_schemas():
     user = db.admin.User(get_jwt_identity())
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    dataset = db.admin.Dataset(exercise.dataset_id)
+    activity = db.admin.Activity(exercise.activity_id)
 
-    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+    database = db.users.get_database(dbname=user.username, dbms=activity.dbms)
     result = database.builtin_list_schemas()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -212,9 +212,9 @@ def list_tables():
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    dataset = db.admin.Dataset(exercise.dataset_id)
+    activity = db.admin.Activity(exercise.activity_id)
 
-    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+    database = db.users.get_database(dbname=user.username, dbms=activity.dbms)
     result = database.builtin_list_tables()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -228,9 +228,9 @@ def describe_tables():
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    dataset = db.admin.Dataset(exercise.dataset_id)
+    activity = db.admin.Activity(exercise.activity_id)
 
-    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+    database = db.users.get_database(dbname=user.username, dbms=activity.dbms)
     result = database.builtin_describe_tables()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -244,9 +244,9 @@ def list_constraints():
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    dataset = db.admin.Dataset(exercise.dataset_id)
+    activity = db.admin.Activity(exercise.activity_id)
     
-    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+    database = db.users.get_database(dbname=user.username, dbms=activity.dbms)
     result = database.builtin_list_constraints()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -260,9 +260,9 @@ def list_users():
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    dataset = db.admin.Dataset(exercise.dataset_id)
+    activity = db.admin.Activity(exercise.activity_id)
     
-    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+    database = db.users.get_database(dbname=user.username, dbms=activity.dbms)
     result = database.builtin_list_users()
     result = next(iter(result))
     result.query_id = log_builtin_query(user, exercise, result)
@@ -277,7 +277,7 @@ def check_solution():
     data = request.get_json()
     query_str = data['query']
     exercise = db.admin.Exercise(int(data['exercise_id']))
-    dataset = db.admin.Dataset(exercise.dataset_id)
+    activity = db.admin.Activity(exercise.activity_id)
     
     coins = user.get_coins()
     attempts = exercise.count_attempts(user)
@@ -301,9 +301,9 @@ def check_solution():
             attempts=attempts,
         )
 
-    database = db.users.get_database(dbname=user.username, dbms=dataset.dbms)
+    database = db.users.get_database(dbname=user.username, dbms=activity.dbms)
     search_path = database.get_search_path()
-    check = database.check_query_solution(query_user=query, query_solutions=exercise.solutions, solution_search_path=dataset.search_path)
+    check = database.check_query_solution(query_user=query, query_solutions=exercise.solutions, solution_search_path=activity.search_path)
 
     batch = db.admin.QueryBatch.log(
         user=user,
@@ -340,8 +340,8 @@ def check_solution():
         solutions=exercise.solutions,
         catalog=catalog,
         search_path=search_path,
-        solution_search_path=dataset.search_path,
-        dialect=dataset.dbms,
+        solution_search_path=activity.search_path,
+        dialect=activity.dbms,
         detectors=DETECTORS,
         debug=False,
     )

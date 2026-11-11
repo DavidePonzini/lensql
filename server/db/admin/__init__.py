@@ -1,4 +1,4 @@
-from .datasets import Dataset
+from .activities import Activity
 from .exercises import Exercise
 from .messages import Message
 from .queries import Query, QueryBatch

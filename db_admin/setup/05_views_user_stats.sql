@@ -5,7 +5,7 @@ SET search_path TO lensql;
 -- Query stats
 CREATE OR REPLACE VIEW v_stats_queries_by_exercise AS
 SELECT
-    dm.dataset_id,
+    dm.activity_id,
     qb.exercise_id,
     qb.username,
     dm.is_owner,
@@ -17,17 +17,17 @@ FROM
     queries q
     JOIN query_batches qb ON qb.id = q.batch_id
     JOIN exercises e ON qb.exercise_id = e.id
-    JOIN dataset_members dm ON dm.username = qb.username AND dm.dataset_id = e.dataset_id
+    JOIN activity_members dm ON dm.username = qb.username AND dm.activity_id = e.activity_id
 WHERE
     q.query_type <> 'BUILTIN'
 GROUP BY
-    dm.dataset_id,
+    dm.activity_id,
     qb.exercise_id,
     qb.username,
     dm.is_owner,
     q.query_type;
 
--- CREATE INDEX ON v_stats_queries_by_exercise(dataset_id);
+-- CREATE INDEX ON v_stats_queries_by_exercise(activity_id);
 -- CREATE INDEX ON v_stats_queries_by_exercise(exercise_id);
 -- CREATE INDEX ON v_stats_queries_by_exercise(username);
 
@@ -52,7 +52,7 @@ GROUP BY
 -- Message stats
 CREATE OR REPLACE VIEW v_stats_messages_by_exercise AS
 SELECT
-    dm.dataset_id,
+    dm.activity_id,
     qb.exercise_id,
     qb.username,
     dm.is_owner,
@@ -65,14 +65,14 @@ FROM
     JOIN queries q ON q.id = m.query_id
     JOIN query_batches qb ON qb.id = q.batch_id
     JOIN exercises e ON qb.exercise_id = e.id
-    JOIN dataset_members dm ON dm.username = qb.username AND dm.dataset_id = e.dataset_id
+    JOIN activity_members dm ON dm.username = qb.username AND dm.activity_id = e.activity_id
 GROUP BY
-    dm.dataset_id,
+    dm.activity_id,
     qb.exercise_id,
     qb.username,
     dm.is_owner;
 
--- CREATE INDEX ON v_stats_messages_by_exercise(dataset_id);
+-- CREATE INDEX ON v_stats_messages_by_exercise(activity_id);
 -- CREATE INDEX ON v_stats_messages_by_exercise(exercise_id);
 -- CREATE INDEX ON v_stats_messages_by_exercise(username);
 
@@ -94,7 +94,7 @@ GROUP BY
 
 CREATE OR REPLACE VIEW v_stats_errors_by_exercise AS
 SELECT
-    dm.dataset_id,
+    dm.activity_id,
     qb.exercise_id,
     qb.username,
     dm.is_owner,
@@ -106,9 +106,9 @@ FROM
     JOIN queries q ON q.id = he.query_id
     JOIN query_batches qb ON qb.id = q.batch_id
     JOIN exercises e ON qb.exercise_id = e.id
-    JOIN dataset_members dm ON dm.username = qb.username AND dm.dataset_id = e.dataset_id
+    JOIN activity_members dm ON dm.username = qb.username AND dm.activity_id = e.activity_id
 GROUP BY
-    dm.dataset_id,
+    dm.activity_id,
     qb.exercise_id,
     qb.username,
     dm.is_owner,
@@ -133,7 +133,7 @@ GROUP BY
 
 CREATE OR REPLACE VIEW v_stats_error_timeline_by_exercise AS
 SELECT
-    dm.dataset_id,
+    dm.activity_id,
     qb.exercise_id,
     qb.username,
     dm.is_owner,
@@ -146,10 +146,10 @@ FROM
     JOIN queries q ON q.id = he.query_id
     JOIN query_batches qb ON qb.id = q.batch_id
     JOIN exercises e ON qb.exercise_id = e.id
-    JOIN dataset_members dm ON dm.username = qb.username AND dm.dataset_id = e.dataset_id
+    JOIN activity_members dm ON dm.username = qb.username AND dm.activity_id = e.activity_id
 GROUP BY
     day,
-    dm.dataset_id,
+    dm.activity_id,
     qb.exercise_id,
     qb.username,
     dm.is_owner,

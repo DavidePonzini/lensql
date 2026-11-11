@@ -7,7 +7,7 @@ import ButtonModal from '../../components/buttons/ButtonModal';
 
 import ExerciseMask from './ExerciseMask';
 
-function ExerciseAdd({ refresh, datasetId }) {
+function ExerciseAdd({ refresh, activityId }) {
     const { apiRequest } = useAuth();
     const { t } = useTranslation();
 
@@ -23,7 +23,7 @@ function ExerciseAdd({ refresh, datasetId }) {
             'title': exerciseTitle,
             'request': exerciseRequest,
             'solutions': JSON.stringify(filteredSolutions),
-            'dataset_id': datasetId,
+            'activity_id': activityId,
         });
 
         refresh();
@@ -32,11 +32,11 @@ function ExerciseAdd({ refresh, datasetId }) {
     return (
         <ButtonModal
             className="btn btn-success"
-            title={t('pages.datasets.exercise_add.title')}
-            buttonText={t('pages.datasets.exercise_add.button_text')}
+            title={t('pages.activities.exercise_add.title')}
+            buttonText={t('pages.activities.exercise_add.button_text')}
             footerButtons={[
                 {
-                    text: t('pages.datasets.exercise_add.save'),
+                    text: t('pages.activities.exercise_add.save'),
                     variant: 'primary',
                     onClick: handleAddExercise,
                     autoClose: true,

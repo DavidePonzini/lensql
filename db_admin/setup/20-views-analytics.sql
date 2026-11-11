@@ -54,18 +54,18 @@ ORDER BY
 CREATE OR REPLACE VIEW v_query_batches_during_lab_hours AS
 SELECT
     qb.id AS batch_id,
-    d.id AS dataset_id,
-    d.name AS dataset_name
+    d.id AS activity_id,
+    d.name AS activity_name
 FROM
     query_batches qb
     JOIN exercises e ON qb.exercise_id = e.id
-    JOIN datasets d ON e.dataset_id = d.id
+    JOIN activities d ON e.activity_id = d.id
 WHERE
     d.activity_start_ts IS NOT NULL
     AND d.activity_end_ts IS NOT NULL
     AND qb.ts BETWEEN d.activity_start_ts AND d.activity_end_ts;
 
-CREATE OR REPLACE VIEW v_messages_per_dataset AS
+CREATE OR REPLACE VIEW v_messages_per_activity AS
 SELECT
     d.name,
     q.query_goal,
@@ -78,12 +78,12 @@ FROM
     RIGHT JOIN queries q ON q.id = m.query_id
     JOIN query_batches qb ON qb.id = q.batch_id
     JOIN exercises e ON e.id = qb.exercise_id
-    JOIN datasets d ON d.id = e.dataset_id
+    JOIN activities d ON d.id = e.activity_id
 GROUP BY d.name, q.query_goal, q.query_type
 HAVING count(m.id) > 0
 ORDER BY name, query_goal, query_type;
 
-CREATE OR REPLACE VIEW v_messages_per_dataset_during_lab_hours AS
+CREATE OR REPLACE VIEW v_messages_per_activity_during_lab_hours AS
 SELECT
     d.name,
     q.query_goal,
@@ -96,15 +96,15 @@ FROM
     RIGHT JOIN queries q ON q.id = m.query_id
     JOIN query_batches qb ON qb.id = q.batch_id
     JOIN exercises e ON e.id = qb.exercise_id
-    JOIN datasets d ON d.id = e.dataset_id
+    JOIN activities d ON d.id = e.activity_id
     JOIN v_query_batches_during_lab_hours lq ON lq.batch_id = qb.id
 GROUP BY d.name, q.query_goal, q.query_type
 HAVING count(m.id) > 0
 ORDER BY name, query_goal, query_type;
 
 CREATE OR REPLACE VIEW v_generated_exercises_errors AS
-SELECT d.name AS dataset_name,
-    e.dataset_id,
+SELECT d.name AS activity_name,
+    e.activity_id,
     e.id AS exercise_id,
     e.title,
     e.generation_error,
@@ -116,7 +116,7 @@ SELECT d.name AS dataset_name,
             ELSE count(he.error_id) FILTER (WHERE he.error_id = e.generation_error) OVER (PARTITION BY d.name, e.id)::double precision / count(he.error_id)::double precision
         END AS expected_error_rate
 FROM exercises e
-    JOIN datasets d ON d.id = e.dataset_id
+    JOIN activities d ON d.id = e.activity_id
     JOIN query_batches qb ON qb.exercise_id = e.id
     JOIN queries q ON q.batch_id = qb.id
     LEFT JOIN has_error he ON q.id = he.query_id
@@ -125,7 +125,7 @@ WHERE
     AND e.generation_difficulty IS NOT NULL
 GROUP BY
     d.name,
-    e.dataset_id,
+    e.activity_id,
     e.id,
     e.title,
     e.generation_error,
@@ -137,8 +137,8 @@ d.name,
 
 CREATE OR REPLACE VIEW v_generated_exercises_expected_errors AS
 SELECT
-    d.name AS dataset_name,
-    e.dataset_id,
+    d.name AS activity_name,
+    e.activity_id,
     e.id AS exercise_id,
     e.title,
     e.generation_error,
@@ -149,7 +149,7 @@ SELECT
     END AS expected_error_rate
 FROM
     exercises e
-    JOIN datasets d ON d.id = e.dataset_id
+    JOIN activities d ON d.id = e.activity_id
     JOIN query_batches qb ON qb.exercise_id = e.id
     JOIN queries q ON q.batch_id = qb.id
     LEFT JOIN has_error he ON q.id = he.query_id
@@ -158,7 +158,7 @@ WHERE
     AND e.generation_difficulty IS NOT NULL
 GROUP BY
     d.name,
-    e.dataset_id,
+    e.activity_id,
     e.id,
     e.title,
     e.generation_error,

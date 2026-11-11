@@ -11,17 +11,17 @@ def test_check_solution_returns_not_enough_coins_message(authenticated_client, m
         get_coins=lambda: 0,
     )
     fake_exercise = SimpleNamespace(
-        dataset_id='dataset-1',
+        activity_id='activity-1',
         count_attempts=lambda user: 3,
     )
-    fake_dataset = SimpleNamespace(
+    fake_activity = SimpleNamespace(
         dbms='postgresql',
         search_path='public',
     )
 
     mocker.patch('server.api.queries.db.admin.User', return_value=fake_user)
     mocker.patch('server.api.queries.db.admin.Exercise', return_value=fake_exercise)
-    mocker.patch('server.api.queries.db.admin.Dataset', return_value=fake_dataset)
+    mocker.patch('server.api.queries.db.admin.Activity', return_value=fake_activity)
     mocker.patch(
         'server.api.queries.gamification.rewards.Actions.Exercise.check_solution_cost',
         return_value=Reward('Checked solution', coins=-5),
@@ -57,12 +57,12 @@ def test_check_solution_returns_rewards_and_logs_context(authenticated_client, m
         add_rewards=mocker.stub(name='add_rewards'),
     )
     fake_exercise = SimpleNamespace(
-        dataset_id='dataset-1',
+        activity_id='activity-1',
         count_attempts=lambda user: 0,
         solutions=['SELECT 1'],
         has_been_solved_by_user=lambda user: False,
     )
-    fake_dataset = SimpleNamespace(
+    fake_activity = SimpleNamespace(
         dbms='postgresql',
         search_path='public',
     )
@@ -89,7 +89,7 @@ def test_check_solution_returns_rewards_and_logs_context(authenticated_client, m
 
     mocker.patch('server.api.queries.db.admin.User', return_value=fake_user)
     mocker.patch('server.api.queries.db.admin.Exercise', return_value=fake_exercise)
-    mocker.patch('server.api.queries.db.admin.Dataset', return_value=fake_dataset)
+    mocker.patch('server.api.queries.db.admin.Activity', return_value=fake_activity)
     mocker.patch('server.api.queries.db.users.get_database', return_value=fake_database)
     mocker.patch('server.api.queries.db.admin.QueryBatch.log', return_value=fake_batch)
     mocker.patch('server.api.queries.db.admin.Query.log', return_value=fake_query)

@@ -162,7 +162,7 @@ paths:
               properties:
                 title:
                   type: string
-                dataset:
+                activity:
                   type: string
       responses:
         "200":
@@ -170,7 +170,7 @@ paths:
     put:
       tags:
         - classes
-      summary: update class title or dataset
+      summary: update class title or activity
       security:
         - auth: []
       requestBody:
@@ -184,7 +184,7 @@ paths:
                   type: string
                 title:
                   type: string
-                dataset:
+                activity:
                   type: string
       responses:
         "200":
@@ -219,7 +219,7 @@ paths:
                     properties:
                       title:
                         type: string
-                      dataset:
+                      activity:
                         type: string
   /classes/join:
     post:
@@ -595,11 +595,11 @@ paths:
       responses:
         "200":
           description: Objective status updated successfully
-  /exercises/init-dataset:
+  /exercises/init-activity:
     post:
       tags:
         - exercises
-      summary: initialize dataset for exercise
+      summary: initialize activity for exercise
       security:
         - auth: []
       requestBody:
@@ -611,17 +611,17 @@ paths:
               properties:
                 exercise_id:
                   type: string
-                dataset_name:
+                activity_name:
                   type: string
       responses:
         "200":
-          description: Dataset initialized successfully
+          description: Activity initialized successfully
 
-  /exercises/dataset:
+  /exercises/activity:
     get:
       tags:
         - exercises
-      summary: get a dataset by class id
+      summary: get a activity by class id
       security:
         - auth: []
       parameters:
@@ -632,7 +632,7 @@ paths:
             type: string
       responses:
         "200":
-          description: Returns the dataset with the given name
+          description: Returns the activity with the given name
           content:
             application/json:
               schema:
@@ -647,7 +647,7 @@ paths:
     post:
       tags:
         - exercises
-      summary: set a new dataset for a class
+      summary: set a new activity for a class
       security:
         - auth: []
       requestBody:
@@ -659,11 +659,11 @@ paths:
               properties:
                 class_id:
                   type: string
-                dataset:
+                activity:
                   type: string
       responses:
         "200":
-          description: Dataset set successfully
+          description: Activity set successfully
           content:
             application/json:
               schema:

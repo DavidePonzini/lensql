@@ -45,11 +45,11 @@ function ExerciseUpdate({ exerciseId, refreshExercises, className }) {
     return (
         <ButtonModal
             className={className}
-            title={t('pages.datasets.exercise_update.title')}
-            buttonText={t('pages.datasets.exercise_update.button')}
+            title={t('pages.activities.exercise_update.title')}
+            buttonText={t('pages.activities.exercise_update.button')}
             footerButtons={[
                 {
-                    text: t('pages.datasets.exercise_update.save'),
+                    text: t('pages.activities.exercise_update.save'),
                     variant: 'primary',
                     onClick: handleEditExercise,
                     autoClose: true,

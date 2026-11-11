@@ -14,7 +14,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ObservedOnce from "../ObservedOnce";
 
-function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = false }) {
+function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher = false }) {
     const { t, i18n } = useTranslation();
     const locale = i18n.resolvedLanguage || 'en';
 
@@ -24,7 +24,7 @@ function LearningStatsErrors({ datasetId = null, exerciseId = null, isTeacher = 
 
     async function fetchData() {
         const response = await apiRequest(
-            `/api/users/stats/errors?dataset_id=${datasetId || ''}&exercise_id=${exerciseId || ''}&is_teacher=${isTeacher ? '1' : '0'}`,
+            `/api/users/stats/errors?activity_id=${activityId || ''}&exercise_id=${exerciseId || ''}&is_teacher=${isTeacher ? '1' : '0'}`,
             'GET'
         );
         setData(response.data);

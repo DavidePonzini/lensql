@@ -9,7 +9,7 @@ class Exercise:
     '''Class for managing exercises'''
 
     def __init__(self, exercise_id: int, *,
-                 dataset_id: str | None = None,
+                 activity_id: str | None = None,
                  is_hidden: bool = False,
                  title: str | None = None,
                  request: str | None = None,
@@ -23,7 +23,7 @@ class Exercise:
 
         # Lazy properties
         self._properties_loaded = all_properties_loaded
-        self._dataset_id = dataset_id
+        self._activity_id = activity_id
         self._is_hidden = is_hidden
         self._title = title
         self._request = request
@@ -34,15 +34,15 @@ class Exercise:
     
     # region Properties
     @property
-    def dataset_id(self) -> str:
-        '''Get the dataset ID this exercise belongs to'''
+    def activity_id(self) -> str:
+        '''Get the activity ID this exercise belongs to'''
 
         if not self._properties_loaded:
             self._load_properties()
 
-        assert self._dataset_id is not None, "Dataset ID should be loaded by _load_properties"
+        assert self._activity_id is not None, "Activity ID should be loaded by _load_properties"
 
-        return self._dataset_id
+        return self._activity_id
 
     @property
     def is_hidden(self) -> bool:
@@ -264,7 +264,7 @@ class Exercise:
         '''
             SELECT
                 e.title,
-                e.dataset_id,
+                e.activity_id,
                 e.is_hidden,
                 e.request,
                 e.solutions,
@@ -288,7 +288,7 @@ class Exercise:
 
         row = result[0]
         self._title = row[0]
-        self._dataset_id = row[1]
+        self._activity_id = row[1]
         self._is_hidden = row[2]
         self._request = row[3]
         self._solutions = json.loads(row[4])
@@ -298,7 +298,7 @@ class Exercise:
     @staticmethod
     def create(title: str, *,
                user: User,
-               dataset_id: str,
+               activity_id: str,
                request: str,
                solutions: list[str] = [],
                difficulty: int | None = None,
@@ -308,7 +308,7 @@ class Exercise:
 
         result = db.insert(SCHEMA, 'exercises', {
             'title': title,
-            'dataset_id': dataset_id,
+            'activity_id': activity_id,
             'is_hidden': False,
             'request': request,
             'solutions': json.dumps(solutions),
@@ -322,7 +322,7 @@ class Exercise:
         exercise_id = int(result[0][0])
 
         return Exercise(exercise_id=exercise_id,
-                        dataset_id=dataset_id,
+                        activity_id=activity_id,
                         is_hidden=False,
                         title=title,
                         request=request,

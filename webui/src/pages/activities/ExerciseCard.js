@@ -54,7 +54,7 @@ function ExerciseCard({
     }
 
     async function handleDelete() {
-        if (!window.confirm(t('pages.datasets.exercise.delete_confirm'))) {
+        if (!window.confirm(t('pages.activities.exercise.delete_confirm'))) {
             return;
         }
 
@@ -77,10 +77,10 @@ function ExerciseCard({
             <Card.Header>
                 <h5 className='card-title'>
                     {title}
-                    {hidden && <span className="badge bg-secondary ms-2">{t('pages.datasets.exercise.hidden')}</span>}
+                    {hidden && <span className="badge bg-secondary ms-2">{t('pages.activities.exercise.hidden')}</span>}
                     {hasSolution && (isSolved ?
-                        <span className="badge bg-success ms-2">{t('pages.datasets.exercise.solved')}</span> :
-                        <span className="badge bg-warning ms-2">{t('pages.datasets.exercise.todo')}</span>
+                        <span className="badge bg-success ms-2">{t('pages.activities.exercise.solved')}</span> :
+                        <span className="badge bg-warning ms-2">{t('pages.activities.exercise.todo')}</span>
                     )}
                 </h5>
             </Card.Header>
@@ -92,7 +92,7 @@ function ExerciseCard({
                     {isOwner && learningObjectives.length > 0 && (
                         <>
                             <div className='col'>
-                                <b>{t('pages.datasets.exercise.objectives')}:</b>
+                                <b>{t('pages.activities.exercise.objectives')}:</b>
                                 <div>
                                     {learningObjectives.map((o, index) => (
                                         <span
@@ -118,7 +118,7 @@ function ExerciseCard({
                     <div className='col'>
                         {isGenerated && (
                             <span className="badge bg-info mx-1 my-2">
-                                {t('pages.datasets.exercise.generated')}
+                                {t('pages.activities.exercise.generated')}
                             </span>
                         )}
                     </div>
@@ -130,7 +130,7 @@ function ExerciseCard({
                     to={`/exercises/${exerciseId}`}
                     className={`btn me-2 mb-1 ${isSolved && !isOwner ? 'btn-outline-primary' : 'btn-primary'}`}
                 >
-                    {t('pages.datasets.exercise.open')}
+                    {t('pages.activities.exercise.open')}
                 </NavLink>
 
                 {isOwner && (
@@ -141,9 +141,9 @@ function ExerciseCard({
                             <>
                                 <ButtonModal
                                     className="btn btn-info me-2 mb-1"
-                                    title={t('pages.datasets.exercise.student_analytics')}
+                                    title={t('pages.activities.exercise.student_analytics')}
                                     fullscreen
-                                    buttonText={t('pages.datasets.exercise.student_analytics')}
+                                    buttonText={t('pages.activities.exercise.student_analytics')}
                                 >
                                     <LearningStatsAll exerciseId={exerciseId} isTeacher={true} />
                                 </ButtonModal>
@@ -160,7 +160,7 @@ function ExerciseCard({
                                         className="me-2 mb-1"
                                         onClick={handleUnhide}
                                     >
-                                        <i className="fa fa-eye"></i> {t('pages.datasets.exercise.show')}
+                                        <i className="fa fa-eye"></i> {t('pages.activities.exercise.show')}
                                     </Button>
                                 ) : (
                                     <Button
@@ -168,7 +168,7 @@ function ExerciseCard({
                                         className="me-2 mb-1"
                                         onClick={handleHide}
                                     >
-                                        <i className="fa fa-eye-slash"></i> {t('pages.datasets.exercise.hide')}
+                                        <i className="fa fa-eye-slash"></i> {t('pages.activities.exercise.hide')}
                                     </Button>
                                 )}
                             </>
@@ -185,7 +185,7 @@ function ExerciseCard({
                             className="me-2 mb-1"
                             onClick={handleDelete}
                         >
-                            <i className="fa fa-trash"></i> {t('pages.datasets.exercise.delete')}
+                            <i className="fa fa-trash"></i> {t('pages.activities.exercise.delete')}
                         </Button>
                     </>
                 )}

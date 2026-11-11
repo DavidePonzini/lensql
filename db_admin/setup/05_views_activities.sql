@@ -2,30 +2,30 @@ BEGIN;
 
 SET search_path TO lensql;
 
-CREATE OR REPLACE VIEW v_dataset_list AS
+CREATE OR REPLACE VIEW v_activity_list AS
 WITH participant_counts AS (
     SELECT
-        dataset_id,
+        activity_id,
         COUNT(*) AS participants
-    FROM dataset_members
+    FROM activity_members
     WHERE
         is_owner = FALSE
         AND is_active = TRUE
-    GROUP BY dataset_id
+    GROUP BY activity_id
 ),
 
 exercise_counts AS (
     SELECT
-        dataset_id,
+        activity_id,
         COUNT(*) AS exercises_all,
         COUNT(*) FILTER (WHERE is_hidden = FALSE) AS exercises_visible
     FROM exercises
-    GROUP BY dataset_id
+    GROUP BY activity_id
 ),
 
 query_counts AS (
     SELECT
-        e.dataset_id,
+        e.activity_id,
         qb.username,
         COUNT(*) AS queries
     FROM exercises e
@@ -35,20 +35,20 @@ query_counts AS (
         ON q.batch_id = qb.id
     WHERE qb.username IS NOT NULL
     GROUP BY
-        e.dataset_id,
+        e.activity_id,
         qb.username
 ),
 
 student_query_counts AS (
     SELECT
-        qc.dataset_id,
+        qc.activity_id,
         SUM(qc.queries)::BIGINT AS queries
     FROM query_counts qc
-    JOIN dataset_members dm
-        ON dm.dataset_id = qc.dataset_id
+    JOIN activity_members dm
+        ON dm.activity_id = qc.activity_id
         AND dm.username = qc.username
     WHERE dm.is_owner = FALSE
-    GROUP BY qc.dataset_id
+    GROUP BY qc.activity_id
 )
 
 SELECT
@@ -61,7 +61,7 @@ SELECT
     dm.is_owner,
     dm.joined_ts,
 
-    -- total number of active students in the dataset
+    -- total number of active students in the activity
     COALESCE(pc.participants, 0) AS participants,
 
     -- owners see all exercises; students only see non-hidden ones
@@ -72,7 +72,7 @@ SELECT
             COALESCE(ec.exercises_visible, 0)
     END AS exercises,
 
-    -- number of queries run by this user in this dataset
+    -- number of queries run by this user in this activity
     COALESCE(qc.queries, 0) AS queries_user,
 
     -- number of queries run by students, only exposed to owners
@@ -82,38 +82,38 @@ SELECT
         ELSE 0
     END AS queries_students
 
-FROM dataset_members dm
-JOIN datasets d
-    ON d.id = dm.dataset_id
+FROM activity_members dm
+JOIN activities d
+    ON d.id = dm.activity_id
 
 LEFT JOIN participant_counts pc
-    ON pc.dataset_id = d.id
+    ON pc.activity_id = d.id
 
 LEFT JOIN exercise_counts ec
-    ON ec.dataset_id = d.id
+    ON ec.activity_id = d.id
 
 LEFT JOIN query_counts qc
-    ON qc.dataset_id = d.id
+    ON qc.activity_id = d.id
     AND qc.username = dm.username
 
 LEFT JOIN student_query_counts sqc
-    ON sqc.dataset_id = d.id
+    ON sqc.activity_id = d.id
 
 WHERE dm.is_active = TRUE;
 
 CREATE OR REPLACE VIEW v_generated_exercises AS
 SELECT
-    e.dataset_id,
+    e.activity_id,
     e.generation_error,
     ARRAY_AGG(e.generation_difficulty ORDER BY e.generation_difficulty) AS generation_difficulties
 FROM exercises e
 WHERE
     e.generation_error IS NOT NULL
     AND e.generation_difficulty IS NOT NULL
-GROUP BY e.dataset_id, e.generation_error
-ORDER BY e.dataset_id, e.generation_error;
+GROUP BY e.activity_id, e.generation_error
+ORDER BY e.activity_id, e.generation_error;
 
-CREATE OR REPLACE VIEW v_dataset_completion AS
+CREATE OR REPLACE VIEW v_activity_completion AS
 WITH solved_exercises AS (
     SELECT
         qb.username,
@@ -124,15 +124,15 @@ WITH solved_exercises AS (
     JOIN exercise_solutions es ON es.id = q.id
     WHERE es.is_correct = TRUE
     GROUP BY e.id, qb.username
-), dataset_progress AS (
+), activity_progress AS (
     SELECT
         dm.username,
-        d.id AS dataset_id,
+        d.id AS activity_id,
         COUNT(DISTINCT e.id) AS total_exercises,
         COUNT(DISTINCT se.exercise_id) AS solved_exercises
-    FROM datasets d
-    JOIN dataset_members dm ON dm.dataset_id = d.id
-    JOIN exercises e ON e.dataset_id = d.id AND e.is_hidden = FALSE
+    FROM activities d
+    JOIN activity_members dm ON dm.activity_id = d.id
+    JOIN exercises e ON e.activity_id = d.id AND e.is_hidden = FALSE
     LEFT JOIN solved_exercises se ON se.exercise_id = e.id AND se.username = dm.username
     WHERE
         dm.is_active = TRUE
@@ -142,17 +142,17 @@ WITH solved_exercises AS (
 
 SELECT
     username,
-    dataset_id,
+    activity_id,
     solved_exercises AS solved,
     total_exercises - solved_exercises AS remaining,
     ((solved_exercises::DECIMAL / total_exercises) * 100)::DECIMAL(5,2) AS completion
-FROM dataset_progress
+FROM activity_progress
 WHERE
     total_exercises > 0
     AND solved_exercises > 0
 ORDER BY
     completion DESC,
-    dataset_id,
+    activity_id,
     username;
 
 

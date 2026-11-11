@@ -42,70 +42,70 @@ msgstr "Failed to reset password. Please try again."
 msgid "Password reset successfully."
 msgstr "Password reset successfully."
 
-#: server/api/datasets.py:65
-msgid "You are not authorized to modify this dataset."
-msgstr "You are not authorized to modify this dataset."
+#: server/api/activities.py:65
+msgid "You are not authorized to modify this activity."
+msgstr "You are not authorized to modify this activity."
 
-#: server/api/datasets.py:92 server/api/datasets.py:207
-msgid "You do not have access to this dataset."
-msgstr "You do not have access to this dataset."
+#: server/api/activities.py:92 server/api/activities.py:207
+msgid "You do not have access to this activity."
+msgstr "You do not have access to this activity."
 
-#: server/api/datasets.py:116
-msgid "Dataset does not exist."
-msgstr "Dataset does not exist."
+#: server/api/activities.py:116
+msgid "Activity does not exist."
+msgstr "Activity does not exist."
 
-#: server/api/datasets.py:143
-msgid "This is a special dataset and cannot be left."
-msgstr "This is a special dataset and cannot be left."
+#: server/api/activities.py:143
+msgid "This is a special activity and cannot be left."
+msgstr "This is a special activity and cannot be left."
 
-#: server/api/datasets.py:148
+#: server/api/activities.py:148
 msgid ""
-"You cannot leave this dataset, as you are an owner and it has data "
+"You cannot leave this activity, as you are an owner and it has data "
 "associated with it."
 msgstr ""
-"You cannot leave this dataset, as you are an owner and it has data "
+"You cannot leave this activity, as you are an owner and it has data "
 "associated with it."
 
-#: server/api/datasets.py:174 server/api/datasets.py:192
-msgid "You are not an owner of this dataset."
-msgstr "You are not an owner of this dataset."
+#: server/api/activities.py:174 server/api/activities.py:192
+msgid "You are not an owner of this activity."
+msgstr "You are not an owner of this activity."
 
-#: server/api/datasets.py:177
-msgid "You cannot set yourself as an owner of this dataset."
-msgstr "You cannot set yourself as an owner of this dataset."
+#: server/api/activities.py:177
+msgid "You cannot set yourself as an owner of this activity."
+msgstr "You cannot set yourself as an owner of this activity."
 
-#: server/api/datasets.py:21
-msgid "Failed to import dataset. JSON syntax error at line %(line)s, column %(column)s: %(details)s."
-msgstr "Failed to import dataset. JSON syntax error at line %(line)s, column %(column)s: %(details)s."
+#: server/api/activities.py:21
+msgid "Failed to import activity. JSON syntax error at line %(line)s, column %(column)s: %(details)s."
+msgstr "Failed to import activity. JSON syntax error at line %(line)s, column %(column)s: %(details)s."
 
-#: server/api/datasets.py:30
-msgid "Failed to import dataset. Missing required field: %(field)s."
-msgstr "Failed to import dataset. Missing required field: %(field)s."
+#: server/api/activities.py:30
+msgid "Failed to import activity. Missing required field: %(field)s."
+msgstr "Failed to import activity. Missing required field: %(field)s."
 
-#: server/api/datasets.py:37
-msgid "Invalid dataset content."
-msgstr "Invalid dataset content."
+#: server/api/activities.py:37
+msgid "Invalid activity content."
+msgstr "Invalid activity content."
 
-#: server/api/datasets.py:39
-msgid "Failed to import dataset. %(details)s"
-msgstr "Failed to import dataset. %(details)s"
+#: server/api/activities.py:39
+msgid "Failed to import activity. %(details)s"
+msgstr "Failed to import activity. %(details)s"
 
-#: server/api/datasets.py:43
-msgid "Failed to import dataset because the server encountered an error."
-msgstr "Failed to import dataset because the server encountered an error."
+#: server/api/activities.py:43
+msgid "Failed to import activity because the server encountered an error."
+msgstr "Failed to import activity because the server encountered an error."
 
 #: server/api/exercises.py:26
-msgid "Dataset ID is required."
-msgstr "Dataset ID is required."
+msgid "Activity ID is required."
+msgstr "Activity ID is required."
 
 #: server/api/exercises.py:31 server/api/exercises.py:131
 #: server/api/exercises.py:219
-msgid "You are not a participant of this dataset."
-msgstr "You are not a participant of this dataset."
+msgid "You are not a participant of this activity."
+msgstr "You are not a participant of this activity."
 
 #: server/api/exercises.py:58
-msgid "You are not authorized to add exercises to this dataset."
-msgstr "You are not authorized to add exercises to this dataset."
+msgid "You are not authorized to add exercises to this activity."
+msgstr "You are not authorized to add exercises to this activity."
 
 #: server/api/exercises.py:84 server/api/exercises.py:175
 msgid "You are not authorized to edit this exercise."
@@ -143,8 +143,8 @@ msgid "Congratulations, I couldn't find any errors in your query!"
 msgstr "Congratulations, I couldn't find any errors in your query!"
 
 #: server/api/users.py:62 server/api/users.py:106 server/api/users.py:143
-msgid "User is not a participant in the specified dataset."
-msgstr "User is not a participant in the specified dataset."
+msgid "User is not a participant in the specified activity."
+msgstr "User is not a participant in the specified activity."
 
 #: server/db/users/database.py:250 server/db/users/database.py:259
 msgid "No tables found in the current search path."
@@ -165,10 +165,10 @@ msgstr "Your query is not supported. Please ensure it is a valid SQL SELECT quer
 #: server/db/users/database.py:437
 msgid ""
 "Error executing teacher-provided solution. Have you initialized the "
-"dataset?"
+"activity?"
 msgstr ""
 "Error executing teacher-provided solution. Have you initialized the "
-"dataset?"
+"activity?"
 
 #: server/db/users/database.py:445
 msgid ""
@@ -206,59 +206,59 @@ msgstr ""
 "You don't have enough coins to use this feature. Check the Profile page "
 "to learn how to earn more."
 
-#: server/sql/result/dataset.py:47
+#: server/sql/result/activity.py:47
 msgid "Unexpected"
 msgstr "Unexpected"
 
-#: server/sql/result/dataset.py:50
+#: server/sql/result/activity.py:50
 msgid "Missing"
 msgstr "Missing"
 
-#: server/sql/result/dataset.py:53
+#: server/sql/result/activity.py:53
 msgid "Correct"
 msgstr "Correct"
 
-#: server/sql/result/dataset.py:56
+#: server/sql/result/activity.py:56
 msgid "row"
 msgstr "row"
 
-#: server/sql/result/dataset.py:56
+#: server/sql/result/activity.py:56
 msgid "rows"
 msgstr "rows"
 
-#: server/sql/result/dataset.py:57
+#: server/sql/result/activity.py:57
 msgid "column"
 msgstr "column"
 
-#: server/sql/result/dataset.py:57
+#: server/sql/result/activity.py:57
 msgid "columns"
 msgstr "columns"
 
-#: server/sql/result/dataset.py:129
+#: server/sql/result/activity.py:129
 msgid "your query should not return this row"
 msgstr "your query should not return this row"
 
-#: server/sql/result/dataset.py:130
+#: server/sql/result/activity.py:130
 msgid "your query should return this row but it does not"
 msgstr "your query should return this row but it does not"
 
-#: server/sql/result/dataset.py:142
+#: server/sql/result/activity.py:142
 #, python-brace-format
 msgid "{count} rows in your query are correct"
 msgstr "{count} rows in your query are correct"
 
 
-#: server/api/datasets.py
-msgid "Invalid dataset ID."
-msgstr "Invalid dataset ID."
+#: server/api/activities.py
+msgid "Invalid activity ID."
+msgstr "Invalid activity ID."
 
-#: server/api/datasets.py
-msgid "Dataset IDs may contain only letters, numbers, underscores and hyphens."
-msgstr "Dataset IDs may contain only letters, numbers, underscores and hyphens."
+#: server/api/activities.py
+msgid "Activity IDs may contain only letters, numbers, underscores and hyphens."
+msgstr "Activity IDs may contain only letters, numbers, underscores and hyphens."
 
-#: server/api/datasets.py
-msgid "This dataset ID is already in use."
-msgstr "This dataset ID is already in use."
+#: server/api/activities.py
+msgid "This activity ID is already in use."
+msgstr "This activity ID is already in use."
 
 #: server/api/auth.py
 msgid "Username and new password are required."
@@ -267,3 +267,27 @@ msgstr "Username and new password are required."
 #: server/api/auth.py
 msgid "Password must contain at least 8 characters, uppercase and lowercase letters, a number and a special character, and be at most 72 bytes."
 msgstr "Password must contain at least 8 characters, uppercase and lowercase letters, a number and a special character, and be at most 72 bytes."
+
+msgid "Invalid request."
+msgstr "Invalid request."
+
+msgid "Credits must be a non-negative integer."
+msgstr "Credits must be a non-negative integer."
+
+msgid "Select at least one activity."
+msgstr "Select at least one activity."
+
+msgid "You are not a teacher in all selected activities."
+msgstr "You are not a teacher in all selected activities."
+
+msgid "Select valid errors and counts (maximum 100 exercises), a title and a prefix."
+msgstr "Select valid errors and counts (maximum 100 exercises), a title and a prefix."
+
+msgid "Insufficient generation credits."
+msgstr "Insufficient generation credits."
+
+msgid "Generation failed. Your credits have been refunded."
+msgstr "Generation failed. Your credits have been refunded."
+
+msgid "Provide valid PostgreSQL dataset SQL with CREATE TABLE statements."
+msgstr "Provide valid PostgreSQL dataset SQL with CREATE TABLE statements."

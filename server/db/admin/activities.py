@@ -22,36 +22,36 @@ class ExerciseJSON:
     learning_objectives: list[str]
 
 @dataclass(frozen=True)
-class DatasetJSON:
+class ActivityJSON:
     title: str
     description: str
-    dataset_str: str
+    activity_str: str
     search_path: str | None
     dbms: str | None
     domain: str | None
     exercises: list[ExerciseJSON]
 
-class Dataset:
-    '''Dataset-related database operations'''
+class Activity:
+    '''Activity-related database operations'''
 
     def __init__(
         self,
-        dataset_id: str,
+        activity_id: str,
         *,
         name: str | None = None,
         description: str | None = None,
-        dataset_str: str | None = None,
+        activity_str: str | None = None,
         search_path: str | None = None,
         dbms: Dialect | None = None,
         activity_start_ts: datetime | None = None,
         activity_end_ts: datetime | None = None,
     ) -> None:
-        self.dataset_id = dataset_id
+        self.activity_id = activity_id
 
         # Lazy properties
         self._name = name
         self._description = description
-        self._dataset_str = dataset_str
+        self._activity_str = activity_str
         self._search_path = search_path
         self._dbms = dbms
         self._activity_start_ts = activity_start_ts
@@ -59,94 +59,94 @@ class Dataset:
 
     # region Properties
     def _load_properties(self) -> None:
-        '''Load all properties of the dataset from the database'''
+        '''Load all properties of the activity from the database'''
 
         query = database.sql.SQL(
         '''
             SELECT
                 name,
                 description,
-                dataset,
+                activity,
                 search_path,
                 activity_start_ts,
                 activity_end_ts
-            FROM {schema}.datasets
-            WHERE id = {dataset_id}
+            FROM {schema}.activities
+            WHERE id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         if len(result) == 0:
-            raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
+            raise ValueError(f'Activity with ID {self.activity_id} does not exist.')
 
         self._name = result[0][0]
         self._description = result[0][1]
-        self._dataset_str = result[0][2] or ''
+        self._activity_str = result[0][2] or ''
         self._search_path = result[0][3]
         self._activity_start_ts = result[0][4]
         self._activity_end_ts = result[0][5]
 
     @property
     def name(self) -> str:
-        '''Get the name of the dataset'''
+        '''Get the name of the activity'''
 
         if self._name is None:
             self._load_properties()
 
             if self._name is None:
-                raise ValueError(f'Failed to load name for dataset with ID {self.dataset_id}')
+                raise ValueError(f'Failed to load name for activity with ID {self.activity_id}')
         return self._name
     
     @property
     def description(self) -> str:
-        '''Get the description of the dataset'''
+        '''Get the description of the activity'''
 
         if self._description is None:
             self._load_properties()
 
             if self._description is None:
-                raise ValueError(f'Failed to load description for dataset with ID {self.dataset_id}')
+                raise ValueError(f'Failed to load description for activity with ID {self.activity_id}')
         
         return self._description
     
     @property
-    def dataset_str(self) -> str:
-        '''Get the dataset string'''
+    def activity_str(self) -> str:
+        '''Get the activity string'''
 
-        if self._dataset_str is None:
+        if self._activity_str is None:
             self._load_properties()
 
-            if self._dataset_str is None:
-                raise ValueError(f'Failed to load dataset string for dataset with ID {self.dataset_id}')
+            if self._activity_str is None:
+                raise ValueError(f'Failed to load activity string for activity with ID {self.activity_id}')
         
-        return self._dataset_str
+        return self._activity_str
     
     @property
     def dbms(self) -> Dialect:
-        '''Get the DBMS of the dataset'''
+        '''Get the DBMS of the activity'''
 
         if self._dbms is None:
             query = database.sql.SQL(
             '''
                 SELECT dbms
-                FROM {schema}.datasets
-                WHERE id = {dataset_id}
+                FROM {schema}.activities
+                WHERE id = {activity_id}
             ''').format(
                 schema=database.sql.Identifier(SCHEMA),
-                dataset_id=database.sql.Placeholder('dataset_id')
+                activity_id=database.sql.Placeholder('activity_id')
             )
 
             result = db.execute_and_fetch(query, {
-                'dataset_id': self.dataset_id
+                'activity_id': self.activity_id
             })
 
             if len(result) == 0:
-                raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
+                raise ValueError(f'Activity with ID {self.activity_id} does not exist.')
 
             self._dbms = Dialect(result[0][0]) if result[0][0] else Dialect.POSTGRES
         
@@ -154,46 +154,46 @@ class Dataset:
 
     @property
     def domain(self) -> str | None:
-        '''Get the domain of the dataset'''
+        '''Get the domain of the activity'''
 
         query = database.sql.SQL(
         '''
             SELECT domain
-            FROM {schema}.datasets
-            WHERE id = {dataset_id}
+            FROM {schema}.activities
+            WHERE id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         if len(result) == 0:
-            raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
+            raise ValueError(f'Activity with ID {self.activity_id} does not exist.')
 
         return result[0][0]
     
     @property
     def is_special(self) -> bool:
-        '''Check if the dataset is special (ID contains a special character)'''
-        return not self.dataset_id.isalnum()
+        '''Check if the activity is special (ID contains a special character)'''
+        return not self.activity_id.isalnum()
     
     @property
     def search_path(self) -> str:
-        '''Get the search path for the dataset'''
+        '''Get the search path for the activity'''
 
         if self._search_path is None:
             self._load_properties()
 
             if self._search_path is None:
-                raise ValueError(f'Failed to load search path for dataset with ID {self.dataset_id}')
+                raise ValueError(f'Failed to load search path for activity with ID {self.activity_id}')
         return self._search_path
 
     @property
     def activity_start_ts(self) -> datetime | None:
-        '''Get the optional start of the dataset activity window.'''
+        '''Get the optional start of the activity activity window.'''
 
         if self._activity_start_ts is None:
             self._load_properties()
@@ -201,7 +201,7 @@ class Dataset:
 
     @property
     def activity_end_ts(self) -> datetime | None:
-        '''Get the optional end of the dataset activity window.'''
+        '''Get the optional end of the activity activity window.'''
 
         if self._activity_end_ts is None:
             self._load_properties()
@@ -212,38 +212,38 @@ class Dataset:
     def rename_id(self, new_id: str) -> bool:
         '''Rename the primary key, cascading to memberships and exercises.'''
         query = database.sql.SQL('''
-            UPDATE {schema}.datasets SET id = {new_id}
-            WHERE id = {dataset_id}
+            UPDATE {schema}.activities SET id = {new_id}
+            WHERE id = {activity_id}
             RETURNING id
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             new_id=database.sql.Placeholder('new_id'),
-            dataset_id=database.sql.Placeholder('dataset_id'),
+            activity_id=database.sql.Placeholder('activity_id'),
         )
         result = db.execute_and_fetch(query, {
             'new_id': new_id,
-            'dataset_id': self.dataset_id,
+            'activity_id': self.activity_id,
         })
         if not result:
             return False
-        self.dataset_id = result[0][0]
+        self.activity_id = result[0][0]
         return True
 
     def exists(self) -> bool:
-        '''Check if a dataset exists by its ID'''
+        '''Check if a activity exists by its ID'''
 
         query = database.sql.SQL(
         '''
             SELECT COUNT(*)
-            FROM {schema}.datasets
-            WHERE id = {dataset_id}
+            FROM {schema}.activities
+            WHERE id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         return result[0][0] > 0
@@ -252,23 +252,23 @@ class Dataset:
     def create(
         title: str,
         description: str,
-        dataset_str: str,
+        activity_str: str,
         *,
         domain: str | None = None,
-        dataset_id: str | None = None,
+        activity_id: str | None = None,
         search_path: str | None = None,
         dbms: Dialect,
         activity_start_ts: datetime | None = None,
         activity_end_ts: datetime | None = None,
-    ) -> 'Dataset':
-        '''Create a new dataset, optionally with a specified ID'''
+    ) -> 'Activity':
+        '''Create a new activity, optionally with a specified ID'''
 
-        if dataset_id is not None:
-            result = db.insert(SCHEMA, 'datasets', {
-                'id': dataset_id,
+        if activity_id is not None:
+            result = db.insert(SCHEMA, 'activities', {
+                'id': activity_id,
                 'name': title,
                 'description': description,
-                'dataset': dataset_str.strip() or None,
+                'activity': activity_str.strip() or None,
                 'domain': domain,
                 'search_path': search_path,
                 'dbms': dbms.value,
@@ -276,10 +276,10 @@ class Dataset:
                 'activity_end_ts': activity_end_ts,
             }, ['id'])
         else:
-            result = db.insert(SCHEMA, 'datasets', {
+            result = db.insert(SCHEMA, 'activities', {
                 'name': title,
                 'description': description,
-                'dataset': dataset_str.strip() or None,
+                'activity': activity_str.strip() or None,
                 'domain': domain,
                 'search_path': search_path,
                 'dbms': dbms.value,
@@ -287,44 +287,44 @@ class Dataset:
                 'activity_end_ts': activity_end_ts,
             }, ['id'])
 
-        assert result is not None and len(result) > 0, 'Failed to create dataset'
+        assert result is not None and len(result) > 0, 'Failed to create activity'
 
-        dataset_id = result[0][0]
+        activity_id = result[0][0]
 
-        return Dataset(
-            dataset_id,
+        return Activity(
+            activity_id,
             name=title,
             description=description,
-            dataset_str=dataset_str,
+            activity_str=activity_str,
             search_path=search_path,
             dbms=dbms,
             activity_start_ts=activity_start_ts,
             activity_end_ts=activity_end_ts,
         )
 
-    def dump(self) -> DatasetJSON:
-        '''Dump a dataset and its exercises to a JSON-serializable structure.'''
+    def dump(self) -> ActivityJSON:
+        '''Dump a activity and its exercises to a JSON-serializable structure.'''
 
-        dataset_query = database.sql.SQL(
+        activity_query = database.sql.SQL(
         '''
             SELECT
                 name,
                 description,
-                dataset,
+                activity,
                 search_path,
                 dbms,
                 domain
-            FROM {schema}.datasets
-            WHERE id = {dataset_id}
+            FROM {schema}.activities
+            WHERE id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
-        dataset_rows = db.execute_and_fetch(dataset_query, {
-            'dataset_id': self.dataset_id
+        activity_rows = db.execute_and_fetch(activity_query, {
+            'activity_id': self.activity_id
         })
-        if not dataset_rows:
-            raise ValueError(f'Dataset with ID {self.dataset_id} does not exist.')
+        if not activity_rows:
+            raise ValueError(f'Activity with ID {self.activity_id} does not exist.')
 
         exercise_query = database.sql.SQL(
         '''
@@ -345,24 +345,24 @@ class Dataset:
                     ARRAY[]::text[]
                 ) AS learning_objectives
             FROM {schema}.exercises e
-            WHERE e.dataset_id = {dataset_id}
+            WHERE e.activity_id = {activity_id}
             ORDER BY e.id
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
         exercise_rows = db.execute_and_fetch(exercise_query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
-        dataset_row = dataset_rows[0]
-        return DatasetJSON(
-            title=dataset_row[0],
-            description=dataset_row[1],
-            dataset_str=dataset_row[2] or '',
-            search_path=dataset_row[3],
-            dbms=Dialect(dataset_row[4]),
-            domain=dataset_row[5],
+        activity_row = activity_rows[0]
+        return ActivityJSON(
+            title=activity_row[0],
+            description=activity_row[1],
+            activity_str=activity_row[2] or '',
+            search_path=activity_row[3],
+            dbms=Dialect(activity_row[4]),
+            domain=activity_row[5],
             exercises=[
                 ExerciseJSON(
                     title=row[0],
@@ -378,26 +378,26 @@ class Dataset:
         )
 
     @staticmethod
-    def load(dataset: DatasetJSON, *, admin_username: str = 'lens') -> 'Dataset':
-        '''Load a dataset and its exercises from a dumped JSON structure.'''
+    def load(activity: ActivityJSON, *, admin_username: str = 'lens') -> 'Activity':
+        '''Load a activity and its exercises from a dumped JSON structure.'''
 
         admin_user = User(admin_username)
-        created_dataset = Dataset.create(
-            title=dataset.title,
-            description=dataset.description,
-            dataset_str=dataset.dataset_str,
-            domain=dataset.domain,
-            search_path=dataset.search_path,
-            dbms=Dialect(dataset.dbms) or Dialect.POSTGRES,
+        created_activity = Activity.create(
+            title=activity.title,
+            description=activity.description,
+            activity_str=activity.activity_str,
+            domain=activity.domain,
+            search_path=activity.search_path,
+            dbms=Dialect(activity.dbms) or Dialect.POSTGRES,
         )
-        created_dataset.add_participant(admin_user)
-        created_dataset.set_owner_status(admin_user, True)
+        created_activity.add_participant(admin_user)
+        created_activity.set_owner_status(admin_user, True)
 
-        for exercise in dataset.exercises:
+        for exercise in activity.exercises:
             created_exercise = Exercise.create(
                 title=exercise.title,
                 user=admin_user,
-                dataset_id=created_dataset.dataset_id,
+                activity_id=created_activity.activity_id,
                 request=exercise.request,
                 solutions=exercise.solutions,
                 difficulty=exercise.difficulty,
@@ -408,18 +408,18 @@ class Dataset:
             for objective_id in exercise.learning_objectives:
                 created_exercise.set_learning_objective(objective_id)
 
-        return created_dataset
+        return created_activity
 
     @staticmethod
-    def load_json(payload: str, *, admin_username: str = 'lens') -> 'Dataset':
-        '''Parse a dumped dataset JSON string and load it into the database.'''
+    def load_json(payload: str, *, admin_username: str = 'lens') -> 'Activity':
+        '''Parse a dumped activity JSON string and load it into the database.'''
 
         parsed_payload: dict[str, Any] = json.loads(payload)
-        return Dataset.load(
-            DatasetJSON(
+        return Activity.load(
+            ActivityJSON(
                 title=parsed_payload['title'],
                 description=parsed_payload['description'],
-                dataset_str=parsed_payload.get('dataset_str', ''),
+                activity_str=parsed_payload.get('activity_str', parsed_payload.get('dataset_str', '')),
                 search_path=parsed_payload.get('search_path'),
                 dbms=parsed_payload.get('dbms'),
                 domain=parsed_payload.get('domain'),
@@ -440,31 +440,31 @@ class Dataset:
         )
 
     def dump_json(self) -> str:
-        '''Dump a dataset to a JSON string.'''
+        '''Dump a activity to a JSON string.'''
 
         return json.dumps(asdict(self.dump()), indent=2, ensure_ascii=False)
 
-    def update(self, title: str, description: str, dataset_str: str, search_path: str | None = None, dbms: Dialect | None = None, activity_start_ts: datetime | None = None, activity_end_ts: datetime | None = None) -> None:
-        '''Update an existing dataset'''
+    def update(self, title: str, description: str, activity_str: str, search_path: str | None = None, dbms: Dialect | None = None, activity_start_ts: datetime | None = None, activity_end_ts: datetime | None = None) -> None:
+        '''Update an existing activity'''
 
         query = database.sql.SQL(
         '''
-            UPDATE {schema}.datasets
+            UPDATE {schema}.activities
             SET
                 name = {title},
                 description = {description},
-                dataset = {dataset},
+                activity = {activity},
                 search_path = {search_path},
                 dbms = {dbms},
                 activity_start_ts = {activity_start_ts},
                 activity_end_ts = {activity_end_ts}
-            WHERE id = {dataset_id}
+            WHERE id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             title=database.sql.Placeholder('title'),
             description=database.sql.Placeholder('description'),
-            dataset_id=database.sql.Placeholder('dataset_id'),
-            dataset=database.sql.Placeholder('dataset'),
+            activity_id=database.sql.Placeholder('activity_id'),
+            activity=database.sql.Placeholder('activity'),
             search_path=database.sql.Placeholder('search_path'),
             dbms=database.sql.Placeholder('dbms'),
             activity_start_ts=database.sql.Placeholder('activity_start_ts'),
@@ -474,8 +474,8 @@ class Dataset:
         db.execute(query, {
             'title': title,
             'description': description,
-            'dataset_id': self.dataset_id,
-            'dataset': dataset_str.strip() or None,
+            'activity_id': self.activity_id,
+            'activity': activity_str.strip() or None,
             'search_path': search_path,
             'dbms': dbms.value if dbms else None,
             'activity_start_ts': activity_start_ts,
@@ -483,50 +483,50 @@ class Dataset:
         })
 
     def delete(self) -> None:
-        '''Delete a dataset by its ID'''
+        '''Delete a activity by its ID'''
 
         query = database.sql.SQL(
         '''
-            DELETE FROM {schema}.datasets d
+            DELETE FROM {schema}.activities d
             WHERE
-                d.id = {dataset_id}
+                d.id = {activity_id}
                 AND NOT EXISTS (
                     SELECT 1
                     FROM {schema}.exercises e
-                    WHERE e.dataset_id = d.id
+                    WHERE e.activity_id = d.id
                 )
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         db.execute(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
     # endregion
 
     # region Membership
     def has_owner(self, user: User) -> bool:
-        '''Check if a user is an owner of a dataset'''
+        '''Check if a user is an owner of a activity'''
 
         query = database.sql.SQL(
         '''
             SELECT
                 is_owner
             FROM
-                {schema}.dataset_members
+                {schema}.activity_members
             WHERE
                 username = {username}
-                AND dataset_id = {dataset_id}
+                AND activity_id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username'),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
             'username': user.username,
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         if len(result) == 0:
@@ -540,18 +540,18 @@ class Dataset:
         query = database.sql.SQL(
         '''
             SELECT COUNT(*)
-            FROM {schema}.dataset_members
+            FROM {schema}.activity_members
             WHERE
                 username = {username}
-                AND dataset_id = {dataset_id}
+                AND activity_id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username'),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
         result = db.execute_and_fetch(query, {
             'username': user.username,
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
         return result[0][0] > 0
 
@@ -560,24 +560,24 @@ class Dataset:
 
         query = database.sql.SQL(
         '''
-            INSERT INTO {schema}.dataset_members (username, dataset_id)
-                VALUES ({username}, {dataset_id})
-            ON CONFLICT (username, dataset_id) DO UPDATE
+            INSERT INTO {schema}.activity_members (username, activity_id)
+                VALUES ({username}, {activity_id})
+            ON CONFLICT (username, activity_id) DO UPDATE
                 SET is_active = TRUE
-                WHERE dataset_members.username = {username} AND dataset_members.dataset_id = {dataset_id}
+                WHERE activity_members.username = {username} AND activity_members.activity_id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username'),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         db.execute(query, {
             'username': user.username,
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
     def can_remove_participant(self, user: User) -> bool:
-        '''Check if a user can leave a dataset. User cannot leave if they are a teacher and the dataset has at least one exercise, one student or one query assigned to it.'''
+        '''Check if a user can leave a activity. User cannot leave if they are a teacher and the activity has at least one exercise, one student or one query assigned to it.'''
 
         # Allow leaving even for teachers
         return True
@@ -590,14 +590,14 @@ class Dataset:
         '''
             SELECT COUNT(*)
             FROM {schema}.exercises
-            WHERE dataset_id = {dataset_id}
+            WHERE activity_id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         if result[0][0] > 0:
@@ -607,18 +607,18 @@ class Dataset:
         query = database.sql.SQL(
         '''
             SELECT COUNT(*)
-            FROM {schema}.dataset_members
+            FROM {schema}.activity_members
             WHERE
-                dataset_id = {dataset_id}
+                activity_id = {activity_id}
                 AND is_owner = FALSE
                 AND is_active = TRUE
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         if result[0][0] > 0:
@@ -630,14 +630,14 @@ class Dataset:
             SELECT COUNT(*)
             FROM {schema}.query_batches qb
             JOIN {schema}.exercises e ON qb.exercise_id = e.id
-            WHERE e.dataset_id = {dataset_id}
+            WHERE e.activity_id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         if result[0][0] > 0:
@@ -646,27 +646,27 @@ class Dataset:
         return True
 
     def remove_participant(self, user: User) -> bool:
-        '''Leave a dataset. User cannot leave if they are a teacher and the dataset has at least one exercise, one student or one query assigned to it.'''
+        '''Leave a activity. User cannot leave if they are a teacher and the activity has at least one exercise, one student or one query assigned to it.'''
 
         if not self.can_remove_participant(user):
             return False
 
         query = database.sql.SQL(
         '''
-            UPDATE {schema}.dataset_members
+            UPDATE {schema}.activity_members
             SET is_active = FALSE
             WHERE
                 username = {username}
-                AND dataset_id = {dataset_id}
+                AND activity_id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             username=database.sql.Placeholder('username'),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         db.execute(query, {
             'username': user.username,
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         return True
@@ -675,26 +675,26 @@ class Dataset:
         '''Set a user's owner status in a class'''
 
         if not self.has_participant(user):
-            raise ValueError(f'User {user.username} is not a participant of dataset {self.dataset_id}')
+            raise ValueError(f'User {user.username} is not a participant of activity {self.activity_id}')
         
         query = database.sql.SQL(
         '''
-            UPDATE {schema}.dataset_members
+            UPDATE {schema}.activity_members
             SET is_owner = {is_owner}
             WHERE
                 username = {username}
-                AND dataset_id = {dataset_id}
+                AND activity_id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
             is_owner=database.sql.Placeholder('is_owner'),
             username=database.sql.Placeholder('username'),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         db.execute(query, {
             'username': user.username,
             'is_owner': is_owner,
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
     def get_members(self) -> list[dict[str, Any]]:
@@ -713,18 +713,18 @@ class Dataset:
                 dm.username,
                 dm.is_owner
             FROM
-                {schema}.dataset_members dm
+                {schema}.activity_members dm
             WHERE
-                dm.dataset_id = {dataset_id}
+                dm.activity_id = {activity_id}
             ORDER BY
                 dm.username
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         return [{
@@ -735,7 +735,7 @@ class Dataset:
 
     # region Exercises
     def shuffle(self, prefix: str = 'Exercise ') -> None:
-        '''Shuffle dataset exercises and rename them sequentially.'''
+        '''Shuffle activity exercises and rename them sequentially.'''
 
         query = database.sql.SQL(
         '''
@@ -746,20 +746,20 @@ class Dataset:
             FROM
                 {schema}.exercises e
             WHERE
-                e.dataset_id = {dataset_id}
+                e.activity_id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         exercises = [
             Exercise(
                 exercise_id=row[0],
-                dataset_id=self.dataset_id,
+                activity_id=self.activity_id,
                 request=row[1],
                 solutions=json.loads(row[2]),
                 all_properties_loaded=True,
@@ -776,7 +776,7 @@ class Dataset:
             )
 
     def list_all_exercises(self) -> list[Exercise]:
-        '''Get all exercises in a dataset, including hidden ones.'''
+        '''Get all exercises in a activity, including hidden ones.'''
 
         query = database.sql.SQL(
         '''
@@ -791,20 +791,20 @@ class Dataset:
             FROM
                 {schema}.exercises e
             WHERE
-                e.dataset_id = {dataset_id}
+                e.activity_id = {activity_id}
         ''').format(
             schema=database.sql.Identifier(SCHEMA),
-            dataset_id=database.sql.Placeholder('dataset_id')
+            activity_id=database.sql.Placeholder('activity_id')
         )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         return [
             Exercise(
                 exercise_id=row[0],
-                dataset_id=self.dataset_id,
+                activity_id=self.activity_id,
                 title=row[1],
                 is_hidden=row[2],
                 request=row[3],
@@ -816,7 +816,7 @@ class Dataset:
         ]
 
     def list_exercises(self, user: User) -> list[Exercise]:
-        '''Get all exercises assigned to a user in a dataset. Includes hidden exercises if the user is a teacher.'''
+        '''Get all exercises assigned to a user in a activity. Includes hidden exercises if the user is a teacher.'''
 
         if self.has_owner(user):
             # User is a teacher, include hidden exercises
@@ -832,10 +832,10 @@ class Dataset:
                 FROM
                     {schema}.exercises e
                 WHERE
-                    e.dataset_id = {dataset_id}
+                    e.activity_id = {activity_id}
             ''').format(
                 schema=database.sql.Identifier(SCHEMA),
-                dataset_id=database.sql.Placeholder('dataset_id')
+                activity_id=database.sql.Placeholder('activity_id')
             )
         else:
             # User is a student, exclude hidden exercises
@@ -851,21 +851,21 @@ class Dataset:
                 FROM
                     {schema}.exercises e
                 WHERE
-                    e.dataset_id = {dataset_id}
+                    e.activity_id = {activity_id}
                     AND e.is_hidden = FALSE
             ''').format(
                 schema=database.sql.Identifier(SCHEMA),
-                dataset_id=database.sql.Placeholder('dataset_id')
+                activity_id=database.sql.Placeholder('activity_id')
             )
 
         result = db.execute_and_fetch(query, {
-            'dataset_id': self.dataset_id
+            'activity_id': self.activity_id
         })
 
         return [
             Exercise(
                 exercise_id=row[0],
-                dataset_id=self.dataset_id,
+                activity_id=self.activity_id,
                 title=row[1],
                 is_hidden=row[2],
                 request=row[3],

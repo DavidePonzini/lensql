@@ -83,12 +83,12 @@ function Badges() {
                 </div>
                 <div className='col-sm-4'>
                     <AchievementBadge
-                        name={'gamification.badges.join_dataset.name'}
-                        description={'gamification.badges.join_dataset.description'}
-                        rank={badges['join_dataset']?.rank || 0}
-                        current={badges['join_dataset']?.current || 0}
-                        next={badges['join_dataset']?.next || 10}
-                        textNext={'gamification.badges.join_dataset.next'}
+                        name={'gamification.badges.join_activity.name'}
+                        description={'gamification.badges.join_activity.description'}
+                        rank={badges['join_activity']?.rank || 0}
+                        current={badges['join_activity']?.current || 0}
+                        next={badges['join_activity']?.next || 10}
+                        textNext={'gamification.badges.join_activity.next'}
                         icon='👋'
                     />
                 </div>

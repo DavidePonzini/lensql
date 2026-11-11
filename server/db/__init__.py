@@ -8,7 +8,7 @@ def register_user(user: admin.User,
                   school: str,
                   is_teacher: bool = False,
                   is_admin: bool = False,
-                  datasets: list[admin.Dataset] = []
+                  activities: list[admin.Activity] = []
     ) -> bool:
     '''
     Register a new user.
@@ -19,7 +19,7 @@ def register_user(user: admin.User,
         school (str): The school of the new user.
         is_teacher (bool): Whether the new user is a teacher.
         is_admin (bool): Whether the new user is an admin.
-        datasets (list[admin.Dataset]): List of datasets to add the user to.
+        activities (list[admin.Activity]): List of activities to add the user to.
 
     Returns:
         bool: True if registration is successful, False otherwise.
@@ -29,7 +29,7 @@ def register_user(user: admin.User,
     if not user.register_account(password, school=school, is_teacher=is_teacher, is_admin=is_admin):
         dav_tools.messages.error(f'User "{user.username}" already exists.')
     
-    for dataset in datasets:
-        dataset.add_participant(user)
+    for activity in activities:
+        activity.add_participant(user)
     
     return True

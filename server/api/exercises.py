@@ -16,19 +16,19 @@ class ExerciseAPI(MethodView):
     decorators = [jwt_required()]
 
     def get(self):
-        '''List exercises for a dataset.'''
+        '''List exercises for a activity.'''
 
         user = db.admin.User(get_jwt_identity())
         
-        dataset_id = request.args.get('dataset_id', type=str)
+        activity_id = request.args.get('activity_id', type=str)
 
-        if not dataset_id:
-            return responses.response(False, message=_('Dataset ID is required.'))
+        if not activity_id:
+            return responses.response(False, message=_('Activity ID is required.'))
 
-        dataset = db.admin.Dataset(dataset_id)
+        activity = db.admin.Activity(activity_id)
 
-        if not dataset.has_participant(user):
-            return responses.response(False, message=_('You are not a participant of this dataset.'))
+        if not activity.has_participant(user):
+            return responses.response(False, message=_('You are not a participant of this activity.'))
 
         result = [{
             'exercise_id': exercise.exercise_id,
@@ -39,7 +39,7 @@ class ExerciseAPI(MethodView):
             'has_solution': len(exercise.solutions) > 0,
             'is_solved': exercise.has_been_solved_by_user(user),
             'is_hidden': exercise.is_hidden,
-        } for exercise in dataset.list_exercises(user)]
+        } for exercise in activity.list_exercises(user)]
 
         return responses.response(True, data=result)
 
@@ -49,18 +49,18 @@ class ExerciseAPI(MethodView):
         user = db.admin.User(get_jwt_identity())
 
         data = request.get_json()
-        dataset = db.admin.Dataset(data['dataset_id'])
+        activity = db.admin.Activity(data['activity_id'])
         title = data['title']
         request_text = data['request']
         solutions = json.loads(data['solutions'])
 
-        if not dataset.has_owner(user):
-            return responses.response(False, message=_('You are not authorized to add exercises to this dataset.'))
+        if not activity.has_owner(user):
+            return responses.response(False, message=_('You are not authorized to add exercises to this activity.'))
 
         db.admin.Exercise.create(
             title=title,
             user=user,
-            dataset_id=dataset.dataset_id,
+            activity_id=activity.activity_id,
             request=request_text,
             solutions=solutions,
         )
@@ -78,9 +78,9 @@ class ExerciseAPI(MethodView):
         request_text = data['request']
         solutions = json.loads(data['solutions'])
 
-        dataset = db.admin.Dataset(exercise.dataset_id)
+        activity = db.admin.Activity(exercise.activity_id)
 
-        if not dataset.has_owner(user):
+        if not activity.has_owner(user):
             return responses.response(False, message=_('You are not authorized to edit this exercise.'))
 
         exercise.update(
@@ -98,9 +98,9 @@ class ExerciseAPI(MethodView):
 
         data = request.get_json()
         exercise = db.admin.Exercise(int(data['exercise_id']))
-        dataset = db.admin.Dataset(exercise.dataset_id)
+        activity = db.admin.Activity(exercise.activity_id)
 
-        if not dataset.has_owner(user):
+        if not activity.has_owner(user):
             return responses.response(False, message=_('You are not authorized to delete this exercise.'))
         
         success = exercise.delete()
@@ -126,9 +126,9 @@ class LearningObjectivesAPI(MethodView):
             return responses.response(False, message=_('Exercise ID is required.'))
         exercise = db.admin.Exercise(exercise_id)
 
-        dataset = db.admin.Dataset(exercise.dataset_id)
-        if not dataset.has_participant(user):
-            return responses.response(False, message=_('You are not a participant of this dataset.'))
+        activity = db.admin.Activity(exercise.activity_id)
+        if not activity.has_participant(user):
+            return responses.response(False, message=_('You are not a participant of this activity.'))
 
         objectives = exercise.learning_objectives
 
@@ -144,8 +144,8 @@ class LearningObjectivesAPI(MethodView):
         objective_id = data['objective_id']
         value = data['value']
 
-        dataset = db.admin.Dataset(exercise.dataset_id)
-        if not dataset.has_owner(user):
+        activity = db.admin.Activity(exercise.activity_id)
+        if not activity.has_owner(user):
             return responses.response(False, message=_('You are not authorized to set learning objectives for this exercise.'))
         
         exercise.set_learning_objective(
@@ -170,32 +170,32 @@ def hide_exercise():
     exercise = db.admin.Exercise(int(data['exercise_id']))
     value = data['value']
 
-    dataset = db.admin.Dataset(exercise.dataset_id)
-    if not dataset.has_owner(user):
+    activity = db.admin.Activity(exercise.activity_id)
+    if not activity.has_owner(user):
         return responses.response(False, message=_('You are not authorized to edit this exercise.'))
 
     exercise.set_hidden(value)
 
     return responses.response(True)
 
-@bp.route('/init-dataset', methods=['POST'])
+@bp.route('/init-activity', methods=['POST'])
 @jwt_required()
-def init_dataset():
-    '''Initialize the exercise dataset.'''
+def init_activity():
+    '''Initialize the exercise activity.'''
 
     user = db.admin.User(get_jwt_identity())
 
     data = request.get_json()
     exercise = db.admin.Exercise(int(data['exercise_id']))
 
-    dataset = db.admin.Dataset(exercise.dataset_id)
-    dataset_str = dataset.dataset_str
+    activity = db.admin.Activity(exercise.activity_id)
+    activity_str = activity.activity_str
 
-    # Log the initialization of the dataset for the exercise
+    # Log the initialization of the activity for the exercise
     batch = db.admin.QueryBatch.log(user, exercise)
     db.admin.Query.log(
         query_batch=batch,
-        sql_string='INIT DATASET',
+        sql_string='INIT ACTIVITY',
         search_path='BUILTIN',
         success=True,
         result='',
@@ -204,8 +204,8 @@ def init_dataset():
     )
 
     def generate_results() -> Iterable[str]:
-        database = db.users.get_database(user.username, dataset.dbms)
-        for query_result in database.execute_sql(dataset_str, strip_comments=False):
+        database = db.users.get_database(user.username, activity.dbms)
+        for query_result in database.execute_sql(activity_str, strip_comments=False):
             yield json.dumps({
                 'success': query_result.success,
                 'builtin': True,
@@ -226,12 +226,12 @@ def get_exercise(exercise_id):
 
     exercise = db.admin.Exercise(int(exercise_id))
 
-    dataset = db.admin.Dataset(exercise.dataset_id)
-    if not dataset.has_participant(user):
-        return responses.response(False, message=_('You are not a participant of this dataset.'))
+    activity = db.admin.Activity(exercise.activity_id)
+    if not activity.has_participant(user):
+        return responses.response(False, message=_('You are not a participant of this activity.'))
 
     result = {
-        'dataset_id': exercise.dataset_id,
+        'activity_id': exercise.activity_id,
         'title': exercise.title,
         'request': exercise.request,
         'attempts': exercise.count_attempts(user),

@@ -6,7 +6,7 @@
                 "profile": "Profilo",
                 "view_profile": "Visualizza Profilo",
                 "learning": "Statistiche di Apprendimento",
-                "datasets": "Dataset",
+                "activities": "Attività",
                 "explore_sql": "Esplora SQL",
                 "howto": "Come Usare LensQL",
                 "admin": "Admin",
@@ -53,7 +53,7 @@
             "modal": {
                 "close": "Chiudi"
             },
-            "dataset": {
+            "activity": {
                 "title": "Dataset",
                 "loading": "Caricamento..."
             }
@@ -201,7 +201,7 @@
     "pages": {
         "admin": {
             "tabs": {
-                "datasets": "Dataset",
+                "activities": "Attività",
                 "users": "Utenti"
             },
             "change_password": {
@@ -211,29 +211,35 @@
                 "success": "Password modificata per {{username}}.",
                 "error": "Impossibile modificare la password."
             },
-            "rename_dataset": {
-                "title": "Rinomina ID del dataset",
-                "current_id": "ID attuale del dataset",
-                "new_id": "Nuovo ID del dataset",
+            "rename_activity": {
+                "title": "Rinomina ID dell’attività",
+                "current_id": "ID attuale dell’attività",
+                "new_id": "Nuovo ID dell’attività",
                 "submit": "Rinomina ID",
-                "success": "ID del dataset modificato in {{id}}.",
-                "error": "Impossibile rinominare l’ID del dataset.",
-                "special": "Dataset speciale"
+                "success": "ID dell’attività modificato in {{id}}.",
+                "error": "Impossibile rinominare l’ID dell’attività.",
+                "special": "Attività speciale"
             },
             "title": "Pagina Admin",
             "add_user": {
-                "title": "Aggiungi Utente a Dataset",
-                "dataset_label": "ID Dataset",
-                "dataset_placeholder": "Inserisci ID dataset",
+                "title": "Aggiungi Utente a un’Attività",
+                "activity_label": "ID Attività",
+                "activity_placeholder": "Inserisci ID attività",
                 "username_label": "Nome Utente",
                 "username_placeholder": "Inserisci nome utente",
                 "is_owner_label": "Aggiungi come proprietario",
                 "submit": "Aggiungi Utente",
                 "success": "Utente aggiunto con successo!",
-                "error_admin": "Solo gli admin possono aggiungere utenti ai dataset.",
-                "error_dataset": "Dataset non trovato.",
+                "error_admin": "Solo gli admin possono aggiungere utenti alle attività.",
+                "error_activity": "Attività non trovata.",
                 "error_user": "Utente non trovato.",
                 "error_general": "Si è verificato un errore durante l'aggiunta dell'utente."
+            },
+            "generation_credits": {
+                "title": "Crediti di generazione IA",
+                "save": "Salva crediti",
+                "success": "Crediti di generazione aggiornati.",
+                "error": "Impossibile aggiornare i crediti."
             }
         },
         "cookies": {
@@ -266,7 +272,7 @@
             "purposes_title": "Finalità del trattamento",
             "purposes_body": "I dati da Lei forniti verranno trattati per finalità di ricerca scientifica, nell'ambito del progetto di ricerca dal titolo “LensQL”. La ricerca è finalizzata allo studio e al miglioramento dell'apprendimento di SQL attraverso la piattaforma LensQL. I dati saranno raccolti durante la registrazione e l'utilizzo della piattaforma.",
             "data_title": "Categorie di dati trattati",
-            "data_body": "I dati oggetto del trattamento nell'ambito del presente studio appartengono alle seguenti categorie: dati personali, quali username, istituzione di appartenenza, ruolo dichiarato, dati di registrazione e di utilizzo, eventi di navigazione, query SQL, risultati, messaggi e feedback inseriti, dati relativi a esercizi e dataset, log tecnici e cookie di autenticazione. Non è richiesto il conferimento di categorie particolari di dati personali di cui all'art. 9, paragrafo 1, del GDPR.",
+            "data_body": "I dati oggetto del trattamento nell'ambito del presente studio appartengono alle seguenti categorie: dati personali, quali username, istituzione di appartenenza, ruolo dichiarato, dati di registrazione e di utilizzo, eventi di navigazione, query SQL, risultati, messaggi e feedback inseriti, dati relativi a esercizi e attività, log tecnici e cookie di autenticazione. Non è richiesto il conferimento di categorie particolari di dati personali di cui all'art. 9, paragrafo 1, del GDPR.",
             "provision_title": "Conferimento dei dati",
             "provision_body": "Il conferimento dei dati è facoltativo, cioè non discende da un obbligo normativo. Il conferimento dei dati per le finalità sopra indicate è tuttavia indispensabile allo svolgimento dello studio. Il rifiuto di conferirli non consentirà all'Interessato di partecipare allo studio in parola e di utilizzare LensQL.",
             "processing_title": "Modalità di trattamento e processi automatizzati",
@@ -294,7 +300,7 @@
             "account_title": "Account",
             "account_body": "Mantieni riservate le tue credenziali. Sei responsabile delle attività svolte con il tuo account. Puoi richiedere la cancellazione dell'account scrivendo a davide.ponzini@edu.unige.it. LensQL può sospendere o chiudere un account in caso di uso illecito, malevolo o contrario a questi Termini. La chiusura dell'account non pregiudica la conservazione dei dati necessaria ai sensi di legge o descritta nell'Informativa privacy.",
             "content_title": "I tuoi contenuti",
-            "content_body": "I diritti sui materiali LensQL, inclusi esercizi, dataset, testi e segni distintivi, spettano all'Università degli Studi di Genova o ai rispettivi titolari, salvo diversa indicazione. Il codice sorgente eventualmente distribuito con licenza GNU GPL resta soggetto a tale licenza. Conservi gli eventuali diritti sui contenuti che invii; concedi all'Università una licenza non esclusiva, gratuita e mondiale per conservarli, riprodurli e trattarli esclusivamente per erogare LensQL e svolgere la ricerca descritta nell'Informativa privacy. I risultati saranno diffusi solo in forma anonima o aggregata. Non inserire dati personali, categorie particolari di dati, informazioni confidenziali o contenuti illeciti nelle query o nei messaggi.",
+            "content_body": "I diritti sui materiali LensQL, inclusi esercizi, attività, testi e segni distintivi, spettano all'Università degli Studi di Genova o ai rispettivi titolari, salvo diversa indicazione. Il codice sorgente eventualmente distribuito con licenza GNU GPL resta soggetto a tale licenza. Conservi gli eventuali diritti sui contenuti che invii; concedi all'Università una licenza non esclusiva, gratuita e mondiale per conservarli, riprodurli e trattarli esclusivamente per erogare LensQL e svolgere la ricerca descritta nell'Informativa privacy. I risultati saranno diffusi solo in forma anonima o aggregata. Non inserire dati personali, categorie particolari di dati, informazioni confidenziali o contenuti illeciti nelle query o nei messaggi.",
             "availability_title": "Disponibilità del servizio e responsabilità",
             "availability_body": "LensQL può essere modificato, aggiornato, sospeso o reso indisponibile per esigenze tecniche, di sicurezza, didattiche o di ricerca. L'Università adotta misure ragionevoli per il funzionamento del servizio, senza pregiudicare i diritti inderogabili riconosciuti dalla legge agli utenti.",
             "law_title": "Legge applicabile",
@@ -302,41 +308,41 @@
             "contact_title": "Contatti",
             "contact_body": "Per domande su questi termini: davide.ponzini@edu.unige.it"
         },
-        "datasets": {
-            "dataset": {
-                "new": "Nuovo Dataset",
+        "activities": {
+            "activity": {
+                "new": "Nuova Attività",
                 "save": "Salva"
             },
-            "dataset_card": {
+            "activity_card": {
                 "exercises": "Esercizi",
                 "queries": "Query eseguite",
                 "badge_teacher": "Docente",
                 "badge_new": "Nuovo!",
-                "badge_special": "Dataset Speciale",
+                "badge_special": "Attività Speciale",
                 "join_code": "Codice di iscrizione",
                 "students": "Studenti",
                 "open": "Apri",
                 "leave": "Lascia",
-                "confirm_leave": "Sei sicuro di voler abbandonare questo dataset?",
+                "confirm_leave": "Sei sicuro di voler abbandonare questa attività?",
                 "my_learning_analytics": "Le mie statistiche di apprendimento",
                 "student_learning_analytics": "Statistiche di apprendimento degli studenti",
                 "export": "Esporta",
                 "set_owners": "Imposta Proprietari",
                 "participants": "Partecipanti"
             },
-            "dataset_list": {
-                "title": "I miei dataset",
-                "empty": "Nessun dataset trovato. Unisciti a un dataset o creane uno nuovo.",
-                "new_dataset_suggestion": "Se vuoi eseguire una query non assegnata da un docente, crea un nuovo dataset.",
-                "import": "Importa Dataset",
-                "join": "Unisciti a un dataset",
-                "join_prompt": "Inserisci il codice del dataset:",
+            "activity_list": {
+                "title": "Le mie attività",
+                "empty": "Nessuna attività trovata. Unisciti a un’attività o creane una nuova.",
+                "new_activity_suggestion": "Se vuoi eseguire una query non assegnata da un docente, crea una nuova attività.",
+                "import": "Importa un’Attività",
+                "join": "Unisciti a un’attività",
+                "join_prompt": "Inserisci il codice dell’attività:",
                 "loading": "Caricamento..."
             },
-            "dataset_mask": {
+            "activity_mask": {
                 "title_label": "Titolo",
                 "description_label": "Descrizione (Opzionale)",
-                "dataset_label": "Dataset (Opzionale)",
+                "activity_label": "Dataset (Opzionale)",
                 "tips_title": "Suggerimenti",
                 "tips": [
                     "Includi l'intero script in un blocco <code>BEGIN; ... COMMIT;</code>",
@@ -344,16 +350,16 @@
                     "Usa un <code>search_path</code> unico per ogni dataset",
                     "Raggruppa le inserzioni in un unico comando <code>INSERT INTO</code> per ogni tabella per migliorare le prestazioni"
                 ],
-                "title_placeholder": "Titolo descrittivo del dataset",
-                "description_placeholder": "Breve descrizione dello scopo del dataset",
-                "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;",
+                "title_placeholder": "Titolo descrittivo dell’attività",
+                "description_placeholder": "Breve descrizione dello scopo dell’attività",
+                "activity_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;",
                 "search_path_label": "Search path della soluzione",
                 "dbms_label": "DBMS",
                 "activity_start_label": "Inizio attività (Opzionale)",
                 "activity_end_label": "Fine attività (Opzionale)"
             },
-            "dataset_update": {
-                "modal_title": "Modifica Dataset",
+            "activity_update": {
+                "modal_title": "Modifica un’Attività",
                 "button_text": "Modifica",
                 "save": "Salva"
             },
@@ -404,6 +410,42 @@
                 "title": "Imposta obiettivi",
                 "button": "Imposta obiettivi",
                 "list_title": "Imposta obiettivi di apprendimento"
+            },
+            "generate": {
+                "button": "Genera",
+                "loading": "Caricamento…",
+                "balance": "Crediti di generazione: {{count}}",
+                "errors": "Scegli gli errori",
+                "cost": "Un credito per esercizio. Massimo 100 esercizi per attività.",
+                "title": "Titolo dell’attività",
+                "prefix": "Prefisso del titolo degli esercizi",
+                "error_label": "Errore",
+                "count": "Esercizi",
+                "total": "Crediti richiesti: {{count}}",
+                "insufficient": "Crediti di generazione insufficienti.",
+                "generating": "Generazione…",
+                "wait": "La generazione può richiedere diversi minuti. Mantieni aperta questa finestra.",
+                "students_mode": "Dalle tue attività",
+                "students_help": "Seleziona le attività in cui sei docente per visualizzare gli studenti iscritti. La generazione per questi studenti sarà disponibile in seguito. Qui non vengono spesi crediti.",
+                "no_activities": "Non sei docente in nessuna attività.",
+                "students": "Studenti iscritti",
+                "no_students": "Nessuno studente iscritto.",
+                "error": "Impossibile completare la richiesta. Riprova.",
+                "targets_heading": "Scegli gli obiettivi degli esercizi",
+                "difficulty_help": "Indica quanti esercizi vuoi per ogni difficoltà. Facile si concentra sull’errore scelto; Media aggiunge alcuni elementi non correlati; Difficile aggiunge maggiore complessità. Lascia zero per non generare esercizi di quel tipo.",
+                "difficulty_1": "Facile",
+                "difficulty_2": "Media",
+                "difficulty_3": "Difficile",
+                "search": "Cerca errori per nome, numero o descrizione",
+                "selected_only": "Mostra solo gli errori selezionati",
+                "no_errors": "Nessun errore corrisponde ai filtri.",
+                "dataset_heading": "Scegli un dataset",
+                "dataset_auto": "Genera un dataset per me",
+                "dataset_custom": "Usa il mio dataset",
+                "dataset_file": "Carica file SQL (facoltativo)",
+                "dataset_sql": "SQL del dataset",
+                "dataset_size": "Il file SQL non può superare 2 MB.",
+                "too_many": "Scegli al massimo 100 esercizi per attività."
             }
         },
         "profile": {
@@ -506,7 +548,7 @@
             "errorServer": "Impossibile connettersi al server.",
             "errorGeneric": "Registrazione fallita",
             "registerAsTeacher": "Registrati come docente",
-            "registerAsTeacherInfo": "I docenti possono vedere le statistiche di apprendimento dei loro studenti e hanno opzioni aggiuntive disponibili quando creano dataset ed esercizi. Questa opzione può essere modificata in qualsiasi momento dalla pagina del profilo.",
+            "registerAsTeacherInfo": "I docenti possono vedere le statistiche di apprendimento dei loro studenti e hanno opzioni aggiuntive disponibili quando creano attività ed esercizi. Questa opzione può essere modificata in qualsiasi momento dalla pagina del profilo.",
             "disclaimer_prefix": "Accetto i",
             "disclaimer_and": "e dichiaro di aver preso visione dell'informativa",
             "termsLink": "Termini di utilizzo",
@@ -531,13 +573,13 @@
                     "list_users": "Elenca Utenti"
                 },
                 "exercise": {
-                    "dataset": "Dataset",
+                    "activity": "Dataset",
                     "create": "Crea",
                     "check_result": "Verifica Risultato",
                     "no_solution": "Soluzione non disponibile",
                     "attempt_singular": "{{count}} tentativo",
                     "attempt_plural": "{{count}} tentativi",
-                    "dataset_error": "Errore durante la creazione del dataset. Controlla la console per i dettagli.\nSe il dataset è molto grande, prova a eseguire i comandi manualmente in piccoli blocchi."
+                    "activity_error": "Errore durante la creazione del dataset. Controlla la console per i dettagli.\nSe il dataset è molto grande, prova a eseguire i comandi manualmente in piccoli blocchi."
                 },
                 "query": {
                     "execute": "Esegui",
@@ -558,8 +600,8 @@
             },
             "query": {
                 "back_to_top": "Torna in cima",
-                "back_to_dataset": "Torna al dataset",
-                "init_dataset": "Inizializza Dataset"
+                "back_to_activity": "Torna all’attività",
+                "init_activity": "Inizializza Dataset"
             },
             "query_result": {
                 "builtin": "Funzione incorporata di LensQL",
@@ -593,7 +635,7 @@
                 "title": "Impara SQL Sbagliando – Con LensQL",
                 "subtitle": "Scopri SQL. Impara dagli errori. Cresci con Lens.",
                 "description": "LensQL è una piattaforma di apprendimento SQL potenziata dall'IA che trasforma gli errori degli studenti in momenti di apprendimento personalizzati e interattivi.",
-                "cta_register": "Crea o Unisciti a un Dataset",
+                "cta_register": "Crea o Unisciti a un’Attività",
                 "cta_howto": "Come Usare LensQL",
                 "cta_about": "Scopri di più su LensQL"
             },
@@ -859,13 +901,13 @@
                     "10": "Raggiunto il livello 10"
                 }
             },
-            "join_dataset": {
-                "name": "Esploratore di Dataset",
-                "description": "Unisciti ai dataset",
-                "next": "Dataset uniti per il prossimo grado",
-                "next_locked": "Dataset uniti per sbloccare",
+            "join_activity": {
+                "name": "Esploratore di Attività",
+                "description": "Unisciti alle attività",
+                "next": "Attività a cui ti sei unito per il prossimo grado",
+                "next_locked": "Attività a cui ti sei unito per sbloccare",
                 "levels": {
-                    "1": "Unito al tuo primo dataset"
+                    "1": "Unito alla tua prima attività"
                 }
             }
         },

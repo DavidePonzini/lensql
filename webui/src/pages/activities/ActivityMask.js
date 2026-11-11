@@ -1,13 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import useUserInfo from '../../hooks/useUserInfo';
+import DatasetTips from './DatasetTips';
 
-function DatasetMask({
+function ActivityMask({
     title,
     setTitle,
     description,
     setDescription,
-    dataset,
-    setDataset,
+    activity,
+    setActivity,
     searchPath,
     setSearchPath,
     dbms,
@@ -25,51 +26,43 @@ function DatasetMask({
         setDbms('postgres');
     }
 
-    const tips = t('pages.datasets.dataset_mask.tips', { returnObjects: true });
 
     return (
         <>
             <div className="mb-3">
-                <label className="form-label">{t('pages.datasets.dataset_mask.title_label')}</label>
+                <label className="form-label">{t('pages.activities.activity_mask.title_label')}</label>
                 <input
                     type="text"
                     className="form-control"
                     defaultValue={title}
                     onInput={(e) => setTitle(e.target.value)}
-                    placeholder={t('pages.datasets.dataset_mask.title_placeholder')}
+                    placeholder={t('pages.activities.activity_mask.title_placeholder')}
                 />
             </div>
             <div className="mb-3">
-                <label className="form-label">{t('pages.datasets.dataset_mask.description_label')}</label>
+                <label className="form-label">{t('pages.activities.activity_mask.description_label')}</label>
                 <input
                     type="text"
                     className="form-control"
                     defaultValue={description}
                     onInput={(e) => setDescription(e.target.value)}
-                    placeholder={t('pages.datasets.dataset_mask.description_placeholder')}
+                    placeholder={t('pages.activities.activity_mask.description_placeholder')}
                 />
             </div>
             <div className="mb-3">
-                <label className="form-label">{t('pages.datasets.dataset_mask.dataset_label')}</label>
+                <label className="form-label">{t('pages.activities.activity_mask.activity_label')}</label>
                 <textarea
                     className="form-control monospace"
                     rows="11"
-                    defaultValue={dataset}
-                    onInput={(e) => setDataset(e.target.value)}
-                    placeholder={t('pages.datasets.dataset_mask.dataset_str_placeholder')}
+                    defaultValue={activity}
+                    onInput={(e) => setActivity(e.target.value)}
+                    placeholder={t('pages.activities.activity_mask.activity_str_placeholder')}
                 />
-                <div>
-                    <b>{t('pages.datasets.dataset_mask.tips_title')}</b>
-                    <ul>
-                        {tips.map((tip, idx) => (
-                            <li key={idx} dangerouslySetInnerHTML={{ __html: tip }} />
-                        ))}
-                    </ul>
-                </div>
+                <DatasetTips />
             </div>
 
             <div className="mb-3">
-                <label className="form-label">{t('pages.datasets.dataset_mask.search_path_label')}</label>
+                <label className="form-label">{t('pages.activities.activity_mask.search_path_label')}</label>
                 <input
                     type="text"
                     className="form-control"
@@ -82,7 +75,7 @@ function DatasetMask({
             </div>
 
             <div className="mb-3">
-                <label className="form-label">{t('pages.datasets.dataset_mask.dbms_label')}</label>
+                <label className="form-label">{t('pages.activities.activity_mask.dbms_label')}</label>
                 <select
                     className="form-select"
                     value={dbms}
@@ -99,7 +92,7 @@ function DatasetMask({
             {isTeacher && (
                 <div className="row">
                     <div className="col-md-6 mb-3">
-                        <label className="form-label">{t('pages.datasets.dataset_mask.activity_start_label')}</label>
+                        <label className="form-label">{t('pages.activities.activity_mask.activity_start_label')}</label>
                         <input
                             type="datetime-local"
                             className="form-control"
@@ -108,7 +101,7 @@ function DatasetMask({
                         />
                     </div>
                     <div className="col-md-6 mb-3">
-                        <label className="form-label">{t('pages.datasets.dataset_mask.activity_end_label')}</label>
+                        <label className="form-label">{t('pages.activities.activity_mask.activity_end_label')}</label>
                         <input
                             type="datetime-local"
                             className="form-control"
@@ -122,4 +115,4 @@ function DatasetMask({
     );
 }
 
-export default DatasetMask;
+export default ActivityMask;

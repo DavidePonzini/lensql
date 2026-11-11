@@ -29,7 +29,7 @@ ORDER BY
 
 CREATE OR REPLACE VIEW v_button_usage_per_lab AS
 SELECT
-    dataset_id,
+    activity_id,
     username,
     button,
     COUNT(*) presses
@@ -39,11 +39,11 @@ FROM
     JOIN queries q ON q.batch_id = qb.id
     JOIN messages m ON m.query_id = q.id
 GROUP BY
-    dataset_id,
+    activity_id,
     username,
     button
 ORDER BY
-    dataset_id,
+    activity_id,
     username,
     button
 ;

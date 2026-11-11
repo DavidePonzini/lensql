@@ -99,7 +99,7 @@ class Badges(Enum):
     }
     '''Reach levels'''
 
-    JOIN_DATASET = {
+    JOIN_ACTIVITY = {
         1: Reward('join_course.1', coins=20)
     }
     '''Join your first course'''

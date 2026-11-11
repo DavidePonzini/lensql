@@ -2,16 +2,16 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../../hooks/useAuth';
 
-function RenameDatasetId() {
+function RenameActivityId() {
     const { t } = useTranslation();
     const { apiRequest } = useAuth();
-    const [datasetId, setDatasetId] = useState('');
+    const [activityId, setActivityId] = useState('');
     const [newId, setNewId] = useState('');
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState(null);
-    const key = 'pages.admin.rename_dataset';
+    const key = 'pages.admin.rename_activity';
     const isSpecial = id => Boolean(id.trim()) && !/^[a-zA-Z0-9]+$/.test(id.trim());
-    const currentIsSpecial = isSpecial(datasetId);
+    const currentIsSpecial = isSpecial(activityId);
     const newIsSpecial = isSpecial(newId);
 
     async function submit(event) {
@@ -19,18 +19,18 @@ function RenameDatasetId() {
         setBusy(true);
         setMessage(null);
         try {
-            const response = await apiRequest('/api/datasets/rename-id', 'POST', {
-                dataset_id: datasetId.trim(),
-                new_dataset_id: newId.trim(),
+            const response = await apiRequest('/api/activities/rename-id', 'POST', {
+                activity_id: activityId.trim(),
+                new_activity_id: newId.trim(),
             });
             setMessage({
                 type: response.success ? 'success' : 'danger',
                 text: response.success
-                    ? t(`${key}.success`, { id: response.dataset_id })
+                    ? t(`${key}.success`, { id: response.activity_id })
                     : response.message || t(`${key}.error`),
             });
             if (response.success) {
-                setDatasetId(response.dataset_id);
+                setActivityId(response.activity_id);
                 setNewId('');
             }
         } catch {
@@ -48,9 +48,9 @@ function RenameDatasetId() {
             <form onSubmit={submit} className="row g-3">
                 <div className="col-md-6">
                     <label htmlFor="rename-current-id" className="form-label">{t(`${key}.current_id`)}</label>
-                    <input id="rename-current-id" className={`form-control${currentIsSpecial ? ' border-warning bg-warning-subtle' : ''}`} value={datasetId}
+                    <input id="rename-current-id" className={`form-control${currentIsSpecial ? ' border-warning bg-warning-subtle' : ''}`} value={activityId}
                         aria-describedby={currentIsSpecial ? 'rename-current-special' : undefined}
-                        onChange={event => setDatasetId(event.target.value.toUpperCase())} required disabled={busy} />
+                        onChange={event => setActivityId(event.target.value.toUpperCase())} required disabled={busy} />
                     {currentIsSpecial && <div id="rename-current-special" className="form-text text-warning-emphasis">{t(`${key}.special`)}</div>}
                 </div>
                 <div className="col-md-6">
@@ -62,11 +62,11 @@ function RenameDatasetId() {
                 </div>
                 <div className="col-12">
                     <button className="btn btn-primary" type="submit"
-                        disabled={busy || !datasetId.trim() || !newId.trim()}>{t(`${key}.submit`)}</button>
+                        disabled={busy || !activityId.trim() || !newId.trim()}>{t(`${key}.submit`)}</button>
                 </div>
             </form>
         </>
     );
 }
 
-export default RenameDatasetId;
+export default RenameActivityId;

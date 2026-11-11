@@ -31,7 +31,7 @@ function Exercise() {
         <div className="container-md">
             <Query
                 exerciseId={exerciseId}
-                datasetId={exercise.dataset_id}
+                activityId={exercise.activity_id}
                 exerciseTitle={exercise.title}
                 exerciseText={exercise.request}
                 attempts={exercise.attempts}

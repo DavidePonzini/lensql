@@ -5,7 +5,7 @@ def test_create_app_registers_expected_blueprints():
     app = create_app()
 
     assert 'auth' in app.blueprints
-    assert 'datasets' in app.blueprints
+    assert 'activities' in app.blueprints
     assert 'exercise' in app.blueprints
     assert 'message' in app.blueprints
     assert 'query' in app.blueprints

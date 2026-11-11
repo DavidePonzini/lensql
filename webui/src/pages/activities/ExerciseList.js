@@ -10,7 +10,7 @@ import ExerciseCard from './ExerciseCard';
 import ExerciseAdd from './ExerciseAdd';
 
 function ExerciseList() {
-    const { datasetId } = useParams();
+    const { activityId } = useParams();
     const { apiRequest } = useAuth();
     const { t } = useTranslation();
 
@@ -20,7 +20,7 @@ function ExerciseList() {
 
     const getExercises = useCallback(async () => {
         setLoading(true);
-        const response = await apiRequest(`/api/exercises?dataset_id=${datasetId}`, 'GET');
+        const response = await apiRequest(`/api/exercises?activity_id=${activityId}`, 'GET');
 
         const sortedExercises = (response.data ?? []).slice().sort((a, b) => {
             return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
@@ -29,7 +29,7 @@ function ExerciseList() {
 
         setExercises(sortedExercises);
         setLoading(false);
-    }, [datasetId, apiRequest]);
+    }, [activityId, apiRequest]);
 
     useEffect(() => {
         getExercises();
@@ -37,22 +37,22 @@ function ExerciseList() {
 
     useEffect(() => {
         async function checkIfOwner() {
-            const response = await apiRequest(`/api/datasets/is-owner/${datasetId}`, 'GET');
+            const response = await apiRequest(`/api/activities/is-owner/${activityId}`, 'GET');
             setIsOwner(response.is_owner);
         }
 
         checkIfOwner();
-    }, [datasetId, apiRequest]);
+    }, [activityId, apiRequest]);
 
     return (
         <div className="container-md">
-            <h1>{t('pages.datasets.exercise_list.title')}</h1>
+            <h1>{t('pages.activities.exercise_list.title')}</h1>
 
             {isOwner && (
                 <div className="mt-4">
                     <ExerciseAdd
                         refresh={getExercises}
-                        datasetId={datasetId}
+                        activityId={activityId}
                     />
 
                     <hr />
@@ -61,11 +61,11 @@ function ExerciseList() {
 
             <CardList>
                 {exercises.length === 0 && !loading && (
-                    <p className="no-assignments">{t('pages.datasets.exercise_list.none')}</p>
+                    <p className="no-assignments">{t('pages.activities.exercise_list.none')}</p>
                 )}
 
                 {loading && (
-                    <p className="loading">{t('pages.datasets.exercise_list.loading')}</p>
+                    <p className="loading">{t('pages.activities.exercise_list.loading')}</p>
                 )}
 
                 {exercises.map((exercise) => (

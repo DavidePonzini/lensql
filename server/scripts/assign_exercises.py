@@ -1,6 +1,6 @@
 import sys
 
-from server.db.admin import Dataset, Exercise, User
+from server.db.admin import Activity, Exercise, User
 from sqlerrors import SqlErrors
 from sqlexercise import DifficultyLevel
 import random
@@ -23,18 +23,18 @@ ADMIN_USER = User('lens')
 
 if __name__ == '__main__':
     dav_tools.argument_parser.add_argument('username', help='Username of the user to assign exercises to')
-    dav_tools.argument_parser.add_argument('dataset', help='ID of the dataset containing exercises to assign')
-    dav_tools.argument_parser.add_argument('-d', '--dataset-name', help='Name of the new dataset')
+    dav_tools.argument_parser.add_argument('activity', help='ID of the activity containing exercises to assign')
+    dav_tools.argument_parser.add_argument('-d', '--activity-name', help='Name of the new activity')
     dav_tools.argument_parser.add_argument('-p', '--exercise-prefix', help='Prefix for the shuffled exercise titles', default='Exercise ')
-    dav_tools.argument_parser.add_argument('--allowed-datasets', nargs='*', help='Only consider queries from these datasets for error extraction')
+    dav_tools.argument_parser.add_argument('--allowed-activities', nargs='*', help='Only consider queries from these activities for error extraction')
     dav_tools.argument_parser.add_argument('--allowed-goals', nargs='*', choices=['FOCUSED', 'CHECK_SOLUTION'], default=['FOCUSED', 'CHECK_SOLUTION'], help='Only consider queries with these goals for error extraction')
     dav_tools.argument_parser.add_argument('--exercises-amount', type=int, default=12, help='Number of exercises to assign')
     dav_tools.argument_parser.add_argument('--dry-run', action='store_true', help='Perform a dry run without actually assigning exercises')
     dav_tools.argument_parser.parse_args()
 
     user = User(dav_tools.argument_parser.args.username)
-    template_dataset = Dataset(dav_tools.argument_parser.args.dataset)
-    template_exercises = template_dataset.list_all_exercises()
+    template_activity = Activity(dav_tools.argument_parser.args.activity)
+    template_exercises = template_activity.list_all_exercises()
 
     exercises_amount = dav_tools.argument_parser.args.exercises_amount
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         dav_tools.messages.critical_error('No exercises found, or the exercises don\'t target a specific error.')
 
     error_patterns = user.get_error_occurrencies(
-        dataset_ids=dav_tools.argument_parser.args.allowed_datasets,
+        activity_ids=dav_tools.argument_parser.args.allowed_activities,
         allowed_query_goals=dav_tools.argument_parser.args.allowed_goals
     )
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         else:
             break
     
-    # add random exercises from the template dataset until we have exercises_amount exercises in total
+    # add random exercises from the template activity until we have exercises_amount exercises in total
     remaining_exercises = [exercise for exercise in template_exercises if exercise not in exercises_found]
     random_exercises = random.sample(template_exercises, k=max(0, exercises_amount - len(exercises_found)))
 
@@ -92,28 +92,28 @@ if __name__ == '__main__':
             print(f'    - {exercise.title} (Error: {exercise.error}, Difficulty: {exercise.difficulty})', file=sys.stderr)
         exit(0)
 
-    # Create a new dataset for the user and assign the found exercises to it
-    dataset = Dataset.create(
-        title=dav_tools.argument_parser.args.dataset_name or template_dataset.name,
-        description=template_dataset.description,
-        dataset_str=template_dataset.dataset_str,
-        domain=template_dataset.domain,
-        search_path=template_dataset.search_path,
-        dbms=template_dataset.dbms,
+    # Create a new activity for the user and assign the found exercises to it
+    activity = Activity.create(
+        title=dav_tools.argument_parser.args.activity_name or template_activity.name,
+        description=template_activity.description,
+        activity_str=template_activity.activity_str,
+        domain=template_activity.domain,
+        search_path=template_activity.search_path,
+        dbms=template_activity.dbms,
     )
     
     for exercise in exercises_found:
         Exercise.create(
             title=exercise.title,
             user=ADMIN_USER,
-            dataset_id=dataset.dataset_id,
+            activity_id=activity.activity_id,
             request=exercise.request,
             solutions=exercise.solutions,
             difficulty=exercise.difficulty,
             error=exercise.error
         )
 
-    dataset.add_participant(user)
-    dataset.shuffle(dav_tools.argument_parser.args.exercise_prefix)
+    activity.add_participant(user)
+    activity.shuffle(dav_tools.argument_parser.args.exercise_prefix)
 
-    dav_tools.messages.success(f'Assigned {len(exercises_found)} exercises to "{user.username}". Dataset ID: {dataset.dataset_id}')
+    dav_tools.messages.success(f'Assigned {len(exercises_found)} exercises to "{user.username}". Activity ID: {activity.activity_id}')

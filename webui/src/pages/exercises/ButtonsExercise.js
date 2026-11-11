@@ -5,13 +5,13 @@ import useAuth from "../../hooks/useAuth";
 import useGamificationData from '../../hooks/useGamificationData';
 
 import ButtonAction from "../../components/buttons/ButtonAction";
-import ButtonShowDataset from "../../components/buttons/ButtonShowDataset";
+import ButtonShowActivity from "../../components/buttons/ButtonShowActivity";
 import { setBadges } from '../../components/notifications/BadgeNotifier';
 import BubbleStatsChange from '../../components/notifications/BubbleStatsChange';
 
 import ButtonCategory from "./ButtonCategory";
 
-function ButtonsExercise({ exerciseId, datasetId, handleCreateDataset, sqlText, isExecuting, setIsExecuting, setResult, attempts: initialAttempts, hasSolution }) {
+function ButtonsExercise({ exerciseId, activityId, handleCreateActivity, sqlText, isExecuting, setIsExecuting, setResult, attempts: initialAttempts, hasSolution }) {
     const { t } = useTranslation();
     const { apiRequest } = useAuth();
     const { Coins } = useGamificationData();
@@ -46,17 +46,17 @@ function ButtonsExercise({ exerciseId, datasetId, handleCreateDataset, sqlText, 
             />
 
             <div className="col">
-                <ButtonShowDataset
+                <ButtonShowActivity
                     variant="info"
                     className="me-1 mb-1"
-                    buttonText={t('pages.exercises.buttons.exercise.dataset')}
-                    datasetId={datasetId}
+                    buttonText={t('pages.exercises.buttons.exercise.activity')}
+                    activityId={activityId}
                     disabled={isExecuting}
                     footerButtons={[
                         {
                             text: t('pages.exercises.buttons.exercise.create'),
                             variant: 'primary',
-                            onClick: handleCreateDataset,
+                            onClick: handleCreateActivity,
                             autoClose: true,
                             disabled: isExecuting,
                         },

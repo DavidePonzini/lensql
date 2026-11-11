@@ -1,8 +1,9 @@
 sqlerrors>=2.0.0
 sqlchecker>=1.0.1
-sqlexercise>=0.3.0
-sqlscope>=1.1.1
+sqlexercise>=0.3.2
+sqlscope>=1.1.2
 dav_tools>=0.4.19
+sqlglot==28.0.0
 Flask>=3.1.0
 Flask_Cors>=5.0.0
 flask_babel

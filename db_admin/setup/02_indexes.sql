@@ -2,8 +2,8 @@ BEGIN;
 
 SET search_path TO lensql;
 
-CREATE INDEX ON dataset_members (dataset_id, is_owner, is_active);
-CREATE INDEX ON exercises (dataset_id);
+CREATE INDEX ON activity_members (activity_id, is_owner, is_active);
+CREATE INDEX ON exercises (activity_id);
 CREATE INDEX ON query_batches (username);
 CREATE INDEX ON query_batches (exercise_id);
 CREATE INDEX ON queries (batch_id);

@@ -43,13 +43,13 @@ function SetLearningObjectives({ exerciseId, refreshExercises, className }) {
     return (
         <ButtonModal
             className={className}
-            title={t('pages.datasets.learning_objectives.title')}
-            buttonText={t('pages.datasets.learning_objectives.button')}
+            title={t('pages.activities.learning_objectives.title')}
+            buttonText={t('pages.activities.learning_objectives.button')}
         >
             <ItemAssignmentList
                 fetchItems={fetchObjectives}
                 assignAction={assignObjective}
-                title={t('pages.datasets.learning_objectives.list_title')}
+                title={t('pages.activities.learning_objectives.list_title')}
             />
         </ButtonModal>
     );

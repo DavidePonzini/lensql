@@ -6,7 +6,7 @@
                 "profile": "Profile",
                 "view_profile": "View Profile",
                 "learning": "Learning Insights",
-                "datasets": "Datasets",
+                "activities": "Activities",
                 "explore_sql": "Explore SQL",
                 "howto": "How To Use LensQL",
                 "admin": "Admin",
@@ -53,7 +53,7 @@
             "modal": {
                 "close": "Close"
             },
-            "dataset": {
+            "activity": {
                 "title": "Dataset",
                 "loading": "Loading..."
             }
@@ -201,7 +201,7 @@
     "pages": {
         "admin": {
             "tabs": {
-                "datasets": "Datasets",
+                "activities": "Activities",
                 "users": "Users"
             },
             "change_password": {
@@ -211,29 +211,35 @@
                 "success": "Password changed for {{username}}.",
                 "error": "Could not change the password."
             },
-            "rename_dataset": {
-                "title": "Rename Dataset ID",
-                "current_id": "Current dataset ID",
-                "new_id": "New dataset ID",
+            "rename_activity": {
+                "title": "Rename Activity ID",
+                "current_id": "Current activity ID",
+                "new_id": "New activity ID",
                 "submit": "Rename ID",
-                "success": "Dataset ID changed to {{id}}.",
-                "error": "Could not rename the dataset ID.",
-                "special": "Special dataset"
+                "success": "Activity ID changed to {{id}}.",
+                "error": "Could not rename the activity ID.",
+                "special": "Special activity"
             },
             "title": "Admin page",
             "add_user": {
-                "title": "Add User to Dataset",
-                "dataset_label": "Dataset ID",
-                "dataset_placeholder": "Enter dataset ID",
+                "title": "Add User to Activity",
+                "activity_label": "Activity ID",
+                "activity_placeholder": "Enter activity ID",
                 "username_label": "Username",
                 "username_placeholder": "Enter username",
                 "is_owner_label": "Add as owner",
                 "submit": "Add User",
                 "success": "User added successfully!",
-                "error_admin": "Only admins can add users to datasets.",
-                "error_dataset": "Dataset does not exist.",
+                "error_admin": "Only admins can add users to activities.",
+                "error_activity": "Activity does not exist.",
                 "error_user": "User does not exist.",
                 "error_general": "An error occurred while adding the user."
+            },
+            "generation_credits": {
+                "title": "AI generation credits",
+                "save": "Save credits",
+                "success": "Generation credits updated.",
+                "error": "Unable to update credits."
             }
         },
         "cookies": {
@@ -266,7 +272,7 @@
             "purposes_title": "Purposes of processing",
             "purposes_body": "Data are processed to conduct research on SQL education, provide and improve the platform's learning features, analyse interaction with exercises and queries, and produce scientific results in aggregated or anonymised form.",
             "data_title": "Categories of data processed",
-            "data_body": "We process usernames, institution, declared role (teacher/student), protected credentials, registration and usage data, navigation events, SQL queries, results, submitted messages and feedback, exercise and dataset data, as well as technical logs and authentication cookies. Do not enter personal data or special categories of personal data in queries or messages.",
+            "data_body": "We process usernames, institution, declared role (teacher/student), protected credentials, registration and usage data, navigation events, SQL queries, results, submitted messages and feedback, exercise and activity data, as well as technical logs and authentication cookies. Do not enter personal data or special categories of personal data in queries or messages.",
             "provision_title": "Provision of data",
             "provision_body": "Providing data is optional and does not arise from a legal obligation. However, the data required for registration and use of the platform are necessary to take part in the study and use LensQL; without them, an account cannot be created or used.",
             "processing_title": "Processing methods and automated decision-making",
@@ -294,7 +300,7 @@
             "account_title": "Accounts",
             "account_body": "Keep your credentials confidential. You are responsible for activity under your account. You may request deletion of your account by writing to davide.ponzini@edu.unige.it. LensQL may suspend or close an account in case of unlawful, malicious, or Terms-violating use. Closing an account does not affect retention of data required by law or described in the Privacy Notice.",
             "content_title": "Your content",
-            "content_body": "Rights in LensQL materials, including exercises, datasets, text, and distinctive signs, belong to the University of Genoa or their respective owners unless stated otherwise. Source code distributed under the GNU GPL remains subject to that licence. You retain any rights in content that you submit; you grant the University a non-exclusive, royalty-free, worldwide licence to store, reproduce, and process it solely to provide LensQL and conduct the research described in the Privacy Notice. Results will be disclosed only in anonymous or aggregated form. Do not enter personal data, special categories of personal data, confidential information, or unlawful content in queries or messages.",
+            "content_body": "Rights in LensQL materials, including exercises, activities, text, and distinctive signs, belong to the University of Genoa or their respective owners unless stated otherwise. Source code distributed under the GNU GPL remains subject to that licence. You retain any rights in content that you submit; you grant the University a non-exclusive, royalty-free, worldwide licence to store, reproduce, and process it solely to provide LensQL and conduct the research described in the Privacy Notice. Results will be disclosed only in anonymous or aggregated form. Do not enter personal data, special categories of personal data, confidential information, or unlawful content in queries or messages.",
             "availability_title": "Service availability and liability",
             "availability_body": "LensQL may be modified, updated, suspended, or made unavailable for technical, security, educational, or research reasons. The University takes reasonable measures for operation of the service, without affecting mandatory rights granted to users by applicable law.",
             "law_title": "Applicable law",
@@ -302,41 +308,41 @@
             "contact_title": "Contact",
             "contact_body": "For questions about these terms: davide.ponzini@edu.unige.it"
         },
-        "datasets": {
-            "dataset": {
-                "new": "New Dataset",
+        "activities": {
+            "activity": {
+                "new": "New Activity",
                 "save": "Save"
             },
-            "dataset_card": {
+            "activity_card": {
                 "exercises": "Exercises",
                 "queries_user": "Queries executed",
                 "queries_students": "Queries executed by students",
                 "badge_teacher": "Teacher",
                 "badge_new": "New!",
-                "badge_special": "Special Dataset",
+                "badge_special": "Special Activity",
                 "join_code": "Join Code",
                 "students": "Students",
                 "open": "Open",
                 "leave": "Leave",
-                "confirm_leave": "Are you sure you want to leave this dataset?",
+                "confirm_leave": "Are you sure you want to leave this activity?",
                 "my_learning_analytics": "My Learning Analytics",
                 "student_learning_analytics": "Students' Learning Analytics",
                 "export": "Export",
                 "set_owners": "Set Owners",
                 "participants": "Participants"
             },
-            "dataset_list": {
-                "title": "My Datasets",
-                "empty": "Nothing here. Join a dataset to see exercises.",
-                "import": "Import Dataset",
-                "join": "Join Dataset",
-                "join_prompt": "Enter dataset join code:",
+            "activity_list": {
+                "title": "My Activities",
+                "empty": "Nothing here. Join a activity to see exercises.",
+                "import": "Import Activity",
+                "join": "Join Activity",
+                "join_prompt": "Enter activity join code:",
                 "loading": "Loading..."
             },
-            "dataset_mask": {
+            "activity_mask": {
                 "title_label": "Title",
                 "description_label": "Description (Optional)",
-                "dataset_label": "Dataset (Optional)",
+                "activity_label": "Dataset (Optional)",
                 "tips_title": "Tips",
                 "tips": [
                     "Include the whole script into a <code>BEGIN; ... COMMIT;</code> block",
@@ -344,16 +350,16 @@
                     "Use a unique <code>search_path</code> for each dataset",
                     "Group insertions into a single <code>INSERT INTO</code> statement for each table to greatly improve performance"
                 ],
-                "title_placeholder": "Descriptive title for the dataset",
-                "description_placeholder": "Brief description of the dataset's purpose",
-                "dataset_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;",
+                "title_placeholder": "Descriptive title for the activity",
+                "description_placeholder": "Brief description of the activity's purpose",
+                "activity_str_placeholder": "BEGIN;\n\nDROP SCHEMA IF EXISTS <schema_name> CASCADE;\nCREATE SCHEMA <schema_name>;\nSET search_path TO <schema_name>;\n\nCREATE TABLE ...;\n\nINSERT INTO ...;\n\nCOMMIT;",
                 "search_path_label": "Solution Search Path",
                 "dbms_label": "DBMS",
                 "activity_start_label": "Activity Start (Optional)",
                 "activity_end_label": "Activity End (Optional)"
             },
-            "dataset_update": {
-                "modal_title": "Edit Dataset",
+            "activity_update": {
+                "modal_title": "Edit Activity",
                 "button_text": "Edit",
                 "save": "Save"
             },
@@ -404,6 +410,42 @@
                 "title": "Set Objectives",
                 "button": "Set Objectives",
                 "list_title": "Set Learning Objectives"
+            },
+            "generate": {
+                "button": "Generate",
+                "loading": "Loading…",
+                "balance": "Generation credits: {{count}}",
+                "errors": "Choose errors",
+                "cost": "One credit per exercise. Maximum 100 exercises per activity.",
+                "title": "Activity title",
+                "prefix": "Exercise title prefix",
+                "error_label": "Error",
+                "count": "Exercises",
+                "total": "Credits required: {{count}}",
+                "insufficient": "Insufficient generation credits.",
+                "generating": "Generating…",
+                "wait": "Generation can take several minutes. Keep this window open.",
+                "students_mode": "From your activities",
+                "students_help": "Select activities where you are a teacher to view enrolled students. Generation for these students will be available later. No credits are spent here.",
+                "no_activities": "You are not a teacher in any activities.",
+                "students": "Enrolled students",
+                "no_students": "No enrolled students.",
+                "error": "Unable to complete the request. Please try again.",
+                "targets_heading": "Choose exercise targets",
+                "difficulty_help": "Enter how many exercises you want at each difficulty. Easy focuses on the selected error; Medium adds some unrelated elements; Hard adds more complexity. Leave a count at zero to skip it.",
+                "difficulty_1": "Easy",
+                "difficulty_2": "Medium",
+                "difficulty_3": "Hard",
+                "search": "Search errors by name, number or description",
+                "selected_only": "Show selected errors only",
+                "no_errors": "No errors match these filters.",
+                "dataset_heading": "Choose a dataset",
+                "dataset_auto": "Generate a dataset for me",
+                "dataset_custom": "Use my own dataset",
+                "dataset_file": "Upload SQL file (optional)",
+                "dataset_sql": "Dataset SQL",
+                "dataset_size": "The SQL file must be no larger than 2 MB.",
+                "too_many": "Choose no more than 100 exercises per activity."
             }
         },
         "profile": {
@@ -504,7 +546,7 @@
             "institutionPlaceholder": "Institution",
             "institutionRequired": "Please enter your institution.",
             "registerAsTeacher": "I am a Teacher",
-            "registerAsTeacherInfo": "Teachers can see learning stats for their students and have additional options available when creating datasets and exercises. This option can be changed anytime from the profile page.",
+            "registerAsTeacherInfo": "Teachers can see learning stats for their students and have additional options available when creating activities and exercises. This option can be changed anytime from the profile page.",
             "disclaimer_prefix": "I accept the",
             "disclaimer_and": "and acknowledge that I have read the",
             "termsLink": "Terms of Use",
@@ -531,13 +573,13 @@
                     "list_users": "List Users"
                 },
                 "exercise": {
-                    "dataset": "Dataset",
+                    "activity": "Dataset",
                     "create": "Create",
                     "check_result": "Check Result",
                     "no_solution": "No solution available",
                     "attempt_singular": "{{count}} attempt",
                     "attempt_plural": "{{count}} attempts",
-                    "dataset_error": "Error when creating dataset. See console for details.\nIf the dataset is very large, you can try manually executing commands in smaller batches."
+                    "activity_error": "Error when creating dataset. See console for details.\nIf the dataset is very large, you can try manually executing commands in smaller batches."
                 },
                 "query": {
                     "execute": "Execute",
@@ -558,8 +600,8 @@
             },
             "query": {
                 "back_to_top": "Back to top",
-                "back_to_dataset": "Back to dataset",
-                "init_dataset": "Initialize Dataset"
+                "back_to_activity": "Back to activity",
+                "init_activity": "Initialize Dataset"
             },
             "query_result": {
                 "builtin": "LensQL built-in function",
@@ -593,7 +635,7 @@
                 "title": "Learn SQL Through Mistakes – With LensQL",
                 "subtitle": "Discover SQL. Learn from your errors. Grow with Lens.",
                 "description": "LensQL is an AI-powered SQL learning platform that turns student mistakes into personalized, interactive learning moments.",
-                "cta_register": "Create or Join a Dataset",
+                "cta_register": "Create or Join a Activity",
                 "cta_howto": "How To Use LensQL",
                 "cta_about": "Learn More About LensQL"
             },
@@ -685,7 +727,7 @@
                 "teachers": {
                     "title": "For Teachers",
                     "items": [
-                        "📊 View aggregate metrics for each dataset: query activity, success rate, and help usage",
+                        "📊 View aggregate metrics for each activity: query activity, success rate, and help usage",
                         "📂 Analyze errors by category: syntax, semantic, logical, or complications",
                         "🕒 Track how query behavior and error patterns evolve over time",
                         "🧭 Adapt instruction based on what students try, not just what they get right"
@@ -704,9 +746,9 @@
                 "teachers": {
                     "title": "✅ For Teachers",
                     "items": [
-                        "📚 Create datasets",
+                        "📚 Create activities",
                         "📝 Assign exercises",
-                        "📊 Track dataset-wide learning"
+                        "📊 Track activity-wide learning"
                     ]
                 },
                 "students": {
@@ -859,13 +901,13 @@
                     "10": "Reached level 10"
                 }
             },
-            "join_dataset": {
-                "name": "Dataset Explorer",
-                "description": "Join Datasets",
-                "next": "Datasets joined to next rank",
-                "next_locked": "Datasets joined to unlock",
+            "join_activity": {
+                "name": "Activity Explorer",
+                "description": "Join Activities",
+                "next": "Activities joined to next rank",
+                "next_locked": "Activities joined to unlock",
                 "levels": {
-                    "1": "Joined your first dataset"
+                    "1": "Joined your first activity"
                 }
             }
         },

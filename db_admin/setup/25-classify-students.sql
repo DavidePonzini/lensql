@@ -53,13 +53,13 @@ GROUP BY
 
 
 -- ============================================================
--- ERROR RATES per USER / DATASET / QUERY GOAL
+-- ERROR RATES per USER / ACTIVITY / QUERY GOAL
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_errors AS
 SELECT
-    d.id AS dataset_id,
-    d.name AS dataset_name,
+    d.id AS activity_id,
+    d.name AS activity_name,
     qb.username,
     q.query_goal,
     qb.ts BETWEEN d.activity_start_ts AND d.activity_end_ts AS is_during_lab_hours,
@@ -136,8 +136,8 @@ FROM
         ON qb.id = q.batch_id
     JOIN exercises e
         ON e.id = qb.exercise_id
-    JOIN datasets d
-        ON d.id = e.dataset_id
+    JOIN activities d
+        ON d.id = e.activity_id
     LEFT JOIN v_relevant_errors re
         ON re.query_id = q.id
 
@@ -195,7 +195,7 @@ GROUP BY
 --     JOIN query_batches qb
 --         ON qb.exercise_id = e.id
 -- WHERE
---     dataset_id IN ('CBE153UF', 'QB637QKQ', 'HVMTH9O3')
+--     activity_id IN ('CBE153UF', 'QB637QKQ', 'HVMTH9O3')
 -- GROUP BY
 --     username
 -- ORDER BY

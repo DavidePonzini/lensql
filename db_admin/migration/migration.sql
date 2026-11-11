@@ -58,11 +58,11 @@ INSERT INTO lensql.user_unique_queries(
     query_hash
 FROM user_unique_queries;
 
-INSERT INTO lensql.datasets(
+INSERT INTO lensql.activities(
     id,
     name,
     description,
-    dataset,
+    activity,
     domain,
     search_path,
     dbms,
@@ -80,9 +80,9 @@ INSERT INTO lensql.datasets(
     activity_end_ts
 FROM datasets;
 
-INSERT INTO lensql.dataset_members(
+INSERT INTO lensql.activity_members(
     username,
-    dataset_id,
+    activity_id,
     is_active,
     is_owner,
     joined_ts
@@ -96,7 +96,7 @@ FROM dataset_members;
 
 INSERT INTO lensql.exercises(
     id,
-    dataset_id,
+    activity_id,
     is_hidden,
     title,
     request,

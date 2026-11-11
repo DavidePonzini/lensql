@@ -17,8 +17,8 @@ if __name__ == '__main__':
         messages.critical_error(f'Failed to register admin user {ADMIN_USER}')
     # endregion
 
-    # region Default datasets
-    datasets = [
+    # region Default activities
+    activities = [
         {
             'file': 'explore.sql',
             'id': '_EXPLORE',
@@ -37,8 +37,8 @@ if __name__ == '__main__':
         {
             'file': 'miedema.sql',
             'id': '_WELCOME_MIEDEMA',
-            'name': 'Sample Dataset: Miedema',
-            'description': 'A sample dataset for practicing queries.',
+            'name': 'Sample Activity: Miedema',
+            'description': 'A sample activity for practicing queries.',
             'search_path': 'miedema',
             'dbms': Dialect.POSTGRES,
             'exercises': [
@@ -81,32 +81,32 @@ if __name__ == '__main__':
             ]
         }
     ]
-    for ds in datasets:
-        messages.info(f'Creating dataset {ds["name"]}...')
+    for ds in activities:
+        messages.info(f'Creating activity {ds["name"]}...')
 
-        with open(f'server/setup/datasets/{ds["file"]}') as f:
-            dataset_str = f.read()
+        with open(f'server/setup/activities/{ds["file"]}') as f:
+            activity_str = f.read()
 
-        dataset = db.admin.Dataset(ds['id'])
-        if dataset.exists():
-            messages.warning(f'  Dataset {ds["name"]} already exists, skipping creation.')
+        activity = db.admin.Activity(ds['id'])
+        if activity.exists():
+            messages.warning(f'  Activity {ds["name"]} already exists, skipping creation.')
             db_exists = True
         else:
-            dataset = db.admin.Dataset.create(
+            activity = db.admin.Activity.create(
                 title=ds['name'],
                 description=ds['description'],
-                dataset_str=dataset_str,
-                dataset_id=ds['id'],
+                activity_str=activity_str,
+                activity_id=ds['id'],
                 search_path=ds['search_path'],
                 dbms=ds['dbms'],
             )
             db_exists = False
-            messages.success(f'  Dataset {ds["name"]} created successfully.')
+            messages.success(f'  Activity {ds["name"]} created successfully.')
 
-        dataset.add_participant(ADMIN_USER)
-        dataset.set_owner_status(ADMIN_USER, True)
+        activity.add_participant(ADMIN_USER)
+        activity.set_owner_status(ADMIN_USER, True)
 
-        # Create exercises if dataset was just created
+        # Create exercises if activity was just created
         if db_exists:
             messages.info(f'  Skipping exercise creation for class {ds["name"]} as it already exists.')
         else:
@@ -114,12 +114,12 @@ if __name__ == '__main__':
                 exercise = db.admin.Exercise.create(
                     title=exercise_data['name'],
                     user=ADMIN_USER,
-                    dataset_id=dataset.dataset_id,
+                    activity_id=activity.activity_id,
                     request=exercise_data['request'],
                     solutions=exercise_data['solutions'],
                 )
 
-                messages.success(f'  Exercise {exercise_data["name"]} added to dataset {ds["name"]} successfully.')
+                messages.success(f'  Exercise {exercise_data["name"]} added to activity {ds["name"]} successfully.')
     # endregion
 
     # region Default users
@@ -136,9 +136,9 @@ if __name__ == '__main__':
     for user, password, school in users:
         if user.exists():
             messages.warning(f'  User {user} already exists, skipping creation.')
-        elif db.register_user(user, password, school=school, datasets=[
-            db.admin.Dataset('_EXPLORE'),
-            db.admin.Dataset('_WELCOME_MIEDEMA'),
+        elif db.register_user(user, password, school=school, activities=[
+            db.admin.Activity('_EXPLORE'),
+            db.admin.Activity('_WELCOME_MIEDEMA'),
         ]):
             messages.success(f'  User {user} registered successfully')
         else:
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     # Add a dummy query and all errors to admin user
     messages.info('Adding all errors to admin user...')
 
-    exercise = db.admin.Dataset('_EXPLORE').list_exercises(ADMIN_USER)[0]
+    exercise = db.admin.Activity('_EXPLORE').list_exercises(ADMIN_USER)[0]
 
     query_batch = db.admin.QueryBatch.log(
         user=ADMIN_USER,

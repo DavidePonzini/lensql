@@ -5,17 +5,17 @@ import AuthProvider from "../../hooks/useAuth";
 
 import ButtonModal from "./ButtonModal";
 
-function ButtonShowDataset({ datasetId, footerButtons, className = 'btn btn-secondary', buttonText = null, disabled = false, variant = 'secondary' }) {
+function ButtonShowActivity({ activityId, footerButtons, className = 'btn btn-secondary', buttonText = null, disabled = false, variant = 'secondary' }) {
     const { t } = useTranslation();
     const { apiRequest } = AuthProvider();
-    const [dataset, setDataset] = useState('');
+    const [activity, setActivity] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        async function fetchDataset() {
+        async function fetchActivity() {
             setIsLoading(true);
 
-            const response = await apiRequest(`/api/datasets/${datasetId}/str`, 'GET');
+            const response = await apiRequest(`/api/activities/${activityId}/str`, 'GET');
 
             if (!response.success) {
                 alert(response.message);
@@ -23,36 +23,36 @@ function ButtonShowDataset({ datasetId, footerButtons, className = 'btn btn-seco
                 return;
             }
 
-            setDataset(response.data);
+            setActivity(response.data);
             setIsLoading(false);
         }
 
-        fetchDataset();
-    }, [datasetId, apiRequest]);
+        fetchActivity();
+    }, [activityId, apiRequest]);
 
     return (
         <ButtonModal
             variant={variant}
             className={className}
-            title={t('components.buttons.dataset.title')}
-            buttonText={buttonText || t('components.buttons.dataset.title')}
+            title={t('components.buttons.activity.title')}
+            buttonText={buttonText || t('components.buttons.activity.title')}
             size="lg"
             footerButtons={footerButtons}
             disabled={disabled}
         >
             {isLoading ? (
-                <p>{t('components.buttons.dataset.loading')}</p>
+                <p>{t('components.buttons.activity.loading')}</p>
             ) : (
                 <pre className="code" style={{
                     // userSelect: 'none',
                     maxHeight: '70vh',
                     overflow: 'auto'
                 }}>
-                    {dataset}
+                    {activity}
                 </pre>
             )}
         </ButtonModal>
     );
 }
 
-export default ButtonShowDataset;
+export default ButtonShowActivity;

@@ -93,12 +93,12 @@ def register():
     if user.exists():
         return responses.response(False, message=_('Username already exists. Please choose a different username.'))
     
-    default_datasets = [
-        db.admin.Dataset('_EXPLORE'),
-        db.admin.Dataset('_WELCOME_MIEDEMA'),
+    default_activities = [
+        db.admin.Activity('_EXPLORE'),
+        db.admin.Activity('_WELCOME_MIEDEMA'),
     ]
 
-    if not db.register_user(user, password, school=school, is_teacher=is_teacher, datasets=default_datasets):
+    if not db.register_user(user, password, school=school, is_teacher=is_teacher, activities=default_activities):
         return responses.response(False, message=_('Registration failed. Please try again.'))
 
     return responses.response(True)

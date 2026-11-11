@@ -20,9 +20,9 @@ UPDATE queries SET search_path = 'public' WHERE search_path = '"$user", public';
 UPDATE queries set search_path = RIGHT(LEFT(search_path, -1), -1) WHERE search_path LIKE '"%"';
 
 -- rename DBMS: 'postgresql' to 'postgres'
-UPDATE datasets set dbms = 'postgres' WHERE dbms = 'postgresql';
+UPDATE activities set dbms = 'postgres' WHERE dbms = 'postgresql';
 
--- fix incorrect search_path due to dataset initialization
+-- fix incorrect search_path due to activity initialization
 update queries set search_path = 'p_260411' where id between 13692 and 13710;
 update queries set search_path = 'unicorsi' where id in (
     16156,
@@ -52,9 +52,9 @@ update queries set search_path = 'unicorsi' where id in (
 ALTER TABLE users ALTER COLUMN registration_ts TYPE TIMESTAMPTZ;
 ALTER TABLE navigation_logs ALTER COLUMN ts TYPE TIMESTAMPTZ;
 ALTER TABLE badges ALTER COLUMN ts TYPE TIMESTAMPTZ;
-ALTER TABLE datasets ALTER COLUMN activity_start_ts TYPE TIMESTAMPTZ;
-ALTER TABLE datasets ALTER COLUMN activity_end_ts TYPE TIMESTAMPTZ;
-ALTER TABLE dataset_members ALTER COLUMN joined_ts TYPE TIMESTAMPTZ;
+ALTER TABLE activities ALTER COLUMN activity_start_ts TYPE TIMESTAMPTZ;
+ALTER TABLE activities ALTER COLUMN activity_end_ts TYPE TIMESTAMPTZ;
+ALTER TABLE activity_members ALTER COLUMN joined_ts TYPE TIMESTAMPTZ;
 ALTER TABLE exercises ALTER COLUMN created_ts TYPE TIMESTAMPTZ;
 ALTER TABLE query_batches ALTER COLUMN ts TYPE TIMESTAMPTZ;
 ALTER TABLE queries ALTER COLUMN ts TYPE TIMESTAMPTZ;

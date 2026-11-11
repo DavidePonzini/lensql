@@ -26,6 +26,7 @@ function UserInfoProvider({ children }) {
                 isTeacher: data.is_teacher,
                 isAdmin: data.is_admin,
                 coins: data.coins,
+                aiGenerationCredits: data.ai_generation_credits,
                 xpTotal: data.xp,
                 xp: xp.current,
                 xpToNextLevel: xp.next,
