@@ -2,6 +2,19 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ActivityGenerate from './ActivityGenerate';
 import i18n from '../../i18n';
 
+const { TextDecoder } = require('util');
+global.TextDecoder = TextDecoder;
+function generationStream(events) {
+    let read = false;
+    return { getReader: () => ({
+        read: async () => {
+            if (read) return { done: true };
+            read = true;
+            return { done: false, value: Buffer.from(events.map(event => JSON.stringify(event)).join('\n') + '\n') };
+        },
+        releaseLock: jest.fn(),
+    }) };
+}
 const mockApiRequest = jest.fn();
 const mockLoadUserInfo = jest.fn();
 jest.mock('../../hooks/useAuth', () => ({ __esModule: true, default: () => ({ apiRequest: mockApiRequest }) }));
@@ -11,8 +24,8 @@ const options = {
     success: true, ai_generation_credits: 10, activities: [],
     categories: [{ id: 'SYN', name: 'Syntax', description: 'Problems with SQL names and rules.' },
         { id: 'LOG', name: 'Logical', description: 'Queries that answer the wrong question.' }],
-    errors: [{ id: 2, name: 'Ambiguous column', category: 'SYN', description: 'Qualify the column with a table name.' },
-        { id: 39, name: 'AND instead of OR', category: 'LOG', description: 'Use OR when either condition should match.' }],
+    errors: [{ id: 2, supported: true, name: 'Ambiguous column', category: 'SYN', description: 'Qualify the column with a table name.' },
+        { id: 39, supported: true, name: 'AND instead of OR', category: 'LOG', description: 'Use OR when either condition should match.' }],
 };
 
 beforeEach(async () => {
@@ -35,14 +48,14 @@ test('requests easy and hard exercises for the same error and totals all credits
     fireEvent.change(screen.getByLabelText('Activity title'), { target: { value: 'Practice' } });
     fireEvent.change(screen.getByLabelText('Ambiguous column — Easy'), { target: { value: '1' } });
     fireEvent.change(screen.getByLabelText('Ambiguous column — Hard'), { target: { value: '3' } });
-    expect(screen.getByText('Credits required: 4')).toBeTruthy();
+    expect(screen.getByText('Credits required: 5')).toBeTruthy();
     expect(screen.queryByLabelText('Solution Search Path')).toBeNull();
-    mockApiRequest.mockResolvedValueOnce({ success: false, message: 'Test stops before generation' });
+    mockApiRequest.mockResolvedValueOnce(generationStream([{ success: false, message: 'Test stops before generation' }]));
     fireEvent.click(screen.getAllByRole('button', { name: 'Generate' })[1]);
     await waitFor(() => expect(mockApiRequest).toHaveBeenCalledWith('/api/activities/generate', 'POST', expect.objectContaining({
         title: 'Practice', dataset_str: null,
         errors: [{ error_id: 2, difficulty: 1, count: 1 }, { error_id: 2, difficulty: 3, count: 3 }],
-    })));
+    }), { stream: true }));
 });
 
 test('search shows matching categories and explanatory descriptions', async () => {
@@ -63,11 +76,11 @@ test('sends supplied dataset SQL and search path', async () => {
     const sql = 'CREATE TABLE school.item (id int);';
     fireEvent.change(screen.getByLabelText('Dataset SQL'), { target: { value: sql } });
     fireEvent.change(screen.getByLabelText('Solution Search Path'), { target: { value: 'school' } });
-    mockApiRequest.mockResolvedValueOnce({ success: false, message: 'Test stops before generation' });
+    mockApiRequest.mockResolvedValueOnce(generationStream([{ success: false, message: 'Test stops before generation' }]));
     fireEvent.click(screen.getAllByRole('button', { name: 'Generate' })[1]);
     await waitFor(() => expect(mockApiRequest).toHaveBeenCalledWith('/api/activities/generate', 'POST', expect.objectContaining({
         dataset_str: sql, search_path: 'school',
-    })));
+    }), { stream: true }));
 });
 
 test('loads uploaded SQL into the editable dataset field', async () => {
@@ -88,4 +101,58 @@ test('custom dataset uses the same tips and placeholder as activity creation', a
     expect(screen.getByText(i18n.t('pages.activities.activity_mask.tips_title'))).toBeTruthy();
     expect(screen.queryByText(/Exercises will be shuffled/)).toBeNull();
     expect(screen.queryByText(/Include CREATE SCHEMA if needed/)).toBeNull();
+});
+
+test('shows live exercise counts and explains failure refunds', async () => {
+    await openGenerator();
+    fireEvent.change(screen.getByLabelText('Activity title'), { target: { value: 'Practice' } });
+    fireEvent.change(screen.getByLabelText('Ambiguous column — Easy'), { target: { value: '2' } });
+    let finish;
+    let first = true;
+    const releaseLock = jest.fn();
+    mockApiRequest.mockResolvedValueOnce({ getReader: () => ({
+        read: () => {
+            if (first) {
+                first = false;
+                return Promise.resolve({ value: Buffer.from(JSON.stringify({ type: 'progress', stage: 'exercises', completed: 1, failed: 0, total: 2 }) + '\n'), done: false });
+            }
+            return new Promise(resolve => { finish = resolve; });
+        }, releaseLock,
+    }) });
+    fireEvent.click(screen.getAllByRole('button', { name: 'Generate' })[1]);
+    await screen.findByText('Exercises: 1 completed, 0 failed, 2 requested');
+    expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('50');
+    expect(screen.queryByText(/Credits for failed exercises are refunded/)).toBeNull();
+    finish({ value: Buffer.from(JSON.stringify({ success: false, message: 'Refunded' }) + '\n'), done: true });
+    await screen.findByText('Refunded');
+    expect(screen.queryByRole('progressbar')).toBeNull();
+});
+
+test('warns when a partial activity is saved and refreshes the balance', async () => {
+    const refresh = await openGenerator();
+    fireEvent.change(screen.getByLabelText('Activity title'), { target: { value: 'Practice' } });
+    fireEvent.change(screen.getByLabelText('Ambiguous column — Easy'), { target: { value: '2' } });
+    mockApiRequest.mockResolvedValueOnce(generationStream([
+        { type: 'result', success: true, activity_id: 'PARTIAL', generated_count: 1, failed_count: 1 },
+    ]));
+    fireEvent.click(screen.getAllByRole('button', { name: 'Generate' })[1]);
+    await screen.findByText('Activity created with 1 exercises. 1 exercises failed; their credits have been refunded.');
+    await waitFor(() => expect(mockLoadUserInfo).toHaveBeenCalled());
+    expect(refresh).toHaveBeenCalled();
+});
+
+test('unsupported errors remain visible with disabled difficulty inputs', async () => {
+    mockApiRequest.mockResolvedValue({ ...options, errors: [
+        ...options.errors,
+        { id: 3, category: 'SYN', supported: false },
+    ] });
+    await openGenerator();
+    const name = i18n.t('errors.errors.3.name');
+    for (const difficulty of ['Easy', 'Medium', 'Hard']) {
+        expect(screen.getByLabelText(`${name} — ${difficulty}`).disabled).toBe(true);
+        expect(screen.getByLabelText(`Ambiguous column — ${difficulty}`).disabled).toBe(false);
+    }
+    expect(screen.getByText('Not supported for generation')).toBeTruthy();
+    fireEvent.change(screen.getByLabelText('Search errors by name, number or description'), { target: { value: name } });
+    expect(screen.getByLabelText(`${name} — Easy`).disabled).toBe(true);
 });

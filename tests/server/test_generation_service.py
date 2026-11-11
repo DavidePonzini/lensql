@@ -29,13 +29,13 @@ def test_generated_activity_saves_all_exercises_and_teacher_atomically(mocker):
     connection.commit.assert_called_once()
 
 
-def test_partial_generation_does_not_save_activity(mocker):
+def test_empty_generation_does_not_save_activity(mocker):
     from server.generation import generate_activity
     mocker.patch('server.generation.get_database')
     mocker.patch('server.generation.sqlexercise.generate_assignment',
-                 return_value=SimpleNamespace(exercises=[generated_exercise()]))
+                 return_value=SimpleNamespace(exercises=[]))
     connect = mocker.patch('server.generation.db.connect')
-    with pytest.raises(ValueError, match='all requested'):
+    with pytest.raises(ValueError, match='any exercises'):
         generate_activity(SimpleNamespace(username='alice'), [(1, 1), (1, 1)], title='Practice', prefix='Task ')
     connect.assert_not_called()
 
@@ -76,3 +76,21 @@ def test_custom_dataset_is_used_and_preserved(mocker):
     assert saved['activity'].endswith("SELECT set_config('search_path', 'school', false);")
     assert saved['search_path'] == 'school'
     assignment.dataset.to_sql.assert_not_called()
+
+
+def test_partial_generation_saves_successful_exercises(mocker):
+    from server.generation import generate_activity
+    mocker.patch('server.generation.get_database')
+    assignment = SimpleNamespace(dataset=mocker.Mock(), exercises=[generated_exercise()])
+    assignment.dataset.to_sql.return_value = 'CREATE TABLE item (id int);'
+    mocker.patch('server.generation.sqlexercise.generate_assignment', return_value=assignment)
+    connection = mocker.MagicMock()
+    connection.__enter__.return_value = connection
+    connection.fetch_one.return_value = ('PARTIAL',)
+    mocker.patch('server.generation.db.connect', return_value=connection)
+    progress = mocker.Mock()
+    assert generate_activity(SimpleNamespace(username='alice'), [(1, 1), (1, 1)],
+                             title='Practice', prefix='Task ', on_progress=progress) == 'PARTIAL'
+    assert len(connection.execute.call_args_list) == 3
+    connection.commit.assert_called_once()
+    assert progress.call_args.args[0]['completed'] == 1

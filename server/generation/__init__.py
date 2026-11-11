@@ -1,6 +1,7 @@
 """Generate and atomically save activities using the SQL exercise generator."""
 import json
 import random
+from threading import Lock
 from uuid import uuid4
 
 import sqlexercise
@@ -13,7 +14,19 @@ from .dataset import generation_dataset_sql
 from sqlglot import exp
 
 
-def generate_activity(user, errors, *, title, prefix, language='en', dataset_str=None, search_path='public'):
+def generate_activity(user, errors, *, title, prefix, language='en', dataset_str=None, search_path='public', on_progress=None):
+    on_progress = on_progress or (lambda event: None)
+    completed = failed = 0
+    progress_lock = Lock()
+
+    def exercise_finished(success):
+        nonlocal completed, failed
+        with progress_lock:
+            completed += int(success)
+            failed += int(not success)
+            on_progress(dict(stage='exercises', completed=completed, failed=failed, total=len(errors)))
+
+    on_progress(dict(stage='preparing', total=len(errors)))
     sandbox = get_database(user.username, Dialect.POSTGRES)
     sandbox.get_connection()
     assignment = sqlexercise.generate_assignment(
@@ -26,13 +39,20 @@ def generate_activity(user, errors, *, title, prefix, language='en', dataset_str
         language=language,
         dataset_str=generation_dataset_sql(dataset_str) if dataset_str else None,
         shuffle_exercises=True,
+        on_dataset_generation_progress=lambda attempt, maximum: on_progress(
+            dict(stage='dataset', attempt=attempt, maximum=maximum)),
+        on_dataset_generation_success=lambda: on_progress(
+            dict(stage='exercises', completed=0, failed=0, total=len(errors))),
+        on_exercise_generation_success=lambda error, difficulty: exercise_finished(True),
+        on_exercise_generation_failure=lambda error, difficulty: exercise_finished(False),
         max_dataset_attempts=10,
         max_exercise_attempts=10,
         max_unique_attempts=10,
     )
     exercises = list(assignment.exercises)
-    if len(exercises) != len(errors):
-        raise ValueError('The generator did not produce all requested exercises.')
+    if not exercises:
+        raise ValueError('The generator did not produce any exercises.')
+    on_progress(dict(stage='saving', completed=len(exercises), failed=len(errors) - len(exercises), total=len(errors)))
     random.shuffle(exercises)
     schema_name = search_path if dataset_str else 'p_' + uuid4().hex[:16]
     if dataset_str:

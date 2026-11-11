@@ -55,16 +55,17 @@ export default function GenerationErrors({ options, counts, setCounts, busy }) {
                             <thead><tr><th scope="col">{t(`${key}.error_label`)}</th>
                                 {difficulties.map(difficulty => <th scope="col" className="text-center" key={difficulty}>{t(`${key}.difficulty_${difficulty}`)}</th>)}
                             </tr></thead>
-                            <tbody>{category.errors.map(error => <tr key={error.id}>
+                            <tbody>{category.errors.map(error => <tr key={error.id} className={error.supported ? undefined : 'text-body-secondary'}>
                                 <th scope="row" className="fw-normal" style={{ minWidth: '15rem' }}>
                                     <strong>{error.id}. {error.name}</strong>
+                                    {!error.supported && <span className="badge text-bg-secondary ms-2">{t(`${key}.unsupported`)}</span>}
                                     <p className="small text-body-secondary mb-0">{error.description}</p>
                                 </th>
                                 {difficulties.map(difficulty => {
                                     const countKey = `${error.id}:${difficulty}`;
                                     return <td key={difficulty}><input className="form-control text-center mx-auto" style={{ width: '5rem' }}
                                         aria-label={`${error.name} — ${t(`${key}.difficulty_${difficulty}`)}`}
-                                        type="number" min="0" max="100" step="1" value={counts[countKey] ?? 0} disabled={busy}
+                                        type="number" min="0" max="100" step="1" value={counts[countKey] ?? 0} disabled={busy || !error.supported}
                                         onChange={event => setCounts(previous => ({ ...previous, [countKey]: event.target.value }))} /></td>;
                                 })}
                             </tr>)}</tbody>

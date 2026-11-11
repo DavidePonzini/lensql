@@ -286,8 +286,8 @@ msgstr "Seleziona errori e quantità validi (massimo 100 esercizi), un titolo e 
 msgid "Insufficient generation credits."
 msgstr "Crediti di generazione insufficienti."
 
-msgid "Generation failed. Your credits have been refunded."
-msgstr "Generazione non riuscita. I crediti sono stati rimborsati."
+msgid "Generation failed. Exercise credits have been refunded; the 1-credit generation fee was charged."
+msgstr "Generazione non riuscita. I crediti degli esercizi sono stati rimborsati; è stato addebitato il costo di generazione di 1 credito."
 
 msgid "Provide valid PostgreSQL dataset SQL with CREATE TABLE statements."
 msgstr "Fornisci SQL PostgreSQL valido per il dataset, con istruzioni CREATE TABLE."

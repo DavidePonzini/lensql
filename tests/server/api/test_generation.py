@@ -21,7 +21,7 @@ def test_insufficient_credits_does_not_generate(authenticated_client, mocker, us
     generate = mocker.patch('server.generation.generate_activity')
     response = authenticated_client.post('/activities/generate', json=valid_request()).get_json()
     assert response['success'] is False
-    user.reserve_generation_credits.assert_called_once_with(2)
+    user.reserve_generation_credits.assert_called_once_with(3)
     generate.assert_not_called()
 
 
@@ -30,6 +30,7 @@ def test_generation_creates_activity_for_requesting_user(authenticated_client, m
     response = authenticated_client.post('/activities/generate', json=valid_request()).get_json()
     assert response['success'] is True
     assert response['activity_id'] == 'NEW123'
+    user.reserve_generation_credits.assert_called_once_with(3)
     assert len(generate.call_args.args[1]) == 2
     assert generate.call_args.args[0] is user
     assert generate.call_args.kwargs['prefix'] == 'Task '
@@ -40,6 +41,8 @@ def test_generation_failure_refunds_credits(authenticated_client, mocker, user):
     mocker.patch('server.generation.generate_activity', side_effect=RuntimeError('Generation failed'))
     response = authenticated_client.post('/activities/generate', json=valid_request()).get_json()
     assert response['success'] is False
+    assert '1-credit generation fee was charged' in response['message']
+    user.reserve_generation_credits.assert_called_once_with(3)
     user.refund_generation_credits.assert_called_once_with(2)
 
 
@@ -116,7 +119,7 @@ def test_same_error_can_have_multiple_difficulties(authenticated_client, mocker,
     errors = generate.call_args.args[1]
     assert [difficulty for _, difficulty in errors] == [DifficultyLevel.EASY] + [DifficultyLevel.HARD] * 3
     assert all(error.value == error_id for error, _ in errors)
-    user.reserve_generation_credits.assert_called_once_with(4)
+    user.reserve_generation_credits.assert_called_once_with(5)
 
 
 @pytest.mark.parametrize('difficulty', [0, 4, -1, 'EASY', True, None, 1.5])
@@ -180,4 +183,71 @@ def test_automatic_dataset_does_not_require_schema(authenticated_client, mocker,
 def test_provided_dataset_requires_schema(authenticated_client, user, search_path):
     data = {**valid_request(), 'dataset_str': 'CREATE TABLE item (id int);', 'search_path': search_path}
     assert authenticated_client.post('/activities/generate', json=data).get_json()['success'] is False
+    user.reserve_generation_credits.assert_not_called()
+
+
+def test_stream_generation_reports_progress_and_result(authenticated_client, mocker, user):
+    import json
+
+    def generate(*args, on_progress, **kwargs):
+        on_progress(dict(stage='exercises', completed=1, failed=0, total=2))
+        return 'STREAMED'
+
+    mocker.patch('server.generation.generate_activity', side_effect=generate)
+    response = authenticated_client.post('/activities/generate', json={**valid_request(), 'stream': True})
+    events = [json.loads(line) for line in response.data.splitlines() if line.strip()]
+    assert response.headers['X-Accel-Buffering'] == 'no'
+    assert events[0] == dict(type='progress', stage='exercises', completed=1, failed=0, total=2)
+    assert events[-1]['success'] is True
+    assert events[-1]['activity_id'] == 'STREAMED'
+
+
+def test_stream_generation_failure_refunds_credits(authenticated_client, mocker, user):
+    import json
+    mocker.patch('server.generation.generate_activity', side_effect=RuntimeError('Exercise failed'))
+    response = authenticated_client.post('/activities/generate', json={**valid_request(), 'stream': True})
+    result = json.loads(response.data)
+    assert result['type'] == 'result'
+    assert result['success'] is False
+    user.reserve_generation_credits.assert_called_once_with(3)
+    user.refund_generation_credits.assert_called_once_with(2)
+
+
+def test_partial_generation_charges_only_saved_exercises(authenticated_client, mocker, user):
+    def generate(*args, on_progress, **kwargs):
+        on_progress(dict(stage='saving', completed=1, failed=0, total=2))
+        return 'PARTIAL'
+
+    mocker.patch('server.generation.generate_activity', side_effect=generate)
+    response = authenticated_client.post('/activities/generate', json=valid_request()).get_json()
+    assert response['success'] is True
+    assert response['activity_id'] == 'PARTIAL'
+    assert response['generated_count'] == 1
+    assert response['failed_count'] == 1
+    user.reserve_generation_credits.assert_called_once_with(3)
+    user.refund_generation_credits.assert_called_once_with(1)
+
+
+def test_generation_options_mark_support_using_library_registry(authenticated_client, user):
+    from sqlerrors import SqlErrors
+    from sqlexercise.error_requirements import ERROR_REQUIREMENTS_MAP
+    user.list_activities.return_value = []
+    response = authenticated_client.get('/activities/generation-options').get_json()
+    errors = {error['id']: error for error in response['errors']}
+    assert set(errors) == {error.value for error in SqlErrors if not error.definition.is_deprecated}
+    assert any(not error['supported'] for error in errors.values())
+    for error in SqlErrors:
+        if not error.definition.is_deprecated:
+            assert errors[error.value]['supported'] is (error in ERROR_REQUIREMENTS_MAP)
+
+
+def test_unsupported_error_rejected_without_charging(authenticated_client, user):
+    from sqlerrors import SqlErrors
+    from sqlexercise.error_requirements import ERROR_REQUIREMENTS_MAP
+    unsupported = next(error for error in SqlErrors
+                       if not error.definition.is_deprecated and error not in ERROR_REQUIREMENTS_MAP)
+    data = valid_request()
+    data['errors'][0]['error_id'] = unsupported.value
+    response = authenticated_client.post('/activities/generate', json=data).get_json()
+    assert response['success'] is False
     user.reserve_generation_credits.assert_not_called()

@@ -389,12 +389,12 @@ def import_activity():
 @jwt_required()
 def generation_options():
     from sqlexercise.error_requirements import ERROR_REQUIREMENTS_MAP
-    from sqlerrors import SqlErrorCategory
+    from sqlerrors import SqlErrorCategory, SqlErrors
     user = db.admin.User(get_jwt_identity())
     errors = [
         {'id': error.value, 'name': error.definition.name,
-         'category': error.definition.category.value}
-        for error in sorted(ERROR_REQUIREMENTS_MAP, key=lambda error: error.value) if not error.definition.is_deprecated
+         'category': error.definition.category.value, 'supported': error in ERROR_REQUIREMENTS_MAP}
+        for error in sorted(SqlErrors, key=lambda error: error.value) if not error.definition.is_deprecated
     ]
     activities = [activity for activity in user.list_activities() if activity['is_owner']]
     categories = [{'id': category.value} for category in SqlErrorCategory]
@@ -479,15 +479,63 @@ def generate():
             Dataset.from_sql(generation_dataset_sql(dataset_str), sql_dialect='postgres')
         except Exception:
             return responses.response(False, message=_('Provide valid PostgreSQL dataset SQL with CREATE TABLE statements.'))
-    if not user.reserve_generation_credits(len(errors)):
+    if not user.reserve_generation_credits(len(errors) + 1):
         return responses.response(False, message=_('Insufficient generation credits.'))
-    try:
-        activity_id = generate_activity(user, errors, title=title, prefix=prefix,
-                                        dataset_str=dataset_str, search_path=search_path,
-                                        language='it' if request.headers.get('X-Language', '').startswith('it') else 'en')
-    except Exception:
-        user.refund_generation_credits(len(errors))
-        current_app.logger.exception('Activity generation failed.')
-        return responses.response(False, message=_('Generation failed. Your credits have been refunded.'))
-    return responses.response(True, activity_id=activity_id,
-                              ai_generation_credits=user.ai_generation_credits)
+    language = 'it' if request.headers.get('X-Language', '').startswith('it') else 'en'
+    failure_message = _('Generation failed. Exercise credits have been refunded; the 1-credit generation fee was charged.')
+
+    def run_generation(on_progress=None):
+        generated_count = len(errors)
+
+        def progress(event):
+            nonlocal generated_count
+            if event['stage'] == 'saving':
+                generated_count = event['completed']
+            if on_progress:
+                on_progress(event)
+
+        try:
+            activity_id = generate_activity(user, errors, title=title, prefix=prefix,
+                                            dataset_str=dataset_str, search_path=search_path,
+                                            language=language, on_progress=progress)
+        except Exception:
+            user.refund_generation_credits(len(errors))
+            current_app.logger.exception('Activity generation failed.')
+            return dict(success=False, message=failure_message)
+        failed_count = len(errors) - generated_count
+        if failed_count:
+            user.refund_generation_credits(failed_count)
+        return dict(success=True, activity_id=activity_id,
+                    generated_count=generated_count, failed_count=failed_count,
+                    ai_generation_credits=user.ai_generation_credits)
+
+    if data.get('stream') is not True:
+        return responses.response(**run_generation())
+
+    from queue import Queue, Empty
+    from threading import Thread
+    from flask import Response
+    app = current_app._get_current_object()
+    events = Queue()
+
+    def worker():
+        # Finish saving or refunding even if the browser disconnects.
+        with app.app_context():
+            events.put(dict(type='result', **run_generation(
+                lambda event: events.put(dict(type='progress', **event)))))
+
+    Thread(target=worker, daemon=True).start()
+
+    def stream():
+        while True:
+            try:
+                event = events.get(timeout=15)
+            except Empty:
+                yield '\n'
+                continue
+            yield json.dumps(event) + '\n'
+            if event['type'] == 'result':
+                break
+
+    return Response(stream(), content_type='application/x-ndjson',
+                    headers={'X-Accel-Buffering': 'no', 'Cache-Control': 'no-cache'})

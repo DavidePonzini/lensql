@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Modal, Tabs, Tab } from 'react-bootstrap';
+import { Button, Modal, Tabs, Tab, ProgressBar } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../../hooks/useAuth';
 import useUserInfo from '../../hooks/useUserInfo';
@@ -23,8 +23,11 @@ export default function ActivityGenerate({ refresh }) {
     const [datasetSql, setDatasetSql] = useState('');
     const [searchPath, setSearchPath] = useState('public');
     const [busy, setBusy] = useState(false);
+    const [warning, setWarning] = useState('');
+    const [progress, setProgress] = useState(null);
     const [message, setMessage] = useState('');
     const total = Object.values(counts).reduce((sum, count) => sum + Number(count || 0), 0);
+    const requiredCredits = total + 1;
     async function open() {
         setShow(true);
         setOptions(null);
@@ -41,10 +44,12 @@ export default function ActivityGenerate({ refresh }) {
         event.preventDefault();
         if (busy) return;
         setBusy(true);
+        setWarning('');
+        setProgress({ stage: 'preparing', total, completed: 0, failed: 0 });
         setMessage('');
         try {
-            const response = await apiRequest('/api/activities/generate', 'POST', {
-                title, prefix,
+            const stream = await apiRequest('/api/activities/generate', 'POST', {
+                title, prefix, stream: true,
                 dataset_str: datasetMode === 'custom' ? datasetSql : null,
                 ...(datasetMode === 'custom' ? { search_path: searchPath } : {}),
                 errors: Object.entries(counts).filter(([, count]) => Number(count) > 0)
@@ -52,8 +57,33 @@ export default function ActivityGenerate({ refresh }) {
                         const [errorId, difficulty] = selection.split(':').map(Number);
                         return { error_id: errorId, difficulty, count: Number(count) };
                     }),
-            });
+            }, { stream: true });
+            let response;
+            const consume = line => {
+                if (!line.trim()) return;
+                const event = JSON.parse(line);
+                if (event.type === 'progress') setProgress(event);
+                else response = event;
+            };
+            const reader = stream.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            try {
+                while (true) {
+                    const { value, done } = await reader.read();
+                    buffer += decoder.decode(value, { stream: !done });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+                    lines.forEach(consume);
+                    if (done) break;
+                }
+                consume(buffer);
+            } finally { reader.releaseLock(); }
+            if (!response) throw new Error('Generation stream ended without a result');
             if (!response.success) { setMessage(response.message); return; }
+            if (response.failed_count) {
+                setWarning(t(`${key}.partial_warning`, { completed: response.generated_count, failed: response.failed_count }));
+            }
             setShow(false);
             setCounts({});
             setTitle('');
@@ -62,7 +92,7 @@ export default function ActivityGenerate({ refresh }) {
             await refresh();
             await loadUserInfo();
         } catch { setMessage(t(`${key}.error`)); }
-        finally { setBusy(false); }
+        finally { setBusy(false); setProgress(null); }
     }
     async function toggleActivity(id, checked) {
         const ids = checked ? [...selected, id] : selected.filter(value => value !== id);
@@ -79,6 +109,7 @@ export default function ActivityGenerate({ refresh }) {
         finally { setBusy(false); }
     }
     return <>
+        {warning && <div className="alert alert-warning" role="alert">{warning}</div>}
         <Button variant="primary" className="me-2 mb-2" onClick={open}>
             <i className="fa fa-wand-magic-sparkles me-1" />{t(`${key}.button`)}
         </Button>
@@ -128,13 +159,19 @@ export default function ActivityGenerate({ refresh }) {
                                 </fieldset>
                                 <GenerationErrors options={options} counts={counts} setCounts={setCounts} busy={busy} />
                                 <div className="position-sticky bottom-0 bg-body border-top pt-3 mt-3" style={{ zIndex: 1 }}>
-                                <p className="fw-semibold" aria-live="polite">{t(`${key}.total`, { count: total })}</p>
+                                <p className="fw-semibold" aria-live="polite">{t(`${key}.total`, { count: requiredCredits })}</p>
                                 {total > 100 && <p className="text-danger">{t(`${key}.too_many`)}</p>}
-                                {total > options.ai_generation_credits && <p className="text-danger">{t(`${key}.insufficient`)}</p>}
-                                <Button type="submit" disabled={busy || !title.trim() || total < 1 || total > 100 || total > options.ai_generation_credits || (datasetMode === 'custom' && (!datasetSql.trim() || !searchPath.trim()))}>
+                                {requiredCredits > options.ai_generation_credits && <p className="text-danger">{t(`${key}.insufficient`)}</p>}
+                                <Button type="submit" disabled={busy || !title.trim() || total < 1 || total > 100 || requiredCredits > options.ai_generation_credits || (datasetMode === 'custom' && (!datasetSql.trim() || !searchPath.trim()))}>
                                     {t(`${key}.${busy ? 'generating' : 'button'}`)}
                                 </Button>
-                                {busy && <p role="status" className="mt-2">{t(`${key}.wait`)}</p>}
+                                {progress && <div className="mt-3" role="status" aria-live="polite">
+                                    <p>{t(`${key}.progress_${progress.stage}`, progress)}</p>
+                                    <ProgressBar animated striped
+                                        now={progress.stage === 'saving' ? 100 : progress.stage === 'exercises' ? 100 * (progress.completed + progress.failed) / progress.total : 0}
+                                        aria-label={t(`${key}.generating`)} />
+                                    <p className="mt-2 mb-1">{t(`${key}.wait`)}</p>
+                                </div>}
                                 </div>
                             </form>
                         </Tab>
