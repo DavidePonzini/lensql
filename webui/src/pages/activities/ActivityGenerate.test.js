@@ -148,6 +148,9 @@ test('unsupported errors remain visible with disabled difficulty inputs', async 
     ] });
     await openGenerator();
     const name = i18n.t('errors.errors.3.name');
+    expect(screen.getByLabelText('Hide unsupported errors').checked).toBe(true);
+    expect(screen.queryByLabelText(`${name} — Easy`)).toBeNull();
+    fireEvent.click(screen.getByLabelText('Hide unsupported errors'));
     for (const difficulty of ['Easy', 'Medium', 'Hard']) {
         expect(screen.getByLabelText(`${name} — ${difficulty}`).disabled).toBe(true);
         expect(screen.getByLabelText(`Ambiguous column — ${difficulty}`).disabled).toBe(false);
@@ -155,4 +158,28 @@ test('unsupported errors remain visible with disabled difficulty inputs', async 
     expect(screen.getByText('Not supported for generation')).toBeTruthy();
     fireEvent.change(screen.getByLabelText('Search errors by name, number or description'), { target: { value: name } });
     expect(screen.getByLabelText(`${name} — Easy`).disabled).toBe(true);
+});
+
+test('badges errors identified as common in the personal history', async () => {
+    mockApiRequest.mockResolvedValue({ ...options, errors: options.errors.map(error => ({
+        ...error, is_common: error.id === 2, common_rank: error.id === 2 ? 1 : null,
+    })) });
+    await openGenerator();
+    expect(screen.getAllByText('Your #1 most common error')).toHaveLength(1);
+    expect(screen.getByText('Your #1 most common error').title).toBe('One of your five most frequent errors across all activities and all time.');
+});
+
+test('top five checkbox filters personal ranks and keeps other filters active', async () => {
+    mockApiRequest.mockResolvedValue({ ...options, errors: options.errors.map(error => ({
+        ...error, common_rank: error.id === 2 ? 2 : null,
+    })) });
+    await openGenerator();
+    const otherName = i18n.t('errors.errors.39.name');
+    expect(screen.getByLabelText('Only show my top 5 errors').checked).toBe(false);
+    fireEvent.click(screen.getByLabelText('Only show my top 5 errors'));
+    expect(screen.getByText('Your #2 most common error')).toBeTruthy();
+    expect(screen.getByLabelText('Ambiguous column — Easy')).toBeTruthy();
+    expect(screen.queryByLabelText(`${otherName} — Easy`)).toBeNull();
+    fireEvent.click(screen.getByLabelText('Only show my top 5 errors'));
+    expect(screen.getByLabelText(`${otherName} — Easy`)).toBeTruthy();
 });

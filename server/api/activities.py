@@ -391,9 +391,17 @@ def generation_options():
     from sqlexercise.error_requirements import ERROR_REQUIREMENTS_MAP
     from sqlerrors import SqlErrorCategory, SqlErrors
     user = db.admin.User(get_jwt_identity())
+    # Personal history across all activities, with no date filter. Use the same
+    # exercise-focused error occurrences as personalized assignments.
+    occurrences = user.get_error_occurrencies()
+    top_errors = {error: rank for rank, (error, count) in enumerate(sorted(
+        ((error, count) for error, count in occurrences if not error.definition.is_deprecated and count > 0),
+        key=lambda item: (-item[1], item[0].value),
+    )[:5], 1)}
     errors = [
         {'id': error.value, 'name': error.definition.name,
-         'category': error.definition.category.value, 'supported': error in ERROR_REQUIREMENTS_MAP}
+         'category': error.definition.category.value, 'supported': error in ERROR_REQUIREMENTS_MAP,
+         'is_common': error in top_errors, 'common_rank': top_errors.get(error)}
         for error in sorted(SqlErrors, key=lambda error: error.value) if not error.definition.is_deprecated
     ]
     activities = [activity for activity in user.list_activities() if activity['is_owner']]

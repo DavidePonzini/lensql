@@ -12,6 +12,7 @@ def valid_request():
 @pytest.fixture
 def user(mocker):
     user = mocker.Mock(username='alice', ai_generation_credits=7)
+    user.get_error_occurrencies.return_value = []
     mocker.patch('server.api.activities.db.admin.User', return_value=user)
     return user
 
@@ -251,3 +252,22 @@ def test_unsupported_error_rejected_without_charging(authenticated_client, user)
     response = authenticated_client.post('/activities/generate', json=data).get_json()
     assert response['success'] is False
     user.reserve_generation_credits.assert_not_called()
+
+
+def test_generation_options_badge_personal_top_five_across_all_activities(authenticated_client, user):
+    from sqlerrors import SqlErrors
+    errors = sorted((error for error in SqlErrors if not error.definition.is_deprecated), key=lambda error: error.value)[:7]
+    user.list_activities.return_value = []
+    user.get_error_occurrencies.return_value = [(error, index + 1) for index, error in enumerate(errors)]
+    response = authenticated_client.get('/activities/generation-options').get_json()
+    common = {error['id'] for error in response['errors'] if error['is_common']}
+    assert common == {error.value for error in errors[2:]}
+    ranks = {error['id']: error['common_rank'] for error in response['errors'] if error['common_rank']}
+    assert ranks == {error.value: rank for rank, error in enumerate(reversed(errors[2:]), 1)}
+    user.get_error_occurrencies.assert_called_once_with()
+
+
+def test_generation_options_no_history_has_no_common_badges(authenticated_client, user):
+    user.list_activities.return_value = []
+    response = authenticated_client.get('/activities/generation-options').get_json()
+    assert not any(error['is_common'] for error in response['errors'])
