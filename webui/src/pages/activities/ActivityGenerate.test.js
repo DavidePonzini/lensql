@@ -59,6 +59,21 @@ test('requests easy and hard exercises for the same error and totals all credits
     }), { stream: true }));
 });
 
+test.each(['', '   '])('generates with the default title when the title is %p', async title => {
+    await openGenerator();
+    const input = screen.getByLabelText('Activity title');
+    expect(input.placeholder).toBe('Generated activity');
+    fireEvent.change(input, { target: { value: title } });
+    fireEvent.change(screen.getByLabelText('Ambiguous column — Easy'), { target: { value: '1' } });
+    const button = screen.getByRole('button', { name: 'Generate' });
+    expect(button.disabled).toBe(false);
+    mockApiRequest.mockResolvedValueOnce(generationStream([{ success: false, message: 'Test stops before generation' }]));
+    fireEvent.click(button);
+    await waitFor(() => expect(mockApiRequest).toHaveBeenCalledWith('/api/activities/generate', 'POST', expect.objectContaining({
+        title: 'Generated activity',
+    }), { stream: true }));
+});
+
 test('search shows matching categories and explanatory descriptions', async () => {
     await openGenerator();
     fireEvent.change(screen.getByLabelText('Search errors by name, number or description'), { target: { value: '39' } });

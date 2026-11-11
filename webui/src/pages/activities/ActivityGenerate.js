@@ -16,6 +16,7 @@ export default function ActivityGenerate() {
     const { loadUserInfo } = useUserInfo();
     const { t } = useTranslation();
     const key = 'pages.activities.generate';
+    const defaultTitle = t(`${key}.default_title`);
     const [options, setOptions] = useState(null);
     const [counts, setCounts] = useState({});
     const selected = useMemo(() => new URLSearchParams(location.search).getAll('activity'), [location.search]);
@@ -88,7 +89,7 @@ export default function ActivityGenerate() {
         setMessage('');
         try {
             const stream = await apiRequest('/api/activities/generate', 'POST', {
-                title, prefix, stream: true,
+                title: title.trim() || defaultTitle, prefix, stream: true,
                 ...(options.student_username ? { student_username: options.student_username, activity_ids: selected } : {}),
                 dataset_str: datasetMode === 'custom' ? datasetSql : null,
                 ...(datasetMode === 'custom' ? { search_path: searchPath } : {}),
@@ -161,7 +162,7 @@ export default function ActivityGenerate() {
                                 </div>}
                                 <p>{t(`${key}.cost`)}</p>
                                 <label className="form-label" htmlFor="generation-title">{t(`${key}.title`)}</label>
-                                <input id="generation-title" className="form-control mb-3" value={title} maxLength={255} onChange={e => setTitle(e.target.value)} required disabled={busy} />
+                                <input id="generation-title" className="form-control mb-3" value={title} placeholder={defaultTitle} maxLength={255} onChange={e => setTitle(e.target.value)} disabled={busy} />
                                 <label className="form-label" htmlFor="generation-prefix">{t(`${key}.prefix`)}</label>
                                 <input id="generation-prefix" className="form-control mb-3" value={prefix} maxLength={240} onChange={e => setPrefix(e.target.value)} disabled={busy} />
                                 <fieldset className="border rounded p-3 mb-4" disabled={busy}>
@@ -198,7 +199,7 @@ export default function ActivityGenerate() {
                                 <p className="fw-semibold" aria-live="polite">{t(`${key}.total`, { count: requiredCredits })}</p>
                                 {total > 100 && <p className="text-danger">{t(`${key}.too_many`)}</p>}
                                 {requiredCredits > options.ai_generation_credits && <p className="text-danger">{t(`${key}.insufficient`)}</p>}
-                                <Button type="submit" disabled={busy || !title.trim() || total < 1 || total > 100 || requiredCredits > options.ai_generation_credits || (datasetMode === 'custom' && (!datasetSql.trim() || !searchPath.trim()))}>
+                                <Button type="submit" disabled={busy || total < 1 || total > 100 || requiredCredits > options.ai_generation_credits || (datasetMode === 'custom' && (!datasetSql.trim() || !searchPath.trim()))}>
                                     {t(`${key}.${busy ? 'generating' : 'button'}`)}
                                 </Button>
                                 {progress && <div className="mt-3" role="status" aria-live="polite">

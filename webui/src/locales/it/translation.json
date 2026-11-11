@@ -347,7 +347,7 @@
                 "tips": [
                     "Includi l'intero script in un blocco <code>BEGIN; ... COMMIT;</code>",
                     "Inizia lo script con <code>DROP SCHEMA IF EXISTS schema_name CASCADE;</code>",
-                    "Usa un <code>search_path</code> unico per ogni dataset",
+                    "Usa un <code>search_path</code> unico per ciascuna attività",
                     "Raggruppa le inserzioni in un unico comando <code>INSERT INTO</code> per ogni tabella per migliorare le prestazioni"
                 ],
                 "title_placeholder": "Titolo descrittivo dell’attività",
@@ -422,6 +422,7 @@
                 "errors": "Scegli gli errori",
                 "cost": "Un credito per esercizio salvato, più un credito per tentativo di generazione anche se fallisce. Massimo 100 esercizi per attività.",
                 "title": "Titolo dell’attività",
+                "default_title": "Attività generata",
                 "prefix": "Prefisso del titolo degli esercizi",
                 "error_label": "Errore",
                 "count": "Esercizi",

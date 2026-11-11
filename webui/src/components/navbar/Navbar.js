@@ -104,7 +104,7 @@ function Navbar() {
 
                                 <li className="nav-item">
                                     <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/activities" end>
-                                        <i className="fa-solid fa-database"></i> {t('components.navbar.nav.activities')}
+                                        <i className="fa-solid fa-chalkboard-user"></i> {t('components.navbar.nav.activities')}
                                     </NavLink>
                                 </li>
 

@@ -347,7 +347,7 @@
                 "tips": [
                     "Include the whole script into a <code>BEGIN; ... COMMIT;</code> block",
                     "Begin the script with <code>DROP SCHEMA IF EXISTS schema_name CASCADE;</code>",
-                    "Use a unique <code>search_path</code> for each dataset",
+                    "Use a unique <code>search_path</code> for each activity",
                     "Group insertions into a single <code>INSERT INTO</code> statement for each table to greatly improve performance"
                 ],
                 "title_placeholder": "Descriptive title for the activity",
@@ -422,6 +422,7 @@
                 "errors": "Choose errors",
                 "cost": "One credit per saved exercise, plus one credit per generation attempt even if it fails. Maximum 100 exercises per activity.",
                 "title": "Activity title",
+                "default_title": "Generated activity",
                 "prefix": "Exercise title prefix",
                 "error_label": "Error",
                 "count": "Exercises",
