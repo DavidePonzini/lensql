@@ -1,0 +1,2 @@
+# Dependency checkouts are installed by scripts/test_all.py.
+-r server/requirements.txt

@@ -2,6 +2,7 @@ SHELL := /bin/bash
 
 VENV=.venv
 REQUIREMENTS_SERVER=server/requirements.txt
+LOCAL_LIBS=../lensql_sqlerrors ../lensql_sqlscope ../lensql_sqlchecker ../lensql_sqlexercise
 
 COMPOSE_PROJECT_NAME=$(subst .,,$(notdir $(patsubst %/,%,$(CURDIR))))
 PORT=3001
@@ -46,7 +47,12 @@ maintenance_stop:
 	@tput cnorm
 
 test: $(VENV)
-	$(VENV_BIN)/pytest
+	$(VENV_BIN)/python -m pytest tests $(PYTEST_ARGS)
+
+.PHONY: test_dependencies
+
+test_dependencies: $(VENV)
+	$(VENV_BIN)/python scripts/test_all.py $(PYTEST_ARGS)
 
 setup:
 	docker exec $(COMPOSE_PROJECT_NAME)_server python /app/server/setup/setup.py
@@ -91,10 +97,8 @@ clean:
 	find server/locales -name '*.mo' -delete
 
 install_local_libs: $(VENV)
-	cd ../lensql_sqlscope && make build
-	cd ../lensql_sqlchecker && make build
-	cp ../lensql_sqlscope/dist/*.whl server/requirements/
-	cp ../lensql_sqlchecker/dist/*.whl server/requirements/
+	rm -f server/requirements/{sqlerrors,sqlscope,sqlchecker,sqlexercise}-*.whl
+	$(VENV_BIN)/python -m pip wheel --no-deps --wheel-dir server/requirements $(LOCAL_LIBS)
 
 	$(VENV_BIN)/python -m pip install --force-reinstall --no-deps server/requirements/*.whl
 

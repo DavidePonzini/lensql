@@ -26,7 +26,7 @@ INSERT INTO lensql.users(
     last_search_path
 FROM users;
 
-INSERT INTO lensql.navigation(
+INSERT INTO lensql.navigation_logs(
     id,
     username,
     url,
@@ -38,7 +38,7 @@ INSERT INTO lensql.navigation(
     url,
     event,
     ts
-FROM navigation;
+FROM navigation_logs;
 
 INSERT INTO lensql.badges(
     username,
