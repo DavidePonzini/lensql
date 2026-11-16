@@ -230,7 +230,7 @@ Dopo aver esaminato la tua query, ho trovato i seguenti problemi:
 ''',
     }
 
-    errors_str = '\n'.join([f'- {str(error)}' for error in errors])
+    errors_str = '\n'.join([f'- {error.message}' for error in errors])
 
     return f'''
 {util.get_localized(request)}

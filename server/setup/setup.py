@@ -166,7 +166,7 @@ if __name__ == '__main__':
         query_goal='DUMMY',
     )
 
-    query.log_errors([DetectedError(e) for e in SqlErrors])
+    query.log_errors([DetectedError(e, message=f'Test finding: {e.definition.name}.') for e in SqlErrors])
 
     messages.success('All errors added to admin user.')
     # endregion

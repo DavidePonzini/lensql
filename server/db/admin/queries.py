@@ -174,7 +174,7 @@ class Query:
 
         if self._errors is None:
             query = database.sql.SQL('''
-                SELECT error_id, details
+                SELECT error_id, details, message
                 FROM {schema}.has_error
                 WHERE query_id = {query_id}
             ''').format(
@@ -187,7 +187,8 @@ class Query:
             self._errors = [
                 DetectedError(
                     error=SqlErrors(row[0]),
-                    data=row[1]
+                    data=tuple(row[1] or ()),
+                    message=row[2]
                 ) for row in result
             ]
 
@@ -275,7 +276,8 @@ class Query:
             db.insert(SCHEMA, 'has_error', {
                 'query_id': self.query_id,
                 'error_id': error.error.value,
-                'details': [str(v) for v in error.data]
+                'details': [str(v) for v in error.data],
+                'message': error.message
             })
 
     @staticmethod

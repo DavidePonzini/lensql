@@ -17,7 +17,7 @@ from tqdm import tqdm
 NCOLS = 80
 
 
-SerializedError = tuple[int, list[str]]
+SerializedError = tuple[int, list[str], str]
 
 @dataclass
 class DBInfo:
@@ -79,11 +79,12 @@ def delete_existing_errors(query: Query) -> None:
     })
 
 def log_errors(query_id: int, errors: list[SerializedError]) -> None:
-    for error_id, details in errors:
+    for error_id, details, message in errors:
         db.insert(SCHEMA, 'has_error', {
             'query_id': query_id,
             'error_id': error_id,
-            'details': details
+            'details': details,
+            'message': message
         })
 
 def list_queries() -> list[Query]:
@@ -111,7 +112,7 @@ def process_query(query_id: int) -> tuple[int, int, list[SerializedError], str |
         return query_id, 0, [], str(e)
 
     return query_id, old_count, [
-        (error.error.value, [str(v) for v in error.data])
+        (error.error.value, [str(v) for v in error.data], error.message)
         for error in errors
     ], None
 
