@@ -13,7 +13,7 @@ def describe_my_query(code: str, *, sql_language='PostgreSQL'):
 Hi Lens! I would like to understand the purpose of the following {sql_language} query. What is it trying to achieve?
 The query is not necessarily correct, so I don't need you to fix it. I just want to understand its goal.
 Also, I know that the query has been deliberately formulated this way, so I don't need you to assume that it is a mistake or an error.
-Additinally, I want you not to provide a detailed explanation of the query, just a high-level description of its purpose.
+Additionally, I want you not to provide a detailed explanation of the query, just a high-level description of its purpose.
 ''',
         'it': f'''
 Ciao Lens! Vorrei capire lo scopo della seguente query {sql_language}. Cosa sta cercando di ottenere?
