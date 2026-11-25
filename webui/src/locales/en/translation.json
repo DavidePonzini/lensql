@@ -527,6 +527,10 @@
             "paper1Desc": "A large-scale study on student SQL mistakes and how they vary across learning settings.",
             "paper2": "Enhancing SQL Learning through Generative AI and Student Error Analysis",
             "paper2Desc": "A framework for AI-assisted feedback, error tracking, and personalized assignment generation in SQL education.",
+            "paper3": "A Proposal for Revising SQL Error Taxonomies Based on Automated Detection (DataEd 2026)",
+            "paper3Desc": "A proposed revision of SQL error taxonomies to support more fine-grained automated classification.",
+            "paper4": "Personalized SQL Exercise Generation with Large Language Models and Constraint-Based Validation (ADBIS 2026)",
+            "paper4Desc": "An approach that uses large language models and constraint-based validation to generate personalized SQL exercises and reference solutions.",
             "cta": "Try LensQL"
         },
         "login": {

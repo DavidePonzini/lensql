@@ -1,6 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+const papers = [
+    { file: 'SEBD2025.pdf', translationKey: 'paper1' },
+    { file: 'ADBIS2025.pdf', translationKey: 'paper2' },
+    { file: 'DataEd2026.pdf', translationKey: 'paper3' },
+    { file: 'ADBIS2026.pdf', translationKey: 'paper4' },
+];
+
 function About() {
     const { t } = useTranslation();
 
@@ -16,28 +23,19 @@ function About() {
             <p className="fs-5 mb-1">{t('pages.about.moreIntro')}</p>
 
             <ul className="fs-6 ps-3">
-                <li className="mb-1">
-                    <a
-                        href="/files/SEBD2025.pdf"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="link-primary text-decoration-none"
-                    >
-                        <em>{t('pages.about.paper1')}</em>
-                    </a>{" "}
-                    — {t('pages.about.paper1Desc')}
-                </li>
-                <li>
-                    <a
-                        href="/files/ADBIS2025.pdf"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="link-primary text-decoration-none"
-                    >
-                        <em>{t('pages.about.paper2')}</em>
-                    </a>{" "}
-                    — {t('pages.about.paper2Desc')}
-                </li>
+                {papers.map(({ file, translationKey }) => (
+                    <li key={file} className="mb-1">
+                        <a
+                            href={`/files/${file}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="link-primary text-decoration-none"
+                        >
+                            <em>{t(`pages.about.${translationKey}`)}</em>
+                        </a>{" "}
+                        — {t(`pages.about.${translationKey}Desc`)}
+                    </li>
+                ))}
             </ul>
 
             <div className="mt-4 text-center">
