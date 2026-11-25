@@ -5,6 +5,7 @@ import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_babel import _
 from sqlchecker import detectors, get_errors, build_catalog
+from sqlerrors import SqlErrorCategory, SqlErrors
 
 from server import db, gamification
 from server.sql.code import SQLCode
@@ -21,6 +22,21 @@ DETECTORS = [
 ]
 
 bp = Blueprint('query', __name__)
+
+
+@bp.get('/error-taxonomy')
+def error_taxonomy():
+    return responses.response(
+        categories=[category.value for category in SqlErrorCategory],
+        errors=[
+            {
+                'id': error.value,
+                'category': error.definition.category.value,
+                'deprecated': error.definition.is_deprecated,
+            }
+            for error in sorted(SqlErrors, key=lambda error: error.value)
+        ],
+    )
 
 
 @bp.route('/run', methods=['POST'])

@@ -137,6 +137,12 @@ function Navbar() {
                             </NavLink>
                         </li>
 
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/error-taxonomy">
+                                {t('pages.errorTaxonomy.title')}
+                            </NavLink>
+                        </li>
+
                         {userInfo?.isAdmin && (
                             <li className="nav-item">
                                 <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/admin">

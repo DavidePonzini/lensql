@@ -13,6 +13,7 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ObservedOnce from "../ObservedOnce";
+import ErrorDetails from "../ErrorDetails";
 
 function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher = false, sampleData = null }) {
     const { t, i18n } = useTranslation();
@@ -168,49 +169,10 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
         const { payload: row } = payload[0];
 
         return (
-            <div style={{
-                background: '#fff',
-                border: '1px solid #ddd',
-                padding: '12px 16px',
-                borderRadius: '6px',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                maxWidth: '600px'
-            }}>
-                <h4 style={{ fontWeight: 600 }}>{row.name}</h4>
-                <span>{t(`errors.errors.${row.id}.description`)}</span>
-                <br />
-                <span>{t(`components.learningStats.errors.count_label`, { count: row.count })}</span>
-
-                <hr style={{ opacity: 0.15 }} />
-
-                <h5 className='mt-2 text-danger'>
-                    {t('components.learningStats.errors.example_label')}
-                </h5>
-                <pre style={{
-                    background: '#f8f9fa',
-                    padding: '8px 10px',
-                    borderLeft: '3px solid #dc3545',
-                    borderRadius: '3px'
-                }}>
-                    {t(`errors.errors.${row.id}.example`)}
-                </pre>
-
-                <h5 className='mt-3 text-info'>
-                    {t('components.learningStats.errors.explanation_label')}
-                </h5>
-                <i>{t(`errors.errors.${row.id}.explanation`)}</i>
-
-                <h5 className='mt-3 text-success'>
-                    {t('components.learningStats.errors.correction_label')}
-                </h5>
-                <pre style={{
-                    background: '#f8f9fa',
-                    padding: '8px 10px',
-                    borderLeft: '3px solid #28a745',
-                    borderRadius: '3px'
-                }}>
-                    {t(`errors.errors.${row.id}.correction`)}
-                </pre>
+            <div style={{ maxWidth: 'min(600px, 90vw)' }}>
+                <ErrorDetails id={row.id} title={row.name} heading="h4">
+                    <span>{t('components.learningStats.errors.count_label', { count: row.count })}</span>
+                </ErrorDetails>
             </div>
         );
     };

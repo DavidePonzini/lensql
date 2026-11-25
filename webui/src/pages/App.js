@@ -12,6 +12,7 @@ import NavigationTracker from '../components/NavigationTracker';
 
 import Home from './Home';
 import About from './About';
+import ErrorTaxonomy from './ErrorTaxonomy';
 import Login from './Login';
 import Register from './Register';
 import Profile from './profile/Profile';
@@ -46,6 +47,7 @@ function App() {
                             <Route path="/">
                                 <Route index element={<Home />} />
                                 <Route path="about" element={<About />} />
+                                <Route path="error-taxonomy/:errorId?" element={<ErrorTaxonomy />} />
                                 <Route path="howto" element={<Tutorial />} />
                                 <Route path="cookies" element={<Cookies />} />
                                 <Route path="privacy" element={<Privacy />} />

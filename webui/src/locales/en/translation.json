@@ -516,6 +516,16 @@
                 }
             }
         },
+        "errorTaxonomy": {
+            "title": "Error Taxonomy",
+            "intro": "Explore SQL error categories with definitions, examples, explanations, and corrections.",
+            "search": "Search by error name, number, or description",
+            "empty": "No errors match your search.",
+            "loading": "Loading the error taxonomy…",
+            "loadError": "The error taxonomy could not be loaded. Reload the page to try again.",
+            "deprecated": "Deprecated entry",
+            "showDeprecated": "Show deprecated entries"
+        },
         "about": {
             "title": "About LensQL",
             "intro": "LensQL is a platform for learning and teaching SQL. It uses students’ query attempts to guide feedback, track recurring mistakes, and help teachers plan follow-up practice.",
@@ -1167,10 +1177,10 @@
             },
             "28": {
                 "name": "Restriction in SELECT clause",
-                "description": "",
+                "description": "A condition appears in the output list when the task requires it to filter rows.",
                 "example": "SELECT fee > 10 FROM customers;",
-                "explanation": "",
-                "correction": ""
+                "explanation": "In SELECT, the expression returns a Boolean value for each customer. Put the condition in WHERE to return only customers whose fee exceeds 10.",
+                "correction": "SELECT * FROM customers WHERE fee > 10;"
             },
             "29": {
                 "name": "Projection in WHERE clause",
@@ -1432,16 +1442,32 @@
                 "correction": "SELECT * FROM students WHERE name = supervisor_name;"
             },
             "66": {
-                "name": "Missing expression"
+                "name": "Missing expression",
+                "description": "The query omits a required expression.",
+                "example": "SELECT name FROM students WHERE;",
+                "explanation": "WHERE must be followed by a condition that determines which rows to keep.",
+                "correction": "SELECT name FROM students WHERE age >= 18;"
             },
             "67": {
-                "name": "Expression on incorrect column"
+                "name": "Expression on incorrect column",
+                "description": "An expression uses the wrong column for the task.",
+                "example": "SELECT * FROM students WHERE age + 5 > 30;",
+                "explanation": "If the task asks for projected scores, add five to score. Adding five to age filters on the wrong value.",
+                "correction": "SELECT * FROM students WHERE score + 5 > 30;"
             },
             "68": {
-                "name": "Extraneous expression"
+                "name": "Extraneous expression",
+                "description": "An expression is included even though the task does not require it.",
+                "example": "SELECT name, salary * 12 FROM employees;",
+                "explanation": "If the task asks for employee names, the annual salary calculation adds an extra output column.",
+                "correction": "SELECT name FROM employees;"
             },
             "69": {
-                "name": "Expression in incorrect clause"
+                "name": "Expression in incorrect clause",
+                "description": "An expression is placed in the wrong SQL clause for the task.",
+                "example": "SELECT age FROM students ORDER BY age + 5;",
+                "explanation": "If the task asks for ages five years from now, the calculation belongs in SELECT so its result appears in the output.",
+                "correction": "SELECT age + 5 AS future_age FROM students ORDER BY future_age;"
             },
             "70": {
                 "name": "Extraneous column in SELECT",
