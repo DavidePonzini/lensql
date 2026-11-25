@@ -518,20 +518,32 @@
         },
         "about": {
             "title": "About LensQL",
-            "p1": "LensQL is an interactive platform that helps students learn SQL through guided practice, personalized feedback, and gamified progression. Built with both students and teachers in mind, it supports a deeper understanding of relational databases by focusing on the reasoning behind queries — not just their correctness.",
-            "p2": "Instead of offering immediate solutions, LensQL encourages active exploration. The AI assistant, Lens, helps students reflect on their mistakes, refine their logic, and grow their skills with every attempt. Teachers, meanwhile, gain insight into how students learn, where they struggle, and how to support them effectively.",
-            "p3": "Whether you're running your first query or refining complex joins, LensQL turns every error into an opportunity to learn.",
-            "moreTitle": "🔍 Want to know more?",
-            "moreIntro": "LensQL is developed as part of ongoing research at the University of Genoa. If you're curious about the academic background or technical details, here are some publications that explore the ideas behind it:",
+            "intro": "LensQL is a platform for learning and teaching SQL. It uses students’ query attempts to guide feedback, track recurring mistakes, and help teachers plan follow-up practice.",
+            "students": {
+                "title": "For students",
+                "practice": "Join an activity, run your queries, and revise them as you go. When you’re stuck, ask Lens, the AI assistant, to explain an error, describe what your query does, or give you a hint.",
+                "progress": "Use your dashboard to revisit attempts and see which errors recur. Earn experience as you practise and spend LensCoins when asking Lens for help."
+            },
+            "teachers": {
+                "title": "For teachers",
+                "practice": "Create activities and assign SQL exercises. Generate follow-up exercises that target specific error types students encounter.",
+                "progress": "Use activity dashboards to see query attempts, recurring errors, and requests for help. These patterns can guide what you cover in class and what students practise next."
+            },
+            "architectureTitle": "LensQL architecture",
+            "architectureIntro": "The diagram follows a student’s SQL query through LensQL, from execution to feedback and personalized practice.",
+            "architectureAlt": "Student queries run on user databases. LensQL categorizes errors, uses a language model to support query explanations, and records attempts in its admin database. Learning analytics provide feedback on weaknesses and guide personalized assignment generation.",
+            "moreTitle": "Research and publications",
+            "viewPdf": "Read PDF",
+            "viewPaper": "Read PDF for {{title}} (opens in a new tab)",
+            "moreIntro": "LensQL is developed at the University of Genoa. These papers cover the analysis and classification of student SQL errors, AI-assisted feedback, and personalized exercise generation.",
             "paper1": "Analyzing Common Student Errors in SQL Query Formulation to Enhance Learning Support",
-            "paper1Desc": "A large-scale study on student SQL mistakes and how they vary across learning settings.",
+            "paper1Desc": "Preliminary manual analysis of student errors that led to the development of LensQL.",
             "paper2": "Enhancing SQL Learning through Generative AI and Student Error Analysis",
-            "paper2Desc": "A framework for AI-assisted feedback, error tracking, and personalized assignment generation in SQL education.",
-            "paper3": "A Proposal for Revising SQL Error Taxonomies Based on Automated Detection (DataEd 2026)",
-            "paper3Desc": "A proposed revision of SQL error taxonomies to support more fine-grained automated classification.",
-            "paper4": "Personalized SQL Exercise Generation with Large Language Models and Constraint-Based Validation (ADBIS 2026)",
-            "paper4Desc": "An approach that uses large language models and constraint-based validation to generate personalized SQL exercises and reference solutions.",
-            "cta": "Try LensQL"
+            "paper2Desc": "Design of LensQL and its components, with preliminary results.",
+            "paper3": "A Proposal for Revising SQL Error Taxonomies Based on Automated Detection",
+            "paper3Desc": "Revisions to the SQL error taxonomy based on the error detection module.",
+            "paper4": "Personalized SQL Exercise Generation with Large Language Models and Constraint-Based Validation",
+            "paper4Desc": "Description of the assignment generation module."
         },
         "login": {
             "rememberMe": "Remember me",
@@ -660,140 +672,25 @@
             }
         },
         "home": {
-            "hero": {
-                "title": "Learn SQL Through Mistakes – With LensQL",
-                "subtitle": "Discover SQL. Learn from your errors. Grow with Lens.",
-                "description": "LensQL is an AI-powered SQL learning platform that turns student mistakes into personalized, interactive learning moments.",
-                "cta_register": "Create or Join a Activity",
-                "cta_howto": "How To Use LensQL",
-                "cta_about": "Learn More About LensQL"
-            },
-            "what_is": {
-                "title": "What is LensQL?",
-                "subtitle": "A smarter way to learn SQL — grounded in your mistakes, powered by AI.",
-                "features": {
-                    "ai_tutor": "🤖 <strong>AI-driven tutor</strong> that helps students debug queries and think critically",
-                    "error_pedagogy": "🧠 <strong>Error-based pedagogy</strong>: Learn from syntax, logic, and semantic mistakes",
-                    "personalization": "🎯 <strong>Personalized assignments and dashboards</strong> based on real progress"
-                },
-                "quote": "“Over 95% of queries are submitted outside class hours. LensQL supports self-paced, reflective learning.”"
-            },
-            "how_it_works": {
-                "title": "How Does LensQL Work",
-                "steps": [
-                    "🧑‍🏫 Teachers create exercises, optionally targeting known error types",
-                    "🎓 Students solve queries with Lens’ help — no direct answers, only interactive guidance",
-                    "📊 The system analyzes every query to extract error patterns and track progress",
-                    "🛠️ Personalized exercises are automatically generated to address specific weaknesses",
-                    "📈 Interactive learning dashboards show students and teachers how understanding evolves over time"
-                ],
-                "cta_research": "See the research behind it"
-            },
-            "meet_lens": {
-                "title": "Meet Lens: Your SQL Sidekick",
-                "description": "Lens used to be an explorer of ancient data relics — until a mysterious SQL query turned them into an AI. Now, Lens guides students through the twists and the joins of query logic with curiosity, kindness, and clear feedback.",
-                "features": {
-                    "explain_errors": "❓ <strong>Explains errors</strong> in plain language",
-                    "locate_mistakes": "📌 <strong>Helps locate mistakes</strong> in your query",
-                    "show_examples": "🧪 <strong>Shows examples</strong> of similar queries",
-                    "describe_query": "🧭 <strong>Describes your query's behavior</strong> to help reflect on intent vs result",
-                    "suggest_after_reflection": "⚠️ <strong>Gives suggestions only after reflection</strong> — to foster genuine learning"
-                }
-            },
-            "why_errors": {
-                "title": "Why Learn From Errors?",
-                "students": {
-                    "title": "For Students",
-                    "items": [
-                        "🧠 <strong>Understand the why</strong>, not just the how",
-                        "🔁 <strong>Improve through iteration</strong> and trial",
-                        "🚀 <strong>Build debugging and metacognitive skills</strong>"
-                    ]
-                },
-                "teachers": {
-                    "title": "For Teachers",
-                    "items": [
-                        "📊 <strong>Identify misconceptions early</strong>",
-                        "🧩 <strong>See learning trajectories</strong>, not just correctness",
-                        "🛠️ <strong>Tailor support</strong> with data-driven insights"
-                    ]
-                }
-            },
-            "gamification": {
-                "title": "🎮 Gamified Learning That Rewards Effort and Insight",
-                "description": "Learning SQL should feel rewarding — and a little fun, too. LensQL uses two progression systems that motivate students to practice, reflect, and grow.",
-                "xp": {
-                    "title": "🔹 XP and Levels — Progress Through Practice",
-                    "description": "Earn experience by writing and running queries. Leveling up shows your growth over time and rewards consistent effort — not just correct answers.",
-                    "quote": "“You don’t need to be perfect — just consistent. The more you experiment, the more you grow.”"
-                },
-                "coins": {
-                    "title": "🪙 LensCoins — Use Wisely, Reflect Deeply",
-                    "description": "LensCoins are earned through engagement and spent when asking Lens for help. They encourage students to try before asking — and to reflect on feedback.",
-                    "quote": "“LensCoins encourage reflection. Spend them when you're truly stuck — and earn them back by solving more and helping Lens improve.”"
-                },
-                "why": {
-                    "title": "💡 Why It Works",
-                    "items": [
-                        "🎯 Encourages <strong>experimentation</strong>, not perfection",
-                        "📈 Rewards <strong>consistent effort</strong> and active learning",
-                        "🤝 Builds a <strong>dialogue</strong> between students and the AI assistant",
-                        "🔄 Helps teachers see <strong>who’s trying, not just who’s succeeding</strong>"
-                    ]
-                }
-            },
-            "dashboard": {
-                "title": "📊 Your Learning Dashboard",
-                "students": {
-                    "title": "For Students",
-                    "items": [
-                        "📌 Track how many queries you’ve run and how often they work",
-                        "📊 Understand what types of queries you write and how they change over time",
-                        "🤖 See when and why you interact with Lens, and how you respond to its suggestions",
-                        "🕒 Follow your learning progress with a timeline of queries and errors"
-                    ]
-                },
-                "teachers": {
-                    "title": "For Teachers",
-                    "items": [
-                        "📊 View aggregate metrics for each activity: query activity, success rate, and help usage",
-                        "📂 Analyze errors by category: syntax, semantic, logical, or complications",
-                        "🕒 Track how query behavior and error patterns evolve over time",
-                        "🧭 Adapt instruction based on what students try, not just what they get right"
-                    ]
-                }
-            },
+            "title": "Learn SQL from your mistakes",
+            "description": "LensQL automatically detects and classifies errors in your SQL queries. Get hints from Lens and practise challenging concepts like joins, aggregation, and subqueries with exercises tailored to the mistakes you make most often.",
+            "register": "Create an account",
+            "activities": "Go to activities",
+            "tutorial": "See the walkthrough",
+            "about": "About LensQL",
             "demo": {
-                "title": "🚀 Try LensQL Now",
-                "description": "While LensQL requires registration, here’s a sneak peek of how it helps you reason about errors step by step.",
-                "example_caption": "Example: <code>SELECT name FROM students WHERE grade &gt; AVG(grade)</code>",
-                "example_note": "Lens identifies a syntax error and explains it in plain language, without giving the answer."
-            },
-            "community": {
-                "title": "🤝 Join the LensQL Community",
-                "description": "Already helping <strong>100+ students</strong> outside the classroom.",
-                "teachers": {
-                    "title": "✅ For Teachers",
-                    "items": [
-                        "📚 Create activities",
-                        "📝 Assign exercises",
-                        "📊 Track activity-wide learning"
-                    ]
-                },
-                "students": {
-                    "title": "✅ For Students",
-                    "items": [
-                        "💬 Get instant feedback",
-                        "💡 Practice SQL with purpose",
-                        "🛠️ Master your weaknesses"
-                    ]
+                "title": "Try a sample query",
+                "task": "List the distinct categories of Northstar books priced at 10 or more.",
+                "run": "Run query",
+                "result": "Query result",
+                "stats": "See sample learning stats",
+                "statsIntro": "This sample history shows which errors recur and how the mix changes over time.",
+                "errors": {
+                    "40": "A price of at least 10 already satisfies the second price condition.",
+                    "51": "The SELECT list returns the category column twice.",
+                    "88": "Use = for an exact publisher match. This LIKE pattern has no wildcards.",
+                    "72": "Add DISTINCT to list each category once."
                 }
-            },
-            "cta": {
-                "title": "💡 Learning SQL doesn't start with answers. It starts with errors.",
-                "register": "Create Your Account",
-                "howto": "How To Use LensQL",
-                "about": "Learn More"
             }
         }
     },

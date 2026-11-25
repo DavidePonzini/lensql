@@ -518,20 +518,32 @@
         },
         "about": {
             "title": "Informazioni su LensQL",
-            "p1": "LensQL è una piattaforma interattiva che aiuta gli studenti a imparare SQL attraverso esercitazioni guidate, feedback personalizzati e un percorso di apprendimento gamificato. Progettata per studenti e insegnanti, favorisce una comprensione più profonda dei database relazionali, concentrandosi sul ragionamento dietro le query, non solo sulla loro correttezza.",
-            "p2": "Anziché fornire soluzioni immediate, LensQL incoraggia l’esplorazione attiva. L’assistente AI, Lens, aiuta gli studenti a riflettere sugli errori, affinare la logica e migliorare le competenze con ogni tentativo. Gli insegnanti, nel frattempo, ottengono una panoramica su come apprendono gli studenti, dove incontrano difficoltà e come supportarli al meglio.",
-            "p3": "Che tu stia eseguendo la tua prima query o perfezionando join complessi, LensQL trasforma ogni errore in un’opportunità di apprendimento.",
-            "moreTitle": "🔍 Vuoi saperne di più?",
-            "moreIntro": "LensQL è sviluppato come parte di una ricerca in corso presso l’Università di Genova. Se sei curioso di approfondire gli aspetti accademici o tecnici, ecco alcune pubblicazioni che ne esplorano i fondamenti:",
+            "intro": "LensQL è una piattaforma per imparare e insegnare SQL. Analizza i tentativi degli studenti per fornire feedback, individuare gli errori ricorrenti e aiutare i docenti a scegliere gli esercizi successivi.",
+            "students": {
+                "title": "Per chi studia",
+                "practice": "Partecipa a un’attività, esegui le query e rivedile man mano. Se ti blocchi, chiedi a Lens, l’assistente basato sull’IA, di spiegarti un errore, descrivere cosa fa la tua query o darti un suggerimento.",
+                "progress": "Consulta la dashboard per rivedere i tentativi e individuare gli errori ricorrenti. Accumula punti esperienza facendo pratica e usa i LensCoin per chiedere aiuto a Lens."
+            },
+            "teachers": {
+                "title": "Per chi insegna",
+                "practice": "Crea attività e assegna esercizi SQL. Genera nuovi esercizi mirati ai tipi di errore che gli studenti incontrano.",
+                "progress": "Consulta le dashboard delle attività per esaminare i tentativi, gli errori ricorrenti e le richieste di aiuto. Usa queste informazioni per decidere quali argomenti riprendere in aula e quali esercizi proporre."
+            },
+            "architectureTitle": "Architettura di LensQL",
+            "architectureIntro": "Il diagramma segue il percorso di una query SQL di uno studente in LensQL, dall’esecuzione al feedback e agli esercizi personalizzati.",
+            "architectureAlt": "Le query degli studenti vengono eseguite nei database utente. LensQL classifica gli errori, usa un modello linguistico per spiegare le query e registra i tentativi nel database di amministrazione. L’analisi dei tentativi fornisce feedback sulle difficoltà e guida la generazione di esercizi personalizzati.",
+            "moreTitle": "Ricerca e pubblicazioni",
+            "viewPdf": "Leggi il PDF",
+            "viewPaper": "Leggi il PDF di {{title}} (si apre in una nuova scheda)",
+            "moreIntro": "LensQL è sviluppato all’Università di Genova. Questi articoli trattano l’analisi e la classificazione degli errori SQL degli studenti, il feedback assistito dall’IA e la generazione di esercizi personalizzati.",
             "paper1": "Analyzing Common Student Errors in SQL Query Formulation to Enhance Learning Support",
-            "paper1Desc": "Uno studio su larga scala sugli errori SQL degli studenti e le differenze nei diversi contesti educativi.",
+            "paper1Desc": "Analisi manuale preliminare degli errori degli studenti che ha portato allo sviluppo di LensQL.",
             "paper2": "Enhancing SQL Learning through Generative AI and Student Error Analysis",
-            "paper2Desc": "Un framework per feedback AI-driven, tracciamento degli errori e generazione personalizzata di esercizi nell'insegnamento di SQL.",
-            "paper3": "A Proposal for Revising SQL Error Taxonomies Based on Automated Detection (DataEd 2026)",
-            "paper3Desc": "Una proposta di revisione delle tassonomie degli errori SQL per supportare una classificazione automatica più dettagliata.",
-            "paper4": "Personalized SQL Exercise Generation with Large Language Models and Constraint-Based Validation (ADBIS 2026)",
-            "paper4Desc": "Un approccio che usa modelli linguistici di grandi dimensioni e la validazione basata su vincoli per generare esercizi SQL personalizzati e soluzioni di riferimento.",
-            "cta": "Prova LensQL"
+            "paper2Desc": "Progettazione di LensQL e dei suoi componenti, con i risultati preliminari.",
+            "paper3": "A Proposal for Revising SQL Error Taxonomies Based on Automated Detection",
+            "paper3Desc": "Revisioni della tassonomia degli errori SQL basate sul modulo di rilevamento degli errori.",
+            "paper4": "Personalized SQL Exercise Generation with Large Language Models and Constraint-Based Validation",
+            "paper4Desc": "Descrizione del modulo di generazione degli esercizi."
         },
         "login": {
             "rememberMe": "Ricordami",
@@ -660,140 +672,25 @@
             }
         },
         "home": {
-            "hero": {
-                "title": "Impara SQL Sbagliando – Con LensQL",
-                "subtitle": "Scopri SQL. Impara dagli errori. Cresci con Lens.",
-                "description": "LensQL è una piattaforma di apprendimento SQL potenziata dall'IA che trasforma gli errori degli studenti in momenti di apprendimento personalizzati e interattivi.",
-                "cta_register": "Crea o Unisciti a un’Attività",
-                "cta_howto": "Come Usare LensQL",
-                "cta_about": "Scopri di più su LensQL"
-            },
-            "what_is": {
-                "title": "Cos'è LensQL?",
-                "subtitle": "Un modo più intelligente per imparare SQL — basato sui tuoi errori, potenziato dall'IA.",
-                "features": {
-                    "ai_tutor": "🤖 <strong>Tutor basato su IA</strong> che aiuta gli studenti a fare debug delle query e a pensare criticamente",
-                    "error_pedagogy": "🧠 <strong>Pedagogia basata sugli errori</strong>: impara da errori di sintassi, logica e semantica",
-                    "personalization": "🎯 <strong>Compiti e dashboard personalizzati</strong> basati sui progressi reali"
-                },
-                "quote": "“Oltre il 95% delle query vengono eseguite fuori dall’orario di lezione. LensQL supporta l’apprendimento riflessivo e autonomo.”"
-            },
-            "how_it_works": {
-                "title": "Come Funziona LensQL",
-                "steps": [
-                    "🧑‍🏫 Gli insegnanti creano esercizi, se vogliono, mirati a errori comuni",
-                    "🎓 Gli studenti risolvono query con l’aiuto di Lens — niente risposte dirette, solo guida interattiva",
-                    "📊 Il sistema analizza ogni query per rilevare errori e tracciare i progressi",
-                    "🛠️ Esercizi personalizzati vengono generati automaticamente per colmare lacune specifiche",
-                    "📈 Dashboard interattive mostrano come evolve la comprensione nel tempo"
-                ],
-                "cta_research": "Guarda la ricerca alla base"
-            },
-            "meet_lens": {
-                "title": "Conosci Lens: il tuo compagno SQL",
-                "description": "Lens era un esploratore di antichi dati — finché una misteriosa query SQL non l'ha trasformato in un'IA. Ora guida gli studenti attraverso i JOIN e i WHERE con curiosità, chiarezza e gentilezza.",
-                "features": {
-                    "explain_errors": "❓ <strong>Spiega gli errori</strong> in modo semplice",
-                    "locate_mistakes": "📌 <strong>Aiuta a localizzare gli errori</strong> nella tua query",
-                    "show_examples": "🧪 <strong>Mostra esempi</strong> di query simili",
-                    "describe_query": "🧭 <strong>Descrive il comportamento della query</strong> per riflettere su intento e risultato",
-                    "suggest_after_reflection": "⚠️ <strong>Offre suggerimenti solo dopo la riflessione</strong> — per favorire un apprendimento autentico"
-                }
-            },
-            "why_errors": {
-                "title": "Perché Imparare dagli Errori?",
-                "students": {
-                    "title": "Per gli Studenti",
-                    "items": [
-                        "🧠 <strong>Capire il perché</strong>, non solo il come",
-                        "🔁 <strong>Migliorare con prove e tentativi</strong>",
-                        "🚀 <strong>Sviluppare abilità di debugging e metacognitive</strong>"
-                    ]
-                },
-                "teachers": {
-                    "title": "Per i Docenti",
-                    "items": [
-                        "📊 <strong>Individuare incomprensioni in anticipo</strong>",
-                        "🧩 <strong>Osservare percorsi di apprendimento</strong>, non solo risposte corrette",
-                        "🛠️ <strong>Adattare il supporto</strong> con dati concreti"
-                    ]
-                }
-            },
-            "gamification": {
-                "title": "🎮 Apprendimento Gamificato che Premia Sforzo e Intuizione",
-                "description": "Imparare SQL dovrebbe essere gratificante — e anche un po’ divertente. LensQL usa due sistemi di progressione per motivare gli studenti a esercitarsi, riflettere e crescere.",
-                "xp": {
-                    "title": "🔹 XP e Livelli — Progredisci con la Pratica",
-                    "description": "Guadagna esperienza scrivendo ed eseguendo query. Salire di livello mostra i tuoi progressi e premia la costanza — non solo le risposte giuste.",
-                    "quote": "“Non devi essere perfetto — solo costante. Più sperimenti, più impari.”"
-                },
-                "coins": {
-                    "title": "🪙 LensCoins — Usali con Cura, Rifletti a Fondo",
-                    "description": "I LensCoins si guadagnano con l’impegno e si spendono quando chiedi aiuto a Lens. Ti incoraggiano a provare prima — e a riflettere dopo.",
-                    "quote": "“I LensCoins incentivano la riflessione. Spendili quando sei davvero bloccato — e riguadagnali risolvendo e aiutando Lens a migliorare.”"
-                },
-                "why": {
-                    "title": "💡 Perché Funziona",
-                    "items": [
-                        "🎯 Incentiva <strong>sperimentazione</strong>, non perfezione",
-                        "📈 Premia <strong>impegno costante</strong> e apprendimento attivo",
-                        "🤝 Crea un <strong>dialogo</strong> tra studente e assistente IA",
-                        "🔄 Aiuta i docenti a vedere <strong>chi si impegna, non solo chi riesce</strong>"
-                    ]
-                }
-            },
-            "dashboard": {
-                "title": "📊 Il Tuo Cruscotto di Apprendimento",
-                "students": {
-                    "title": "Per gli Studenti",
-                    "items": [
-                        "📌 Tieni traccia di quante query esegui e con quale successo",
-                        "📊 Comprendi che tipo di query scrivi e come cambiano nel tempo",
-                        "🤖 Osserva quando e perché interagisci con Lens e come reagisci ai suoi suggerimenti",
-                        "🕒 Segui i tuoi progressi nel tempo attraverso le query e gli errori"
-                    ]
-                },
-                "teachers": {
-                    "title": "Per i Docenti",
-                    "items": [
-                        "📊 Visualizza metriche aggregate per ogni classe: attività, successo e uso dell’assistente",
-                        "📂 Analizza gli errori per categoria: sintattici, semantici, logici o complicazioni",
-                        "🕒 Tieni traccia dell’evoluzione nel tempo delle query e degli errori",
-                        "🧭 Adatta la didattica in base a ciò che gli studenti provano, non solo a ciò che riescono"
-                    ]
-                }
-            },
+            "title": "Impara SQL dai tuoi errori",
+            "description": "LensQL rileva e classifica automaticamente gli errori nelle tue query SQL. Chiedi suggerimenti a Lens e fai pratica con concetti come join, aggregazioni e sottoquery grazie a esercizi mirati agli errori che commetti più spesso.",
+            "register": "Crea un account",
+            "activities": "Vai alle attività",
+            "tutorial": "Guarda la guida",
+            "about": "Informazioni su LensQL",
             "demo": {
-                "title": "🚀 Prova LensQL Ora",
-                "description": "LensQL richiede registrazione, ma ecco un’anteprima di come ti aiuta a ragionare sugli errori passo dopo passo.",
-                "example_caption": "Esempio: <code>SELECT name FROM students WHERE grade &gt; AVG(grade)</code>",
-                "example_note": "Lens identifica un errore di sintassi e lo spiega in modo semplice, senza fornire la risposta."
-            },
-            "community": {
-                "title": "🤝 Entra nella Community di LensQL",
-                "description": "Già utilizzato da <strong>oltre 100 studenti</strong> al di fuori della classe.",
-                "teachers": {
-                    "title": "✅ Per i Docenti",
-                    "items": [
-                        "📚 Crea corsi",
-                        "📝 Assegna esercizi",
-                        "📊 Monitora l'apprendimento della classe"
-                    ]
-                },
-                "students": {
-                    "title": "✅ Per gli Studenti",
-                    "items": [
-                        "💬 Ottieni feedback immediato",
-                        "💡 Allena il tuo SQL con uno scopo",
-                        "🛠️ Supera le tue difficoltà"
-                    ]
+                "title": "Prova una query di esempio",
+                "task": "Elenca senza duplicati le categorie dei libri di Northstar con un prezzo di almeno 10.",
+                "run": "Esegui query",
+                "result": "Risultato della query",
+                "stats": "Vedi un esempio delle statistiche di apprendimento",
+                "statsIntro": "Questo riepilogo di esempio mostra quali errori si ripetono e come cambia la loro distribuzione nel tempo.",
+                "errors": {
+                    "40": "Un prezzo di almeno 10 soddisfa già la seconda condizione sul prezzo.",
+                    "51": "La clausola SELECT restituisce due volte la colonna category.",
+                    "88": "Usa = per una corrispondenza esatta dell’editore. Il pattern di LIKE non contiene caratteri jolly.",
+                    "72": "Aggiungi DISTINCT per elencare ogni categoria una sola volta."
                 }
-            },
-            "cta": {
-                "title": "💡 Imparare SQL non inizia dalle risposte. Inizia dagli errori.",
-                "register": "Crea il Tuo Account",
-                "howto": "Come Usare LensQL",
-                "about": "Scopri di più"
             }
         }
     },
