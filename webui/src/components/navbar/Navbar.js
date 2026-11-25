@@ -12,13 +12,29 @@ import GamificationStats from './GamificationStats';
 
 import './Navbar.css';
 
+function NavbarDropdown({ id, icon, title, children }) {
+    const [isOpen, setOpen] = useState(false);
+
+    return (
+        <NavDropdown
+            as="li"
+            id={id}
+            title={<><i className={icon} aria-hidden="true" /> {title}</>}
+            show={isOpen}
+            onToggle={setOpen}
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+        >
+            {children}
+        </NavDropdown>
+    );
+}
+
 function Navbar() {
     const { t } = useTranslation();
 
     const { isLoggedIn } = useAuth();
     const { userInfo, loadingUserInfo, logout } = useUserInfo();
-    const [isDropdownOpen, setDropdownOpen] = useState(false);
-    const [isHelpOpen, setHelpOpen] = useState(false);
     const [logoutError, setLogoutError] = useState(false);
 
     async function handleLogout() {
@@ -92,32 +108,18 @@ function Navbar() {
 
                         {isLoggedIn && (
                             <>
-                                <li
-                                    className={`nav-item dropdown ${isDropdownOpen ? 'show' : ''}`}
-                                    onMouseEnter={() => setDropdownOpen(true)}
-                                    onMouseLeave={() => setDropdownOpen(false)}
+                                <NavbarDropdown
+                                    id="navbar-profile"
+                                    icon="fa-solid fa-user-circle"
+                                    title={t('components.navbar.nav.profile')}
                                 >
-                                    <NavLink
-                                        className={`nav-link dropdown-toggle ${isDropdownOpen ? 'active' : ''}`}
-                                        to="/profile"
-                                        onClick={() => setDropdownOpen(false)}
-                                        aria-expanded={isDropdownOpen ? 'true' : 'false'}
-                                    >
-                                        <i className="fa-solid fa-user-circle"></i> {t('components.navbar.nav.profile')}
-                                    </NavLink>
-                                    <ul className={`dropdown-menu ${isDropdownOpen ? 'show' : ''}`}>
-                                        <li onClick={() => setDropdownOpen(false)}>
-                                            <NavLink className="dropdown-item" to="/profile">
-                                                <i className="fa-solid fa-user"></i> {t('components.navbar.nav.view_profile')}
-                                            </NavLink>
-                                        </li>
-                                        <li onClick={() => setDropdownOpen(false)}>
-                                            <NavLink className="dropdown-item" to="/learning">
-                                                <i className="fa-solid fa-chart-line"></i> {t('components.navbar.nav.learning')}
-                                            </NavLink>
-                                        </li>
-                                    </ul>
-                                </li>
+                                    <NavDropdown.Item as={NavLink} to="/profile">
+                                        <i className="fa-solid fa-user" aria-hidden="true" /> {t('components.navbar.nav.view_profile')}
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Item as={NavLink} to="/learning">
+                                        <i className="fa-solid fa-chart-line" aria-hidden="true" /> {t('components.navbar.nav.learning')}
+                                    </NavDropdown.Item>
+                                </NavbarDropdown>
 
                                 <li className="nav-item">
                                     <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/activities" end>
@@ -133,14 +135,10 @@ function Navbar() {
                             </>
                         )}
 
-                        <NavDropdown
-                            as="li"
+                        <NavbarDropdown
                             id="navbar-help"
+                            icon="fa-solid fa-circle-question"
                             title={t('components.navbar.nav.help')}
-                            show={isHelpOpen}
-                            onToggle={setHelpOpen}
-                            onMouseEnter={() => setHelpOpen(true)}
-                            onMouseLeave={() => setHelpOpen(false)}
                         >
                             <NavDropdown.Item as={NavLink} to="/howto" end>
                                 <i className="fa-brands fa-readme" aria-hidden="true" /> {t('components.navbar.nav.howto')}
@@ -148,7 +146,7 @@ function Navbar() {
                             <NavDropdown.Item as={NavLink} to="/error-taxonomy">
                                 <i className="fa-solid fa-book" aria-hidden="true" /> {t('pages.errorTaxonomy.title')}
                             </NavDropdown.Item>
-                        </NavDropdown>
+                        </NavbarDropdown>
 
                         {userInfo?.isAdmin && (
                             <li className="nav-item">
