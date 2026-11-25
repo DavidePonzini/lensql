@@ -47,6 +47,18 @@ services:
       # - "3000:3000"
     profiles:
       - dev
+    develop:
+      watch:
+        - action: sync
+          path: ./webui/src
+          target: /app/src
+        - action: sync
+          path: ./webui/public
+          target: /app/public
+        - action: rebuild
+          path: ./webui/package.json
+        - action: rebuild
+          path: ./webui/package-lock.json
 
   server:
     build: ./server
@@ -73,6 +85,18 @@ services:
       - db_users
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./server
+          target: /app/server
+          ignore:
+            - requirements.txt
+            - requirements/
+        - action: rebuild
+          path: ./server/requirements.txt
+        - action: rebuild
+          path: ./server/requirements
 
   db_admin:
     build: ./db_admin

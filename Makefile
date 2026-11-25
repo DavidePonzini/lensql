@@ -20,7 +20,7 @@ prod: stop_app locales_compile test
 	@tput cnorm
 
 dev: stop_app locales_compile test
-	export PORT=$(PORT) && docker compose --profile dev up --build
+	export PORT=$(PORT) && docker compose --profile dev up --build --watch
 	@tput cnorm
 
 logs:
