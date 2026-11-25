@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, Fragment, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const AuthContext = createContext();
@@ -16,12 +16,21 @@ function AuthProvider({ children }) {
 
     const MAX_REQUEST_SIZE = 1024 * 1024 * 20;
 
-    const hasAccessCookie = typeof document !== 'undefined' && document.cookie.includes('access_token_cookie=');
-    const [isAuthenticated, setIsAuthenticated] = useState(
-        sessionStorage.getItem('is_authenticated') === 'true' || hasAccessCookie
-    );
+    const [isAuthenticated, setIsAuthenticated] = useState(null);
+    const sessionVersion = useRef(0);
+    const version = sessionVersion.current;
+    const pendingRefresh = useRef(null);
+    const pendingLogout = useRef(null);
+
+    const endSession = useCallback(() => {
+        sessionVersion.current += 1;
+        sessionStorage.removeItem('hasProvidedFeedback');
+        setIsAuthenticated(false);
+    }, []);
 
     const logout = useCallback(() => {
+        if (pendingLogout.current) return pendingLogout.current;
+
         const url = window.location?.pathname + window.location?.search + window.location?.hash;
 
         // log the logout event while the cookie is still present
@@ -33,38 +42,55 @@ function AuthProvider({ children }) {
             keepalive: true,
         }).catch(() => {});
 
-        fetch('/api/auth/logout', {
+        const operation = (async () => {
+            // Apply the logout cookie headers after any refresh already in flight.
+            await pendingRefresh.current?.catch(() => {});
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+            });
+            if (!response.ok) throw new Error('Logout failed.');
+            endSession();
+        })().finally(() => {
+            pendingLogout.current = null;
+        });
+        pendingLogout.current = operation;
+        return operation;
+    }, [endSession]);
+
+    const refreshAccessToken = useCallback(() => {
+        if (pendingRefresh.current) return pendingRefresh.current;
+
+        const operation = fetch('/api/auth/refresh', {
             method: 'POST',
             credentials: 'include',
-        }).catch(() => {
-            // ignore network errors on logout
+        }).then(async response => {
+            if (response.status === 401 || response.status === 422) return false;
+            if (!response.ok) throw new Error('Session refresh failed.');
+            return (await response.json()).success === true;
         }).finally(() => {
-            sessionStorage.removeItem('is_authenticated');
-            setIsAuthenticated(false);
+            pendingRefresh.current = null;
         });
+        pendingRefresh.current = operation;
+        return operation;
     }, []);
 
-    const refreshAccessToken = useCallback(async () => {
-        const response = await fetch('/api/auth/refresh', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include'
+    useEffect(() => {
+        let active = true;
+        sessionStorage.removeItem('is_authenticated');
+        refreshAccessToken().catch(() => false).then(authenticated => {
+            if (active) setIsAuthenticated(authenticated);
         });
-
-        const data = await response.json();
-        if (data.success) {
-            setIsAuthenticated(true);
-            sessionStorage.setItem('is_authenticated', 'true');
-            return true;
-        } else {
-            logout();
-            throw new Error('Refresh token invalid.');
-        }
-    }, [logout]);
+        return () => { active = false; };
+    }, [refreshAccessToken]);
 
     const apiRequest = useCallback(async (endpoint, method = 'GET', body = null, { stream = false } = {}) => {
+        function checkSession() {
+            if (version !== sessionVersion.current || pendingLogout.current) {
+                throw new Error('Session changed.');
+            }
+        }
+
         async function doRequest() {
             let content = body ? JSON.stringify(body) : null;
             if (content && content.length > MAX_REQUEST_SIZE) {
@@ -82,11 +108,19 @@ function AuthProvider({ children }) {
             });
         }
 
+        checkSession();
         let response = await doRequest();
+        checkSession();
 
         if (response.status === 401) {
-            await refreshAccessToken();
+            const refreshed = await refreshAccessToken();
+            checkSession();
+            if (!refreshed) {
+                endSession();
+                throw new Error('Session expired.');
+            }
             response = await doRequest();
+            checkSession();
         }
 
         if (!response.ok) {
@@ -95,11 +129,14 @@ function AuthProvider({ children }) {
             throw error;
         }
 
-        return stream ? response.body : response.json();
-    }, [refreshAccessToken, MAX_REQUEST_SIZE, i18n.language]);
+        const result = stream ? response.body : await response.json();
+        checkSession();
+        return result;
+    }, [refreshAccessToken, endSession, version, MAX_REQUEST_SIZE, i18n.language]);
 
     const saveTokens = useCallback(() => {
-        sessionStorage.setItem('is_authenticated', 'true');
+        sessionVersion.current += 1;
+        sessionStorage.removeItem('hasProvidedFeedback');
         setIsAuthenticated(true);
     }, []);
 
@@ -111,7 +148,11 @@ function AuthProvider({ children }) {
     }), [isAuthenticated, apiRequest, logout, saveTokens]);
 
     return (
-        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={value}>
+            {isAuthenticated !== null && (
+                <Fragment key={String(isAuthenticated)}>{children}</Fragment>
+            )}
+        </AuthContext.Provider>
     );
 }
 

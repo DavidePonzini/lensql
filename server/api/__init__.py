@@ -24,6 +24,7 @@ def create_app() -> Flask:
     app.config['BABEL_DEFAULT_LOCALE'] = 'en'
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = '../locales'  # Relative path starts from the app root, which is this file's directory
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    app.config['JWT_SESSION_COOKIE'] = True
     app.config['JWT_COOKIE_SECURE'] = os.getenv('JWT_COOKIE_SECURE', 'False').lower() == 'true'
     app.config['JWT_COOKIE_SAMESITE'] = os.getenv('JWT_COOKIE_SAMESITE', 'Lax')
     app.config['JWT_ACCESS_COOKIE_PATH'] = '/api'

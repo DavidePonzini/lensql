@@ -36,7 +36,7 @@ function App() {
     useTooltipObserver();
 
     return (
-        <>
+        <BadgeNotifier>
             <Router>
                 <NavigationTracker />
                 <Navbar />
@@ -86,8 +86,7 @@ function App() {
                 <Footer />
             </Router>
 
-            <BadgeNotifier />
-        </>
+        </BadgeNotifier>
     )
 }
 

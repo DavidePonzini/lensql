@@ -17,6 +17,16 @@ function Navbar() {
     const { isLoggedIn } = useAuth();
     const { userInfo, loadingUserInfo, logout } = useUserInfo();
     const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const [logoutError, setLogoutError] = useState(false);
+
+    async function handleLogout() {
+        setLogoutError(false);
+        try {
+            await logout();
+        } catch {
+            setLogoutError(true);
+        }
+    }
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
@@ -44,9 +54,14 @@ function Navbar() {
                             <>
                                 <LanguageSelectionButton className="mx-1" />
 
-                                <button className="btn btn-outline-danger mx-1" type="button" onClick={logout}>
+                                <button className="btn btn-outline-danger mx-1" type="button" onClick={handleLogout}>
                                     {t('components.navbar.nav.logout')}
                                 </button>
+                                {logoutError && (
+                                    <span className="text-danger" role="alert">
+                                        {t('components.navbar.nav.logoutError')}
+                                    </span>
+                                )}
                             </>
                         ) : (
                             <>

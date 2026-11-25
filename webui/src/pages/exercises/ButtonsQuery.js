@@ -5,12 +5,13 @@ import { useAuth, RequestSizeError } from '../../hooks/useAuth';
 
 import ButtonAction from '../../components/buttons/ButtonAction';
 import BubbleStatsChange from '../../components/notifications/BubbleStatsChange';
-import { setBadges } from '../../components/notifications/BadgeNotifier';
+import { useBadgeNotifications } from '../../components/notifications/BadgeNotifier';
 
 import ButtonCategory from './ButtonCategory';
 
 function ButtonsQuery({ exerciseId, isExecuting, setIsExecuting, sqlText, result, setResult }) {
     const { t } = useTranslation();
+    const setBadges = useBadgeNotifications();
     const { apiRequest } = useAuth();
     const [rewards, setRewards] = useState([]);
 

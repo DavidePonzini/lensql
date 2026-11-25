@@ -17,6 +17,7 @@ from server import db
 from .util import responses
 
 bp = Blueprint('auth', __name__)
+REFRESH_TOKEN_LIFETIME = timedelta(days=7)
 
 
 @bp.route('/admin/change-password', methods=['POST'])
@@ -54,11 +55,13 @@ def login():
         return responses.response(False, message=_('Cannot login. Please check your username and password.'))
 
     access_token = create_access_token(identity=username, expires_delta=timedelta(minutes=15))
-    refresh_token = create_refresh_token(identity=username, expires_delta=timedelta(days=7))
+    refresh_token = create_refresh_token(identity=username, expires_delta=REFRESH_TOKEN_LIFETIME)
 
     resp = responses.response(True)
     set_access_cookies(resp, access_token)
-    set_refresh_cookies(resp, refresh_token)
+    # Only the refresh cookie needs to survive a browser restart.
+    max_age = int(REFRESH_TOKEN_LIFETIME.total_seconds()) if data.get('remember_me') is True else None
+    set_refresh_cookies(resp, refresh_token, max_age=max_age)
     return resp
 
 @bp.route('/refresh', methods=['POST'])

@@ -6,13 +6,14 @@ import useGamificationData from '../../hooks/useGamificationData';
 
 import ButtonAction from "../../components/buttons/ButtonAction";
 import ButtonShowActivity from "../../components/buttons/ButtonShowActivity";
-import { setBadges } from '../../components/notifications/BadgeNotifier';
+import { useBadgeNotifications } from '../../components/notifications/BadgeNotifier';
 import BubbleStatsChange from '../../components/notifications/BubbleStatsChange';
 
 import ButtonCategory from "./ButtonCategory";
 
 function ButtonsExercise({ exerciseId, activityId, handleCreateActivity, sqlText, isExecuting, setIsExecuting, setResult, attempts: initialAttempts, hasSolution }) {
     const { t } = useTranslation();
+    const setBadges = useBadgeNotifications();
     const { apiRequest } = useAuth();
     const { Coins } = useGamificationData();
 

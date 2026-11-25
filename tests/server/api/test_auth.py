@@ -77,6 +77,34 @@ def test_login_sets_auth_cookies_for_valid_credentials(client, mocker):
     assert any('refresh_token_cookie=' in cookie for cookie in cookies)
 
 
+@pytest.mark.parametrize('remember_me, max_age', [(True, 604800), (False, None), ('true', None)])
+def test_remember_me_persists_only_refresh_cookie(app, client, mocker, remember_me, max_age):
+    mocker.patch('server.api.auth.db.admin.User', return_value=SimpleNamespace(can_login=lambda password: True))
+
+    client.post('/auth/login', json={
+        'username': 'alice',
+        'password': 'correct-password',
+        'remember_me': remember_me,
+    })
+
+    access = client.get_cookie('access_token_cookie', path='/api')
+    refresh = client.get_cookie('refresh_token_cookie', path='/api/auth/refresh')
+    assert access.http_only and access.max_age is None
+    assert refresh.http_only and refresh.max_age == max_age
+
+    # A reopened browser has only the persistent refresh cookie available.
+    if remember_me is True:
+        reopened = app.test_client(use_cookies=False)
+        response = reopened.post('/auth/refresh', headers={'Cookie': f'{refresh.key}={refresh.value}'})
+        assert response.get_json()['success'] is True
+        cookies = response.headers.getlist('Set-Cookie')
+        assert len(cookies) == 1 and cookies[0].startswith('access_token_cookie=')
+
+    client.post('/auth/logout')
+    assert client.get_cookie('access_token_cookie', path='/api') is None
+    assert client.get_cookie('refresh_token_cookie', path='/api/auth/refresh') is None
+
+
 def test_register_returns_error_when_user_exists(client, mocker):
     fake_user = SimpleNamespace(exists=lambda: True)
 

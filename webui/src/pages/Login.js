@@ -21,6 +21,8 @@ function Login() {
     const [isPasswordValid, setIsPasswordValid] = useState(false);
 
     const [error, setError] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     function checkUsername(username) {
         setUsernameInput(username);
@@ -55,6 +57,7 @@ function Login() {
 
     async function handleLogin(event) {
         event.preventDefault();
+        if (submitting) return;
 
         const hasUsername = usernameInput.trim();
         const hasPassword = passwordInput.trim();
@@ -64,6 +67,7 @@ function Login() {
             return;
         }
 
+        setSubmitting(true);
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -72,7 +76,11 @@ function Login() {
                     'X-Language': i18n.language || 'en', // Use the current language from i18n
                 },
                 credentials: 'include',
-                body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                body: JSON.stringify({
+                    username: usernameInput,
+                    password: passwordInput,
+                    remember_me: rememberMe,
+                })
             });
 
             const data = await response.json();
@@ -98,6 +106,8 @@ function Login() {
             }
         } catch (err) {
             setError(t('pages.login.errorServer'));
+        } finally {
+            setSubmitting(false);
         }
     }
 
@@ -172,11 +182,24 @@ function Login() {
                                     />
                                 </div>
 
+                                <div className="form-check mb-3">
+                                    <input
+                                        type="checkbox"
+                                        id="remember-me"
+                                        className="form-check-input"
+                                        checked={rememberMe}
+                                        onChange={(event) => setRememberMe(event.target.checked)}
+                                    />
+                                    <label className="form-check-label" htmlFor="remember-me">
+                                        {t('pages.login.rememberMe')}
+                                    </label>
+                                </div>
+
                                 <div className="pt-1 mb-4">
                                     <button
                                         className="btn btn-primary btn-lg btn-block w-100"
                                         type="submit"
-                                        disabled={!isUsernameValid || !isPasswordValid}
+                                        disabled={submitting || !isUsernameValid || !isPasswordValid}
                                     >
                                         {t('pages.login.submit')}
                                     </button>

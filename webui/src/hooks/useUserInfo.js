@@ -1,21 +1,21 @@
-import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 
 import useAuth from './useAuth';
 
-import useGamificationData from './useGamificationData';
+import { getXpStats } from './useGamificationData';
 
 const UserInfoContext = createContext();
 
 function UserInfoProvider({ children }) {
     const { apiRequest, isLoggedIn, logout } = useAuth();
-    const { getXpStats } = useGamificationData();
-
     const [userInfo, setUserInfo] = useState(null);
     const [loadingUserInfo, setLoadingUserInfo] = useState(false);
+    const loading = useRef(false);
 
     const loadUserInfo = useCallback(async () => {
-        if (!isLoggedIn || loadingUserInfo) return;
+        if (!isLoggedIn || loading.current) return;
 
+        loading.current = true;
         setLoadingUserInfo(true);
         try {
             const data = await apiRequest('/api/users/info');
@@ -34,11 +34,11 @@ function UserInfoProvider({ children }) {
             });
         } catch (err) {
             console.error('Failed to load user info.', err);
-            logout();
         } finally {
+            loading.current = false;
             setLoadingUserInfo(false);
         }
-    }, [isLoggedIn, loadingUserInfo, apiRequest, logout, getXpStats]);
+    }, [isLoggedIn, apiRequest]);
 
     const incrementStats = useCallback((coins = 0, experience = 0) => {
         setUserInfo(prev => {
@@ -56,7 +56,7 @@ function UserInfoProvider({ children }) {
                 level: xp.level,
             };
         });
-    }, [getXpStats]);
+    }, []);
 
     const setTeacherStatus = useCallback((isTeacher) => {
         setUserInfo(prev => {
@@ -69,25 +69,18 @@ function UserInfoProvider({ children }) {
         });
     }, []);
 
-    const logoutUser = useCallback(() => {
-        setUserInfo(null);
-        logout();
-    }, [logout]);
-
     useEffect(() => {
-        if (isLoggedIn && !userInfo) {
-            loadUserInfo();
-        }
-    }, [isLoggedIn, userInfo, loadUserInfo]);
+        loadUserInfo();
+    }, [loadUserInfo]);
 
     const value = useMemo(() => ({
         userInfo,
         loadingUserInfo,
         loadUserInfo,
         incrementStats,
-        logout: logoutUser,
+        logout,
         setTeacherStatus,
-    }), [userInfo, loadingUserInfo, loadUserInfo, incrementStats, logoutUser, setTeacherStatus]);
+    }), [userInfo, loadingUserInfo, loadUserInfo, incrementStats, logout, setTeacherStatus]);
 
     return (
         <UserInfoContext.Provider value={value}>{children}</UserInfoContext.Provider>

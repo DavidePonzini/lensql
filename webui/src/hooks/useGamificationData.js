@@ -1,5 +1,23 @@
 import { useTranslation } from 'react-i18next';
 
+function cumulativeXp(level) {
+    return Math.floor(100 * level * (level + 1) * (2 * level + 1) / 6);
+}
+
+export function getXpStats(totalXp) {
+    if (totalXp < 0) totalXp = 0;
+    let level = 0;
+    while (cumulativeXp(level + 1) <= totalXp) level++;
+
+    const xpForCurrent = cumulativeXp(level);
+    const xpForNext = cumulativeXp(level + 1);
+    return {
+        level,
+        current: totalXp - xpForCurrent,
+        next: xpForNext - xpForCurrent
+    };
+}
+
 function useGamificationData() {
     const { t } = useTranslation();
 
@@ -59,24 +77,6 @@ function useGamificationData() {
         return level >= 0 && level < levelTitles.length
             ? levelTitles[level]
             : `Level ${level}`;
-    }
-
-    function cumulativeXp(level) {
-        return Math.floor(100 * level * (level + 1) * (2 * level + 1) / 6);
-    }
-
-    function getXpStats(totalXp) {
-        if (totalXp < 0) totalXp = 0;
-        let level = 0;
-        while (cumulativeXp(level + 1) <= totalXp) level++;
-
-        const xpForCurrent = cumulativeXp(level);
-        const xpForNext = cumulativeXp(level + 1);
-        return {
-            level,
-            current: totalXp - xpForCurrent,
-            next: xpForNext - xpForCurrent
-        };
     }
 
     return {

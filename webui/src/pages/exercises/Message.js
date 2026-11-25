@@ -4,12 +4,13 @@ import { useTranslation } from 'react-i18next';
 import useAuth from '../../hooks/useAuth';
 
 import BubbleStatsChange from '../../components/notifications/BubbleStatsChange';
-import { setBadges } from '../../components/notifications/BadgeNotifier';
+import { useBadgeNotifications } from '../../components/notifications/BadgeNotifier';
 
 import './Message.css';
 
 function Message({ children, text, messageId = null }) {
     const { t } = useTranslation();
+    const setBadges = useBadgeNotifications();
     const { apiRequest } = useAuth();
 
     const [feedback, setFeedback] = useState(null);
