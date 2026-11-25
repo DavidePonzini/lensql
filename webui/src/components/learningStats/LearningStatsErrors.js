@@ -14,12 +14,13 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ObservedOnce from "../ObservedOnce";
 
-function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher = false }) {
+function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher = false, sampleData = null }) {
     const { t, i18n } = useTranslation();
     const locale = i18n.resolvedLanguage || 'en';
 
     const { apiRequest } = useAuth();
-    const [data, setData] = useState(null);
+    const [fetchedData, setData] = useState(null);
+    const data = sampleData ?? fetchedData;
     const [selectedQueryGoal, setSelectedQueryGoal] = useState('all');
 
     async function fetchData() {
@@ -214,15 +215,15 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
         );
     };
 
-    return (
-        <ObservedOnce onFirstVisible={fetchData}>
+    const charts = (
+        <>
             {!hasAnyErrors ? (
                 <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                     {t(`components.learningStats.errors.empty.${role}`)}
                 </p>
             ) : (
                 <>
-                    <div className="learning-stats-filter mb-3">
+                    {!sampleData && <div className="learning-stats-filter mb-3">
                         <label className="text-muted" htmlFor="error-query-goal-filter">
                             {t('components.learningStats.errors.query_goal.label')}
                         </label>
@@ -236,7 +237,7 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
                             <option value="focused">{t('components.learningStats.errors.query_goal.options.focused')}</option>
                             <option value="submitted">{t('components.learningStats.errors.query_goal.options.submitted')}</option>
                         </select>
-                    </div>
+                    </div>}
                     {!hasErrors ? (
                         <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                             {t(`components.learningStats.errors.empty.${role}`)}
@@ -245,7 +246,7 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
                         <>
                             <Row className="g-4 mb-4">
                                 {/* PIE */}
-                                <Col>
+                                <Col xs={12} lg={6}>
                                     <Card className="learning-stats-panel">
                                         <Card.Header>
                                             <Card.Title>{t('components.learningStats.errors.kind_title')}</Card.Title>
@@ -275,7 +276,7 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
                                 </Col>
 
                                 {/* TIMELINE */}
-                                <Col>
+                                <Col xs={12} lg={6}>
                                     <Card className="learning-stats-panel">
                                         <Card.Header>
                                             <Card.Title>{t(`components.learningStats.errors.timeline_title.${role}`)}</Card.Title>
@@ -388,8 +389,10 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
                     )}
                 </>
             )}
-        </ObservedOnce>
+        </>
     );
+
+    return sampleData ? charts : <ObservedOnce onFirstVisible={fetchData}>{charts}</ObservedOnce>;
 }
 
 export default LearningStatsErrors;

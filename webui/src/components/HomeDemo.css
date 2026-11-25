@@ -1,0 +1,12 @@
+.home-demo-feedback .messagebox .icon {
+    flex-shrink: 0;
+}
+
+.home-demo-feedback .messagebox .message {
+    max-width: none;
+    min-width: 0;
+}
+
+.home-demo-feedback li + li {
+    margin-top: 0.5rem;
+}
