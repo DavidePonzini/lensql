@@ -1,36 +1,27 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useAuth from "../../hooks/useAuth";
 
 import {
     PieChart, Pie, Cell,
     BarChart, Bar, XAxis, YAxis,
-    ResponsiveContainer, Tooltip, LabelList,
+    ResponsiveContainer, Tooltip, LabelList, Text,
     AreaChart, Area, CartesianGrid, Legend
 } from 'recharts';
 
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import ObservedOnce from "../ObservedOnce";
 import ErrorDetails from "../ErrorDetails";
 
-function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher = false, sampleData = null }) {
+function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = null }) {
     const { t, i18n } = useTranslation();
     const locale = i18n.resolvedLanguage || 'en';
 
-    const { apiRequest } = useAuth();
-    const [fetchedData, setData] = useState(null);
-    const data = sampleData ?? fetchedData;
+    const data = sampleData ?? statsData;
     const [selectedQueryGoal, setSelectedQueryGoal] = useState('all');
-
-    async function fetchData() {
-        const response = await apiRequest(
-            `/api/users/stats/errors?activity_id=${activityId || ''}&exercise_id=${exerciseId || ''}&is_teacher=${isTeacher ? '1' : '0'}`,
-            'GET'
-        );
-        setData(response.data);
-    }
+    const [selectedErrorId, setSelectedErrorId] = useState(null);
+    const [barChartWidth, setBarChartWidth] = useState(0);
+    const errorSelectId = useId();
 
     const role = isTeacher ? 'teacher' : 'student';
 
@@ -106,6 +97,8 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
 
     const hasAnyErrors = allErrors.length > 0;
     const hasErrors = dataErrors.length > 0;
+    const selectedError = perErrorData.find(error => error.id === selectedErrorId);
+    const axisWidth = Math.min(200, Math.round(barChartWidth * 0.48));
 
     // ----------------------------------------------------------------------
     // TIMELINE: GROUP + NORMALIZE + FORMAT DATE
@@ -162,22 +155,7 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
         );
     };
 
-    const barTooltip = ({ payload }) => {
-        if (!payload || !payload.length)
-            return null;
-
-        const { payload: row } = payload[0];
-
-        return (
-            <div style={{ maxWidth: 'min(600px, 90vw)' }}>
-                <ErrorDetails id={row.id} title={row.name} heading="h4">
-                    <span>{t('components.learningStats.errors.count_label', { count: row.count })}</span>
-                </ErrorDetails>
-            </div>
-        );
-    };
-
-    const charts = (
+    return (
         <>
             {!hasAnyErrors ? (
                 <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
@@ -318,14 +296,56 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
                                             </Card.Subtitle>
                                         </Card.Header>
                                         <Card.Body>
-                                            <ResponsiveContainer width="100%" height={40 * perErrorData.length}>
-                                                <BarChart layout="vertical" data={perErrorData} margin={{ left: 40, right: 60 }}>
+                                            <label htmlFor={errorSelectId} className="form-label">
+                                                {t('components.learningStats.errors.details_label')}
+                                            </label>
+                                            <select
+                                                id={errorSelectId}
+                                                className="form-select mb-3"
+                                                value={selectedError?.id ?? ''}
+                                                onChange={event => setSelectedErrorId(
+                                                    perErrorData.find(error => String(error.id) === event.target.value)?.id ?? null
+                                                )}
+                                            >
+                                                <option value="">{t('components.learningStats.errors.details_placeholder')}</option>
+                                                {perErrorData.map(error => (
+                                                    <option key={error.id} value={error.id}>{error.name}</option>
+                                                ))}
+                                            </select>
+                                            {selectedError && (
+                                                <div className="mb-3">
+                                                    <ErrorDetails id={selectedError.id} title={selectedError.name} heading="h4">
+                                                        <span>{t('components.learningStats.errors.count_label', { count: selectedError.count })}</span>
+                                                    </ErrorDetails>
+                                                </div>
+                                            )}
+                                            <ResponsiveContainer width="100%" height={40 * perErrorData.length} onResize={setBarChartWidth}>
+                                                <BarChart layout="vertical" data={perErrorData} margin={{ left: 0, right: 32 }}>
                                                     <XAxis type="number" hide />
-                                                    <YAxis type="category" dataKey="name" width={200} />
-                                                    <Tooltip content={barTooltip} wrapperStyle={{ zIndex: 1000 }} />
+                                                    <YAxis
+                                                        type="category"
+                                                        dataKey="id"
+                                                        width={axisWidth}
+                                                        tick={({ payload, x, y, textAnchor, verticalAnchor, fill }) => (
+                                                            <Text
+                                                                x={x}
+                                                                y={y}
+                                                                textAnchor={textAnchor}
+                                                                verticalAnchor={verticalAnchor}
+                                                                fill={fill}
+                                                                width={Math.max(0, axisWidth - 8)}
+                                                                maxLines={2}
+                                                                style={{ fontWeight: payload.value === selectedError?.id ? 700 : 400 }}
+                                                            >
+                                                                {perErrorData.find(error => error.id === payload.value)?.name}
+                                                            </Text>
+                                                        )}
+                                                    />
                                                     <Bar
                                                         dataKey="count"
+                                                        onClick={({ payload }) => setSelectedErrorId(payload.id)}
                                                         isAnimationActive={false}
+                                                        cursor="pointer"
                                                         shape={(props) => {
                                                             const barColor = CATEGORY_COLOR[props.payload.cat];
                                                             return (
@@ -335,6 +355,7 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
                                                                     width={props.width}
                                                                     height={props.height}
                                                                     fill={barColor}
+                                                                    fillOpacity={selectedError && props.payload.id !== selectedError.id ? 0.3 : 1}
                                                                 />
                                                             );
                                                         }}
@@ -353,8 +374,6 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
             )}
         </>
     );
-
-    return sampleData ? charts : <ObservedOnce onFirstVisible={fetchData}>{charts}</ObservedOnce>;
 }
 
 export default LearningStatsErrors;

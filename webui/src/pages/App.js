@@ -56,7 +56,7 @@ function App() {
                             {isLoggedIn ? (
                                 <>
                                     <Route path="profile" element={<Profile />} />
-                                    <Route path="learning" element={<Learning />} />
+                                    <Route path="learning/:tab?" element={<Learning />} />
 
                                     <Route path="activities">
                                         <Route index element={<ActivityList />} />

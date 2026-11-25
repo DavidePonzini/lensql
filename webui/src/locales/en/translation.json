@@ -79,6 +79,13 @@
         },
         "learningStats": {
             "learning": {
+                "loading": "Loading",
+                "loadError": "Learning stats could not be loaded.",
+                "tabs": {
+                    "execution": "Execution",
+                    "errors": "Errors",
+                    "assistance": "Assistance"
+                },
                 "queries_teacher": "Let's look at your students' queries",
                 "queries_student": "Let's look at your queries",
                 "messages": "Turning Questions Into Progress",
@@ -124,6 +131,8 @@
                     }
                 },
                 "count_label": "{{count}} errors",
+                "details_label": "Error details",
+                "details_placeholder": "Select an error or click a bar",
                 "example_label": "Example",
                 "correction_label": "Correction",
                 "explanation_label": "Explanation"

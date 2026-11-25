@@ -1,26 +1,14 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import useAuth from "../../hooks/useAuth";
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, PieChart, Pie, Cell } from 'recharts';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-import ObservedOnce from "../ObservedOnce";
 
-function LearningStatsQueries({ activityId = null, exerciseId = null, isTeacher = false }) {
-    const { apiRequest } = useAuth();
+function LearningStatsQueries({ data, isTeacher = false }) {
     const { t } = useTranslation();
-    const [data, setData] = useState(null);
-
-    async function fetchData() {
-        const response = await apiRequest(
-            `/api/users/stats/queries?activity_id=${activityId || ''}&exercise_id=${exerciseId || ''}&is_teacher=${isTeacher ? '1' : '0'}`,
-            'GET');
-        setData(response.data);
-    }
 
     const queriesTotal = +(data?.queries) || 0;
     const queriesUnique = +(data?.queries_d) || 0;
@@ -55,7 +43,7 @@ function LearningStatsQueries({ activityId = null, exerciseId = null, isTeacher 
     const role = isTeacher ? 'teacher' : 'student';
 
     return (
-        <ObservedOnce onFirstVisible={fetchData}>
+        <>
             {queriesTotal === 0 ? (
                 <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                     {t(`components.learningStats.queries.empty.${role}`)}
@@ -205,7 +193,7 @@ function LearningStatsQueries({ activityId = null, exerciseId = null, isTeacher 
                     </Row>
                 </>
             )}
-        </ObservedOnce>
+        </>
     );
 }
 

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import useUserInfo from "../../hooks/useUserInfo";
 
@@ -7,6 +8,12 @@ import LearningStatsAll from "../../components/learningStats/LearningStatsAll";
 function Learning() {
     const { userInfo } = useUserInfo();
     const { t } = useTranslation();
+    const { tab } = useParams();
+    const navigate = useNavigate();
+
+    if (!['execution', 'errors', 'assistance'].includes(tab)) {
+        return <Navigate to="/learning/execution" replace />;
+    }
 
     return (
         <div className="container-md">
@@ -16,7 +23,7 @@ function Learning() {
             <p className="lead">{t('pages.profile.learning.subtitle')}</p>
 
             <hr />
-            <LearningStatsAll />
+            <LearningStatsAll requestedTab={tab} onTabChange={id => navigate(`/learning/${id}`)} />
         </div>
     );
 }

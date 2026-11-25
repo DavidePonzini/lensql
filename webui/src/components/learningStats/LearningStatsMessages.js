@@ -1,26 +1,14 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import useAuth from "../../hooks/useAuth";
 
 import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-import ObservedOnce from "../ObservedOnce";
 
-function LearningStatsMessages({ activityId = null, exerciseId = null, isTeacher = false }) {
+function LearningStatsMessages({ data, isTeacher = false }) {
     const { t } = useTranslation();
-    const { apiRequest } = useAuth();
-    const [data, setData] = useState(null);
-
-    async function fetchData() {
-        const response = await apiRequest(
-            `/api/users/stats/messages?activity_id=${activityId || ''}&exercise_id=${exerciseId || ''}&is_teacher=${isTeacher ? '1' : '0'}`,
-            'GET');
-        setData(response.data);
-    }
 
     const messagesTotal = data?.messages || 0;
     const messagesSelect = data?.messages_select || 0;
@@ -45,7 +33,7 @@ function LearningStatsMessages({ activityId = null, exerciseId = null, isTeacher
     const role = isTeacher ? 'teacher' : 'student';
 
     return (
-        <ObservedOnce onFirstVisible={fetchData}>
+        <>
             {messagesTotal === 0 ? (
                 <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                     {t(`components.learningStats.messages.empty.${role}`)}
@@ -158,7 +146,7 @@ function LearningStatsMessages({ activityId = null, exerciseId = null, isTeacher
                     </Col>
                 </Row>
             )}
-        </ObservedOnce>
+        </>
     );
 }
 

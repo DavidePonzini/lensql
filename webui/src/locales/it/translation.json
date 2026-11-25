@@ -79,6 +79,13 @@
         },
         "learningStats": {
             "learning": {
+                "loading": "Caricamento",
+                "loadError": "Impossibile caricare le statistiche di apprendimento.",
+                "tabs": {
+                    "execution": "Esecuzione",
+                    "errors": "Errori",
+                    "assistance": "Assistenza"
+                },
                 "queries_teacher": "Esploriamo le query dei tuoi studenti",
                 "queries_student": "Esploriamo le tue query",
                 "messages": "Trasformare le domande in progresso",
@@ -124,6 +131,8 @@
                     }
                 },
                 "count_label": "{{count}} errori",
+                "details_label": "Dettagli dell’errore",
+                "details_placeholder": "Seleziona un errore o fai clic su una barra",
                 "example_label": "Esempio",
                 "correction_label": "Correzione",
                 "explanation_label": "Spiegazione"
