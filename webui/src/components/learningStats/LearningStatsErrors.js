@@ -72,7 +72,7 @@ function LearningStatsErrors({ activityId = null, exerciseId = null, isTeacher =
     // PIE DATA
     // ----------------------------------------------------------------------
     const categoryCounts = { SYN: 0, SEM: 0, LOG: 0, COM: 0 };
-    for (const { error_id, count, category } of dataErrors) {
+    for (const { count, category } of dataErrors) {
         categoryCounts[category] += count;
     }
 

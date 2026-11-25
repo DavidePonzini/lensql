@@ -22,11 +22,6 @@ function ActivityMask({
     const { userInfo } = useUserInfo();
     const isTeacher = userInfo?.isTeacher || false;
 
-    if (dbms == '') {
-        setDbms('postgres');
-    }
-
-
     return (
         <>
             <div className="mb-3">

@@ -23,7 +23,7 @@ function ActivityUpdate({ activityId, refresh, className }) {
     const [description, setDescription] = useState('');
     const [activity, setActivity] = useState('');
     const [searchPath, setSearchPath] = useState('');
-    const [dbms, setDbms] = useState('');
+    const [dbms, setDbms] = useState('postgres');
     const [activityStartTs, setActivityStartTs] = useState('');
     const [activityEndTs, setActivityEndTs] = useState('');
 
@@ -50,7 +50,7 @@ function ActivityUpdate({ activityId, refresh, className }) {
         setDescription(result.data.description);
         setActivity(result.data.activity_str);
         setSearchPath(result.data.search_path);
-        setDbms(result.data.dbms);
+        setDbms(result.data.dbms || 'postgres');
         setActivityStartTs(toLocalDateTimeInput(result.data.activity_start_ts));
         setActivityEndTs(toLocalDateTimeInput(result.data.activity_end_ts));
     }, [activityId, apiRequest]);

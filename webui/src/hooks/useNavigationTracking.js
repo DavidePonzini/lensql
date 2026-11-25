@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import useAuth from './useAuth';
 
@@ -9,7 +9,7 @@ function useNavigationTracking() {
     const lastPathRef = useRef(null);
     const visibleRef = useRef(document.visibilityState === 'visible');
 
-    function sendEvent(url, event) {
+    const sendEvent = useCallback((url, event) => {
         if (!isLoggedIn)
             return;
 
@@ -21,13 +21,12 @@ function useNavigationTracking() {
         );
 
         // Best effort even during page close/hide
-        if (navigator.sendBeacon) {
-            navigator.sendBeacon('/api/navigation/log', new Blob([body], { type: 'application/json' }));
+        if (navigator.sendBeacon?.('/api/navigation/log', new Blob([body], { type: 'application/json' }))) {
             return;
         }
 
-        apiRequest('/api/navigation/log', 'POST', { url, event });
-    }
+        apiRequest('/api/navigation/log', 'POST', { url, event }).catch(() => {});
+    }, [apiRequest, isLoggedIn]);
 
     // Route change tracking
     useEffect(() => {
@@ -38,7 +37,7 @@ function useNavigationTracking() {
 
             sendEvent(url, 'VISIT');
         }
-    }, [location]);
+    }, [location, isLoggedIn, sendEvent]);
 
     // Focus / unfocus / close tracking
     useEffect(() => {
@@ -69,7 +68,7 @@ function useNavigationTracking() {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('pagehide', handlePageHide);
         };
-    }, []);
+    }, [sendEvent]);
 
 }
 

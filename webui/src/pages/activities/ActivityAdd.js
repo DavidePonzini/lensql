@@ -13,7 +13,7 @@ function ActivityAdd({ refresh, className }) {
     const [description, setDescription] = useState('');
     const [activity, setActivity] = useState('');
     const [searchPath, setSearchPath] = useState('');
-    const [dbms, setDbms] = useState('');
+    const [dbms, setDbms] = useState('postgres');
     const [activityStartTs, setActivityStartTs] = useState('');
     const [activityEndTs, setActivityEndTs] = useState('');
 
