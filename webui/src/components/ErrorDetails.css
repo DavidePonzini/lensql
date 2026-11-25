@@ -28,7 +28,10 @@
     border-left: 3px solid #28a745;
 }
 
-.error-taxonomy-list {
-    max-height: min(55vh, 34rem);
-    overflow-y: auto;
+.modal.error-details-dialog {
+    z-index: 1075;
+}
+
+.modal-backdrop.error-details-backdrop {
+    z-index: 1070;
 }

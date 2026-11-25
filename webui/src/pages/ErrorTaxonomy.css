@@ -1,0 +1,21 @@
+.error-taxonomy-id {
+    width: 2em;
+    font-variant-numeric: tabular-nums;
+}
+
+.error-taxonomy-entries > .active > a {
+    color: inherit;
+    background-color: inherit;
+}
+
+@media (min-width: 992px) {
+    .list-group.error-taxonomy-entries {
+        display: block;
+        column-count: 2;
+        column-gap: 1rem;
+    }
+
+    .error-taxonomy-entries > .list-group-item {
+        break-inside: avoid;
+    }
+}

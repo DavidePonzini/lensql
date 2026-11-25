@@ -11,7 +11,7 @@ import {
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import ErrorDetails from "../ErrorDetails";
+import ErrorDetailsDialog from "../ErrorDetailsDialog";
 
 function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = null }) {
     const { t, i18n } = useTranslation();
@@ -312,13 +312,6 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                                     <option key={error.id} value={error.id}>{error.name}</option>
                                                 ))}
                                             </select>
-                                            {selectedError && (
-                                                <div className="mb-3">
-                                                    <ErrorDetails id={selectedError.id} title={selectedError.name} heading="h4">
-                                                        <span>{t('components.learningStats.errors.count_label', { count: selectedError.count })}</span>
-                                                    </ErrorDetails>
-                                                </div>
-                                            )}
                                             <ResponsiveContainer width="100%" height={40 * perErrorData.length} onResize={setBarChartWidth}>
                                                 <BarChart layout="vertical" data={perErrorData} margin={{ left: 0, right: 32 }}>
                                                     <XAxis type="number" hide />
@@ -343,7 +336,9 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                                     />
                                                     <Bar
                                                         dataKey="count"
-                                                        onClick={({ payload }) => setSelectedErrorId(payload.id)}
+                                                        onClick={({ payload }) => setSelectedErrorId(
+                                                            current => current === payload.id ? null : payload.id
+                                                        )}
                                                         isAnimationActive={false}
                                                         cursor="pointer"
                                                         shape={(props) => {
@@ -372,6 +367,15 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                     )}
                 </>
             )}
+            <ErrorDetailsDialog
+                id={selectedError?.id}
+                title={selectedError?.name}
+                onHide={() => setSelectedErrorId(null)}
+            >
+                {selectedError && (
+                    <span>{t('components.learningStats.errors.count_label', { count: selectedError.count })}</span>
+                )}
+            </ErrorDetailsDialog>
         </>
     );
 }
