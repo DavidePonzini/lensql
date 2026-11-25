@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import NavDropdown from 'react-bootstrap/NavDropdown';
 
 import useAuth from '../../hooks/useAuth';
 import useUserInfo from '../../hooks/useUserInfo';
@@ -17,6 +18,7 @@ function Navbar() {
     const { isLoggedIn } = useAuth();
     const { userInfo, loadingUserInfo, logout } = useUserInfo();
     const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const [isHelpOpen, setHelpOpen] = useState(false);
     const [logoutError, setLogoutError] = useState(false);
 
     async function handleLogout() {
@@ -131,17 +133,22 @@ function Navbar() {
                             </>
                         )}
 
-                        <li className="nav-item">
-                            <NavLink className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')} to="/howto" end>
-                                <i className="fa-solid fa-book"></i> {t('components.navbar.nav.howto')}
-                            </NavLink>
-                        </li>
-
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to="/error-taxonomy">
-                                {t('pages.errorTaxonomy.title')}
-                            </NavLink>
-                        </li>
+                        <NavDropdown
+                            as="li"
+                            id="navbar-help"
+                            title={t('components.navbar.nav.help')}
+                            show={isHelpOpen}
+                            onToggle={setHelpOpen}
+                            onMouseEnter={() => setHelpOpen(true)}
+                            onMouseLeave={() => setHelpOpen(false)}
+                        >
+                            <NavDropdown.Item as={NavLink} to="/howto" end>
+                                <i className="fa-brands fa-readme" aria-hidden="true" /> {t('components.navbar.nav.howto')}
+                            </NavDropdown.Item>
+                            <NavDropdown.Item as={NavLink} to="/error-taxonomy">
+                                <i className="fa-solid fa-book" aria-hidden="true" /> {t('pages.errorTaxonomy.title')}
+                            </NavDropdown.Item>
+                        </NavDropdown>
 
                         {userInfo?.isAdmin && (
                             <li className="nav-item">
