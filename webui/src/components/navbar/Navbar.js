@@ -140,11 +140,11 @@ function Navbar() {
                             icon="fa-solid fa-circle-question"
                             title={t('components.navbar.nav.help')}
                         >
-                            <NavDropdown.Item as={NavLink} to="/howto" end>
-                                <i className="fa-brands fa-readme" aria-hidden="true" /> {t('components.navbar.nav.howto')}
-                            </NavDropdown.Item>
                             <NavDropdown.Item as={NavLink} to="/error-taxonomy">
                                 <i className="fa-solid fa-book" aria-hidden="true" /> {t('pages.errorTaxonomy.title')}
+                            </NavDropdown.Item>
+                            <NavDropdown.Item as={NavLink} to="/howto" end>
+                                <i className="fa-brands fa-readme" aria-hidden="true" /> {t('components.navbar.nav.howto')}
                             </NavDropdown.Item>
                         </NavbarDropdown>
 
