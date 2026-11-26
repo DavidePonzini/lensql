@@ -1,14 +1,27 @@
 import { useTranslation } from "react-i18next";
 
 
-import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+    Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
+    LineChart, Line, CartesianGrid, XAxis, YAxis, Legend,
+} from 'recharts';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 
 function LearningStatsMessages({ data, isTeacher = false }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = i18n.resolvedLanguage || 'en';
+    const dateFormatter = new Intl.DateTimeFormat(locale, {
+        month: 'short',
+        day: 'numeric',
+        timeZone: 'UTC',
+    });
+    const formatDay = date => dateFormatter.format(new Date(date));
+    const timeline = data?.timeline ?? [];
+    const resultsLabel = t('components.learningStats.messages.understanding_results');
+    const errorsLabel = t('components.learningStats.messages.understanding_errors');
 
     const messagesTotal = data?.messages || 0;
     const messagesSelect = data?.messages_select || 0;
@@ -18,8 +31,8 @@ function LearningStatsMessages({ data, isTeacher = false }) {
     const messagesErrorRate = messagesTotal > 0 ? messagesError / messagesTotal : 0;
 
     const messagesBreakdownData = [
-        { name: t('components.learningStats.messages.understanding_results'), value: messagesSuccess },
-        { name: t('components.learningStats.messages.understanding_errors'), value: messagesError },
+        { name: resultsLabel, value: messagesSuccess },
+        { name: errorsLabel, value: messagesError },
     ];
 
     const messagesFeedback = data?.messages_feedback || 0;
@@ -93,11 +106,11 @@ function LearningStatsMessages({ data, isTeacher = false }) {
                                             </ResponsiveContainer>
                                             <div className="text-center text-muted" style={{ fontSize: '0.9rem' }}>
                                                 <span style={{ color: '#0d6efd', fontWeight: 'bold' }}>
-                                                    {t('components.learningStats.messages.understanding_results')}
+                                                    {resultsLabel}
                                                 </span>: {(messagesSuccessRate * 100).toFixed(0)}%
                                                 <br />
                                                 <span style={{ color: '#ffc107', fontWeight: 'bold' }}>
-                                                    {t('components.learningStats.messages.understanding_errors')}
+                                                    {errorsLabel}
                                                 </span>: {(messagesErrorRate * 100).toFixed(0)}%
                                             </div>
                                         </div>
@@ -144,6 +157,32 @@ function LearningStatsMessages({ data, isTeacher = false }) {
                             </Card.Body>
                         </Card>
                     </Col>
+
+                    {timeline.length > 0 && (
+                        <Col xs={12}>
+                            <Card className="learning-stats-panel">
+                                <Card.Header>
+                                    <Card.Title>{t('components.learningStats.messages.timeline_title')}</Card.Title>
+                                    <Card.Subtitle className="text-muted">
+                                        {t(`components.learningStats.messages.timeline_subtitle.${role}`)}
+                                    </Card.Subtitle>
+                                </Card.Header>
+                                <Card.Body>
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <LineChart data={timeline}>
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis dataKey="date" tickFormatter={formatDay} />
+                                            <YAxis allowDecimals={false} />
+                                            <Tooltip labelFormatter={formatDay} wrapperStyle={{ zIndex: 1000 }} />
+                                            <Legend />
+                                            <Line type="linear" dataKey="understanding_errors" name={errorsLabel} strokeWidth={2} dot={{ r: 2 }} stroke="#ffc107" />
+                                            <Line type="linear" dataKey="understanding_results" name={resultsLabel} strokeWidth={2} dot={{ r: 2 }} stroke="#0d6efd" />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    )}
                 </Row>
             )}
         </>

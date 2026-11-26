@@ -16,13 +16,13 @@ function LearningStatsAll({ activityId = null, exerciseId = null, isTeacher = fa
     const { apiRequest } = useAuth();
     const tabsId = useId();
     const started = useRef(new Set());
-    const initialTab = requestedTab ?? 'execution';
+    const initialTab = requestedTab ?? 'errors';
     const [view, setView] = useState({ active: initialTab, requested: initialTab, results: {} });
     const key = 'components.learningStats.learning';
     const sections = [
-        { id: 'execution', style: 'queries', heading: isTeacher ? 'queries_teacher' : 'queries_student', Stats: LearningStatsQueries },
         { id: 'errors', style: 'errors', heading: 'errors', Stats: LearningStatsErrors },
         { id: 'assistance', style: 'messages', heading: 'messages', Stats: LearningStatsMessages },
+        { id: 'execution', style: 'queries', heading: isTeacher ? 'queries_teacher' : 'queries_student', Stats: LearningStatsQueries },
     ];
 
     const loadTab = useCallback(async id => {

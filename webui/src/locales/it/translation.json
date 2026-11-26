@@ -93,8 +93,8 @@
             },
             "errors": {
                 "empty": {
-                    "student": "Non hai ancora commesso errori. Quando lo farai, ti mostreremo i tipi di errori e come sono cambiati nel tempo.",
-                    "teacher": "I tuoi studenti non hanno ancora commesso errori. Quando lo faranno, ti mostreremo i tipi di errori e come sono cambiati nel tempo."
+                    "student": "Non hai ancora commesso errori.",
+                    "teacher": "I tuoi studenti non hanno ancora commesso errori."
                 },
                 "kind_title": "Che tipo di problemi sono emersi?",
                 "kind_subtitle": {
@@ -115,12 +115,12 @@
                     "teacher": "In fase di sviluppo! Questa sezione mostrerà i pattern di errore più frequenti nelle query dei tuoi studenti."
                 },
                 "timeline_title": {
-                    "student": "Come sono cambiati i tuoi errori nel tempo",
-                    "teacher": "Come sono cambiati gli errori dei tuoi studenti nel tempo"
+                    "student": "I tuoi errori per query",
+                    "teacher": "Gli errori per query dei tuoi studenti"
                 },
                 "timeline_subtitle": {
-                    "student": "Guarda se stai commettendo meno errori man mano che progredisci.",
-                    "teacher": "Guarda se i tuoi studenti stanno commettendo meno errori man mano che progrediscono."
+                    "student": "Scopri quali tipi di errori diventano meno frequenti man mano che ti eserciti.",
+                    "teacher": "Scopri quali tipi di errori diventano meno frequenti man mano che i tuoi studenti si esercitano."
                 },
                 "query_goal": {
                     "label": "Mostra",
@@ -131,6 +131,7 @@
                     }
                 },
                 "count_label": "{{count}} errori",
+                "details_label": "Dettagli dell’errore",
                 "details_hint": "Fai clic su un errore per maggiori informazioni",
                 "example_label": "Esempio",
                 "correction_label": "Correzione",
@@ -163,6 +164,11 @@
                 },
                 "understanding_results": "Comprendere risultati",
                 "understanding_errors": "Comprendere errori",
+                "timeline_title": "Richieste di aiuto nel tempo",
+                "timeline_subtitle": {
+                    "student": "Scopri quando hai chiesto aiuto per capire gli errori o i risultati delle tue query.",
+                    "teacher": "Scopri quando i tuoi studenti hanno chiesto aiuto per capire gli errori o i risultati delle loro query."
+                },
                 "title_feedback": {
                     "student": "Hai valutato le risposte",
                     "teacher": "I tuoi studenti hanno valutato le risposte"

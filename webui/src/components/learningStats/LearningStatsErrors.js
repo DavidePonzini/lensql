@@ -5,7 +5,7 @@ import {
     PieChart, Pie, Cell,
     BarChart, Bar, XAxis, YAxis,
     ResponsiveContainer, Tooltip, LabelList, Text,
-    AreaChart, Area, CartesianGrid, Legend
+    LineChart, Line, CartesianGrid, Legend
 } from 'recharts';
 
 import Card from 'react-bootstrap/Card';
@@ -94,47 +94,39 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
             cat: category,
         }));
 
-    const hasAnyErrors = allErrors.length > 0;
+    const hasAnyStats = allErrors.length > 0 || (data?.timeline?.length ?? 0) > 0;
     const hasErrors = dataErrors.length > 0;
     const selectedError = perErrorData.find(error => error.id === selectedErrorId);
     const axisWidth = Math.min(200, Math.round(barChartWidth * 0.48));
     const toggleErrorDetails = id => setSelectedErrorId(current => current === id ? null : id);
 
     // ----------------------------------------------------------------------
-    // TIMELINE: GROUP + NORMALIZE + FORMAT DATE
+    // TIMELINE: ERRORS PER QUERY BY DAY
     // ----------------------------------------------------------------------
-    const timelineMap = {};
+    const timelineMap = new Map();
+    const categories = Object.keys(CATEGORY_COLOR);
 
-    for (const row of dataTimeline) {
-        const cat = row.category;
-        const dateKey = new Date(row.date).toISOString().split('T')[0];
-
-        if (!timelineMap[dateKey]) {
-            timelineMap[dateKey] = { date: dateKey, SYN: 0, SEM: 0, LOG: 0, COM: 0 };
+    for (const { date, query_count, errors } of dataTimeline) {
+        if (!timelineMap.has(date)) {
+            timelineMap.set(date, { date, queryCount: 0, SYN: 0, SEM: 0, LOG: 0, COM: 0 });
         }
-        timelineMap[dateKey][cat] += row.count;
+        const day = timelineMap.get(date);
+        day.queryCount += query_count;
+        for (const category of categories) {
+            day[category] += errors[category] ?? 0;
+        }
     }
 
-    // convert to array + percentages
-    const timelineData = Object.values(timelineMap)
-        .map(row => {
-            const total = row.SYN + row.SEM + row.LOG + row.COM;
-            if (total === 0)
-                return row;
-
-            return {
-                ...row,
-                SYN: (row.SYN / total) * 100,
-                SEM: (row.SEM / total) * 100,
-                LOG: (row.LOG / total) * 100,
-                COM: (row.COM / total) * 100,
-                dateFormatted: new Date(row.date).toLocaleDateString(locale, {
-                    month: 'short',
-                    day: 'numeric'
-                })
-            };
-        })
-        .sort((a, b) => a.date.localeCompare(b.date));
+    const timelineData = Array.from(timelineMap.values())
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .map(({ date, queryCount, ...errors }) => ({
+            dateFormatted: new Date(date).toLocaleDateString(locale, {
+                month: 'short',
+                day: 'numeric',
+                timeZone: 'UTC',
+            }),
+            ...Object.fromEntries(categories.map(category => [category, errors[category] / queryCount])),
+        }));
 
     // ----------------------------------------------------------------------
     // TOOLTIP FUNCTIONS
@@ -157,7 +149,7 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
 
     return (
         <>
-            {!hasAnyErrors ? (
+            {!hasAnyStats ? (
                 <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                     {t(`components.learningStats.errors.empty.${role}`)}
                 </p>
@@ -178,15 +170,16 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                             <option value="submitted">{t('components.learningStats.errors.query_goal.options.submitted')}</option>
                         </select>
                     </div>}
-                    {!hasErrors ? (
+                    {!hasErrors && (
                         <p className="text-muted learning-stats-empty" style={{ fontSize: '1.1rem' }}>
                             {t(`components.learningStats.errors.empty.${role}`)}
                         </p>
-                    ) : (
+                    )}
+                    {(hasErrors || timelineData.length > 0) && (
                         <>
                             <Row className="g-4 mb-4">
                                 {/* PIE */}
-                                <Col xs={12} lg={6}>
+                                {hasErrors && <Col xs={12} lg={timelineData.length > 0 ? 6 : 12}>
                                     <Card className="learning-stats-panel">
                                         <Card.Header>
                                             <Card.Title>{t('components.learningStats.errors.kind_title')}</Card.Title>
@@ -213,10 +206,10 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                             </ResponsiveContainer>
                                         </Card.Body>
                                     </Card>
-                                </Col>
+                                </Col>}
 
                                 {/* TIMELINE */}
-                                <Col xs={12} lg={6}>
+                                {timelineData.length > 0 && <Col xs={12} lg={hasErrors ? 6 : 12}>
                                     <Card className="learning-stats-panel">
                                         <Card.Header>
                                             <Card.Title>{t(`components.learningStats.errors.timeline_title.${role}`)}</Card.Title>
@@ -226,19 +219,19 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                         </Card.Header>
                                         <Card.Body>
                                             <ResponsiveContainer width="100%" height={300}>
-                                                <AreaChart data={timelineData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                                                <LineChart data={timelineData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
                                                     <CartesianGrid strokeDasharray="3 3" />
 
                                                     <XAxis dataKey="dateFormatted" />
-                                                    <YAxis domain={[0, 100]} tickFormatter={(v) => `${v.toFixed(0)}%`} />
+                                                    <YAxis domain={[0, dataMax => dataMax || 1]} tickFormatter={v => v.toLocaleString(locale)} />
 
                                                     <Tooltip
                                                         formatter={(value, name) => {
                                                             const label = t(`errors.categories.${name.toLowerCase()}.name`);
-                                                            return [`${value.toFixed(1)}%`, label];
+                                                            return [value.toLocaleString(locale, { maximumFractionDigits: 3 }), label];
                                                         }}
                                                         itemSorter={(entry) => {
-                                                            const ORDER = { com: 1, log: 2, sem: 3, SYN: 4 };
+                                                            const ORDER = { COM: 1, LOG: 2, SEM: 3, SYN: 4 };
                                                             return ORDER[entry.dataKey];
                                                         }}
                                                         wrapperStyle={{ zIndex: 1000 }}
@@ -246,46 +239,42 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
 
                                                     <Legend formatter={(v) => t(`errors.categories.${v.toLowerCase()}.name`)} />
 
-                                                    <Area
+                                                    <Line
                                                         type="linear"
                                                         dataKey="SYN"
-                                                        stackId="1"
+                                                        dot={{ r: 2 }}
                                                         stroke={CATEGORY_COLOR.SYN}
-                                                        fill={CATEGORY_COLOR.SYN}
-                                                        fillOpacity={0.35}
+                                                        strokeWidth={2}
                                                     />
-                                                    <Area
+                                                    <Line
                                                         type="linear"
                                                         dataKey="SEM"
-                                                        stackId="1"
+                                                        dot={{ r: 2 }}
                                                         stroke={CATEGORY_COLOR.SEM}
-                                                        fill={CATEGORY_COLOR.SEM}
-                                                        fillOpacity={0.35}
+                                                        strokeWidth={2}
                                                     />
-                                                    <Area
+                                                    <Line
                                                         type="linear"
                                                         dataKey="LOG"
-                                                        stackId="1"
+                                                        dot={{ r: 2 }}
                                                         stroke={CATEGORY_COLOR.LOG}
-                                                        fill={CATEGORY_COLOR.LOG}
-                                                        fillOpacity={0.35}
+                                                        strokeWidth={2}
                                                     />
-                                                    <Area
+                                                    <Line
                                                         type="linear"
                                                         dataKey="COM"
-                                                        stackId="1"
+                                                        dot={{ r: 2 }}
                                                         stroke={CATEGORY_COLOR.COM}
-                                                        fill={CATEGORY_COLOR.COM}
-                                                        fillOpacity={0.35}
+                                                        strokeWidth={2}
                                                     />
-                                                </AreaChart>
+                                                </LineChart>
                                             </ResponsiveContainer>
                                         </Card.Body>
                                     </Card>
-                                </Col>
+                                </Col>}
                             </Row>
 
-                            <Row className="mb-4">
+                            {hasErrors && <Row className="mb-4">
                                 {/* BAR */}
                                 <Col>
                                     <Card className="learning-stats-panel">
@@ -362,7 +351,7 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                         </Card.Body>
                                     </Card>
                                 </Col>
-                            </Row>
+                            </Row>}
                         </>
                     )}
                 </>

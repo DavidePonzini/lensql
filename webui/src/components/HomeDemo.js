@@ -26,12 +26,9 @@ const sampleStats = {
         { error_id: 72, category: 'LOG', count: 5, query_goal: 'FOCUSED' },
     ],
     timeline: [
-        { date: '2026-03-10', category: 'SEM', count: 4, query_goal: 'FOCUSED' },
-        { date: '2026-03-10', category: 'COM', count: 2, query_goal: 'FOCUSED' },
-        { date: '2026-03-10', category: 'LOG', count: 2, query_goal: 'FOCUSED' },
-        { date: '2026-03-12', category: 'SEM', count: 2, query_goal: 'FOCUSED' },
-        { date: '2026-03-12', category: 'COM', count: 1, query_goal: 'FOCUSED' },
-        { date: '2026-03-12', category: 'LOG', count: 3, query_goal: 'FOCUSED' },
+        { date: '2026-03-10', query_goal: 'FOCUSED', query_count: 5, errors: { SEM: 3, COM: 1, LOG: 2 } },
+        { date: '2026-03-11', query_goal: 'FOCUSED', query_count: 5, errors: { SEM: 2, COM: 1, LOG: 2 } },
+        { date: '2026-03-12', query_goal: 'FOCUSED', query_count: 8, errors: { SEM: 1, COM: 1, LOG: 1 } },
     ],
 };
 

@@ -911,130 +911,74 @@ class User:
         }
 
     def get_message_stats(self, *, activity_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
-        '''Get statistics about chat interactions for a user'''
-
-        # Prevent students from accessing teacher stats, even if the teacher flag is set
-        if not self.is_teacher:
-            is_teacher = False
+        """Get help request totals and a daily breakdown."""
 
         if activity_id is None and exercise_id is not None:
-            return {}  # fallback case
+            return {}
 
-        if activity_id is None:
-            # Global stats
-            query = database.sql.SQL(
-            '''
-                SELECT
-                    messages,
-                    messages_select,
-                    messages_success,
-                    messages_feedback
-                FROM
-                    {schema}.v_stats_messages_by_user
-                WHERE
-                    username = {username}
-            ''').format(
-                schema=database.sql.Identifier(SCHEMA),
-                username=database.sql.Placeholder('username')
-            )
-            params = {'username': self.username}
+        joins = database.sql.SQL('')
+        filters = []
+        params = {}
+        if activity_id is not None:
+            joins = database.sql.SQL(
+                """
+                JOIN {schema}.exercises e ON e.id = qb.exercise_id
+                JOIN {schema}.activity_members am
+                    ON am.activity_id = e.activity_id AND am.username = qb.username
+                """
+            ).format(schema=database.sql.Identifier(SCHEMA))
+            filters.append(database.sql.SQL('e.activity_id = %(activity_id)s'))
+            params['activity_id'] = activity_id
+            if exercise_id is not None:
+                filters.append(database.sql.SQL('qb.exercise_id = %(exercise_id)s'))
+                params['exercise_id'] = exercise_id
 
-        elif exercise_id is None:
-            if is_teacher:
-                query = database.sql.SQL(
-                '''
-                    SELECT
-                        SUM(messages),
-                        SUM(messages_select),
-                        SUM(messages_success),
-                        SUM(messages_feedback)
-                    FROM
-                    {schema}.v_stats_messages_by_exercise
-                    WHERE
-                        activity_id = {activity_id}
-                        AND is_owner = FALSE
-                ''').format(
-                    schema=database.sql.Identifier(SCHEMA),
-                    activity_id=database.sql.Placeholder('activity_id')
-                )
-                params = {'activity_id': activity_id}
-            else:
-                query = database.sql.SQL(
-                '''
-                    SELECT
-                        SUM(messages),
-                        SUM(messages_select),
-                        SUM(messages_success),
-                        SUM(messages_feedback)
-                    FROM
-                        {schema}.v_stats_messages_by_exercise
-                    WHERE
-                        activity_id = {activity_id}
-                        AND username = {username}
-                ''').format(
-                    schema=database.sql.Identifier(SCHEMA),
-                    activity_id=database.sql.Placeholder('activity_id'),
-                    username=database.sql.Placeholder('username')
-                )
-                params = {'activity_id': activity_id, 'username': self.username}
-
+        if activity_id is not None and is_teacher and self.is_teacher:
+            filters.append(database.sql.SQL('am.is_owner = FALSE'))
         else:
-            if is_teacher:
-                query = database.sql.SQL(
-                '''
-                    SELECT
-                        SUM(messages),
-                        SUM(messages_select),
-                        SUM(messages_success),
-                        SUM(messages_feedback)
-                    FROM
-                        {schema}.v_stats_messages_by_exercise
-                    WHERE
-                        exercise_id = {exercise_id}
-                        AND is_owner = FALSE
-                ''').format(
-                    schema=database.sql.Identifier(SCHEMA),
-                    exercise_id=database.sql.Placeholder('exercise_id')
-                )
-                params = {'exercise_id': exercise_id}
-            else:
-                query = database.sql.SQL(
-                '''
-                    SELECT
-                        messages,
-                        messages_select,
-                        messages_success,
-                        messages_feedback
-                    FROM
-                        {schema}.v_stats_messages_by_exercise
-                    WHERE
-                        exercise_id = {exercise_id}
-                        AND username = {username}
-                ''').format(
-                    schema=database.sql.Identifier(SCHEMA),
-                    exercise_id=database.sql.Placeholder('exercise_id'),
-                    username=database.sql.Placeholder('username')
-                )
-                params = {'exercise_id': exercise_id, 'username': self.username}
+            filters.append(database.sql.SQL('qb.username = %(username)s'))
+            params['username'] = self.username
 
-        result = db.execute_and_fetch(query, params)
+        query = database.sql.SQL(
+            """
+            SELECT
+                DATE(m.ts) AS day,
+                COUNT(*) AS messages,
+                COUNT(*) FILTER (WHERE q.query_type = 'SELECT') AS messages_select,
+                COUNT(*) FILTER (WHERE q.success) AS messages_success,
+                COUNT(*) FILTER (WHERE m.feedback IS NOT NULL) AS messages_feedback
+            FROM {schema}.messages m
+            JOIN {schema}.queries q ON q.id = m.query_id
+            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+            {joins}
+            WHERE {filters}
+            GROUP BY day
+            ORDER BY day
+            """
+        ).format(
+            schema=database.sql.Identifier(SCHEMA),
+            joins=joins,
+            filters=database.sql.SQL(' AND ').join(filters),
+        )
 
-        if len(result) == 0:
-            return {
-                'messages': 0,
-                'messages_select': 0,
-                'messages_success': 0,
-                'messages_feedback': 0,
-            }
-        
-        result = result[0]
-
-        return {
-            'messages': int(result[0] or 0),
-            'messages_select': int(result[1] or 0),
-            'messages_success': int(result[2] or 0),
-            'messages_feedback': int(result[3] or 0),
+        stats = {
+            'messages': 0,
+            'messages_select': 0,
+            'messages_success': 0,
+            'messages_feedback': 0,
+            'timeline': [],
         }
+        for day, total, select_count, results_count, feedback_count in db.execute_and_fetch(query, params):
+            stats['messages'] += total
+            stats['messages_select'] += select_count
+            stats['messages_success'] += results_count
+            stats['messages_feedback'] += feedback_count
+            stats['timeline'].append({
+                'date': day.isoformat(),
+                'understanding_errors': total - results_count,
+                'understanding_results': results_count,
+            })
+        return stats
 
     def get_error_stats(self, *, activity_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> dict:
         '''Get statistics about errors for a user'''
@@ -1178,149 +1122,75 @@ class User:
         }
 
     def get_error_timeline(self, *, activity_id: str | None = None, exercise_id: int | None = None, is_teacher: bool = False) -> list[dict]:
-        '''Get a timeline of errors for a user'''
-
-        # Prevent students from accessing teacher stats, even if the teacher flag is set
-        if not self.is_teacher:
-            is_teacher = False
+        """Get daily query and error counts by query goal."""
 
         if activity_id is None and exercise_id is not None:
-            return []  # fallback case
-        
-        if activity_id is None:
-            # Global stats
-            query = database.sql.SQL(
-                '''
-                    SELECT
-                        day,
-                        query_goal,
-                        error_id,
-                        occurrences
-                    FROM
-                        {schema}.v_stats_error_timeline_by_user
-                    WHERE
-                        username = {username}
-                    ORDER BY
-                        day ASC
-                '''
-            ).format(
-                schema=database.sql.Identifier(SCHEMA),
-                username=database.sql.Placeholder('username')
-            )
-            params = {'username': self.username}
-        elif exercise_id is None:
-            if is_teacher:
-                # Activity-wide stats for teacher (excluding other teachers)
-                query = database.sql.SQL(
-                    '''
-                        SELECT
-                            day,
-                            query_goal,
-                            error_id,
-                            SUM(occurrences) AS occurrences
-                        FROM
-                            {schema}.v_stats_error_timeline_by_exercise
-                        WHERE
-                            activity_id = {activity_id}
-                            AND is_owner = FALSE
-                        GROUP BY
-                            day, query_goal, error_id
-                        ORDER BY
-                            day ASC
-                    '''
-                ).format(
-                    schema=database.sql.Identifier(SCHEMA),
-                    activity_id=database.sql.Placeholder('activity_id')
-                )
-                params = {'activity_id': activity_id}
-            else:
-                # Activity stats for student
-                query = database.sql.SQL(
-                    '''
-                        SELECT
-                            day,
-                            query_goal,
-                            error_id,
-                            SUM(occurrences) AS occurrences 
-                        FROM
-                            {schema}.v_stats_error_timeline_by_exercise
-                        WHERE
-                            activity_id = {activity_id}
-                            AND username = {username}
-                        GROUP BY
-                            day, query_goal, error_id
-                        ORDER BY
-                            day ASC
-                    '''
-                ).format(
-                    schema=database.sql.Identifier(SCHEMA),
-                    activity_id=database.sql.Placeholder('activity_id'),
-                    username=database.sql.Placeholder('username')
-                )
-                params = {'activity_id': activity_id, 'username': self.username}
+            return []
+
+        joins = database.sql.SQL('')
+        filters = [database.sql.SQL("q.query_type <> 'BUILTIN'")]
+        params = {}
+        if activity_id is not None:
+            joins = database.sql.SQL(
+                """
+                JOIN {schema}.exercises e ON e.id = qb.exercise_id
+                JOIN {schema}.activity_members am
+                    ON am.activity_id = e.activity_id AND am.username = qb.username
+                """
+            ).format(schema=database.sql.Identifier(SCHEMA))
+            filters.append(database.sql.SQL('e.activity_id = %(activity_id)s'))
+            params['activity_id'] = activity_id
+            if exercise_id is not None:
+                filters.append(database.sql.SQL('qb.exercise_id = %(exercise_id)s'))
+                params['exercise_id'] = exercise_id
+
+        if activity_id is not None and is_teacher and self.is_teacher:
+            filters.append(database.sql.SQL('am.is_owner = FALSE'))
         else:
-            if is_teacher:
-                # Exercise stats for all students
-                query = database.sql.SQL(
-                    '''
-                        SELECT
-                            day,
-                            query_goal,
-                            error_id,
-                            SUM(occurrences) AS occurrences
-                        FROM
-                            {schema}.v_stats_error_timeline_by_exercise
-                        WHERE
-                            exercise_id = {exercise_id}
-                            AND is_owner = FALSE
-                        GROUP BY
-                            day, query_goal, error_id
-                        ORDER BY
-                            day ASC
-                    '''
-                ).format(
-                    schema=database.sql.Identifier(SCHEMA),
-                    exercise_id=database.sql.Placeholder('exercise_id')
-                )
-                params = {'exercise_id': exercise_id}
+            filters.append(database.sql.SQL('qb.username = %(username)s'))
+            params['username'] = self.username
+
+        query = database.sql.SQL(
+            """
+            SELECT
+                DATE(q.ts) AS day,
+                q.query_goal,
+                he.error_id,
+                GROUPING(he.error_id) AS is_query_total,
+                COUNT(DISTINCT q.id) AS count
+            FROM {schema}.queries q
+            JOIN {schema}.query_batches qb ON qb.id = q.batch_id
+            {joins}
+            LEFT JOIN {schema}.has_error he ON he.query_id = q.id
+            WHERE {filters}
+            GROUP BY GROUPING SETS (
+                (DATE(q.ts), q.query_goal),
+                (DATE(q.ts), q.query_goal, he.error_id)
+            )
+            ORDER BY day
+            """
+        ).format(
+            schema=database.sql.Identifier(SCHEMA),
+            joins=joins,
+            filters=database.sql.SQL(' AND ').join(filters),
+        )
+
+        timeline = {}
+        for day, query_goal, error_id, is_query_total, count in db.execute_and_fetch(query, params):
+            if not is_query_total and error_id is None:
+                continue
+            row = timeline.setdefault(
+                (day, query_goal),
+                {'date': day.isoformat(), 'query_goal': query_goal, 'query_count': 0, 'errors': {}},
+            )
+            if is_query_total:
+                row['query_count'] = int(count)
             else:
-                # Exercise stats for a student
-                query = database.sql.SQL(
-                    '''
-                        SELECT
-                            day,
-                            query_goal,
-                            error_id,
-                            SUM(occurrences) AS occurrences
-                        FROM
-                            {schema}.v_stats_error_timeline_by_exercise
-                        WHERE
-                            exercise_id = {exercise_id}
-                            AND username = {username}
-                        GROUP BY
-                            day, query_goal, error_id
-                        ORDER BY
-                            day ASC
-                    '''
-                ).format(
-                    schema=database.sql.Identifier(SCHEMA),
-                    exercise_id=database.sql.Placeholder('exercise_id'),
-                    username=database.sql.Placeholder('username')
-                )
-                params = {'exercise_id': exercise_id, 'username': self.username}
+                category = SqlErrors(int(error_id)).definition.category
+                row['errors'][category] = row['errors'].get(category, 0) + int(count)
 
-        result = db.execute_and_fetch(query, params)
+        return list(timeline.values())
 
-        return [
-            {
-                'date': row[0],
-                'query_goal': row[1],
-                'error_id': int(row[2]),
-                'category': SqlErrors(int(row[2])).definition.category,
-                'count': int(row[3]),
-            } for row in result
-        ]            
-    
     def get_error_occurrencies(self, activity_ids: list[str] = [], *, allowed_query_goals: list[str] = ['FOCUSED', 'CHECK_SOLUTION']) -> list[tuple[SqlErrors, int]]:
         '''Get the most common errors for a user, optionally filtered by activity IDs'''
 

@@ -12,7 +12,7 @@ function Learning() {
     const navigate = useNavigate();
 
     if (!['execution', 'errors', 'assistance'].includes(tab)) {
-        return <Navigate to="/learning/execution" replace />;
+        return <Navigate to="/learning/errors" replace />;
     }
 
     return (
