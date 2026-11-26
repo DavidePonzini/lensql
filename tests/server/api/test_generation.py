@@ -361,3 +361,48 @@ def test_miedema_dataset_is_forwarded_without_prevalidation(authenticated_client
     assert generator.call_args.kwargs['dataset_str'] == sql.strip()
     assert generator.call_args.kwargs['search_path'] == 'miedema'
     parser.assert_not_called()
+
+
+@pytest.mark.parametrize('target', [
+    None,
+    ('', 'public', 'postgres'),
+    ('CREATE TABLE item (id int);', 'public', 'mysql'),
+    ('CREATE TABLE item (id int);', 'public', 'postgres'),
+])
+def test_existing_generation_destination_is_validated_before_charging(authenticated_client, mocker, user, target):
+    get_target = mocker.patch('server.generation.get_generation_target', return_value=target)
+    generate = mocker.patch('server.generation.generate_activity', return_value='EXISTING')
+    data = valid_request()
+    del data['title']
+    data['target_activity_id'] = 'EXISTING'
+    response = authenticated_client.post('/activities/generate', json=data).get_json()
+
+    get_target.assert_called_once_with(user, 'EXISTING')
+    if target and target[0] and target[2] == 'postgres':
+        assert response['success'] is True
+        assert response['activity_id'] == 'EXISTING'
+        assert generate.call_args.kwargs['target'] == target
+        user.reserve_generation_credits.assert_called_once_with(3)
+    else:
+        assert response['success'] is False
+        generate.assert_not_called()
+        user.reserve_generation_credits.assert_not_called()
+
+
+@pytest.mark.parametrize(('language', 'expected'), [(None, 'it'), ('en', 'en'), ('fr', None)])
+def test_exercise_language_overrides_ui_language(authenticated_client, mocker, user, language, expected):
+    generate = mocker.patch('server.generation.generate_activity', return_value='NEW')
+    data = valid_request()
+    if language is not None:
+        data['language'] = language
+    response = authenticated_client.post(
+        '/activities/generate', json=data, headers={'X-Language': 'it-IT'},
+    ).get_json()
+
+    if expected is None:
+        assert response['success'] is False
+        generate.assert_not_called()
+        user.reserve_generation_credits.assert_not_called()
+    else:
+        assert response['success'] is True
+        assert generate.call_args.kwargs['language'] == expected

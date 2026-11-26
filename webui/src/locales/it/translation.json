@@ -431,12 +431,17 @@
                 "button": "Genera",
                 "back_activities": "Torna alle attività",
                 "page_title": "Genera un’attività",
+                "exercise_language": "Lingua degli esercizi",
+                "destination": "Salva gli esercizi in",
+                "new_activity": "Nuova attività",
+                "existing_dataset": "La generazione usa il dataset dell’attività selezionata. I nuovi esercizi sono visibili ai suoi partecipanti.",
+                "appended": "Esercizi aggiunti con successo.",
                 "created": "Attività creata con successo.",
                 "view_activity": "Visualizza attività",
                 "loading": "Caricamento…",
                 "balance": "Crediti di generazione: {{count}}",
                 "errors": "Scegli gli errori",
-                "cost": "Un credito per esercizio salvato, più un credito per tentativo di generazione anche se fallisce. Massimo 100 esercizi per attività.",
+                "cost": "Un credito per esercizio salvato, più un credito per tentativo di generazione anche se fallisce. Massimo 100 esercizi per generazione.",
                 "title": "Titolo dell’attività",
                 "default_title": "Attività generata",
                 "prefix": "Prefisso del titolo degli esercizi",
@@ -484,7 +489,7 @@
                 "dataset_file": "Carica file SQL (facoltativo)",
                 "dataset_sql": "SQL del dataset",
                 "dataset_size": "Il file SQL non può superare 2 MB.",
-                "too_many": "Scegli al massimo 100 esercizi per attività."
+                "too_many": "Scegli al massimo 100 esercizi per generazione."
             }
         },
         "profile": {

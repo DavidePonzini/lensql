@@ -297,3 +297,9 @@ msgstr "Select a student."
 
 msgid "Select an enrolled student from the selected activities."
 msgstr "Select an enrolled student from the selected activities."
+
+msgid "Select a PostgreSQL activity with a dataset that you own."
+msgstr "Select a PostgreSQL activity with a dataset that you own."
+
+msgid "Select English or Italian for the exercises."
+msgstr "Select English or Italian for the exercises."

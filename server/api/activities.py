@@ -477,13 +477,16 @@ def generate():
     from sqlerrors import SqlErrors
     from sqlexercise import DifficultyLevel
     from sqlexercise.error_requirements import ERROR_REQUIREMENTS_MAP
-    from server.generation import generate_activity
+    from server.generation import generate_activity, get_generation_target
     user = db.admin.User(get_jwt_identity())
     data = request.get_json(silent=True)
     try:
         if not isinstance(data, dict):
             raise ValueError()
-        title = data.get('title', '').strip()
+        target_activity_id = data.get('target_activity_id')
+        if target_activity_id is not None and (not isinstance(target_activity_id, str) or not target_activity_id.strip()):
+            raise ValueError()
+        title = '' if target_activity_id else data.get('title', '').strip()
         prefix = data.get('prefix', 'Exercise ')
         selections = data.get('errors')
         dataset_str = data.get('dataset_str')
@@ -498,7 +501,9 @@ def generate():
             search_path = search_path.strip()
         else:
             search_path = 'public'
-        if not title or len(title) > 255 or not isinstance(prefix, str) or len(prefix) > 240:
+        if target_activity_id and dataset_str:
+            raise ValueError()
+        if (not target_activity_id and not title) or len(title) > 255 or not isinstance(prefix, str) or len(prefix) > 240:
             raise ValueError()
         if not isinstance(selections, list) or not selections:
             raise ValueError()
@@ -522,9 +527,18 @@ def generate():
         student, activity_ids = _generation_student_context(user, data)
     except ValueError as error:
         return responses.response(False, message=str(error))
+    default_language = 'it' if request.headers.get('X-Language', '').startswith('it') else 'en'
+    language = data.get('language', default_language)
+    if language not in ('en', 'it'):
+        return responses.response(False, message=_('Select English or Italian for the exercises.'))
+    target_options = {}
+    if target_activity_id:
+        target = get_generation_target(user, target_activity_id)
+        if not target or target[2] != Dialect.POSTGRES.value or not target[0].strip():
+            return responses.response(False, message=_('Select a PostgreSQL activity with a dataset that you own.'))
+        target_options = dict(target_activity_id=target_activity_id, target=target)
     if not user.reserve_generation_credits(len(errors) + 1):
         return responses.response(False, message=_('Insufficient generation credits.'))
-    language = 'it' if request.headers.get('X-Language', '').startswith('it') else 'en'
     failure_message = _('Generation failed. Exercise credits have been refunded; the 1-credit generation fee was charged.')
 
     def run_generation(on_progress=None):
@@ -540,7 +554,7 @@ def generate():
         try:
             activity_id = generate_activity(user, errors, title=title, prefix=prefix,
                                             dataset_str=dataset_str, search_path=search_path,
-                                            language=language, on_progress=progress,
+                                            language=language, on_progress=progress, **target_options,
                                             **({'student_username': student} if student else {}))
         except Exception:
             user.refund_generation_credits(len(errors))

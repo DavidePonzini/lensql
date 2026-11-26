@@ -54,7 +54,7 @@ test('requests easy and hard exercises for the same error and totals all credits
     mockApiRequest.mockResolvedValueOnce(generationStream([{ success: false, message: 'Test stops before generation' }]));
     fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     await waitFor(() => expect(mockApiRequest).toHaveBeenCalledWith('/api/activities/generate', 'POST', expect.objectContaining({
-        title: 'Practice', dataset_str: null,
+        title: 'Practice', dataset_str: null, language: 'en',
         errors: [{ error_id: 2, difficulty: 1, count: 1 }, { error_id: 2, difficulty: 3, count: 3 }],
     }), { stream: true }));
 });
@@ -267,4 +267,35 @@ test('activity selection preserves the activity column and refreshes only studen
     expect(mockApiRequest.mock.calls.filter(([endpoint]) => endpoint.endsWith('/generation-options'))).toHaveLength(1);
     expect(screen.getByLabelText('SQL class (A)')).toBe(activity);
     expect(screen.getByRole('link', { name: 'carol' }).getAttribute('href')).toContain('activity=A&activity=B');
+});
+
+test('generates into an existing PostgreSQL activity using its dataset', async () => {
+    mockApiRequest.mockResolvedValueOnce({ ...options, activities: [
+        { activity_id: 'EXISTING', title: 'SQL Practice', dbms: 'postgres' },
+        { activity_id: 'MYSQL', title: 'MySQL Practice', dbms: 'mysql' },
+    ] });
+    await openGenerator();
+    const destination = screen.getByLabelText('Save exercises to');
+    expect(screen.queryByRole('option', { name: 'MySQL Practice (MYSQL)' })).toBeNull();
+    fireEvent.change(destination, { target: { value: 'EXISTING' } });
+    fireEvent.change(screen.getByLabelText('Exercise language'), { target: { value: 'it' } });
+    expect(screen.queryByLabelText('Activity title')).toBeNull();
+    fireEvent.change(screen.getByLabelText('Ambiguous column — Easy'), { target: { value: '1' } });
+    mockApiRequest.mockResolvedValueOnce(generationStream([
+        { success: true, activity_id: 'EXISTING', generated_count: 1, failed_count: 0 },
+    ]));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+
+    await screen.findByText('Exercises added successfully.');
+    expect(screen.getByRole('link', { name: 'View activity' }).getAttribute('href')).toBe('/activities/EXISTING');
+    expect(mockApiRequest).toHaveBeenLastCalledWith('/api/activities/generate', 'POST', {
+        target_activity_id: 'EXISTING', prefix: 'Exercise ', language: 'it', stream: true,
+        errors: [{ error_id: 2, difficulty: 1, count: 1 }],
+    }, { stream: true });
+});
+
+test('defaults exercise language to the current UI language', async () => {
+    await i18n.changeLanguage('it-IT');
+    render(<MemoryRouter><ActivityGenerate /></MemoryRouter>);
+    expect((await screen.findByLabelText('Lingua degli esercizi')).value).toBe('it');
 });

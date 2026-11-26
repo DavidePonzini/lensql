@@ -431,12 +431,17 @@
                 "button": "Generate",
                 "back_activities": "Back to activities",
                 "page_title": "Generate an activity",
+                "exercise_language": "Exercise language",
+                "destination": "Save exercises to",
+                "new_activity": "New activity",
+                "existing_dataset": "Generation uses the selected activity’s dataset. New exercises are visible to its participants.",
+                "appended": "Exercises added successfully.",
                 "created": "Activity created successfully.",
                 "view_activity": "View activity",
                 "loading": "Loading…",
                 "balance": "Generation credits: {{count}}",
                 "errors": "Choose errors",
-                "cost": "One credit per saved exercise, plus one credit per generation attempt even if it fails. Maximum 100 exercises per activity.",
+                "cost": "One credit per saved exercise, plus one credit per generation attempt even if it fails. Maximum 100 exercises per generation.",
                 "title": "Activity title",
                 "default_title": "Generated activity",
                 "prefix": "Exercise title prefix",
@@ -484,7 +489,7 @@
                 "dataset_file": "Upload SQL file (optional)",
                 "dataset_sql": "Dataset SQL",
                 "dataset_size": "The SQL file must be no larger than 2 MB.",
-                "too_many": "Choose no more than 100 exercises per activity."
+                "too_many": "Choose no more than 100 exercises per generation."
             }
         },
         "profile": {

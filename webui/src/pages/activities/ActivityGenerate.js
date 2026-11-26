@@ -14,7 +14,7 @@ export default function ActivityGenerate() {
     const mode = location.pathname.endsWith('/students') ? 'students' : 'errors';
     const { apiRequest } = useAuth();
     const { loadUserInfo } = useUserInfo();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const key = 'pages.activities.generate';
     const defaultTitle = t(`${key}.default_title`);
     const [options, setOptions] = useState(null);
@@ -23,7 +23,10 @@ export default function ActivityGenerate() {
     const studentScope = username ? location.search : '';
     const [studentsLoading, setStudentsLoading] = useState(false);
     const [students, setStudents] = useState(null);
+    const [targetActivityId, setTargetActivityId] = useState('');
     const [title, setTitle] = useState('');
+    const [exerciseLanguage, setExerciseLanguage] = useState('');
+    const language = exerciseLanguage || (i18n.resolvedLanguage === 'it' ? 'it' : 'en');
     const [prefix, setPrefix] = useState('Exercise ');
     const [datasetMode, setDatasetMode] = useState('automatic');
     const [datasetSql, setDatasetSql] = useState('');
@@ -35,10 +38,12 @@ export default function ActivityGenerate() {
     const [message, setMessage] = useState('');
     const total = Object.values(counts).reduce((sum, count) => sum + Number(count || 0), 0);
     const requiredCredits = total + 1;
+    const destinations = options?.activities.filter(activity => activity.dbms === 'postgres') ?? [];
     useEffect(() => {
         let active = true;
         const ids = new URLSearchParams(studentScope).getAll('activity');
         setOptions(null);
+        setTargetActivityId('');
         setCounts({});
         setMessage('');
         setWarning('');
@@ -89,10 +94,13 @@ export default function ActivityGenerate() {
         setMessage('');
         try {
             const stream = await apiRequest('/api/activities/generate', 'POST', {
-                title: title.trim() || defaultTitle, prefix, stream: true,
+                prefix, language, stream: true,
                 ...(options.student_username ? { student_username: options.student_username, activity_ids: selected } : {}),
-                dataset_str: datasetMode === 'custom' ? datasetSql : null,
-                ...(datasetMode === 'custom' ? { search_path: searchPath } : {}),
+                ...(targetActivityId ? { target_activity_id: targetActivityId } : {
+                    title: title.trim() || defaultTitle,
+                    dataset_str: datasetMode === 'custom' ? datasetSql : null,
+                    ...(datasetMode === 'custom' ? { search_path: searchPath } : {}),
+                }),
                 errors: Object.entries(counts).filter(([, count]) => Number(count) > 0)
                     .map(([selection, count]) => {
                         const [errorId, difficulty] = selection.split(':').map(Number);
@@ -147,7 +155,7 @@ export default function ActivityGenerate() {
         </nav>
         {warning && <div className="alert alert-warning" role="alert">{warning}</div>}
         {result && <div className="alert alert-success" role="status">
-            <p>{t(`${key}.created`)}</p>
+            <p>{t(`${key}.${targetActivityId ? 'appended' : 'created'}`)}</p>
             <Button as={Link} role="link" to={`/activities/${encodeURIComponent(result.activity_id)}`}>{t(`${key}.view_activity`)}</Button>
         </div>}
                 {message && <div className="alert alert-danger" role="alert">{message}</div>}
@@ -161,11 +169,29 @@ export default function ActivityGenerate() {
                                     <Button variant="link" className="p-0" disabled={busy} as={Link} role="link" to="/activities/generate">{t(`${key}.personal_metrics`)}</Button>
                                 </div>}
                                 <p>{t(`${key}.cost`)}</p>
-                                <label className="form-label" htmlFor="generation-title">{t(`${key}.title`)}</label>
-                                <input id="generation-title" className="form-control mb-3" value={title} placeholder={defaultTitle} maxLength={255} onChange={e => setTitle(e.target.value)} disabled={busy} />
+                                {destinations.length > 0 && <>
+                                    <label className="form-label" htmlFor="generation-target">{t(`${key}.destination`)}</label>
+                                    <select id="generation-target" className="form-select mb-3" value={targetActivityId}
+                                        onChange={event => setTargetActivityId(event.target.value)} disabled={busy}>
+                                        <option value="">{t(`${key}.new_activity`)}</option>
+                                        {destinations.map(activity => <option key={activity.activity_id} value={activity.activity_id}>
+                                            {activity.title} ({activity.activity_id})
+                                        </option>)}
+                                    </select>
+                                </>}
+                                {targetActivityId ? <p>{t(`${key}.existing_dataset`)}</p> : <>
+                                    <label className="form-label" htmlFor="generation-title">{t(`${key}.title`)}</label>
+                                    <input id="generation-title" className="form-control mb-3" value={title} placeholder={defaultTitle} maxLength={255} onChange={e => setTitle(e.target.value)} disabled={busy} />
+                                </>}
                                 <label className="form-label" htmlFor="generation-prefix">{t(`${key}.prefix`)}</label>
                                 <input id="generation-prefix" className="form-control mb-3" value={prefix} maxLength={240} onChange={e => setPrefix(e.target.value)} disabled={busy} />
-                                <fieldset className="border rounded p-3 mb-4" disabled={busy}>
+                                <label className="form-label" htmlFor="generation-language">{t(`${key}.exercise_language`)}</label>
+                                <select id="generation-language" className="form-select mb-3" value={language}
+                                    onChange={event => setExerciseLanguage(event.target.value)} disabled={busy}>
+                                    <option value="en">English</option>
+                                    <option value="it">Italiano</option>
+                                </select>
+                                {!targetActivityId && <fieldset className="border rounded p-3 mb-4" disabled={busy}>
                                     <legend className="float-none w-auto px-2 fs-5">{t(`${key}.dataset_heading`)}</legend>
                                     <div className="form-check">
                                         <input id="generation-dataset-auto" className="form-check-input" type="radio" name="generation-dataset" checked={datasetMode === 'automatic'} onChange={() => setDatasetMode('automatic')} />
@@ -193,13 +219,13 @@ export default function ActivityGenerate() {
                                         <label className="form-label" htmlFor="generation-search-path">{t('pages.activities.activity_mask.search_path_label')}</label>
                                         <input id="generation-search-path" className="form-control" value={searchPath} maxLength={255} onChange={event => setSearchPath(event.target.value)} required />
                                     </>}
-                                </fieldset>
+                                </fieldset>}
                                 <GenerationErrors options={options} counts={counts} setCounts={setCounts} busy={busy} />
                                 <div className="position-sticky bottom-0 bg-body border-top pt-3 mt-3" style={{ zIndex: 1 }}>
                                 <p className="fw-semibold" aria-live="polite">{t(`${key}.total`, { count: requiredCredits })}</p>
                                 {total > 100 && <p className="text-danger">{t(`${key}.too_many`)}</p>}
                                 {requiredCredits > options.ai_generation_credits && <p className="text-danger">{t(`${key}.insufficient`)}</p>}
-                                <Button type="submit" disabled={busy || total < 1 || total > 100 || requiredCredits > options.ai_generation_credits || (datasetMode === 'custom' && (!datasetSql.trim() || !searchPath.trim()))}>
+                                <Button type="submit" disabled={busy || total < 1 || total > 100 || requiredCredits > options.ai_generation_credits || (!targetActivityId && datasetMode === 'custom' && (!datasetSql.trim() || !searchPath.trim()))}>
                                     {t(`${key}.${busy ? 'generating' : 'button'}`)}
                                 </Button>
                                 {progress && <div className="mt-3" role="status" aria-live="polite">

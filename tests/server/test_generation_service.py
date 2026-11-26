@@ -113,3 +113,38 @@ def test_student_enrollment_is_saved_with_teacher_and_exercises(mocker):
     assert calls[2].args[1]['username'] == 'bob' and 'FALSE' in str(calls[2].args[0])
     assert all(call.kwargs['commit'] is False for call in calls)
     connection.commit.assert_called_once()
+
+
+@pytest.mark.parametrize('changed', [False, True])
+def test_append_exercises_uses_existing_dataset_and_checks_it_before_saving(mocker, changed):
+    from server.generation import generate_activity
+
+    target = ('CREATE TABLE school.item (id int); INSERT INTO school.item VALUES (1);', 'school', 'postgres')
+    mocker.patch('server.generation.get_database')
+    generator = mocker.patch('server.generation.sqlexercise.generate_assignment',
+                             return_value=SimpleNamespace(exercises=[generated_exercise()]))
+    connection = mocker.MagicMock()
+    connection.__enter__.return_value = connection
+    connection.fetch_one.return_value = None if changed else target
+    connection.fetch_all.return_value = [('Task 1',)]
+    mocker.patch('server.generation.db.connect', return_value=connection)
+
+    def append():
+        return generate_activity(SimpleNamespace(username='alice'), [(1, 1)], title='', prefix='Task ',
+                                 target_activity_id='EXISTING', target=target)
+
+    if changed:
+        with pytest.raises(ValueError, match='changed during generation'):
+            append()
+        connection.execute.assert_called_once()
+        connection.commit.assert_not_called()
+    else:
+        assert append() == 'EXISTING'
+        calls = connection.execute.call_args_list
+        assert len(calls) == 3
+        assert 'FOR UPDATE' in str(calls[0].args[0])
+        assert 'INSERT INTO' in str(calls[2].args[0]) and 'exercises' in str(calls[2].args[0])
+        assert calls[2].args[1]['title'] == 'Task 2'
+        assert calls[2].args[1]['activity_id'] == 'EXISTING'
+        connection.commit.assert_called_once()
+    assert 'CREATE TABLE item' in generator.call_args.kwargs['dataset_str']

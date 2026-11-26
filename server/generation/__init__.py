@@ -14,7 +14,23 @@ from .dataset import generation_dataset_sql
 from sqlglot import exp
 
 
-def generate_activity(user, errors, *, title, prefix, language='en', dataset_str=None, search_path='public', on_progress=None, student_username=None):
+def _target_query(lock=False):
+    query = database.sql.SQL("""
+        SELECT COALESCE(a.activity, ''), a.search_path, COALESCE(a.dbms, 'postgres')
+        FROM {schema}.activities a
+        JOIN {schema}.activity_members m ON m.activity_id = a.id
+        WHERE a.id = %(activity_id)s AND m.username = %(username)s
+            AND m.is_active AND m.is_owner
+    """).format(schema=database.sql.Identifier(SCHEMA))
+    return query + database.sql.SQL(' FOR UPDATE OF a, m') if lock else query
+
+
+def get_generation_target(user, activity_id):
+    rows = db.execute_and_fetch(_target_query(), {'activity_id': activity_id, 'username': user.username})
+    return rows[0] if rows else None
+
+
+def generate_activity(user, errors, *, title, prefix, language='en', dataset_str=None, search_path='public', on_progress=None, student_username=None, target_activity_id=None, target=None):
     on_progress = on_progress or (lambda event: None)
     completed = failed = 0
     progress_lock = Lock()
@@ -25,6 +41,12 @@ def generate_activity(user, errors, *, title, prefix, language='en', dataset_str
             completed += int(success)
             failed += int(not success)
             on_progress(dict(stage='exercises', completed=completed, failed=failed, total=len(errors)))
+
+    if target_activity_id is not None:
+        dataset_str, search_path, _ = target
+    prepared_dataset = generation_dataset_sql(dataset_str) if dataset_str else None
+    if target_activity_id is not None and not prepared_dataset:
+        raise ValueError('The activity has no dataset tables for generation.')
 
     on_progress(dict(stage='preparing', total=len(errors)))
     sandbox = get_database(user.username, Dialect.POSTGRES)
@@ -37,7 +59,7 @@ def generate_activity(user, errors, *, title, prefix, language='en', dataset_str
         db_password='password',
         sql_dialect=Dialect.POSTGRES,
         language=language,
-        dataset_str=generation_dataset_sql(dataset_str) if dataset_str else None,
+        dataset_str=prepared_dataset,
         shuffle_exercises=True,
         on_dataset_generation_progress=lambda attempt, maximum: on_progress(
             dict(stage='dataset', attempt=attempt, maximum=maximum)),
@@ -54,38 +76,52 @@ def generate_activity(user, errors, *, title, prefix, language='en', dataset_str
         raise ValueError('The generator did not produce any exercises.')
     on_progress(dict(stage='saving', completed=len(exercises), failed=len(errors) - len(exercises), total=len(errors)))
     random.shuffle(exercises)
-    schema_name = search_path if dataset_str else 'p_' + uuid4().hex[:16]
-    if dataset_str:
-        # Apply the chosen path both while loading unqualified tables and after
-        # any SET statements inside an uploaded script.
-        path = exp.Literal.string(search_path).sql(dialect='postgres')
-        set_path = f"SELECT set_config('search_path', {path}, false);"
-        activity_sql = f'{set_path}\n{dataset_str}\n;\n{set_path}'
-    else:
-        activity_sql = assignment.dataset.to_sql(schema_name)
-    # All saved content and membership either commit together or roll back together.
     with db.connect() as connection:
         def execute(sql, values):
             connection.execute(database.sql.SQL(sql).format(
                 schema=database.sql.Identifier(SCHEMA)), values, commit=False)
 
-        execute('''INSERT INTO {schema}.activities (name, description, activity, search_path, dbms)
-            VALUES (%(title)s, '', %(activity)s, %(search_path)s, 'postgres') RETURNING id''',
-            {'title': title, 'activity': activity_sql, 'search_path': schema_name})
-        activity_id = connection.fetch_one()[0]
-        execute('''INSERT INTO {schema}.activity_members (username, activity_id, is_owner)
-            VALUES (%(username)s, %(activity_id)s, TRUE)''',
-            {'username': user.username, 'activity_id': activity_id})
-        if student_username:
+        existing_titles = set()
+        if target_activity_id is not None:
+            activity_id = target_activity_id
+            values = {'activity_id': activity_id, 'username': user.username}
+            connection.execute(_target_query(lock=True), values, commit=False)
+            if connection.fetch_one() != target:
+                raise ValueError('The destination activity changed during generation.')
+            execute('SELECT title FROM {schema}.exercises WHERE activity_id = %(activity_id)s', values)
+            existing_titles = {row[0] for row in connection.fetch_all()}
+        else:
+            schema_name = search_path if dataset_str else 'p_' + uuid4().hex[:16]
+            if dataset_str:
+                # Apply the path before and after any SET statements in the script.
+                path = exp.Literal.string(search_path).sql(dialect='postgres')
+                set_path = f"SELECT set_config('search_path', {path}, false);"
+                activity_sql = f'{set_path}\n{dataset_str}\n;\n{set_path}'
+            else:
+                activity_sql = assignment.dataset.to_sql(schema_name)
+            execute('''INSERT INTO {schema}.activities (name, description, activity, search_path, dbms)
+                VALUES (%(title)s, '', %(activity)s, %(search_path)s, 'postgres') RETURNING id''',
+                {'title': title, 'activity': activity_sql, 'search_path': schema_name})
+            activity_id = connection.fetch_one()[0]
             execute('''INSERT INTO {schema}.activity_members (username, activity_id, is_owner)
-                VALUES (%(username)s, %(activity_id)s, FALSE)''',
-                {'username': student_username, 'activity_id': activity_id})
-        for index, exercise in enumerate(exercises, 1):
+                VALUES (%(username)s, %(activity_id)s, TRUE)''',
+                {'username': user.username, 'activity_id': activity_id})
+            if student_username:
+                execute('''INSERT INTO {schema}.activity_members (username, activity_id, is_owner)
+                    VALUES (%(username)s, %(activity_id)s, FALSE)''',
+                    {'username': student_username, 'activity_id': activity_id})
+
+        index = 1
+        for exercise in exercises:
+            while f'{prefix}{index}' in existing_titles:
+                index += 1
+            exercise_title = f'{prefix}{index}'
+            index += 1
             execute('''INSERT INTO {schema}.exercises
                 (activity_id, title, request, solutions, created_by, generation_difficulty, generation_error, is_hidden)
                 VALUES (%(activity_id)s, %(title)s, %(request)s, %(solutions)s, %(username)s,
                     %(difficulty)s, %(error)s, FALSE)''',
-                {'activity_id': activity_id, 'title': f'{prefix}{index}',
+                {'activity_id': activity_id, 'title': exercise_title,
                  'request': exercise.request, 'solutions': json.dumps([q.sql for q in exercise.solutions]),
                  'username': user.username, 'difficulty': exercise.difficulty.value,
                  'error': exercise.error.value})
