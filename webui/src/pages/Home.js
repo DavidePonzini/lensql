@@ -21,6 +21,9 @@ function Home() {
                         <Link to="/howto" className="btn btn-outline-secondary">
                             {t('pages.home.tutorial')}
                         </Link>
+                        <Link to="/error-taxonomy" className="btn btn-outline-secondary">
+                            {t('pages.home.exploreErrors')}
+                        </Link>
                     </div>
                     <Link to="/about" className="d-inline-block mt-3">{t('pages.home.about')}</Link>
                 </section>

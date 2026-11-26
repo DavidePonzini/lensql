@@ -701,6 +701,7 @@
             "register": "Create an account",
             "activities": "Go to activities",
             "tutorial": "See the walkthrough",
+            "exploreErrors": "Explore SQL errors",
             "about": "About LensQL",
             "demo": {
                 "title": "Try a sample query",
