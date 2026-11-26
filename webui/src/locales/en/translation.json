@@ -534,8 +534,7 @@
         "errorTaxonomy": {
             "title": "Error Taxonomy",
             "intro": "Explore SQL error categories with definitions, examples, explanations, and corrections.",
-            "search": "Search by error name, number, or description",
-            "empty": "No errors match your search.",
+            "empty": "No errors to display.",
             "loading": "Loading the error taxonomy…",
             "loadError": "The error taxonomy could not be loaded. Reload the page to try again.",
             "deprecated": "Deprecated entry",

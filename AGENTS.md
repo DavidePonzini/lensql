@@ -79,3 +79,16 @@ The agent must:
 4. Update `requirements.txt` whenever dependencies change.
 5. Prefer Makefile targets when available.
 6. Never use the system Python environment or global package installation.
+
+## Error category colors
+
+Use the shared palette in `webui/src/errorCategoryColors.js` for Taxonomy and Error Stats charts.
+
+| Category | Color |
+| --- | --- |
+| Syntax (SYN) | Red |
+| Semantic (SEM) | Yellow |
+| Logical (LOG) | Blue |
+| Complications (COM) | Green |
+
+Use a light category tint for each Taxonomy accordion body. Apply the same stronger category tint to hovered and selected error rows on the `<li>` itself.

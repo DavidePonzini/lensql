@@ -534,8 +534,7 @@
         "errorTaxonomy": {
             "title": "Tassonomia degli errori",
             "intro": "Esplora le categorie degli errori SQL con definizioni, esempi, spiegazioni e correzioni.",
-            "search": "Cerca per nome, numero o descrizione dell’errore",
-            "empty": "Nessun errore corrisponde alla ricerca.",
+            "empty": "Nessun errore da mostrare.",
             "loading": "Caricamento della tassonomia degli errori…",
             "loadError": "Impossibile caricare la tassonomia degli errori. Ricarica la pagina per riprovare.",
             "deprecated": "Voce deprecata",

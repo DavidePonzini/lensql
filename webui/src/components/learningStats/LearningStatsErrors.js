@@ -12,6 +12,7 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ErrorDetailsDialog from "../ErrorDetailsDialog";
+import CATEGORY_COLOR from '../../errorCategoryColors';
 
 function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = null }) {
     const { t, i18n } = useTranslation();
@@ -45,13 +46,6 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
     const dataTimeline = (data?.timeline || []).filter(
         ({ query_goal }) => selectedQueryGoal === 'all' || query_goal === selectedGoalValue
     );
-
-    const CATEGORY_COLOR = {
-        SYN: '#d9534f',
-        SEM: '#fd7e14',
-        LOG: '#0d6efd',
-        COM: '#198754',
-    };
 
     const CATEGORY_DESC = {
         SYN: t('errors.categories.syn.description'),
@@ -140,7 +134,7 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
 
         return (
             <div style={{ background: '#fff', border: '1px solid #ccc', padding: '5px 10px' }}>
-                <strong style={{ color }}>{name}</strong><br />
+                <strong style={{ borderInlineStart: `4px solid ${color}`, paddingInlineStart: '0.5rem' }}>{name}</strong><br />
                 {CATEGORY_DESC[p.cat]}<br />
                 {t('components.learningStats.errors.count_label', { count: value })}
             </div>
@@ -226,6 +220,7 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                                     <YAxis domain={[0, dataMax => dataMax || 1]} tickFormatter={v => v.toLocaleString(locale)} />
 
                                                     <Tooltip
+                                                        itemStyle={{ color: 'var(--bs-body-color)' }}
                                                         formatter={(value, name) => {
                                                             const label = t(`errors.categories.${name.toLowerCase()}.name`);
                                                             return [value.toLocaleString(locale, { maximumFractionDigits: 3 }), label];
@@ -237,7 +232,9 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                                         wrapperStyle={{ zIndex: 1000 }}
                                                     />
 
-                                                    <Legend formatter={(v) => t(`errors.categories.${v.toLowerCase()}.name`)} />
+                                                    <Legend formatter={(v) => (
+                                                        <span className="text-body">{t(`errors.categories.${v.toLowerCase()}.name`)}</span>
+                                                    )} />
 
                                                     <Line
                                                         type="linear"
