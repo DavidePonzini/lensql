@@ -131,8 +131,7 @@
                     }
                 },
                 "count_label": "{{count}} errors",
-                "details_label": "Error details",
-                "details_placeholder": "Select an error or click a bar",
+                "details_hint": "Click on an error for more information",
                 "example_label": "Example",
                 "correction_label": "Correction",
                 "explanation_label": "Explanation"

@@ -131,8 +131,7 @@
                     }
                 },
                 "count_label": "{{count}} errori",
-                "details_label": "Dettagli dell’errore",
-                "details_placeholder": "Seleziona un errore o fai clic su una barra",
+                "details_hint": "Fai clic su un errore per maggiori informazioni",
                 "example_label": "Esempio",
                 "correction_label": "Correzione",
                 "explanation_label": "Spiegazione"

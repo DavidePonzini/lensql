@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -21,7 +21,6 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
     const [selectedQueryGoal, setSelectedQueryGoal] = useState('all');
     const [selectedErrorId, setSelectedErrorId] = useState(null);
     const [barChartWidth, setBarChartWidth] = useState(0);
-    const errorSelectId = useId();
 
     const role = isTeacher ? 'teacher' : 'student';
 
@@ -99,6 +98,7 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
     const hasErrors = dataErrors.length > 0;
     const selectedError = perErrorData.find(error => error.id === selectedErrorId);
     const axisWidth = Math.min(200, Math.round(barChartWidth * 0.48));
+    const toggleErrorDetails = id => setSelectedErrorId(current => current === id ? null : id);
 
     // ----------------------------------------------------------------------
     // TIMELINE: GROUP + NORMALIZE + FORMAT DATE
@@ -296,22 +296,9 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                             </Card.Subtitle>
                                         </Card.Header>
                                         <Card.Body>
-                                            <label htmlFor={errorSelectId} className="form-label">
-                                                {t('components.learningStats.errors.details_label')}
-                                            </label>
-                                            <select
-                                                id={errorSelectId}
-                                                className="form-select mb-3"
-                                                value={selectedError?.id ?? ''}
-                                                onChange={event => setSelectedErrorId(
-                                                    perErrorData.find(error => String(error.id) === event.target.value)?.id ?? null
-                                                )}
-                                            >
-                                                <option value="">{t('components.learningStats.errors.details_placeholder')}</option>
-                                                {perErrorData.map(error => (
-                                                    <option key={error.id} value={error.id}>{error.name}</option>
-                                                ))}
-                                            </select>
+                                            <p className="bg-body-tertiary border rounded px-3 py-2 mb-4">
+                                                {t('components.learningStats.errors.details_hint')}
+                                            </p>
                                             <ResponsiveContainer width="100%" height={40 * perErrorData.length} onResize={setBarChartWidth}>
                                                 <BarChart layout="vertical" data={perErrorData} margin={{ left: 0, right: 32 }}>
                                                     <XAxis type="number" hide />
@@ -320,27 +307,39 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                                         dataKey="id"
                                                         width={axisWidth}
                                                         tick={({ payload, x, y, textAnchor, verticalAnchor, fill }) => (
-                                                            <Text
-                                                                x={x}
-                                                                y={y}
-                                                                textAnchor={textAnchor}
-                                                                verticalAnchor={verticalAnchor}
-                                                                fill={fill}
-                                                                width={Math.max(0, axisWidth - 8)}
-                                                                maxLines={2}
-                                                                style={{ fontWeight: payload.value === selectedError?.id ? 700 : 400 }}
+                                                            <g
+                                                                role="button"
+                                                                tabIndex={0}
+                                                                aria-haspopup="dialog"
+                                                                aria-label={perErrorData.find(error => error.id === payload.value)?.name}
+                                                                onClick={() => toggleErrorDetails(payload.value)}
+                                                                onKeyDown={event => {
+                                                                    if (event.key === 'Enter' || event.key === ' ') {
+                                                                        event.preventDefault();
+                                                                        toggleErrorDetails(payload.value);
+                                                                    }
+                                                                }}
+                                                                style={{ cursor: 'help' }}
                                                             >
-                                                                {perErrorData.find(error => error.id === payload.value)?.name}
-                                                            </Text>
+                                                                <Text
+                                                                    x={x}
+                                                                    y={y}
+                                                                    textAnchor={textAnchor}
+                                                                    verticalAnchor={verticalAnchor}
+                                                                    fill={fill}
+                                                                    width={Math.max(0, axisWidth - 8)}
+                                                                    maxLines={2}
+                                                                    style={{ fontWeight: payload.value === selectedError?.id ? 700 : 400 }}
+                                                                >
+                                                                    {perErrorData.find(error => error.id === payload.value)?.name}
+                                                                </Text>
+                                                            </g>
                                                         )}
                                                     />
                                                     <Bar
                                                         dataKey="count"
-                                                        onClick={({ payload }) => setSelectedErrorId(
-                                                            current => current === payload.id ? null : payload.id
-                                                        )}
+                                                        onClick={({ payload }) => toggleErrorDetails(payload.id)}
                                                         isAnimationActive={false}
-                                                        cursor="pointer"
                                                         shape={(props) => {
                                                             const barColor = CATEGORY_COLOR[props.payload.cat];
                                                             return (
@@ -349,6 +348,7 @@ function LearningStatsErrors({ data: statsData, isTeacher = false, sampleData = 
                                                                     y={props.y}
                                                                     width={props.width}
                                                                     height={props.height}
+                                                                    cursor="help"
                                                                     fill={barColor}
                                                                     fillOpacity={selectedError && props.payload.id !== selectedError.id ? 0.3 : 1}
                                                                 />
