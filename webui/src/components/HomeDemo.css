@@ -1,3 +1,22 @@
+@media (prefers-reduced-motion: no-preference) {
+    .home-demo-reveal {
+        display: grid;
+        animation: home-demo-reveal 500ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+}
+
+@keyframes home-demo-reveal {
+    from {
+        grid-template-rows: minmax(0, 0fr);
+        overflow: clip;
+    }
+
+    to {
+        grid-template-rows: minmax(0, 1fr);
+        overflow: clip;
+    }
+}
+
 .home-demo-feedback .messagebox .icon {
     flex-shrink: 0;
 }
